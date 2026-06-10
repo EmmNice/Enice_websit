@@ -40,7 +40,7 @@ function Logo({ size = "md" }: { size?: "md" | "sm" }) {
   const small = size === "md" ? "text-[10px]" : "text-[9px]";
   return (
     <div className="flex items-center gap-2.5">
-      <div className={`flex items-baseline ${big} font-display`}>
+      <div className={`flex items-baseline ${big}`} style={{ fontFamily: "Space Grotesk, sans-serif" }}>
         <span className="font-bold tracking-tight text-primary">E</span>
         <span className="font-light tracking-[0.22em] text-foreground/90 -ml-px">
           NICE
