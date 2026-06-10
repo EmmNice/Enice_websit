@@ -154,8 +154,4 @@
     letter-spacing: -0.02em;
   }
 
-  .placeholder-block {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-  }
 }
