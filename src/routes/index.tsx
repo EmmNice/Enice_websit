@@ -379,7 +379,15 @@ function Landing() {
         </div>
       </section>
 
+      <AboutMatrix />
+      <NetworkMetrics />
+      <Roadmap />
+      <Careers />
+      <ContactHub />
+
       <SiteFooter />
+      <AIChatbot />
     </div>
   );
 }
+
