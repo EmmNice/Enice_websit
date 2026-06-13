@@ -16,6 +16,13 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { AboutMatrix } from "@/components/site/AboutMatrix";
+import { NetworkMetrics } from "@/components/site/NetworkMetrics";
+import { Roadmap } from "@/components/site/Roadmap";
+import { Careers } from "@/components/site/Careers";
+import { ContactHub } from "@/components/site/ContactHub";
+import { AIChatbot } from "@/components/site/AIChatbot";
+
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -372,7 +379,15 @@ function Landing() {
         </div>
       </section>
 
+      <AboutMatrix />
+      <NetworkMetrics />
+      <Roadmap />
+      <Careers />
+      <ContactHub />
+
       <SiteFooter />
+      <AIChatbot />
     </div>
   );
 }
+
