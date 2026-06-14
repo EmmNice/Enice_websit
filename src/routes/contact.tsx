@@ -37,7 +37,7 @@ function ContactPage() {
     name: "",
     email: "",
     company: "",
-    inquiry: INQUIRY_OPTIONS[0],
+    inquiry: "",
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
@@ -174,10 +174,12 @@ function ContactPage() {
                   <select
                     value={form.inquiry}
                     onChange={(e) => setForm({ ...form, inquiry: e.target.value })}
+                    required
                     className="mt-2 block w-full rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
                   >
+                    <option value="" disabled>Select Nature of Inquiry…</option>
                     {INQUIRY_OPTIONS.map((o) => (
-                      <option key={o}>{o}</option>
+                      <option key={o} value={o}>{o}</option>
                     ))}
                   </select>
                 </div>
