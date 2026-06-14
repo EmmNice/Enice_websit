@@ -9,13 +9,6 @@ const drawerLinks: DrawerLink[] = [
   { label: "Home", to: "/" },
   { label: "Portfolio", to: "/portfolio" },
   { label: "About Us", to: "/about" },
-  { label: "API Documentation", to: "/docs" },
-  { label: "Roadmap", hash: "#roadmap" },
-  { label: "Careers", hash: "#careers" },
-  { label: "Contact Us", hash: "#contact" },
-  { label: "Privacy Policy", to: "/privacy" },
-  { label: "Terms of Service", to: "/terms" },
-  { label: "Regulatory Compliance", to: "/compliance" },
 ];
 
 function scrollToHash(hash: string) {
