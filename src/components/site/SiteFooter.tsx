@@ -90,7 +90,7 @@ export function SiteFooter() {
           <ul className="mt-4 space-y-2.5 text-sm text-foreground/80">
             <li><Link to="/portfolio" className="hover:text-primary">Portfolio</Link></li>
             <li><Link to="/about" className="hover:text-primary">About Us</Link></li>
-            <li><Link to="/contact" className="hover:text-primary">Contact</Link></li>
+            <li><Link to="/contact" className="hover:text-primary">Get in Touch</Link></li>
           </ul>
         </div>
 
@@ -99,6 +99,7 @@ export function SiteFooter() {
             Platforms
           </div>
           <ul className="mt-4 space-y-2.5 text-sm text-foreground/80">
+            <li><Link to="/docs" className="hover:text-primary">API Documentation</Link></li>
             <li>PulsePay</li>
             <li>PulseAssist</li>
             <li>ENICE Core</li>
@@ -110,9 +111,9 @@ export function SiteFooter() {
             Legal
           </div>
           <ul className="mt-4 space-y-2.5 text-sm text-foreground/80">
-            <li><a href="#privacy" className="hover:text-primary">Privacy Policy</a></li>
-            <li><a href="#terms" className="hover:text-primary">Terms of Service</a></li>
-            <li><a href="#compliance" className="hover:text-primary">Regulatory Compliance</a></li>
+            <li><Link to="/privacy" className="hover:text-primary">Privacy Policy</Link></li>
+            <li><Link to="/terms" className="hover:text-primary">Terms of Service</Link></li>
+            <li><Link to="/compliance" className="hover:text-primary">Regulatory Compliance</Link></li>
           </ul>
         </div>
       </div>

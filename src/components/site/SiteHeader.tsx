@@ -1,21 +1,34 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 
-const drawerLinks: { label: string; to?: string; hash?: string }[] = [
+type DrawerLink = { label: string; to?: string; hash?: string };
+
+const drawerLinks: DrawerLink[] = [
+  { label: "Home", to: "/" },
   { label: "Portfolio", to: "/portfolio" },
-  { label: "About Us", hash: "#about" },
-  { label: "API Documentation", hash: "#api-docs" },
+  { label: "About Us", to: "/about" },
+  { label: "API Documentation", to: "/docs" },
   { label: "Roadmap", hash: "#roadmap" },
   { label: "Careers", hash: "#careers" },
   { label: "Contact Us", hash: "#contact" },
-  { label: "Privacy Policy", hash: "#privacy" },
-  { label: "Terms of Service", hash: "#terms" },
+  { label: "Privacy Policy", to: "/privacy" },
+  { label: "Terms of Service", to: "/terms" },
+  { label: "Regulatory Compliance", to: "/compliance" },
 ];
+
+function scrollToHash(hash: string) {
+  if (typeof window === "undefined") return;
+  const id = hash.replace("#", "");
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   useEffect(() => {
     document.documentElement.style.overflow = open ? "hidden" : "";
@@ -24,15 +37,26 @@ export function SiteHeader() {
     };
   }, [open]);
 
-  const handleHash = (hash: string) => {
+  const goToHash = (hash: string) => {
     setOpen(false);
-    // small delay so the drawer can close before scroll
+    if (pathname === "/") {
+      setTimeout(() => scrollToHash(hash), 180);
+    } else {
+      navigate({ to: "/", hash: hash.replace("#", "") }).then(() => {
+        setTimeout(() => scrollToHash(hash), 220);
+      });
+    }
+  };
+
+  const goToRoute = (to: string) => {
+    setOpen(false);
     setTimeout(() => {
-      if (typeof window === "undefined") return;
-      const id = hash.replace("#", "");
-      const el = document.getElementById(id);
-      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 180);
+      if (pathname === to && to === "/") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        navigate({ to });
+      }
+    }, 140);
   };
 
   return (
@@ -51,14 +75,13 @@ export function SiteHeader() {
             <Logo />
           </div>
 
-          <Link
-            to="/contact"
-            className="group inline-flex items-center gap-1.5 rounded-md border border-foreground bg-foreground px-3.5 py-2 text-[11px] font-semibold text-background transition-all hover:bg-foreground/90 sm:px-4 sm:text-[12px]"
+          <button
+            onClick={() => goToHash("#contact")}
+            className="group inline-flex items-center gap-1.5 rounded-md border border-primary bg-primary px-3.5 py-2 text-[11px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 sm:px-4 sm:text-[12px]"
           >
-            <span className="hidden sm:inline">Get in Touch</span>
-            <span className="sm:hidden">Contact</span>
+            Get in Touch
             <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-          </Link>
+          </button>
         </div>
       </header>
 
@@ -93,30 +116,17 @@ export function SiteHeader() {
               Navigate
             </div>
             <ul className="space-y-1">
-              {drawerLinks.map((l) =>
-                l.to ? (
-                  <li key={l.label}>
-                    <Link
-                      to={l.to}
-                      onClick={() => setOpen(false)}
-                      className="flex items-center justify-between rounded-md px-3 py-3 text-[15px] font-medium text-foreground transition-colors hover:bg-secondary"
-                    >
-                      {l.label}
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                    </Link>
-                  </li>
-                ) : (
-                  <li key={l.label}>
-                    <button
-                      onClick={() => handleHash(l.hash!)}
-                      className="flex w-full items-center justify-between rounded-md px-3 py-3 text-left text-[15px] font-medium text-foreground transition-colors hover:bg-secondary"
-                    >
-                      {l.label}
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
-                    </button>
-                  </li>
-                ),
-              )}
+              {drawerLinks.map((l) => (
+                <li key={l.label}>
+                  <button
+                    onClick={() => (l.to ? goToRoute(l.to) : goToHash(l.hash!))}
+                    className="flex w-full items-center justify-between rounded-md px-3 py-3 text-left text-[15px] font-medium text-foreground transition-colors hover:bg-secondary"
+                  >
+                    {l.label}
+                    <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </li>
+              ))}
             </ul>
           </nav>
           <div className="absolute bottom-0 left-0 right-0 border-t border-border px-6 py-5">
