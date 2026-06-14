@@ -51,7 +51,7 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1.4fr_1fr]">
         <div>
           <Logo />
           <p className="mt-5 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
@@ -81,29 +81,6 @@ export function SiteFooter() {
               </a>
             ))}
           </div>
-        </div>
-
-        <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            Ecosystem
-          </div>
-          <ul className="mt-4 space-y-2.5 text-sm text-foreground/80">
-            <li><Link to="/portfolio" className="hover:text-primary">Portfolio</Link></li>
-            <li><Link to="/about" className="hover:text-primary">About Us</Link></li>
-            <li><Link to="/contact" className="hover:text-primary">Get in Touch</Link></li>
-          </ul>
-        </div>
-
-        <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            Platforms
-          </div>
-          <ul className="mt-4 space-y-2.5 text-sm text-foreground/80">
-            <li><Link to="/docs" className="hover:text-primary">API Documentation</Link></li>
-            <li>PulsePay</li>
-            <li>PulseAssist</li>
-            <li>ENICE Core</li>
-          </ul>
         </div>
 
         <div>
