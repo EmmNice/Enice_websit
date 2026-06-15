@@ -20,7 +20,7 @@ import { AboutMatrix } from "@/components/site/AboutMatrix";
 import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Roadmap } from "@/components/site/Roadmap";
 import { Careers } from "@/components/site/Careers";
-import { ContactHub } from "@/components/site/ContactHub";
+
 import { AIChatbot } from "@/components/site/AIChatbot";
 
 
@@ -38,6 +38,50 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content:
           "An institutional venture ecosystem building fintech and operational AI infrastructure.",
+      },
+      { property: "og:url", content: "/" },
+    ],
+    links: [{ rel: "canonical", href: "/" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: "https://enicegroup.com",
+          logo: "/logo.png",
+          founder: {
+            "@type": "Person",
+            name: "Godson Chukwukemeka",
+            jobTitle: "Founder & CEO",
+          },
+          subOrganization: [
+            {
+              "@type": "FinancialProduct",
+              name: "PulsePay",
+              description:
+                "Premium fintech utility payment and digital wallet platform.",
+            },
+            {
+              "@type": "Organization",
+              name: "PulseAssist",
+              description:
+                "Multi-tenant, AI-driven omnichannel helpdesk SaaS solutions.",
+            },
+            {
+              "@type": "FinancialProduct",
+              name: "EPulse",
+              description: "Standard premium digital banking infrastructure.",
+            },
+            {
+              "@type": "FinancialProduct",
+              name: "PulseX",
+              description:
+                "Elite global cryptocurrency asset trading exchange.",
+            },
+          ],
+        }),
       },
     ],
   }),
@@ -383,7 +427,7 @@ function Landing() {
       <NetworkMetrics />
       <Roadmap />
       <Careers />
-      <ContactHub />
+      
 
       <SiteFooter />
       <AIChatbot />

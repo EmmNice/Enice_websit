@@ -68,13 +68,13 @@ export function SiteHeader() {
             <Logo />
           </div>
 
-          <button
-            onClick={() => goToHash("#contact")}
+          <Link
+            to="/contact"
             className="group inline-flex items-center gap-1.5 rounded-md border border-primary bg-primary px-3.5 py-2 text-[11px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 sm:px-4 sm:text-[12px]"
           >
             Get in Touch
             <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-          </button>
+          </Link>
         </div>
       </header>
 
