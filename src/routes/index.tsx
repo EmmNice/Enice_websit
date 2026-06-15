@@ -20,6 +20,11 @@ import { AboutMatrix } from "@/components/site/AboutMatrix";
 import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Roadmap } from "@/components/site/Roadmap";
 import { Careers } from "@/components/site/Careers";
+import { PartnersStrip } from "@/components/site/PartnersStrip";
+import { PressSection } from "@/components/site/PressSection";
+import { FAQSection } from "@/components/site/FAQSection";
+import { ScrollProgress } from "@/components/site/ScrollProgress";
+import { Reveal } from "@/components/site/Reveal";
 
 import { AIChatbot } from "@/components/site/AIChatbot";
 
@@ -144,6 +149,7 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-primary/15">
+      <ScrollProgress />
       <SiteHeader />
 
       {/* ============ HERO ============ */}
@@ -217,6 +223,9 @@ function Landing() {
           </div>
         </div>
       </section>
+
+      {/* ============ PARTNERS STRIP ============ */}
+      <PartnersStrip />
 
       {/* ============ CORE VERTICALS ============ */}
       <section id="verticals" className="bg-secondary py-24 sm:py-32">
@@ -426,6 +435,8 @@ function Landing() {
       <AboutMatrix />
       <NetworkMetrics />
       <Roadmap />
+      <PressSection />
+      <FAQSection />
       <Careers />
       
 
