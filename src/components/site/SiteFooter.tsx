@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
+import { Mail, MapPin } from "lucide-react";
 
 function XIcon({ className }: { className?: string }) {
   return (
@@ -25,6 +26,36 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
+const footerCols = [
+  {
+    heading: "Company",
+    links: [
+      { label: "Home", to: "/" },
+      { label: "About Us", to: "/about" },
+      { label: "Portfolio", to: "/portfolio" },
+      { label: "Roadmap", to: "/#roadmap" },
+      { label: "API Docs", to: "/docs" },
+    ],
+  },
+  {
+    heading: "Ventures",
+    links: [
+      { label: "PulsePay", to: "/portfolio" },
+      { label: "PulseAssist", to: "/portfolio" },
+      { label: "EPulse", to: "/portfolio" },
+      { label: "PulseX", to: "/portfolio" },
+    ],
+  },
+  {
+    heading: "Legal",
+    links: [
+      { label: "Privacy Policy", to: "/privacy" },
+      { label: "Terms of Service", to: "/terms" },
+      { label: "Regulatory Compliance", to: "/compliance" },
+    ],
+  },
+];
+
 export function SiteFooter() {
   const year = new Date().getFullYear();
   return (
@@ -38,11 +69,13 @@ export function SiteFooter() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              PulsePay Network: <span className="text-foreground font-semibold">Operational (99.9%)</span>
+              PulsePay Network:{" "}
+              <span className="font-semibold text-foreground">Operational (99.9%)</span>
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              PulseAssist Engine: <span className="text-foreground font-semibold">Operational</span>
+              PulseAssist Engine:{" "}
+              <span className="font-semibold text-foreground">Operational</span>
             </span>
           </div>
           <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
@@ -51,50 +84,82 @@ export function SiteFooter() {
         </div>
       </div>
 
-      <div className="mx-auto grid max-w-7xl gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1.4fr_1fr]">
-        <div>
-          <Logo />
-          <p className="mt-5 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-            ENICE Group — a technology venture studio and infrastructure holding firm,
-            engineering full-stack platforms for global commerce.
-          </p>
-          <div className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            SMEDAN Registered · Nano Enterprise
-          </div>
+      {/* Main footer body */}
+      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+        <div className="grid gap-12 lg:grid-cols-[1.6fr_repeat(3,1fr)]">
+          {/* Brand column */}
+          <div>
+            <Logo />
+            <p className="mt-5 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
+              ENICE Group — a technology venture studio and infrastructure holding
+              firm, engineering full-stack platforms for global commerce.
+            </p>
 
-          <div className="mt-6 flex items-center gap-2">
-            {[
-              { href: "https://x.com", label: "X", Icon: XIcon },
-              { href: "https://instagram.com", label: "Instagram", Icon: InstagramIcon },
-              { href: "https://facebook.com", label: "Facebook", Icon: FacebookIcon },
-            ].map((s) => (
+            <div className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+              SMEDAN Registered · Nano Enterprise
+            </div>
+
+            {/* Social icons */}
+            <div className="mt-6 flex items-center gap-2">
+              {[
+                { href: "https://x.com", label: "X", Icon: XIcon },
+                { href: "https://instagram.com", label: "Instagram", Icon: InstagramIcon },
+                { href: "https://facebook.com", label: "Facebook", Icon: FacebookIcon },
+              ].map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  aria-label={s.label}
+                  className="grid h-9 w-9 place-items-center rounded-md border border-border bg-background text-foreground/70 transition-colors hover:border-primary hover:text-primary"
+                >
+                  <s.Icon className="h-3.5 w-3.5" />
+                </a>
+              ))}
+            </div>
+
+            {/* Contact snippets */}
+            <div className="mt-8 space-y-2.5">
               <a
-                key={s.label}
-                href={s.href}
-                target="_blank"
-                rel="noreferrer noopener"
-                aria-label={s.label}
-                className="grid h-9 w-9 place-items-center rounded-md border border-border bg-background text-foreground/70 transition-colors hover:border-primary hover:text-primary"
+                href="mailto:corporate@enicegroup.com"
+                className="flex items-center gap-2.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
               >
-                <s.Icon className="h-3.5 w-3.5" />
+                <Mail className="h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.75} />
+                corporate@enicegroup.com
               </a>
-            ))}
+              <div className="flex items-start gap-2.5 text-[13px] text-muted-foreground">
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.75} />
+                Abuja &amp; Kaduna, Nigeria
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div>
-          <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            Legal
-          </div>
-          <ul className="mt-4 space-y-2.5 text-sm text-foreground/80">
-            <li><Link to="/privacy" className="hover:text-primary">Privacy Policy</Link></li>
-            <li><Link to="/terms" className="hover:text-primary">Terms of Service</Link></li>
-            <li><Link to="/compliance" className="hover:text-primary">Regulatory Compliance</Link></li>
-          </ul>
+          {/* Link columns */}
+          {footerCols.map((col) => (
+            <div key={col.heading}>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                {col.heading}
+              </div>
+              <ul className="mt-4 space-y-3">
+                {col.links.map((l) => (
+                  <li key={l.label}>
+                    <Link
+                      to={l.to as "/"}
+                      className="text-[13px] text-foreground/75 transition-colors hover:text-foreground"
+                    >
+                      {l.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
 
+      {/* Bottom bar */}
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-5 py-6 sm:flex-row sm:items-center sm:px-8">
           <p className="text-[11px] font-medium text-muted-foreground">

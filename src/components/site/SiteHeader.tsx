@@ -3,12 +3,13 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
 
-type DrawerLink = { label: string; to?: string; hash?: string };
+type NavLink = { label: string; to?: string; hash?: string };
 
-const drawerLinks: DrawerLink[] = [
+const navLinks: NavLink[] = [
   { label: "Home", to: "/" },
   { label: "Portfolio", to: "/portfolio" },
-  { label: "About Us", to: "/about" },
+  { label: "About", to: "/about" },
+  { label: "Contact", to: "/contact" },
 ];
 
 function scrollToHash(hash: string) {
@@ -20,8 +21,15 @@ function scrollToHash(hash: string) {
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
     document.documentElement.style.overflow = open ? "hidden" : "";
@@ -54,34 +62,56 @@ export function SiteHeader() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-border bg-background/85 backdrop-blur-md">
-        <div className="mx-auto grid max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-4 py-4 sm:px-8 sm:py-5">
-          <button
-            aria-label="Open navigation"
-            onClick={() => setOpen(true)}
-            className="grid h-10 w-10 place-items-center rounded-md border border-border bg-background text-foreground transition-colors hover:bg-secondary"
-          >
-            <Menu className="h-4 w-4" strokeWidth={2} />
-          </button>
-
-          <div className="flex justify-center sm:justify-start sm:pl-2">
+      <header
+        className={`sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md transition-shadow duration-200 ${scrolled ? "shadow-sm" : ""}`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 py-4 sm:px-8">
+          {/* Logo */}
+          <div className="flex shrink-0 items-center">
             <Logo />
           </div>
 
-          <Link
-            to="/contact"
-            className="group inline-flex items-center gap-1.5 rounded-md border border-primary bg-primary px-3.5 py-2 text-[11px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 sm:px-4 sm:text-[12px]"
-          >
-            Get in Touch
-            <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-          </Link>
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-1 md:flex">
+            {navLinks.map((l) => (
+              <Link
+                key={l.label}
+                to={l.to ?? "/"}
+                className="rounded-md px-3.5 py-2 text-[13px] font-medium text-foreground/70 transition-colors hover:bg-secondary hover:text-foreground [&.active]:text-foreground [&.active]:font-semibold"
+                activeProps={{ className: "active" }}
+                activeOptions={{ exact: l.to === "/" }}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right side */}
+          <div className="flex items-center gap-3">
+            <Link
+              to="/contact"
+              className="group hidden items-center gap-1.5 rounded-md border border-primary bg-primary px-4 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 md:inline-flex"
+            >
+              Get in Touch
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
+            </Link>
+
+            {/* Mobile hamburger */}
+            <button
+              aria-label="Open navigation"
+              onClick={() => setOpen(true)}
+              className="grid h-9 w-9 place-items-center rounded-md border border-border bg-background text-foreground transition-colors hover:bg-secondary md:hidden"
+            >
+              <Menu className="h-4 w-4" strokeWidth={2} />
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Drawer */}
+      {/* Mobile drawer */}
       <div
         aria-hidden={!open}
-        className={`fixed inset-0 z-50 transition-opacity duration-300 ${
+        className={`fixed inset-0 z-50 transition-opacity duration-300 md:hidden ${
           open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
       >
@@ -109,7 +139,7 @@ export function SiteHeader() {
               Navigate
             </div>
             <ul className="space-y-1">
-              {drawerLinks.map((l) => (
+              {navLinks.map((l) => (
                 <li key={l.label}>
                   <button
                     onClick={() => (l.to ? goToRoute(l.to) : goToHash(l.hash!))}
@@ -122,6 +152,16 @@ export function SiteHeader() {
               ))}
             </ul>
           </nav>
+          <div className="px-6 pt-2 pb-6">
+            <Link
+              to="/contact"
+              onClick={() => setOpen(false)}
+              className="group flex w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+            >
+              Get in Touch
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
           <div className="absolute bottom-0 left-0 right-0 border-t border-border px-6 py-5">
             <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
               ENICE Group
