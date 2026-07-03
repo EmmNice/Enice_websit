@@ -114,7 +114,7 @@ export function SiteFooter() {
 
             <div className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              SMEDAN Registered · Est. 2024
+              Technology Venture Studio · Nigeria
             </div>
 
             {/* Social icons */}

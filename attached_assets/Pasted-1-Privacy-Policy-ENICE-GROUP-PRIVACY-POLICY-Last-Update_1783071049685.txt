@@ -1,0 +1,55 @@
+1. Privacy Policy
+​ENICE GROUP PRIVACY POLICY
+Last Updated: [Insert Date]
+​1. INTRODUCTION
+Welcome to ENICE Group (“we,” “our,” or “us”). We operate as a technology venture studio and infrastructure holding firm. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our commerce platforms, or interact with our infrastructure services.
+​2. INFORMATION WE COLLECT
+​Personal Data: Name, email address, phone number, shipping/billing addresses, and business registration details when you interact with our platforms or venture services.
+​Financial Data: Payment details, bank account information, or transaction history processed via our commerce infrastructure (all financial transactions are encrypted via secure third-party processors).
+​Technical Data: IP address, browser type, operating system, and tracking data collected through cookies to optimize platform performance.
+​3. HOW WE USE YOUR INFORMATION
+We use your data to:
+​Provide, maintain, and engineer our full-stack commerce platforms.
+​Manage venture applications, partnerships, and infrastructure integration.
+​Comply with legal obligations, prevent fraud, and ensure network security.
+​4. DATA SHARING AND DISCLOSURE
+We do not sell your personal data. We may share information with:
+​Subsidiaries and Affiliates: Companies under the ENICE Group umbrella.
+​Service Providers: Third-party vendors who handle payment processing, data analysis, hosting, and infrastructure delivery.
+​Legal Authorities: When required by law to comply with regulatory compliance audits or legal processes.
+​5. SECURITY & INTERNATIONAL TRANSFERS
+We implement industry-standard administrative, technical, and physical security measures to protect your data. Because we engineer platforms for global commerce, your data may be transferred to and maintained on servers located outside your country. We ensure all transfers comply with applicable data protection laws.
+​6. YOUR RIGHTS
+Depending on your location, you may have the right to access, correct, delete, or restrict the processing of your personal data.
+​7. CONTACT US
+For any privacy requests, please contact us at: legal@enice.group (or your chosen email).
+​2. Terms of Service
+​ENICE GROUP TERMS OF SERVICE
+Last Updated: [Insert Date]
+​1. AGREEMENT TO TERMS
+By accessing or using the websites, infrastructure, or commerce platforms operated by ENICE Group, you agree to be bound by these Terms of Service. If you do not agree, you must discontinue use immediately.
+​2. ELIGIBILITY & ACCOUNTS
+To use certain enterprise or platform features, you may be required to register an account. You agree to provide accurate information and maintain the security of your credentials. You are responsible for all activities that occur under your account.
+​3. INTELLECTUAL PROPERTY RIGHTS
+Unless otherwise indicated, all platforms, software builds, architecture, code, designs, text, and trademarks on our services are the proprietary property of ENICE Group and are protected by intellectual property laws.
+​4. PROHIBITED ACTIVITIES
+You agree not to:
+​Reverse engineer, decompile, or disrupt any full-stack infrastructure or networks managed by ENICE Group.
+​Use our commerce platforms for fraudulent, unlawful, or unauthorized financial transactions.
+​Circumvent any security protocols or rate limits established on our web servers.
+​5. LIMITATION OF LIABILITY
+To the maximum extent permitted by law, ENICE Group, its subsidiaries, and its directors shall not be liable for any indirect, incidental, special, or consequential damages arising out of your use or inability to use our infrastructure platforms. Services are provided on an "AS IS" and "AS AVAILABLE" basis.
+​6. GOVERNING LAW
+These Terms shall be governed by and construed in accordance with the laws of [Insert Country/State, e.g., the Federal Republic of Nigeria], without regard to its conflict of law principles.
+​3. Regulatory Compliance
+​REGULATORY COMPLIANCE STATEMENT
+​ENICE Group is committed to operating with transparency, integrity, and absolute adherence to global and local statutory frameworks. As a venture studio and commerce infrastructure holding firm, our compliance strategy covers three core areas:
+​1. Corporate & Enterprise Registration
+​SMEDAN Status: ENICE Group is fully registered under the Small and Medium Enterprises Development Agency of Nigeria (SMEDAN) as a certified Nano Enterprise, fulfilling all localized operational, reporting, and statutory guidelines for enterprise businesses.
+​2. Commerce & Financial Infrastructure Compliance
+​Anti-Money Laundering (AML) & KYC: Our engineered platforms for global commerce utilize rigorous Know Your Customer (KYC) and Anti-Money Laundering verification frameworks to prevent illicit financial flows, identity theft, and commercial fraud.
+​Data Security Standards: Any financial processing built into our full-stack environments relies on industry-standard security architectures (such as PCI-DSS compliant gateways) ensuring secure data handling pipelines.
+​3. Global Data Compliance Frameworks
+We map our application data layouts to comply with leading privacy regulations based on user demographics:
+​NDPA / NDPR: Compliant with the Nigerian Data Protection Act/Regulation regarding consumer data privacy.
+​GDPR / International Standards: Adhering to strict data controllership regulations for data cross-border transfers and user privacy consent flags in global commerce transactions.
