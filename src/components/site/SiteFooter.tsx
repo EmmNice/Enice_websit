@@ -2,6 +2,8 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { Mail, MapPin } from "lucide-react";
 
+// ─── Social icon components ───────────────────────────────────────────────────
+
 function XIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill="currentColor">
@@ -9,6 +11,7 @@ function XIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
 function InstagramIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill="none" stroke="currentColor" strokeWidth="1.6">
@@ -18,6 +21,7 @@ function InstagramIcon({ className }: { className?: string }) {
     </svg>
   );
 }
+
 function FacebookIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill="currentColor">
@@ -26,7 +30,9 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
-const footerCols = [
+// ─── Navigation columns ───────────────────────────────────────────────────────
+
+const FOOTER_COLS = [
   {
     heading: "Company",
     links: [
@@ -56,11 +62,21 @@ const footerCols = [
   },
 ];
 
+const SOCIAL_LINKS = [
+  { href: "https://x.com/ENICEHQ", label: "X (Twitter)", Icon: XIcon },
+  { href: "https://www.instagram.com/enicehq", label: "Instagram", Icon: InstagramIcon },
+  { href: "https://www.facebook.com/share/1Nx7q11BZK/", label: "Facebook", Icon: FacebookIcon },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function SiteFooter() {
   const year = new Date().getFullYear();
+
   return (
     <footer className="border-t border-border bg-background">
-      {/* Live status ribbon */}
+
+      {/* System status ribbon */}
       <div className="border-b border-border bg-secondary/60">
         <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-medium text-muted-foreground">
@@ -70,7 +86,7 @@ export function SiteFooter() {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
               PulsePay Network:{" "}
-              <span className="font-semibold text-foreground">Operational (99.9%)</span>
+              <span className="font-semibold text-foreground">Operational</span>
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
@@ -84,29 +100,26 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* Main footer body */}
+      {/* Main body */}
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.6fr_repeat(3,1fr)]">
+
           {/* Brand column */}
           <div>
             <Logo />
             <p className="mt-5 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-              ENICE Group — a technology venture studio and infrastructure holding
-              firm, engineering full-stack platforms for global commerce.
+              A technology venture studio and infrastructure holding firm — engineering
+              full-stack platforms for the future of global commerce.
             </p>
 
             <div className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              SMEDAN Registered · Nano Enterprise
+              SMEDAN Registered · Est. 2024
             </div>
 
             {/* Social icons */}
             <div className="mt-6 flex items-center gap-2">
-              {[
-                { href: "https://x.com", label: "X", Icon: XIcon },
-                { href: "https://instagram.com", label: "Instagram", Icon: InstagramIcon },
-                { href: "https://facebook.com", label: "Facebook", Icon: FacebookIcon },
-              ].map((s) => (
+              {SOCIAL_LINKS.map((s) => (
                 <a
                   key={s.label}
                   href={s.href}
@@ -120,7 +133,7 @@ export function SiteFooter() {
               ))}
             </div>
 
-            {/* Contact snippets */}
+            {/* Contact */}
             <div className="mt-8 space-y-2.5">
               <a
                 href="mailto:corporate@enicegroup.com"
@@ -136,8 +149,8 @@ export function SiteFooter() {
             </div>
           </div>
 
-          {/* Link columns */}
-          {footerCols.map((col) => (
+          {/* Navigation columns */}
+          {FOOTER_COLS.map((col) => (
             <div key={col.heading}>
               <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
                 {col.heading}
@@ -166,10 +179,11 @@ export function SiteFooter() {
             © {year} ENICE Group. All rights reserved.
           </p>
           <p className="text-[11px] font-medium text-muted-foreground">
-            Enterprise Infrastructure · Built with intent
+            Enterprise Infrastructure · Built with intent.
           </p>
         </div>
       </div>
+
     </footer>
   );
 }

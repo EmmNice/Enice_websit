@@ -24,29 +24,34 @@ export const Route = createFileRoute("/about")({
 
 const SHADOW_CARD = "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)";
 
-function AboutPage() {
-  const columns = [
-    {
-      label: "01",
-      title: "Corporate Thesis",
-      body: "ENICE Group operates as a specialized technology venture studio and infrastructure holding firm. We design, engineer, and deploy high-capacity software ecosystems that power modern digital commerce and institutional automation. Our mission is to bridge operational gaps for enterprises through robust financial transaction architecture and advanced autonomous AI systems.",
-    },
-    {
-      label: "02",
-      title: "Operational Excellence & Security Standards",
-      body: "At ENICE Group, infrastructure integrity is paramount. Our proprietary software platforms are engineered on foundations of zero-trust security architectures, absolute multi-tenant database isolation, and real-time algorithmic guardrails. We build to satisfy rigorous compliance frameworks, ensuring that our corporate partners in banking, financial technology, and telecommunications can scale their operations with zero structural risk.",
-    },
-    {
-      label: "03",
-      title: "Ecosystem Strategy",
-      body: "We do not merely build software; we incubate market-defining platforms. By controlling the entire development lifecycle — from low-level database schemas to high-throughput external API integration gateways — ENICE Group ensures every venture in our ecosystem operates with institutional-grade speed, premium usability, and flawless data isolation.",
-    },
-  ];
+// ─── Column content ───────────────────────────────────────────────────────────
 
+const COLUMNS = [
+  {
+    label: "01",
+    title: "Corporate Thesis",
+    body: "ENICE Group operates as a specialized technology venture studio and infrastructure holding firm. We design, engineer, and deploy high-capacity software ecosystems that power modern digital commerce and institutional automation. Our mandate is to close the infrastructure gap facing enterprises — through robust financial transaction architecture and advanced autonomous AI systems.",
+  },
+  {
+    label: "02",
+    title: "Operational Standards",
+    body: "Infrastructure integrity is non-negotiable. Our platforms are built on zero-trust security architecture, per-tenant database isolation, and real-time algorithmic guardrails. We design to satisfy rigorous compliance frameworks — so partners in banking, financial technology, and telecommunications can scale their operations without structural risk.",
+  },
+  {
+    label: "03",
+    title: "Ecosystem Strategy",
+    body: "We do not simply build software — we incubate market-defining platforms. By controlling the full development lifecycle, from database schema design to high-throughput external API gateway integration, ENICE Group ensures every venture in our ecosystem operates with institutional-grade performance, precision, and data isolation.",
+  },
+];
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
+function AboutPage() {
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
       <SiteHeader />
 
+      {/* Page header */}
       <section className="border-b border-border py-20 sm:py-28">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
@@ -62,10 +67,11 @@ function AboutPage() {
         </div>
       </section>
 
+      {/* Three-column detail */}
       <section className="bg-secondary py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="grid gap-6 lg:grid-cols-3">
-            {columns.map((c) => (
+            {COLUMNS.map((c) => (
               <article
                 key={c.title}
                 className="flex flex-col rounded-xl border border-border bg-background p-8 sm:p-10"

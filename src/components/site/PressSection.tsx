@@ -1,32 +1,36 @@
 import { ArrowUpRight } from "lucide-react";
 import { Reveal } from "./Reveal";
 
-const SHADOW_CARD =
-  "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)";
+const SHADOW_CARD = "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)";
+
+// ─── Announcements ────────────────────────────────────────────────────────────
+// Update these entries as ENICE Group publishes new milestones or press items.
 
 const POSTS = [
   {
     tag: "Announcement",
     date: "Jun 2026",
-    title: "ENICE Group formalizes its Shared Ecosystem Infrastructure thesis.",
+    title: "ENICE Group establishes its Shared Ecosystem Infrastructure framework.",
     excerpt:
-      "A look at the unified AI, ledger, and compliance backbone powering every ENICE venture.",
+      "A unified AI pipeline, high-velocity ledger, and automated compliance backbone now underpins every venture within the ENICE Group ecosystem.",
   },
   {
     tag: "Product",
     date: "May 2026",
-    title: "PulsePay enters extended pilot with regional treasury partners.",
+    title: "PulsePay advances to extended pilot phase with regional treasury partners.",
     excerpt:
-      "Programmable wallets, instant issuance, and embedded compliance reach a wider pilot cohort.",
+      "Programmable wallets, instant virtual card issuance, and embedded compliance controls enter a broader pilot cohort across West Africa.",
   },
   {
     tag: "Engineering",
     date: "Apr 2026",
-    title: "Inside PulseAssist: policy-bound agents for regulated industries.",
+    title: "PulseAssist: how policy-bound agents operate inside regulated institutions.",
     excerpt:
-      "How we engineer autonomous support workflows with auditable, deterministic guardrails.",
+      "An engineering overview of autonomous support workflows built with auditable, deterministic guardrails for banking and telecommunications.",
   },
 ];
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export function PressSection() {
   return (
@@ -43,10 +47,10 @@ export function PressSection() {
               </h2>
             </div>
             <a
-              href="#"
+              href="mailto:corporate@enicegroup.com"
               className="group inline-flex items-center gap-2 text-sm font-semibold text-primary"
             >
-              View newsroom
+              Press inquiries
               <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
             </a>
           </div>
@@ -69,7 +73,7 @@ export function PressSection() {
                 <p className="mt-3 text-[13.5px] leading-relaxed text-muted-foreground">
                   {p.excerpt}
                 </p>
-                <div className="mt-8 inline-flex items-center gap-1.5 text-[12px] font-semibold text-primary">
+                <div className="mt-auto pt-8 inline-flex items-center gap-1.5 text-[12px] font-semibold text-primary">
                   Read brief
                   <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
                 </div>
