@@ -165,61 +165,55 @@ function Landing() {
       <SiteHeader />
 
       {/* ══════════════════════════════════════════════════════════════
-          HERO — dark section with radial glow
+          HERO
       ══════════════════════════════════════════════════════════════ */}
-      <section className="relative overflow-hidden bg-[#05091a]">
+      <section className="relative overflow-hidden border-b border-border bg-background">
 
-        {/* Grid overlay */}
+        {/* Subtle grid */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0"
+          className="pointer-events-none absolute inset-0 -z-10 opacity-40"
           style={{
             backgroundImage:
-              "linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px)",
-            backgroundSize: "72px 72px",
+              "linear-gradient(to right, rgba(17,24,39,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(17,24,39,0.05) 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+            maskImage:
+              "radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 80%)",
           }}
         />
 
-        {/* Radial glow */}
+        {/* Soft blue radial glow at top */}
         <div
           aria-hidden
-          className="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2"
+          className="pointer-events-none absolute left-1/2 top-0 -z-10 -translate-x-1/2"
           style={{
-            width: "900px",
-            height: "600px",
+            width: "800px",
+            height: "400px",
             background:
-              "radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.28) 0%, transparent 70%)",
+              "radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.07) 0%, transparent 70%)",
           }}
         />
 
         {/* Content */}
-        <div className="relative mx-auto max-w-6xl px-5 pb-32 pt-28 text-center sm:px-8 sm:pb-40 sm:pt-36">
+        <div className="mx-auto max-w-5xl px-5 pb-28 pt-24 text-center sm:px-8 sm:pb-36 sm:pt-32">
 
           {/* Pill badge */}
-          <div className="mx-auto mb-10 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] font-semibold tracking-[0.14em] text-white/60 backdrop-blur-sm">
+          <div className="mx-auto mb-8 inline-flex items-center gap-2.5 rounded-full border border-border bg-secondary px-4 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-muted-foreground">
             <span className="relative flex h-1.5 w-1.5">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
             </span>
             Enterprise Venture Ecosystem · Est. 2026
           </div>
 
           {/* Headline */}
-          <h1 className="mx-auto max-w-5xl text-balance text-4xl font-semibold leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl md:text-[3.75rem] lg:text-[4.5rem]">
+          <h1 className="mx-auto max-w-4xl text-balance text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl lg:text-[4.25rem]">
             Engineering the Infrastructure for the{" "}
-            <span
-              className="bg-clip-text text-transparent"
-              style={{
-                backgroundImage:
-                  "linear-gradient(135deg, #60a5fa 0%, #818cf8 50%, #a78bfa 100%)",
-              }}
-            >
-              Future of Global Commerce.
-            </span>
+            <span className="text-primary">Future of Global Commerce.</span>
           </h1>
 
           {/* Subheadline */}
-          <p className="mx-auto mt-8 max-w-2xl text-pretty text-base leading-relaxed text-white/50 sm:text-lg">
+          <p className="mx-auto mt-8 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
             ENICE Group architects, capitalises, and operates full-stack software
             ventures — building the financial and AI infrastructure that powers
             modern global industry.
@@ -229,34 +223,35 @@ function Landing() {
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <Link
               to="/portfolio"
-              className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-white px-8 text-sm font-semibold text-[#05091a] transition-all hover:bg-white/90 sm:w-auto"
+              className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-primary px-8 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 sm:w-auto"
             >
               Explore Portfolio
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#verticals"
-              className="inline-flex h-12 w-full items-center justify-center rounded-md border border-white/15 bg-white/5 px-8 text-sm font-medium text-white/80 backdrop-blur-sm transition-colors hover:bg-white/10 sm:w-auto"
+              className="inline-flex h-12 w-full items-center justify-center rounded-md border border-border bg-background px-8 text-sm font-medium text-foreground transition-colors hover:bg-secondary sm:w-auto"
             >
               Corporate Overview
             </a>
           </div>
 
           {/* Stats bar */}
-          <div className="mt-20 grid grid-cols-2 overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-sm md:grid-cols-4">
+          <div
+            className="mt-20 grid grid-cols-2 overflow-hidden rounded-xl border border-border bg-background md:grid-cols-4"
+            style={{ boxShadow: SHADOW_CARD }}
+          >
             {HERO_STATS.map((s, i) => (
               <div
                 key={s.label}
                 className={`p-7 text-left ${
-                  i !== 0
-                    ? "border-t border-white/10 md:border-l md:border-t-0"
-                    : ""
+                  i !== 0 ? "border-t border-border md:border-l md:border-t-0" : ""
                 } ${i === 1 ? "border-t md:border-t-0" : ""}`}
               >
-                <div className="text-3xl font-semibold tracking-tight text-white sm:text-[2rem]">
+                <div className="text-3xl font-semibold tracking-tight text-foreground sm:text-[2rem]">
                   {s.value}
                 </div>
-                <div className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-white/45">
+                <div className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
                   {s.label}
                 </div>
               </div>
