@@ -34,16 +34,6 @@ function FacebookIcon({ className }: { className?: string }) {
 
 const FOOTER_COLS = [
   {
-    heading: "Company",
-    links: [
-      { label: "Home", to: "/" },
-      { label: "About Us", to: "/about" },
-      { label: "Portfolio", to: "/portfolio" },
-      { label: "Roadmap", to: "/roadmap" },
-      { label: "API Docs", to: "/docs" },
-    ],
-  },
-  {
     heading: "Ventures",
     links: [
       { label: "PulsePay", to: "/portfolio" },
