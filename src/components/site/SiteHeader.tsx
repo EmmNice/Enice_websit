@@ -111,8 +111,10 @@ export function SiteHeader() {
       {/* Mobile drawer */}
       <div
         aria-hidden={!open}
-        className={`fixed inset-0 z-50 transition-opacity duration-300 md:hidden ${
-          open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        className={`fixed inset-0 z-50 md:hidden ${
+          open
+            ? "pointer-events-auto opacity-100 transition-opacity duration-300"
+            : "pointer-events-none invisible opacity-0"
         }`}
       >
         <div

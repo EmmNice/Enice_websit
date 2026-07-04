@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -26,6 +27,11 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -102,6 +108,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy': typeof PrivacyRoute
+  '/roadmap': typeof RoadmapRoute
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -117,6 +124,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy': typeof PrivacyRoute
+  '/roadmap': typeof RoadmapRoute
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/portfolio': typeof PortfolioRoute
   '/privacy': typeof PrivacyRoute
+  '/roadmap': typeof RoadmapRoute
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -150,6 +159,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/portfolio'
     | '/privacy'
+    | '/roadmap'
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -165,6 +175,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/portfolio'
     | '/privacy'
+    | '/roadmap'
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -180,6 +191,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/portfolio'
     | '/privacy'
+    | '/roadmap'
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
@@ -196,6 +208,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   PortfolioRoute: typeof PortfolioRoute
   PrivacyRoute: typeof PrivacyRoute
+  RoadmapRoute: typeof RoadmapRoute
   TermsRoute: typeof TermsRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -209,6 +222,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -308,6 +328,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   PortfolioRoute: PortfolioRoute,
   PrivacyRoute: PrivacyRoute,
+  RoadmapRoute: RoadmapRoute,
   TermsRoute: TermsRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:

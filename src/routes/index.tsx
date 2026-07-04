@@ -230,12 +230,12 @@ function Landing() {
               Explore Portfolio
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
-            <a
-              href="#verticals"
+            <Link
+              to="/about"
               className="inline-flex h-12 w-full items-center justify-center rounded-md border border-border bg-background px-8 text-sm font-medium text-foreground transition-colors hover:bg-secondary sm:w-auto"
             >
               Corporate Overview
-            </a>
+            </Link>
           </div>
 
           {/* Stats bar */}

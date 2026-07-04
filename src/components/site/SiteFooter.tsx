@@ -39,7 +39,7 @@ const FOOTER_COLS = [
       { label: "Home", to: "/" },
       { label: "About Us", to: "/about" },
       { label: "Portfolio", to: "/portfolio" },
-      { label: "Roadmap", to: "/#roadmap" },
+      { label: "Roadmap", to: "/roadmap" },
       { label: "API Docs", to: "/docs" },
     ],
   },
