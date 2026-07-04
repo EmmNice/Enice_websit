@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -26,6 +27,22 @@ import { FAQSection } from "@/components/site/FAQSection";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { AIChatbot } from "@/components/site/AIChatbot";
+import { ComingSoon } from "@/components/site/ComingSoon";
+import { isPreLaunch } from "@/lib/launch";
+
+// ─── Time-gate wrapper ────────────────────────────────────────────────────────
+// Renders the Coming Soon page until LAUNCH_DATE; then automatically swaps
+// to the real landing page with no code change required.
+
+function IndexPage() {
+  // Initialise from the clock so SSR and first paint are consistent.
+  const [launched, setLaunched] = useState(() => !isPreLaunch());
+
+  if (!launched) {
+    return <ComingSoon onLaunched={() => setLaunched(true)} />;
+  }
+  return <Landing />;
+}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -69,7 +86,7 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  component: Landing,
+  component: IndexPage,
 });
 
 // ─── Shared shadow ────────────────────────────────────────────────────────────
