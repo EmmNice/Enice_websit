@@ -96,12 +96,6 @@ export function SiteFooter() {
 
           {/* Brand column */}
           <div>
-            <Logo />
-            <p className="mt-5 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-              A technology venture studio and infrastructure holding firm — engineering
-              full-stack platforms for the future of global commerce.
-            </p>
-
             {/* Social icons */}
             <div className="mt-6 flex items-center gap-2">
               {SOCIAL_LINKS.map((s) => (
