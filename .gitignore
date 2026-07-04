@@ -1,3 +1,7 @@
+# Build outputs
+dist
+.vercel/output
+
 # Logs
 logs
 *.log
