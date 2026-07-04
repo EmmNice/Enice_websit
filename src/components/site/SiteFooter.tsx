@@ -112,11 +112,6 @@ export function SiteFooter() {
               full-stack platforms for the future of global commerce.
             </p>
 
-            <div className="mt-6 inline-flex items-center gap-2 rounded-md border border-border bg-secondary px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Technology Venture Studio · Nigeria
-            </div>
-
             {/* Social icons */}
             <div className="mt-6 flex items-center gap-2">
               {SOCIAL_LINKS.map((s) => (
@@ -136,11 +131,11 @@ export function SiteFooter() {
             {/* Contact */}
             <div className="mt-8 space-y-2.5">
               <a
-                href="mailto:corporate@enicegroup.com"
+                href="mailto:corporate@enicehq.com"
                 className="flex items-center gap-2.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
               >
                 <Mail className="h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.75} />
-                corporate@enicegroup.com
+                corporate@enicehq.com
               </a>
               <div className="flex items-start gap-2.5 text-[13px] text-muted-foreground">
                 <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.75} />

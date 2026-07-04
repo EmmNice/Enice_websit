@@ -224,8 +224,8 @@ function DocsPage() {
               <p className="text-[11px] font-semibold text-foreground">Need help?</p>
               <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
                 Write to us at{" "}
-                <a href="mailto:corporate@enicegroup.com" className="text-primary hover:underline">
-                  corporate@enicegroup.com
+                <a href="mailto:corporate@enicehq.com" className="text-primary hover:underline">
+                  corporate@enicehq.com
                 </a>
               </p>
             </div>

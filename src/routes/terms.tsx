@@ -87,10 +87,10 @@ export const Route = createFileRoute("/terms")({
             <p>
               Questions regarding these Terms may be directed to{" "}
               <a
-                href="mailto:corporate@enicegroup.com"
+                href="mailto:corporate@enicehq.com"
                 className="font-medium text-primary hover:underline"
               >
-                corporate@enicegroup.com
+                corporate@enicehq.com
               </a>
               .
             </p>

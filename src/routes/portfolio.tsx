@@ -127,7 +127,7 @@ function PortfolioPage() {
                   asset transfers, and optimized value-added service delivery.
                 </p>
                 <a
-                  href="mailto:corporate@enicegroup.com"
+                  href="mailto:corporate@enicehq.com"
                   className="group mt-8 inline-flex w-fit items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
                 >
                   Request Access
@@ -197,7 +197,7 @@ function PortfolioPage() {
                   failover capabilities.
                 </p>
                 <a
-                  href="mailto:corporate@enicegroup.com"
+                  href="mailto:corporate@enicehq.com"
                   className="group mt-8 inline-flex w-fit items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
                 >
                   Request Integration Access

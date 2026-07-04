@@ -47,7 +47,7 @@ export function PressSection() {
               </h2>
             </div>
             <a
-              href="mailto:corporate@enicegroup.com"
+              href="mailto:corporate@enicehq.com"
               className="group inline-flex items-center gap-2 text-sm font-semibold text-primary"
             >
               Press inquiries

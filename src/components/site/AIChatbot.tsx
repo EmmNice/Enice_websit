@@ -10,7 +10,7 @@ type Message = { from: "bot" | "user"; text: string };
 const SEED_MESSAGES: Message[] = [
   {
     from: "bot",
-    text: "Welcome to ENICE Group. Ask about PulsePay, PulseAssist, or partnership opportunities — or contact us directly at corporate@enicegroup.com.",
+    text: "Welcome to ENICE Group. Ask about PulsePay, PulseAssist, or partnership opportunities — or contact us directly at corporate@enicehq.com.",
   },
 ];
 
@@ -18,7 +18,7 @@ const SEED_MESSAGES: Message[] = [
 // This is a static fallback reply. Replace with a real AI endpoint when ready.
 
 const BOT_REPLY =
-  "Thank you for reaching out. An ENICE specialist will follow up shortly. For urgent matters, write directly to corporate@enicegroup.com.";
+  "Thank you for reaching out. An ENICE specialist will follow up shortly. For urgent matters, write directly to corporate@enicehq.com.";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 

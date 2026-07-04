@@ -91,10 +91,10 @@ export const Route = createFileRoute("/compliance")({
             <p>
               Regulators, auditors, and compliance partners may reach our office at{" "}
               <a
-                href="mailto:compliance@enicegroup.com"
+                href="mailto:compliance@enicehq.com"
                 className="font-medium text-primary hover:underline"
               >
-                compliance@enicegroup.com
+                compliance@enicehq.com
               </a>
               .
             </p>

@@ -123,10 +123,10 @@ function ContactPage() {
                       Corporate
                     </div>
                     <a
-                      href="mailto:corporate@enicegroup.com"
+                      href="mailto:corporate@enicehq.com"
                       className="mt-1 block text-sm text-foreground hover:text-primary transition-colors"
                     >
-                      corporate@enicegroup.com
+                      corporate@enicehq.com
                     </a>
                   </div>
                 </li>
@@ -186,8 +186,8 @@ function ContactPage() {
                   <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                     Something went wrong. Please try again or email us directly at{" "}
-                    <a href="mailto:corporate@enicegroup.com" className="underline">
-                      corporate@enicegroup.com
+                    <a href="mailto:corporate@enicehq.com" className="underline">
+                      corporate@enicehq.com
                     </a>
                     .
                   </div>

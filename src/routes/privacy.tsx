@@ -94,10 +94,10 @@ export const Route = createFileRoute("/privacy")({
               or restrict the processing of your personal data. To exercise these rights,
               contact us at{" "}
               <a
-                href="mailto:privacy@enicegroup.com"
+                href="mailto:privacy@enicehq.com"
                 className="font-medium text-primary hover:underline"
               >
-                privacy@enicegroup.com
+                privacy@enicehq.com
               </a>
               . We respond to verified requests within fifteen business days.
             </p>
@@ -109,10 +109,10 @@ export const Route = createFileRoute("/privacy")({
             <p>
               For any privacy-related requests or questions, please write to{" "}
               <a
-                href="mailto:privacy@enicegroup.com"
+                href="mailto:privacy@enicehq.com"
                 className="font-medium text-primary hover:underline"
               >
-                privacy@enicegroup.com
+                privacy@enicehq.com
               </a>
               .
             </p>

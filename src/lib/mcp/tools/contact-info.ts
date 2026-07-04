@@ -3,7 +3,7 @@ import { defineTool } from "@lovable.dev/mcp-js";
 const CONTACT = {
   organization: "ENICE Group",
   founder: "Godson Chukwukemeka",
-  email: "corporate@enicegroup.com",
+  email: "corporate@enicehq.com",
   responseTime: "Within 2 business days",
   contactPage: "/contact",
 };
