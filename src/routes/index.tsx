@@ -198,13 +198,13 @@ function Landing() {
         <div className="mx-auto max-w-5xl px-5 pb-28 pt-24 text-center sm:px-8 sm:pb-36 sm:pt-32">
 
           {/* Pill badge */}
-          <div className="mb-8 flex justify-center">
-            <div className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-border bg-secondary px-4 py-1.5 text-[11px] font-semibold tracking-[0.12em] text-muted-foreground">
+          <div className="mb-8 flex justify-center px-4">
+            <div className="flex w-fit items-center gap-2.5 rounded-full border border-border bg-secondary px-4 py-1.5 text-[11px] font-semibold tracking-[0.10em] text-muted-foreground">
               <span className="relative flex h-1.5 w-1.5 shrink-0">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
               </span>
-              <span className="min-w-0">Enterprise Venture Ecosystem · Est. 2026</span>
+              <span className="whitespace-nowrap">Enterprise Venture Ecosystem · Est. 2026</span>
             </div>
           </div>
 
