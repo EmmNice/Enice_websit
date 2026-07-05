@@ -7,7 +7,31 @@
  *   4. Launch moment (scheduled)
  */
 import { Resend } from "resend";
-import { withErrorHandling } from "./lib/handler";
+
+// Inlined from api/lib/handler.ts — Vercel treats every file under api/ as its
+// own serverless function and does not reliably bundle sibling imports, so an
+// `import "./lib/handler"` throws ERR_MODULE_NOT_FOUND at cold start.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyReq = any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyRes = any;
+type ApiHandler = (req: AnyReq, res: AnyRes) => Promise<void> | void;
+function withErrorHandling(handler: ApiHandler): ApiHandler {
+  return async (req, res) => {
+    try {
+      await handler(req, res);
+    } catch (err: unknown) {
+      const ref = `E${Date.now().toString(36).toUpperCase()}`;
+      console.error(`[api:unhandled:${ref}]`, err);
+      if (res.headersSent) return;
+      res.status(500).json({
+        ok: false,
+        error: "An unexpected error occurred on our end. Please try again shortly.",
+        ref,
+      });
+    }
+  };
+}
 
 const FROM = "ENICE Group <noreply@enicehq.com>";
 const LAUNCH = {

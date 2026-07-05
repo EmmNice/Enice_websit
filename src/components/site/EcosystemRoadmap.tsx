@@ -65,7 +65,7 @@ export function EcosystemRoadmap() {
         <div className="mt-16 hidden md:block">
           <div className="grid grid-cols-3">
             {MILESTONES.map((m, i) => {
-              const isLive = m.status === "live";
+              const isLive = (m.status as string) === "live";
               const isFirst = i === 0;
               const isLast = i === MILESTONES.length - 1;
 
@@ -124,7 +124,7 @@ export function EcosystemRoadmap() {
         {/* Node + label inline above each card, no connector line */}
         <div className="mt-10 flex flex-col gap-8 md:hidden">
           {MILESTONES.map((m, i) => {
-            const isLive = m.status === "live";
+            const isLive = (m.status as string) === "live";
             return (
               <Reveal key={m.product} delay={i * 80}>
                 <div>
