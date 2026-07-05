@@ -180,28 +180,76 @@ export default async function handler(req: any, res: any) {
 
   try {
     const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) throw new Error("RESEND_API_KEY not configured");
+    if (!apiKey) {
+      console.error("[watchlist] RESEND_API_KEY is not set");
+      res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
+      return;
+    }
 
     const resend = new Resend(apiKey);
 
-    const [t1, t2, t3, t4] = await Promise.allSettled([
-      resend.emails.send({ from: FROM, to: email, subject: "You're on the ENICE Watchlist", html: confirmationHtml(email) }),
-      resend.emails.send({ from: FROM, to: email, subject: "3 Days Until We Engineer the Future — ENICE Group", html: threeDayHtml(email), scheduledAt: LAUNCH.threeDayReminder }),
-      resend.emails.send({ from: FROM, to: email, subject: "Tomorrow, Everything Changes — ENICE Group", html: oneDayHtml(email), scheduledAt: LAUNCH.oneDayReminder }),
-      resend.emails.send({ from: FROM, to: email, subject: "ENICE Group Is Live — You Have Early Access", html: launchHtml(email), scheduledAt: LAUNCH.launchMoment }),
-    ]);
-
-    if (t1.status === "rejected") {
-      console.error("[watchlist] Confirmation email failed:", t1.reason);
-      throw new Error("Failed to send confirmation email.");
+    // Step 1: Send the required confirmation email first.
+    // Resend v6 SDK returns { data, error } — it does NOT throw on API errors.
+    let confirmation: { data: unknown; error: { message: string; name: string } | null };
+    try {
+      confirmation = await resend.emails.send({
+        from: FROM,
+        to: email,
+        subject: "You're on the ENICE Watchlist",
+        html: confirmationHtml(email),
+      }) as typeof confirmation;
+    } catch (sendErr) {
+      // Network-level throw (rare)
+      console.error("[watchlist] Confirmation throw:", sendErr);
+      res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
+      return;
     }
 
-    res.status(200).json({
-      ok: true,
-      scheduledReminders: [t2, t3, t4].filter((r) => r.status === "fulfilled").length,
-    });
+    if (confirmation.error) {
+      console.error("[watchlist] Confirmation SDK error:", JSON.stringify(confirmation.error));
+      res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
+      return;
+    }
+
+    // Step 2: Schedule the 3 reminder emails. These are best-effort —
+    // if the Resend plan doesn't support scheduled sends, we still succeed.
+    const reminders = await Promise.allSettled([
+      resend.emails.send({
+        from: FROM,
+        to: email,
+        subject: "3 Days Until We Engineer the Future — ENICE Group",
+        html: threeDayHtml(email),
+        scheduledAt: LAUNCH.threeDayReminder,
+      }),
+      resend.emails.send({
+        from: FROM,
+        to: email,
+        subject: "Tomorrow, Everything Changes — ENICE Group",
+        html: oneDayHtml(email),
+        scheduledAt: LAUNCH.oneDayReminder,
+      }),
+      resend.emails.send({
+        from: FROM,
+        to: email,
+        subject: "ENICE Group Is Live — You Have Early Access",
+        html: launchHtml(email),
+        scheduledAt: LAUNCH.launchMoment,
+      }),
+    ]);
+
+    const scheduled = reminders.filter(
+      (r) => r.status === "fulfilled" && !(r.value as { error?: unknown }).error
+    ).length;
+
+    if (scheduled < 3) {
+      console.warn("[watchlist] Some scheduled sends failed:", JSON.stringify(
+        reminders.map((r) => r.status === "fulfilled" ? (r.value as { error?: unknown }).error : r.reason)
+      ));
+    }
+
+    res.status(200).json({ ok: true, scheduledReminders: scheduled });
   } catch (err) {
-    console.error("[watchlist] Error:", err);
+    console.error("[watchlist] Unexpected error:", err);
     res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
   }
 }
