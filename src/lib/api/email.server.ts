@@ -4,7 +4,7 @@
  * no Node.js / Resend code ever reaches the browser.
  */
 import { Resend } from "resend";
-import { LAUNCH_EMAILS } from "@/lib/launch";
+import { LAUNCH_EMAILS } from "../launch.js";
 
 const FROM = "ENICE Group <noreply@enicehq.com>";
 

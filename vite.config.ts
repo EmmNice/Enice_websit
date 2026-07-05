@@ -1,14 +1,94 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function watchlistDevPlugin(): Plugin {
+  return {
+    name: "watchlist-dev-api",
+    configureServer(server) {
+      server.middlewares.use("/api/watchlist", async (req, res, next) => {
+        if (req.method !== "POST") return next();
+
+        // Rate limit (3 per IP per 10 min)
+        const ip =
+          (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
+          "unknown";
+        const now = Date.now();
+        const entry = rateLimitMap.get(ip);
+        if (!entry || now > entry.resetAt) {
+          rateLimitMap.set(ip, { count: 1, resetAt: now + 600_000 });
+        } else if (entry.count >= 3) {
+          res.writeHead(429, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "Too many requests. Please try again later." }));
+          return;
+        } else {
+          entry.count++;
+        }
+
+        // Parse body
+        let raw = "";
+        for await (const chunk of req) raw += chunk;
+        let email = "";
+        try {
+          const body = JSON.parse(raw);
+          email =
+            typeof body.email === "string"
+              ? body.email.trim().toLowerCase()
+              : "";
+        } catch {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "Invalid request body." }));
+          return;
+        }
+
+        if (!email || !EMAIL_RE.test(email) || email.length > 320) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "Please enter a valid email address." }));
+          return;
+        }
+
+        const apiKey = process.env.RESEND_API_KEY;
+        if (!apiKey) {
+          // No key in dev — return success so the form can be tested
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: true, scheduledReminders: 0, dev: true }));
+          return;
+        }
+
+        try {
+          // Dynamically load the shared email module (Node/Bun context, no bundling)
+          const { sendWatchlistEmails } = await import(
+            "./src/lib/api/email.server.js"
+          );
+          const result = await sendWatchlistEmails(email);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify(result));
+        } catch (err) {
+          console.error("[watchlist-dev] error:", err);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(
+            JSON.stringify({
+              ok: false,
+              error: "We could not process your request. Please try again.",
+            })
+          );
+        }
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     tsconfigPaths({ ignoreConfigErrors: true }),
     mcpPlugin(),
+    watchlistDevPlugin(),
     TanStackRouterVite({ autoCodeSplitting: true }),
     react(),
     tailwindcss(),
