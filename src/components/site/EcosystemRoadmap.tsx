@@ -4,10 +4,10 @@ import { Reveal } from "./Reveal";
 
 const MILESTONES = [
   {
-    status: "live" as const,
-    quarter: "2026",
+    status: "upcoming" as const,
+    quarter: "Q3 2026",
     product: "PulsePay",
-    headline: "Live Launch",
+    headline: "Launching Q3 2026",
     desc: "Our flagship high-volume transactional and digital wallet architecture.",
     index: "01",
   },
