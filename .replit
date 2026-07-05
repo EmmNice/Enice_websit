@@ -38,3 +38,8 @@ externalPort = 80
 deploymentTarget = "autoscale"
 run = ["bun", "run", ".output/server/index.mjs"]
 build = ["bun", "run", "build"]
+
+[userenv]
+
+[userenv.shared]
+RESEND_AUDIENCE_ID = "58c2ec8b-ad13-4582-8779-ea6500def2dd"
