@@ -35,8 +35,13 @@ import { isPreLaunch } from "@/lib/launch";
 // to the real landing page with no code change required.
 
 function IndexPage() {
-  // Initialise from the clock so SSR and first paint are consistent.
-  const [launched, setLaunched] = useState(() => !isPreLaunch());
+  // ?preview in the URL bypasses the launch gate so the team can review
+  // the full site before launch. Remove the param to return to coming soon.
+  const isPreview =
+    typeof window !== "undefined" &&
+    new URLSearchParams(window.location.search).has("preview");
+
+  const [launched, setLaunched] = useState(() => isPreview || !isPreLaunch());
 
   if (!launched) {
     return <ComingSoon onLaunched={() => setLaunched(true)} />;
