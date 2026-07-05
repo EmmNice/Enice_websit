@@ -7,6 +7,7 @@ import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const devWatchlistEmails = new Set<string>();
 
 function watchlistDevPlugin(): Plugin {
   return {
@@ -53,9 +54,17 @@ function watchlistDevPlugin(): Plugin {
           return;
         }
 
+        // Duplicate check (in-memory for dev)
+        if (devWatchlistEmails.has(email)) {
+          res.writeHead(409, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, code: "DUPLICATE" }));
+          return;
+        }
+
         const apiKey = process.env.RESEND_API_KEY;
         if (!apiKey) {
           // No key in dev — return success so the form can be tested
+          devWatchlistEmails.add(email);
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify({ ok: true, scheduledReminders: 0, dev: true }));
           return;
@@ -67,6 +76,7 @@ function watchlistDevPlugin(): Plugin {
             "./src/lib/api/email.server.js"
           );
           const result = await sendWatchlistEmails(email);
+          devWatchlistEmails.add(email);
           res.writeHead(200, { "Content-Type": "application/json" });
           res.end(JSON.stringify(result));
         } catch (err) {

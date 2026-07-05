@@ -12,7 +12,7 @@ interface TimeLeft {
   expired: boolean;
 }
 
-type FormState = "idle" | "loading" | "success" | "error";
+type FormState = "idle" | "loading" | "success" | "error" | "duplicate";
 
 // ─── Countdown logic ──────────────────────────────────────────────────────────
 
@@ -112,7 +112,11 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: email.trim() }),
         });
-        const json = await res.json() as { ok: boolean; error?: string };
+        const json = await res.json() as { ok: boolean; code?: string; error?: string };
+        if (res.status === 409 || json.code === "DUPLICATE") {
+          setFormState("duplicate");
+          return;
+        }
         if (!res.ok || !json.ok) throw new Error(json.error ?? "Something went wrong. Please try again.");
         setFormState("success");
       } catch (err) {
@@ -227,7 +231,7 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (formState === "error") setFormState("idle");
+                    if (formState === "error" || formState === "duplicate") setFormState("idle");
                   }}
                   placeholder="you@company.com"
                   disabled={formState === "loading"}
@@ -250,6 +254,12 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
                   )}
                 </button>
               </div>
+
+              {formState === "duplicate" && (
+                <p className="mt-3 text-xs text-white/60">
+                  You are already on the watchlist!
+                </p>
+              )}
 
               {formState === "error" && (
                 <div className="mt-3 flex items-center gap-2 text-left">

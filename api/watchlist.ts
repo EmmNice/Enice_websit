@@ -31,6 +31,61 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
+/**
+ * Checks all pages of a Resend Audience for a given email address.
+ * Returns true  → email already exists (duplicate)
+ * Returns false → email not found (new subscriber)
+ * Returns null  → check failed (API error); caller should fail closed
+ *
+ * Uses the Resend REST API directly so we control pagination fully.
+ * The SDK's contacts.list() does not expose page/cursor params.
+ */
+async function isEmailInAudience(
+  apiKey: string,
+  audienceId: string,
+  email: string
+): Promise<boolean | null> {
+  const BASE = "https://api.resend.com";
+  let page = 1;
+  const PAGE_SIZE = 100; // Resend default max per page
+
+  try {
+    while (true) {
+      const url = `${BASE}/audiences/${audienceId}/contacts?page=${page}&per_page=${PAGE_SIZE}`;
+      const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
+
+      if (!response.ok) {
+        console.error(
+          `[watchlist] Audience contacts fetch failed: ${response.status} ${response.statusText}`
+        );
+        return null; // fail closed
+      }
+
+      const json = (await response.json()) as {
+        data: Array<{ email: string }>;
+      };
+
+      const contacts: Array<{ email: string }> = json.data ?? [];
+
+      if (contacts.some((c) => c.email.toLowerCase() === email)) {
+        return true; // found duplicate
+      }
+
+      // If we got fewer results than the page size, we've seen everything
+      if (contacts.length < PAGE_SIZE) {
+        return false;
+      }
+
+      page++;
+    }
+  } catch (err) {
+    console.error("[watchlist] Exception while checking audience:", err);
+    return null; // fail closed
+  }
+}
+
 // ─── Email templates ──────────────────────────────────────────────────────────
 
 function confirmationHtml(email: string) {
@@ -188,7 +243,22 @@ export default async function handler(req: any, res: any) {
 
     const resend = new Resend(apiKey);
 
-    // Step 1: Send the required confirmation email first.
+    // Step 1: Duplicate check via Resend Contacts (all pages).
+    const audienceId = process.env.RESEND_AUDIENCE_ID;
+    if (audienceId) {
+      const isDuplicate = await isEmailInAudience(apiKey, audienceId, email);
+      if (isDuplicate === null) {
+        // Could not verify — fail closed rather than risk a duplicate send
+        res.status(500).json({ ok: false, error: "We could not verify your subscription status. Please try again." });
+        return;
+      }
+      if (isDuplicate) {
+        res.status(409).json({ ok: false, code: "DUPLICATE" });
+        return;
+      }
+    }
+
+    // Step 2: Send the required confirmation email first.
     // Resend v6 SDK returns { data, error } — it does NOT throw on API errors.
     let confirmation: { data: unknown; error: { message: string; name: string } | null };
     try {
@@ -245,6 +315,13 @@ export default async function handler(req: any, res: any) {
       console.warn("[watchlist] Some scheduled sends failed:", JSON.stringify(
         reminders.map((r) => r.status === "fulfilled" ? (r.value as { error?: unknown }).error : r.reason)
       ));
+    }
+
+    // Step 4: Record the contact so future submissions are caught as duplicates.
+    if (audienceId) {
+      await resend.contacts.create({ audienceId, email, unsubscribeOnClick: false }).catch((err) => {
+        console.warn("[watchlist] Could not save contact to audience:", err);
+      });
     }
 
     res.status(200).json({ ok: true, scheduledReminders: scheduled });
