@@ -182,7 +182,7 @@ export default async function handler(req: any, res: any) {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
       console.error("[watchlist] RESEND_API_KEY is not set");
-      res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
+      res.status(500).json({ ok: false, error: "Configuration error: RESEND_API_KEY is not set on the server." });
       return;
     }
 
@@ -207,7 +207,7 @@ export default async function handler(req: any, res: any) {
 
     if (confirmation.error) {
       console.error("[watchlist] Confirmation SDK error:", JSON.stringify(confirmation.error));
-      res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
+      res.status(500).json({ ok: false, error: `Resend error: ${confirmation.error.message}` });
       return;
     }
 
