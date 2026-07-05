@@ -43,6 +43,15 @@ const FOOTER_COLS = [
     ],
   },
   {
+    heading: "Updates",
+    links: [
+      { label: "Blog", to: "/blog/" },
+      { label: "Changelog", to: "/blog/" },
+      { label: "Roadmap", to: "/roadmap" },
+      { label: "Announcements", to: "/blog/" },
+    ],
+  },
+  {
     heading: "Legal",
     links: [
       { label: "Privacy Policy", to: "/privacy" },

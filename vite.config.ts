@@ -98,6 +98,11 @@ export default defineConfig({
     port: 5000,
     strictPort: true,
     allowedHosts: true,
+    watch: {
+      // Exclude the Sanity studio directory from Vite file-watching
+      // to avoid ENOSPC (too many file watchers) errors.
+      ignored: ["**/studio-enice-group/**", "**/.cache/**"],
+    },
   },
   optimizeDeps: {
     include: [
