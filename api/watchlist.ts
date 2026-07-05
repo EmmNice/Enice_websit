@@ -7,6 +7,7 @@
  *   4. Launch moment (scheduled)
  */
 import { Resend } from "resend";
+import { withErrorHandling } from "./lib/handler";
 
 const FROM = "ENICE Group <noreply@enicehq.com>";
 const LAUNCH = {
@@ -203,7 +204,7 @@ function launchHtml(email: string) {
 // ─── Handler ──────────────────────────────────────────────────────────────────
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default async function handler(req: any, res: any) {
+export default withErrorHandling(async function handler(req: any, res: any) {
   if (req.method !== "POST") {
     res.status(405).json({ ok: false, error: "Method not allowed" });
     return;
@@ -236,8 +237,8 @@ export default async function handler(req: any, res: any) {
   try {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      console.error("[watchlist] RESEND_API_KEY is not set");
-      res.status(500).json({ ok: false, error: "Configuration error: RESEND_API_KEY is not set on the server." });
+      console.error("[watchlist] RESEND_API_KEY is not configured");
+      res.status(500).json({ ok: false, error: "We could not process your request. Please try again shortly." });
       return;
     }
 
@@ -276,8 +277,9 @@ export default async function handler(req: any, res: any) {
     }
 
     if (confirmation.error) {
+      // Log full provider detail privately — never expose to the client
       console.error("[watchlist] Confirmation SDK error:", JSON.stringify(confirmation.error));
-      res.status(500).json({ ok: false, error: `Resend error: ${confirmation.error.message}` });
+      res.status(500).json({ ok: false, error: "We could not process your request. Please try again shortly." });
       return;
     }
 
@@ -329,4 +331,4 @@ export default async function handler(req: any, res: any) {
     console.error("[watchlist] Unexpected error:", err);
     res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
   }
-}
+});

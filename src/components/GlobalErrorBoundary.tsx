@@ -1,40 +1,55 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-} from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
-import { RefreshCw, ArrowLeft } from "lucide-react";
+/**
+ * GlobalErrorBoundary — class-based React Error Boundary.
+ *
+ * Wraps the entire application in main.tsx. Catches any crash that TanStack
+ * Router's own errorComponent cannot (e.g. the router itself failing, errors
+ * in providers, or any component outside the router tree).
+ *
+ * Must be a class component — React's Error Boundary API requires lifecycle
+ * methods that are not available in function components.
+ */
+import { Component, type ReactNode, type ErrorInfo } from "react";
+import { RefreshCw } from "lucide-react";
 
-function NotFoundComponent() {
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
-      </div>
-    </div>
-  );
+interface Props {
+  children: ReactNode;
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
-  // Log privately — never surfaced to the user
-  console.error("[RouteErrorBoundary]", error);
-  const router = useRouter();
+interface State {
+  hasError: boolean;
+}
 
+export class GlobalErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): State {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    // Log privately — never exposed to the user
+    console.error("[GlobalErrorBoundary] Uncaught error:", error);
+    console.error("[GlobalErrorBoundary] Component stack:", info.componentStack);
+  }
+
+  private handleRetry = () => {
+    this.setState({ hasError: false });
+  };
+
+  render() {
+    if (this.state.hasError) {
+      return <GlobalErrorFallback onRetry={this.handleRetry} />;
+    }
+    return this.props.children;
+  }
+}
+
+// ─── Branded fallback screen ──────────────────────────────────────────────────
+
+function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
   return (
     <div
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5"
@@ -46,6 +61,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20"
           style={{ background: "radial-gradient(ellipse, #1d4ed8 0%, transparent 70%)" }}
         />
+        {/* Subtle grid */}
         <div
           className="absolute inset-0 opacity-[0.03]"
           style={{
@@ -87,7 +103,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
           </span>
         </h1>
 
-        {/* Copy — exact text requested */}
+        {/* Body copy — exact text requested */}
         <p className="mb-10 max-w-sm text-[15px] leading-relaxed text-white/45">
           We are fixing it right now — please refresh the page or try again
           shortly.
@@ -99,14 +115,13 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             onClick={() => window.location.reload()}
             className="group inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white transition-all hover:bg-blue-500 active:scale-95"
           >
-            <RefreshCw className="h-4 w-4 transition-transform duration-500 group-hover:rotate-180" />
+            <RefreshCw className="h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
             Refresh page
           </button>
           <button
-            onClick={() => { router.invalidate(); reset(); }}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-6 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
+            onClick={onRetry}
+            className="inline-flex h-11 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-6 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
           >
-            <ArrowLeft className="h-4 w-4" />
             Try again
           </button>
         </div>
@@ -123,21 +138,5 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         </p>
       </div>
     </div>
-  );
-}
-
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  component: RootComponent,
-  notFoundComponent: NotFoundComponent,
-  errorComponent: ErrorComponent,
-});
-
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
   );
 }
