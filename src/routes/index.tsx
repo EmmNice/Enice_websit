@@ -21,8 +21,8 @@ import { AboutMatrix } from "@/components/site/AboutMatrix";
 import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Roadmap } from "@/components/site/Roadmap";
 import { Careers } from "@/components/site/Careers";
-import { PartnersStrip } from "@/components/site/PartnersStrip";
-import { PressSection } from "@/components/site/PressSection";
+import { EcosystemRoadmap } from "@/components/site/EcosystemRoadmap";
+import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
@@ -281,9 +281,9 @@ function Landing() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════
-          PARTNERS STRIP
+          ECOSYSTEM ROADMAP
       ══════════════════════════════════════════════════════════════ */}
-      <PartnersStrip />
+      <EcosystemRoadmap />
 
       {/* ══════════════════════════════════════════════════════════════
           CORE VERTICALS
@@ -498,7 +498,7 @@ function Landing() {
       <AboutMatrix />
       <NetworkMetrics />
       <Roadmap />
-      <PressSection />
+      <InfraStack />
       <FAQSection />
       <Careers />
 
