@@ -106,22 +106,45 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
       if (!email.trim() || formState === "loading" || formState === "success") return;
       setFormState("loading");
       setErrorMsg("");
+      const FRIENDLY_FALLBACK =
+        "Oops! Something went wrong on our end. Please try again in a moment.";
       try {
         const res = await fetch("/api/watchlist", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: email.trim() }),
         });
-        const json = await res.json() as { ok: boolean; code?: string; error?: string };
+
+        // Guard: the server is contractually expected to always return JSON.
+        // If a platform-level failure (e.g. a crashed function, a proxy error
+        // page, or a network edge case) returns HTML/plain text instead, we
+        // must never surface that raw payload to the user — fail closed with
+        // a friendly message instead of letting `JSON.parse` throw upward.
+        let json: { ok: boolean; code?: string; error?: string } | null = null;
+        try {
+          json = (await res.json()) as { ok: boolean; code?: string; error?: string };
+        } catch (parseErr) {
+          console.error("[watchlist] Non-JSON response from server:", parseErr);
+          setFormState("error");
+          setErrorMsg(FRIENDLY_FALLBACK);
+          return;
+        }
+
         if (res.status === 409 || json.code === "DUPLICATE") {
           setFormState("duplicate");
           return;
         }
-        if (!res.ok || !json.ok) throw new Error(json.error ?? "Something went wrong. Please try again.");
+        if (!res.ok || !json.ok) {
+          setFormState("error");
+          setErrorMsg(json.error ?? FRIENDLY_FALLBACK);
+          return;
+        }
         setFormState("success");
       } catch (err) {
+        // Network failure or any other unexpected client-side error.
+        console.error("[watchlist] Request failed:", err);
         setFormState("error");
-        setErrorMsg(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+        setErrorMsg(FRIENDLY_FALLBACK);
       }
     },
     [email, formState]
