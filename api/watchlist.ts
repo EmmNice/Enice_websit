@@ -221,28 +221,40 @@ export default withErrorHandling(async function handler(req: any, res: any) {
 
     const resend = new Resend(apiKey);
 
-    // Step 1: Idempotently upsert the contact into the audience.
-    // Resend's POST /audiences/:id/contacts is idempotent on (audienceId, email):
-    // re-submitting an existing email is a no-op that returns the existing
-    // contact — no pagination, no scan, constant-time regardless of audience
-    // size. This keeps the function well under Vercel's 10s cold-start budget.
+    // Step 1: Check for an existing contact by direct email lookup — O(1),
+    // not a pagination scan — so this stays well under Vercel's 10s budget
+    // regardless of audience size. If found, this is a duplicate signup.
     const audienceId = process.env.RESEND_AUDIENCE_ID;
     if (audienceId) {
-      const contact = await resend.contacts.create({
+      const existing = await resend.contacts
+        .get({ audienceId, email })
+        .catch((err) => {
+          // Network-level throw. Treat as "not found" so a transient lookup
+          // failure never blocks a legitimate first-time signup.
+          console.warn("[watchlist] contacts.get threw:", err);
+          return null;
+        });
+
+      if (existing && !existing.error && existing.data) {
+        res.status(409).json({ ok: false, code: "DUPLICATE" });
+        return;
+      }
+
+      const created = await resend.contacts.create({
         audienceId,
         email,
         unsubscribeOnClick: false,
       }).catch((err) => {
-        // Network-level throw. Log and continue — a failed contact upsert
+        // Network-level throw. Log and continue — a failed contact create
         // should not block the confirmation email the user is expecting.
         console.warn("[watchlist] contacts.create threw:", err);
         return null;
       });
 
-      if (contact && (contact as { error?: unknown }).error) {
+      if (created && (created as { error?: unknown }).error) {
         console.warn(
           "[watchlist] contacts.create returned error:",
-          JSON.stringify((contact as { error: unknown }).error)
+          JSON.stringify((created as { error: unknown }).error)
         );
       }
     }
