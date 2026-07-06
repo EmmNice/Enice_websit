@@ -56,60 +56,13 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-/**
- * Checks all pages of a Resend Audience for a given email address.
- * Returns true  → email already exists (duplicate)
- * Returns false → email not found (new subscriber)
- * Returns null  → check failed (API error); caller should fail closed
- *
- * Uses the Resend REST API directly so we control pagination fully.
- * The SDK's contacts.list() does not expose page/cursor params.
- */
-async function isEmailInAudience(
-  apiKey: string,
-  audienceId: string,
-  email: string
-): Promise<boolean | null> {
-  const BASE = "https://api.resend.com";
-  let page = 1;
-  const PAGE_SIZE = 100; // Resend default max per page
-
-  try {
-    while (true) {
-      const url = `${BASE}/audiences/${audienceId}/contacts?page=${page}&per_page=${PAGE_SIZE}`;
-      const response = await fetch(url, {
-        headers: { Authorization: `Bearer ${apiKey}` },
-      });
-
-      if (!response.ok) {
-        console.error(
-          `[watchlist] Audience contacts fetch failed: ${response.status} ${response.statusText}`
-        );
-        return null; // fail closed
-      }
-
-      const json = (await response.json()) as {
-        data: Array<{ email: string }>;
-      };
-
-      const contacts: Array<{ email: string }> = json.data ?? [];
-
-      if (contacts.some((c) => c.email.toLowerCase() === email)) {
-        return true; // found duplicate
-      }
-
-      // If we got fewer results than the page size, we've seen everything
-      if (contacts.length < PAGE_SIZE) {
-        return false;
-      }
-
-      page++;
-    }
-  } catch (err) {
-    console.error("[watchlist] Exception while checking audience:", err);
-    return null; // fail closed
-  }
-}
+// Note: We no longer paginate through the Resend audience to pre-check for
+// duplicates. That approach scaled O(N) per signup and would time out the
+// 10s Vercel function once the audience grew past a few hundred contacts.
+// Instead we rely on `resend.contacts.create` being idempotent on
+// (audienceId, email) — creating an already-existing contact is a no-op that
+// returns the existing contact's id without error. Abuse from a single user
+// resubmitting is bounded by the in-memory rate limiter above (3 / 10min / IP).
 
 // ─── Email templates ──────────────────────────────────────────────────────────
 
