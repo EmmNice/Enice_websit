@@ -21,9 +21,9 @@ const MILESTONES = [
   },
   {
     status: "upcoming" as const,
-    quarter: "Q4 2028",
+    quarter: "Q3 2027",
     product: "PulseX",
-    headline: "Launching Q4 2028",
+    headline: "Launching Q3 2027",
     desc: "Next-generation multi-asset value processing and enterprise-grade billing rails.",
     index: "03",
   },
