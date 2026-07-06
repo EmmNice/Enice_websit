@@ -94,11 +94,76 @@ function watchlistDevPlugin(): Plugin {
   };
 }
 
+function adminWatchlistDevPlugin(): Plugin {
+  return {
+    name: "admin-watchlist-dev-api",
+    configureServer(server) {
+      server.middlewares.use("/api/admin/watchlist", async (req, res, next) => {
+        if (req.method !== "GET") return next();
+
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        if (!adminPassword) {
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "Admin access is not configured." }));
+          return;
+        }
+
+        if (req.headers["x-admin-password"] !== adminPassword) {
+          res.writeHead(401, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "Invalid password." }));
+          return;
+        }
+
+        const apiKey = process.env.RESEND_API_KEY;
+        const audienceId = process.env.RESEND_AUDIENCE_ID;
+        if (!apiKey || !audienceId) {
+          // No Resend key in dev — return the in-memory dev sign-ups instead
+          const contacts = Array.from(devWatchlistEmails).map((email, i) => ({
+            id: `dev-${i}`,
+            email,
+            created_at: new Date().toISOString(),
+            unsubscribed: false,
+          }));
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: true, contacts, total: contacts.length, dev: true }));
+          return;
+        }
+
+        try {
+          const { Resend } = await import("resend");
+          const resend = new Resend(apiKey);
+          const result = await resend.contacts.list({ audienceId });
+          if (result.error) {
+            res.writeHead(502, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ ok: false, error: "Could not fetch watchlist from provider." }));
+            return;
+          }
+          const contacts = (result.data?.data ?? [])
+            .map((c) => ({
+              id: c.id,
+              email: c.email,
+              created_at: c.created_at,
+              unsubscribed: c.unsubscribed,
+            }))
+            .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: true, contacts, total: contacts.length }));
+        } catch (err) {
+          console.error("[admin-watchlist-dev] error:", err);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "An unexpected error occurred." }));
+        }
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     tsconfigPaths({ ignoreConfigErrors: true }),
     mcpPlugin(),
     watchlistDevPlugin(),
+    adminWatchlistDevPlugin(),
     TanStackRouterVite({ autoCodeSplitting: true }),
     react(),
     tailwindcss(),
