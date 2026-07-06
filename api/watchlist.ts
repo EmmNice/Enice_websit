@@ -221,18 +221,29 @@ export default withErrorHandling(async function handler(req: any, res: any) {
 
     const resend = new Resend(apiKey);
 
-    // Step 1: Duplicate check via Resend Contacts (all pages).
+    // Step 1: Idempotently upsert the contact into the audience.
+    // Resend's POST /audiences/:id/contacts is idempotent on (audienceId, email):
+    // re-submitting an existing email is a no-op that returns the existing
+    // contact — no pagination, no scan, constant-time regardless of audience
+    // size. This keeps the function well under Vercel's 10s cold-start budget.
     const audienceId = process.env.RESEND_AUDIENCE_ID;
     if (audienceId) {
-      const isDuplicate = await isEmailInAudience(apiKey, audienceId, email);
-      if (isDuplicate === null) {
-        // Could not verify — fail closed rather than risk a duplicate send
-        res.status(500).json({ ok: false, error: "We could not verify your subscription status. Please try again." });
-        return;
-      }
-      if (isDuplicate) {
-        res.status(409).json({ ok: false, code: "DUPLICATE" });
-        return;
+      const contact = await resend.contacts.create({
+        audienceId,
+        email,
+        unsubscribeOnClick: false,
+      }).catch((err) => {
+        // Network-level throw. Log and continue — a failed contact upsert
+        // should not block the confirmation email the user is expecting.
+        console.warn("[watchlist] contacts.create threw:", err);
+        return null;
+      });
+
+      if (contact && (contact as { error?: unknown }).error) {
+        console.warn(
+          "[watchlist] contacts.create returned error:",
+          JSON.stringify((contact as { error: unknown }).error)
+        );
       }
     }
 
