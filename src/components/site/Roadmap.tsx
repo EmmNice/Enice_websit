@@ -18,17 +18,17 @@ interface Milestone {
 
 const MILESTONES: Milestone[] = [
   {
-    when: "Q2 2026",
-    quarter: "Q2 2026",
+    when: "Q1 2026",
+    quarter: "Q1 2026",
     status: "completed",
     product: "ENICE Core",
-    title: "Shared Ecosystem Infrastructure Framework",
+    title: "Shared Ecosystem Framework",
     body: "Unified AI pipeline, high-velocity ledger, and automated compliance backbone now underpins every ENICE venture.",
     tags: ["Infrastructure", "AI", "Compliance"],
   },
   {
-    when: "Q2 2026",
-    quarter: "Q2 2026",
+    when: "Q3 2026",
+    quarter: "Q3 2026",
     status: "completed",
     product: "PulsePay",
     title: "Extended Pilot — Regional Treasury Partners",
@@ -36,8 +36,8 @@ const MILESTONES: Milestone[] = [
     tags: ["Fintech", "Wallets", "KYC"],
   },
   {
-    when: "Q3 2026",
-    quarter: "Q3 2026",
+    when: "Q4 2026",
+    quarter: "Q4 2026",
     status: "in-progress",
     product: "PulseAssist",
     title: "Enterprise B2B Launch",
@@ -45,8 +45,8 @@ const MILESTONES: Milestone[] = [
     tags: ["AI", "B2B", "Telecom"],
   },
   {
-    when: "Q3 2026",
-    quarter: "Q3 2026",
+    when: "Q2 2026",
+    quarter: "Q2 2026",
     status: "in-progress",
     product: "PulsePay",
     title: "Developer API — Public Beta",
@@ -54,8 +54,8 @@ const MILESTONES: Milestone[] = [
     tags: ["API", "Developer", "Fintech"],
   },
   {
-    when: "Q4 2026",
-    quarter: "Q4 2026",
+    when: "Q3 2026",
+    quarter: "Q3 2026",
     status: "planned",
     product: "PulsePay",
     title: "Multi-Currency Expansion",
@@ -63,12 +63,12 @@ const MILESTONES: Milestone[] = [
     tags: ["Fintech", "Multi-Currency", "Treasury"],
   },
   {
-    when: "Q4 2026",
-    quarter: "Q4 2026",
+    when: "Q4 2027",
+    quarter: "Q4 2027",
     status: "planned",
-    product: "EPulse",
+    product: "ePulse",
     title: "Digital Banking Infrastructure — Closed Alpha",
-    body: "EPulse begins closed alpha testing with select institutional partners, covering digital banking core, account management, and statement APIs.",
+    body: "ePulse begins closed alpha testing with select institutional partners, covering digital banking core, account management, and statement APIs.",
     tags: ["Banking", "Alpha"],
   },
   {
