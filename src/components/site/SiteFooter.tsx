@@ -38,7 +38,7 @@ const FOOTER_COLS = [
     links: [
       { label: "PulsePay", to: "/portfolio" },
       { label: "PulseAssist", to: "/portfolio" },
-      { label: "EPulse", to: "/portfolio" },
+      { label: "ePulse", to: "/portfolio" },
       { label: "PulseX", to: "/portfolio" },
     ],
   },
@@ -46,9 +46,9 @@ const FOOTER_COLS = [
     heading: "Updates",
     links: [
       { label: "Blog", to: "/blog/" },
-      { label: "Changelog", to: "/blog/" },
+      { label: "Announcement", to: "/blog/" },
       { label: "Roadmap", to: "/roadmap" },
-      { label: "Announcements", to: "/blog/" },
+      { label: "System Status", href: "https://status.enice.group" },
     ],
   },
   {
