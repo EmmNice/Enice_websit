@@ -307,13 +307,6 @@ export default withErrorHandling(async function handler(req: any, res: any) {
       ));
     }
 
-    // Step 4: Record the contact so future submissions are caught as duplicates.
-    if (audienceId) {
-      await resend.contacts.create({ audienceId, email, unsubscribeOnClick: false }).catch((err) => {
-        console.warn("[watchlist] Could not save contact to audience:", err);
-      });
-    }
-
     res.status(200).json({ ok: true, scheduledReminders: scheduled });
   } catch (err) {
     console.error("[watchlist] Unexpected error:", err);
