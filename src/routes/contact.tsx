@@ -191,13 +191,16 @@ function ContactPage() {
                 {status === "error" && (
                   <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
-                    Something went wrong. Please try again or email us directly at{" "}
-                    <a href="mailto:corporate@enicehq.com" className="underline">
-                      corporate@enicehq.com
-                    </a>
-                    .
+                    <p className="min-w-0 flex-1 break-words">
+                      {errorMessage || "Something went wrong."} You can also email us directly at{" "}
+                      <a href="mailto:corporate@enicehq.com" className="break-all underline">
+                        corporate@enicehq.com
+                      </a>
+                      .
+                    </p>
                   </div>
                 )}
+
 
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field
