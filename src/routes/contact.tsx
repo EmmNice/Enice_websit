@@ -34,11 +34,11 @@ const INQUIRY_OPTIONS = [
   "General Corporate Inquiry",
 ];
 
-// ─── Formspree endpoint ───────────────────────────────────────────────────────
-// Register a free form at https://formspree.io and replace this with your
-// unique form ID: https://formspree.io/f/<YOUR_FORM_ID>
+// ─── Contact endpoint ─────────────────────────────────────────────────────────
+// Server-side Vercel function that forwards submissions to corporate@enicehq.com
+// via Resend. See api/contact.ts.
 
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/xzzpkrnj";
+const CONTACT_ENDPOINT = "/api/contact";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -51,6 +51,7 @@ function ContactPage() {
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -58,29 +59,34 @@ function ContactPage() {
       return;
 
     setStatus("submitting");
+    setErrorMessage("");
 
     try {
-      const res = await fetch(FORMSPREE_ENDPOINT, {
+      const res = await fetch(CONTACT_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           name: form.name,
           email: form.email,
           company: form.company,
-          inquiry: form.inquiry || "–",
+          inquiry: form.inquiry,
           message: form.message,
         }),
       });
 
-      if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.ok) {
         setStatus("success");
       } else {
+        setErrorMessage(data?.error || "Something went wrong. Please try again.");
         setStatus("error");
       }
     } catch {
+      setErrorMessage("Network error. Please check your connection and try again.");
       setStatus("error");
     }
   }
+
 
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
