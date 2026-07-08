@@ -4,7 +4,7 @@ import { LegalPage } from "@/components/site/LegalPage";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service — ENICE Group" },
+      { title: "Terms of Service | ENICE Group" },
       {
         name: "description",
         content:
@@ -16,10 +16,10 @@ export const Route = createFileRoute("/terms")({
     <LegalPage
       kicker="Legal · Service Agreement"
       title="Terms of Service"
-      intro="By accessing or using the websites, infrastructure, or commerce platforms operated by ENICE Group, you agree to be bound by these Terms of Service. If you do not agree, you must discontinue use immediately."
+      intro="By accessing or using the websites, infrastructure, or commerce platforms operated by ENICE Group, you agree to be bound by these Terms of Service. If you do not agree, please discontinue use immediately."
       sections={[
         {
-          heading: "Eligibility & Accounts",
+          heading: "Eligibility and Accounts",
           body: (
             <p>
               To use certain enterprise or platform features, you may be required to register
