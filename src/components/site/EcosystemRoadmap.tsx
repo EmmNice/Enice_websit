@@ -8,7 +8,7 @@ const MILESTONES = [
     quarter: "Q3 2026",
     product: "PulsePay",
     headline: "Launching Q3 2026",
-    desc: "Our flagship high-volume transactional and digital wallet architecture.",
+    desc: "Our flagship high-volume transaction and digital wallet platform.",
     index: "01",
   },
   {
@@ -16,7 +16,7 @@ const MILESTONES = [
     quarter: "Q3 2026",
     product: "PulseAssist",
     headline: "Launching Q3 2026",
-    desc: "Proprietary B2B SaaS platform designed for automated financial operations and AI-driven micro-transactions.",
+    desc: "A B2B SaaS platform for automated financial operations and AI-driven micro-transactions.",
     index: "02",
   },
   {
@@ -24,7 +24,7 @@ const MILESTONES = [
     quarter: "Q3 2027",
     product: "PulseX",
     headline: "Launching Q3 2027",
-    desc: "Next-generation multi-asset value processing and enterprise-grade billing rails.",
+    desc: "Next-generation multi-asset value processing and enterprise billing rails.",
     index: "03",
   },
 ] as const;
@@ -45,10 +45,10 @@ export function EcosystemRoadmap() {
               Product Roadmap
             </div>
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
-              The ENICE Group Ecosystem Roadmap.
+              The ENICE Group ecosystem roadmap.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              A phased rollout of purpose-built ventures — each platform
+              A phased rollout of the platforms we are building, each one
               engineered for institutional scale from day one.
             </p>
           </div>

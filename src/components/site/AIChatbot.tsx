@@ -10,7 +10,7 @@ type Message = { from: "bot" | "user"; text: string };
 const SEED_MESSAGES: Message[] = [
   {
     from: "bot",
-    text: "Welcome to ENICE Group. Ask about PulsePay, PulseAssist, or partnership opportunities — or contact us directly at corporate@enicehq.com.",
+    text: "Welcome to ENICE Group. Ask about PulsePay, PulseAssist, or partnership opportunities, or reach us directly at corporate@enicehq.com.",
   },
 ];
 
@@ -18,7 +18,7 @@ const SEED_MESSAGES: Message[] = [
 // This is a static fallback reply. Replace with a real AI endpoint when ready.
 
 const BOT_REPLY =
-  "Thank you for reaching out. An ENICE specialist will follow up shortly. For urgent matters, write directly to corporate@enicehq.com.";
+  "Thanks for reaching out. A member of our team will follow up shortly. For urgent matters, write to corporate@enicehq.com.";
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -84,7 +84,7 @@ export function AIChatbot() {
               </div>
               <div className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                Online · replies within 1 business day
+                Online, replies within one business day
               </div>
             </div>
           </div>

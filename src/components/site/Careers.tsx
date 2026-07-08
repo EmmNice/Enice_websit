@@ -15,9 +15,9 @@ export function Careers() {
           Building the future of financial infrastructure?
         </h2>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          We engage engineers, strategists, and institutional operators who are
-          serious about infrastructure that scales. If you build at the frontier,
-          we want to hear from you.
+          We work with engineers, strategists, and institutional operators who
+          are serious about infrastructure that scales. If you build at the
+          frontier, we want to hear from you.
         </p>
         <Link
           to="/contact"

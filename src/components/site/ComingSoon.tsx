@@ -202,17 +202,17 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
 
         {/* Headline */}
         <h1 className="mb-5 text-4xl font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl md:text-6xl">
-          Engineering the
+          Building the
           <br />
           <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-            Future of Commerce.
+            future of commerce.
           </span>
         </h1>
 
         {/* Sub-copy */}
         <p className="mb-12 max-w-lg text-base leading-relaxed text-white/45 sm:mb-14 sm:text-lg">
-          A venture-grade technology ecosystem built for the next era of global commerce.
-          Four platforms. Three verticals. One infrastructure stack.
+          A venture-grade technology ecosystem for the next era of global
+          commerce. Four platforms, three verticals, one infrastructure stack.
         </p>
 
         {/* ── Countdown ── */}
@@ -240,7 +240,7 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
               <div className="text-left">
                 <p className="text-sm font-semibold text-emerald-300">You're on the list.</p>
                 <p className="text-xs text-emerald-500/80">
-                  Confirmation sent — we'll notify you at launch.
+                  Confirmation sent. We'll notify you at launch.
                 </p>
               </div>
             </div>
@@ -280,7 +280,7 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
 
               {formState === "duplicate" && (
                 <p className="mt-3 text-xs text-white/60">
-                  You are already on the watchlist!
+                  You're already on the watchlist.
                 </p>
               )}
 
@@ -292,8 +292,8 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
               )}
 
               <p className="mt-3 text-[11px] text-white/25">
-                No spam. You'll receive 4 emails total — confirmation, two reminders, and the
-                launch announcement.
+                No spam. You'll receive four emails in total: a confirmation, two
+                reminders, and the launch announcement.
               </p>
             </form>
           )}
@@ -301,7 +301,7 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
 
         {/* Bottom meta */}
         <div className="mt-14 flex items-center gap-5 text-[11px] font-medium text-white/20 sm:mt-16">
-          <span>Abuja &amp; Kaduna, Nigeria</span>
+          <span>Abuja and Kaduna, Nigeria</span>
           <span className="h-3 w-px bg-white/10" />
           <span>Est. 2026</span>
           <span className="h-3 w-px bg-white/10" />

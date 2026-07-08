@@ -170,7 +170,7 @@ export function SiteHeader() {
               ENICE Group
             </div>
             <p className="mt-1 text-[12px] text-muted-foreground">
-              Engineering the infrastructure for tomorrow.
+              Building infrastructure for what's next.
             </p>
           </div>
         </aside>

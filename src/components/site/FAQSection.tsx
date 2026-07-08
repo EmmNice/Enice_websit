@@ -12,23 +12,23 @@ import { Reveal } from "./Reveal";
 const FAQS = [
   {
     q: "How does ENICE Group incubate ventures?",
-    a: "Every venture begins inside the studio with shared access to the ENICE Core — the AI, ledger, and compliance backbone. From concept and capitalization through engineering and go-to-market, a venture graduates from incubation only after meeting institutional thresholds for security, reliability, and unit economics.",
+    a: "Every venture begins inside the studio with shared access to the ENICE Core, our AI, ledger, and compliance backbone. From concept and funding through engineering and go-to-market, a venture graduates from incubation only after meeting institutional thresholds for security, reliability, and unit economics.",
   },
   {
     q: "Which industries does ENICE Group serve?",
-    a: "Our primary verticals are financial services, telecommunications, and enterprise operations. PulsePay targets payment infrastructure; PulseAssist serves regulated support operations; EPulse and PulseX extend the ecosystem into digital banking and global digital asset trading.",
+    a: "Our primary verticals are financial services, telecommunications, and enterprise operations. PulsePay targets payments infrastructure, PulseAssist serves regulated support operations, and EPulse and PulseX extend the ecosystem into digital banking and global digital asset trading.",
   },
   {
     q: "What does the ENICE Core provide?",
-    a: "A unified AI and automation pipeline, a high-velocity ledger and payment core, an automated KYC and compliance layer, and a global cloud grid. Each is shared infrastructure — ventures inherit enterprise-grade scale, security posture, and observability from day one.",
+    a: "A unified AI and automation pipeline, a high-velocity ledger and payment core, an automated KYC and compliance layer, and a global cloud grid. Each is shared infrastructure, so every venture inherits enterprise-grade scale, security, and observability from day one.",
   },
   {
     q: "How does ENICE Group approach security and compliance?",
-    a: "We operate a zero-trust architecture with per-tenant database isolation, row-level security enforcement, audit logging, and continuous controls monitoring. Every system is designed for regulatory readiness from inception, aligned with SOC 2 control objectives.",
+    a: "We operate a zero-trust architecture with per-tenant database isolation, row-level security, audit logging, and continuous controls monitoring. Every system is designed for regulatory readiness from day one and aligned with SOC 2 control objectives.",
   },
   {
     q: "How can partners or institutions engage with ENICE Group?",
-    a: "Institutional partners, regulators, and enterprise customers can reach our partnerships desk via the Contact page. Qualified inquiries are reviewed by a partner and responded to within two business days.",
+    a: "Institutional partners, regulators, and enterprise customers can reach our partnerships desk through the Contact page. Qualified inquiries are reviewed by a partner and answered within two business days.",
   },
 ];
 
@@ -48,7 +48,7 @@ export function FAQSection() {
               Questions, answered.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              A precise look at how ENICE Group operates, builds, and partners.
+              A clear look at how ENICE Group operates, builds, and partners.
             </p>
           </div>
         </Reveal>

@@ -6,17 +6,17 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/portfolio")({
   head: () => ({
     meta: [
-      { title: "Portfolio — ENICE Group Ecosystem" },
+      { title: "Portfolio | ENICE Group Ecosystem" },
       {
         name: "description",
         content:
-          "Explore the ENICE Group portfolio — active, proprietary software products and infrastructure networks built for modern financial and enterprise operations.",
+          "Explore the ENICE Group portfolio: proprietary software products and infrastructure networks built for modern financial and enterprise operations.",
       },
       { property: "og:title", content: "ENICE Group Portfolio" },
       {
         property: "og:description",
         content:
-          "Active proprietary software products and infrastructure networks built by ENICE Group.",
+          "Proprietary software products and infrastructure networks built by ENICE Group.",
       },
     ],
   }),
@@ -122,9 +122,9 @@ function PortfolioPage() {
                   PulsePay
                 </h2>
                 <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                  A virtual payment infrastructure platform enabling Naira and USD
-                  virtual card issuance, automated KYC verification, peer-to-peer
-                  asset transfers, and optimized value-added service delivery.
+                  A virtual payment platform that issues Naira and USD cards,
+                  handles KYC verification, moves funds between users, and
+                  delivers value-added services with speed and reliability.
                 </p>
                 <a
                   href="mailto:corporate@enicehq.com"
@@ -191,10 +191,10 @@ function PortfolioPage() {
                   PulseAssist
                 </h2>
                 <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                  A multi-tenant AI operations platform providing telecommunications
-                  companies and financial networks with autonomous customer support
-                  routing, API-driven account management, and real-time live-agent
-                  failover capabilities.
+                  A multi-tenant AI operations platform for telecoms and financial
+                  networks. It handles customer support routing, provides
+                  API-driven account management, and hands calls to live agents
+                  in real time when needed.
                 </p>
                 <a
                   href="mailto:corporate@enicehq.com"

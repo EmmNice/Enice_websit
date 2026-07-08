@@ -7,16 +7,16 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact — ENICE Group" },
+      { title: "Contact | ENICE Group" },
       {
         name: "description",
         content:
-          "Connect with the ENICE Group executive or engineering office regarding integration, enterprise licensing, or venture partnerships.",
+          "Reach the ENICE Group executive and engineering office about integration, enterprise licensing, or venture partnerships.",
       },
       { property: "og:title", content: "Contact ENICE Group" },
       {
         property: "og:description",
-        content: "Enterprise engagement and corporate inquiries — ENICE Group.",
+        content: "Enterprise engagement and corporate inquiries at ENICE Group.",
       },
     ],
   }),
@@ -29,8 +29,8 @@ const SHADOW_CARD = "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,
 
 const INQUIRY_OPTIONS = [
   "Fintech Infrastructure Integration (PulsePay)",
-  "Telecom / Banking AI Deployment (PulseAssist)",
-  "Venture Strategic Partnership",
+  "Telecom or Banking AI Deployment (PulseAssist)",
+  "Strategic Venture Partnership",
   "General Corporate Inquiry",
 ];
 
@@ -102,7 +102,7 @@ function ContactPage() {
             Get in Touch
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Connect with the ENICE Group executive or engineering office regarding
+            Reach the ENICE Group executive and engineering office about
             integration, enterprise licensing, or venture partnerships.
           </p>
         </div>
@@ -143,7 +143,7 @@ function ContactPage() {
                       Offices
                     </div>
                     <div className="mt-1 text-sm text-foreground">
-                      Abuja · Kaduna, Nigeria
+                      Abuja and Kaduna, Nigeria
                     </div>
                   </div>
                 </li>
@@ -158,8 +158,8 @@ function ContactPage() {
                 Response SLA
               </div>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                Formal inquiries are reviewed by an ENICE partner and responded to
-                within two business days.
+                Inquiries are reviewed by an ENICE partner and answered within
+                two business days.
               </p>
             </div>
           </aside>
@@ -180,8 +180,8 @@ function ContactPage() {
                   Thank you, {form.name.split(" ")[0] || "partner"}.
                 </h3>
                 <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                  Your submission has been routed to the appropriate ENICE office. A
-                  partner will respond within two business days.
+                  Your message has been routed to the right team. A partner will
+                  respond within two business days.
                 </p>
               </div>
             ) : (
@@ -256,7 +256,7 @@ function ContactPage() {
                     }
                     rows={6}
                     required
-                    placeholder="Describe the integration, partnership, or operational scope you'd like to discuss."
+                    placeholder="Tell us about the integration, partnership, or project you'd like to discuss."
                     className="mt-2 block w-full resize-none rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
                   />
                 </div>
