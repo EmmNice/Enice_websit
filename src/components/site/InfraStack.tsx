@@ -6,26 +6,26 @@ const STACK = [
   {
     name: "Monnify",
     provider: "by Moniepoint",
-    label: "Primary Banking & Virtual Account Rails",
+    label: "Primary Banking and Virtual Account Rails",
     index: "01",
   },
   {
     name: "Paystack",
     provider: "by Stripe",
-    label: "Card Processing & Collection Gateway",
+    label: "Card Processing and Collection Gateway",
     index: "02",
   },
   {
     name: "Amazon Web Services",
     abbr: "AWS",
     provider: null,
-    label: "Cloud Infrastructure & Security Architecture",
+    label: "Cloud Infrastructure and Security Architecture",
     index: "03",
   },
   {
     name: "Google Cloud",
-    provider: "& Gemini AI",
-    label: "Core AI Engine & Computational Intelligence",
+    provider: "and Gemini AI",
+    label: "Core AI Engine and Computational Intelligence",
     sub: "Powering PulseAssist",
     index: "04",
   },
@@ -45,12 +45,11 @@ export function InfraStack() {
               Technology Foundation
             </div>
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
-              Core Infrastructure &amp; Technology Stack.
+              Core infrastructure and technology stack.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              Every ENICE Group venture is built on a shared backbone of
-              institutional-grade infrastructure — selected for reliability,
-              compliance, and global scale.
+              Every ENICE Group venture runs on the same institutional-grade
+              backbone, chosen for reliability, compliance, and global scale.
             </p>
           </div>
         </Reveal>

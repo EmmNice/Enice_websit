@@ -6,11 +6,11 @@ import { Roadmap } from "@/components/site/Roadmap";
 export const Route = createFileRoute("/roadmap")({
   head: () => ({
     meta: [
-      { title: "Roadmap — ENICE Group" },
+      { title: "Roadmap | ENICE Group" },
       {
         name: "description",
         content:
-          "The ENICE Group product roadmap — milestones completed, ventures in progress, and the infrastructure we are building next.",
+          "The ENICE Group product roadmap: milestones completed, ventures in progress, and the infrastructure we are building next.",
       },
       { property: "og:title", content: "ENICE Group Roadmap" },
       {
@@ -39,7 +39,7 @@ function RoadmapPage() {
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
             Milestones completed, ventures in progress, and the infrastructure
-            we are building next — published openly so our partners and
+            we are building next. Published openly so partners and the wider
             ecosystem can plan ahead with confidence.
           </p>
         </div>

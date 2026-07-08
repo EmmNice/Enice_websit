@@ -4,7 +4,7 @@ import { LegalPage } from "@/components/site/LegalPage";
 export const Route = createFileRoute("/compliance")({
   head: () => ({
     meta: [
-      { title: "Regulatory Compliance — ENICE Group" },
+      { title: "Regulatory Compliance | ENICE Group" },
       {
         name: "description",
         content:
@@ -16,36 +16,36 @@ export const Route = createFileRoute("/compliance")({
     <LegalPage
       kicker="Compliance · Regulatory Posture"
       title="Regulatory Compliance"
-      intro="ENICE Group is committed to operating with transparency, integrity, and absolute adherence to global and local statutory frameworks. As a venture studio and commerce infrastructure holding firm, our compliance strategy covers three core areas."
+      intro="ENICE Group operates with transparency, integrity, and full adherence to global and local statutory frameworks. As a venture studio and commerce infrastructure holding firm, our compliance program covers three core areas."
       sections={[
         {
-          heading: "Corporate & Enterprise Registration",
+          heading: "Corporate and Enterprise Registration",
           body: (
             <p>
-              ENICE Group is fully registered under the Small and Medium Enterprises
-              Development Agency of Nigeria (SMEDAN) as a certified Nano Enterprise,
-              fulfilling all localized operational, reporting, and statutory guidelines for
-              enterprise businesses.
+              ENICE Group is fully registered with the Small and Medium
+              Enterprises Development Agency of Nigeria (SMEDAN) as a certified
+              Nano Enterprise, and meets all local operational, reporting, and
+              statutory requirements for enterprise businesses.
             </p>
           ),
         },
         {
-          heading: "Commerce & Financial Infrastructure Compliance",
+          heading: "Commerce and Financial Infrastructure Compliance",
           body: (
             <div className="space-y-4">
               <p>
                 <span className="font-medium text-foreground">
-                  Anti-Money Laundering (AML) & KYC —
+                  Anti-Money Laundering (AML) and KYC.
                 </span>{" "}
-                Our engineered platforms utilize rigorous Know Your Customer and Anti-Money
-                Laundering verification frameworks to prevent illicit financial flows, identity
-                theft, and commercial fraud.
+                Our platforms rely on rigorous Know Your Customer and
+                Anti-Money Laundering verification frameworks to prevent illicit
+                financial flows, identity theft, and commercial fraud.
               </p>
               <p>
-                <span className="font-medium text-foreground">Data Security Standards —</span>{" "}
-                Any financial processing built into our environments relies on
-                industry-standard security architectures — including PCI-DSS compliant
-                gateways — ensuring secure data handling pipelines end to end.
+                <span className="font-medium text-foreground">Data security standards.</span>{" "}
+                Any financial processing that runs in our environments uses
+                industry-standard security architectures, including PCI-DSS
+                compliant gateways, so data pipelines stay secure end to end.
               </p>
             </div>
           ),
@@ -55,21 +55,21 @@ export const Route = createFileRoute("/compliance")({
           body: (
             <div className="space-y-4">
               <p>
-                We map our application data layouts to comply with leading privacy regulations
-                based on user demographics:
+                We map our application data models to comply with leading
+                privacy regulations based on user demographics:
               </p>
               <ul className="list-disc space-y-2 pl-5">
                 <li>
-                  <span className="font-medium text-foreground">NDPA / NDPR —</span>{" "}
-                  Compliant with the Nigerian Data Protection Act and Regulation regarding
-                  consumer data privacy.
+                  <span className="font-medium text-foreground">NDPA and NDPR.</span>{" "}
+                  Compliant with the Nigerian Data Protection Act and Regulation
+                  on consumer data privacy.
                 </li>
                 <li>
                   <span className="font-medium text-foreground">
-                    GDPR / International Standards —
+                    GDPR and international standards.
                   </span>{" "}
-                  Adhering to strict data controllership regulations for cross-border data
-                  transfers and user privacy consent in global commerce transactions.
+                  Adhering to strict data-controllership rules for cross-border
+                  data transfers and user consent in global commerce.
                 </li>
               </ul>
             </div>
@@ -79,9 +79,9 @@ export const Route = createFileRoute("/compliance")({
           heading: "Security Architecture",
           body: (
             <p>
-              Our systems implement SOC2-aligned controls, Row-Level Security across every
-              multi-tenant database, encrypted-at-rest storage, zero-trust access
-              architecture, and active-active disaster recovery posture.
+              Our systems apply SOC 2 aligned controls, row-level security on
+              every multi-tenant database, encryption at rest, zero-trust
+              access, and active-active disaster recovery.
             </p>
           ),
         },
@@ -89,7 +89,8 @@ export const Route = createFileRoute("/compliance")({
           heading: "Contact for Regulatory Matters",
           body: (
             <p>
-              Regulators, auditors, and compliance partners may reach our office at{" "}
+              Regulators, auditors, and compliance partners can reach our office
+              at{" "}
               <a
                 href="mailto:compliance@enicehq.com"
                 className="font-medium text-primary hover:underline"

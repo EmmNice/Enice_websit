@@ -5,17 +5,17 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About — ENICE Group" },
+      { title: "About | ENICE Group" },
       {
         name: "description",
         content:
-          "ENICE Group operates as a specialized technology venture studio and infrastructure holding firm — engineering software ecosystems that power modern digital commerce.",
+          "ENICE Group is a technology venture studio and infrastructure holding firm that engineers software ecosystems for modern digital commerce.",
       },
       { property: "og:title", content: "About ENICE Group" },
       {
         property: "og:description",
         content:
-          "Corporate thesis, operational standards, and ecosystem strategy of ENICE Group.",
+          "Corporate thesis, operating standards, and ecosystem strategy of ENICE Group.",
       },
     ],
   }),
@@ -30,17 +30,17 @@ const COLUMNS = [
   {
     label: "01",
     title: "Corporate Thesis",
-    body: "ENICE Group operates as a specialized technology venture studio and infrastructure holding firm. We design, engineer, and deploy high-capacity software ecosystems that power modern digital commerce and institutional automation. Our mandate is to close the infrastructure gap facing enterprises — through robust financial transaction architecture and advanced autonomous AI systems.",
+    body: "ENICE Group is a technology venture studio and infrastructure holding firm. We design, engineer, and operate the software systems that power modern digital commerce and institutional automation. Our mandate is to close the infrastructure gap facing enterprises through robust financial transaction platforms and advanced autonomous AI.",
   },
   {
     label: "02",
-    title: "Operational Standards",
-    body: "Infrastructure integrity is non-negotiable. Our platforms are built on zero-trust security architecture, per-tenant database isolation, and real-time algorithmic guardrails. We design to satisfy rigorous compliance frameworks — so partners in banking, financial technology, and telecommunications can scale their operations without structural risk.",
+    title: "Operating Standards",
+    body: "Infrastructure integrity is non-negotiable. Our platforms are built on zero-trust security, per-tenant database isolation, and real-time algorithmic guardrails. We build to satisfy rigorous compliance frameworks so partners in banking, fintech, and telecom can scale without carrying structural risk.",
   },
   {
     label: "03",
     title: "Ecosystem Strategy",
-    body: "We do not simply build software — we incubate market-defining platforms. By controlling the full development lifecycle, from database schema design to high-throughput external API gateway integration, ENICE Group ensures every venture in our ecosystem operates with institutional-grade performance, precision, and data isolation.",
+    body: "We do more than build software. We incubate market-defining platforms by owning the full development lifecycle, from database schema through high-throughput API gateways. Every venture in our ecosystem is engineered for institutional performance, precision, and data isolation.",
   },
 ];
 
@@ -61,8 +61,8 @@ function AboutPage() {
             A venture studio engineered for institutional scale.
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            We architect, capitalize, and operate full-stack software ventures —
-            building the financial and AI infrastructure that powers modern industry.
+            We design, capitalize, and operate full-stack software ventures that
+            deliver the financial and AI infrastructure modern industry runs on.
           </p>
         </div>
       </section>

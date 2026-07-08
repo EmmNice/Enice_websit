@@ -132,7 +132,7 @@ export function SiteFooter() {
               </a>
               <div className="flex items-start gap-2.5 text-[13px] text-muted-foreground">
                 <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.75} />
-                Abuja &amp; Kaduna, Nigeria
+                Abuja and Kaduna, Nigeria
               </div>
             </div>
           </div>
@@ -178,7 +178,7 @@ export function SiteFooter() {
             © {year} ENICE Group. All rights reserved.
           </p>
           <p className="text-[11px] font-medium text-muted-foreground">
-            Enterprise Infrastructure · Built with intent.
+            Enterprise infrastructure, built with intent.
           </p>
         </div>
       </div>

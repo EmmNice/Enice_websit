@@ -4,9 +4,9 @@ const SHADOW_CARD =
   "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)";
 
 const items = [
-  { icon: Gauge, label: "Global API Latency", value: "14ms", sub: "p50 · multi-region" },
+  { icon: Gauge, label: "Global API Latency", value: "14ms", sub: "p50, multi-region" },
   { icon: Activity, label: "Cross-Platform Uptime", value: "99.99%", sub: "rolling 90 days" },
-  { icon: ShieldCheck, label: "Data Vectors", value: "AES-256", sub: "encrypted in transit & rest" },
+  { icon: ShieldCheck, label: "Data Encryption", value: "AES-256", sub: "in transit and at rest" },
 ];
 
 export function NetworkMetrics() {
@@ -19,7 +19,7 @@ export function NetworkMetrics() {
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
           <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Live Network · Health Check
+            Live Network Health
           </span>
         </div>
         <div

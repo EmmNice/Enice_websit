@@ -89,7 +89,7 @@ function EmptyState() {
       </div>
       <h3 className="mb-2 text-lg font-bold text-white">No posts yet</h3>
       <p className="max-w-xs text-sm text-zinc-500">
-        Content is being prepared. Check back soon — the first update is coming.
+        Content is on the way. Check back soon for the first update.
       </p>
     </div>
   );
@@ -120,14 +120,14 @@ function BlogPage() {
       <section className="border-b border-white/[0.06] bg-gradient-to-b from-[#0f172a] to-[#09090b] px-5 pb-16 pt-28 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <p className="mb-3 text-[11px] font-bold tracking-[0.22em] text-blue-400 uppercase">
-            ENICE Group · Dispatch
+            ENICE Group Dispatch
           </p>
           <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Blog &amp; Changelog
+            Blog and Changelog
           </h1>
           <p className="max-w-xl text-base leading-relaxed text-zinc-400">
-            Updates on our ventures, infrastructure changes, product launches, and everything
-            happening inside ENICE Group.
+            Updates on our ventures, infrastructure changes, product launches,
+            and everything happening inside ENICE Group.
           </p>
         </div>
       </section>

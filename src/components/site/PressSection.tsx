@@ -12,21 +12,21 @@ const POSTS = [
     date: "Jun 2026",
     title: "ENICE Group establishes its Shared Ecosystem Infrastructure framework.",
     excerpt:
-      "A unified AI pipeline, high-velocity ledger, and automated compliance backbone now underpins every venture within the ENICE Group ecosystem.",
+      "A unified AI pipeline, high-velocity ledger, and automated compliance backbone now underpin every venture in the ENICE Group ecosystem.",
   },
   {
     tag: "Product",
     date: "May 2026",
-    title: "PulsePay advances to extended pilot phase with regional treasury partners.",
+    title: "PulsePay enters extended pilot with regional treasury partners.",
     excerpt:
-      "Programmable wallets, instant virtual card issuance, and embedded compliance controls enter a broader pilot cohort across West Africa.",
+      "Programmable wallets, instant virtual card issuance, and embedded compliance controls have opened to a broader pilot cohort across West Africa.",
   },
   {
     tag: "Engineering",
     date: "Apr 2026",
     title: "PulseAssist: how policy-bound agents operate inside regulated institutions.",
     excerpt:
-      "An engineering overview of autonomous support workflows built with auditable, deterministic guardrails for banking and telecommunications.",
+      "An engineering overview of autonomous support workflows built with auditable, deterministic guardrails for banking and telecoms.",
   },
 ];
 
@@ -40,7 +40,7 @@ export function PressSection() {
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div className="max-w-2xl">
               <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Press · Announcements
+                Press and Announcements
               </div>
               <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
                 Latest from ENICE Group.

@@ -52,17 +52,17 @@ function IndexPage() {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ENICE Group — Engineering the Infrastructure for Global Commerce" },
+      { title: "ENICE Group | Infrastructure for Global Commerce" },
       {
         name: "description",
         content:
-          "ENICE Group is a technology venture studio and infrastructure holding firm building fintech platforms and enterprise AI systems — home of PulsePay and PulseAssist.",
+          "ENICE Group is a technology venture studio and infrastructure holding firm. We build fintech platforms and enterprise AI systems, including PulsePay and PulseAssist.",
       },
       { property: "og:title", content: "ENICE Group" },
       {
         property: "og:description",
         content:
-          "An institutional venture ecosystem building fintech and operational AI infrastructure.",
+          "A venture ecosystem building fintech and enterprise AI infrastructure for institutions.",
       },
       { property: "og:url", content: "/" },
     ],
@@ -83,9 +83,9 @@ export const Route = createFileRoute("/")({
           },
           subOrganization: [
             { "@type": "FinancialProduct", name: "PulsePay", description: "Virtual card issuance, programmable wallets, multi-currency rails, and embedded treasury." },
-            { "@type": "Organization", name: "PulseAssist", description: "Multi-tenant AI-driven conversational SaaS for banking and telecom." },
+            { "@type": "Organization", name: "PulseAssist", description: "Multi-tenant AI conversational SaaS for banking and telecom." },
             { "@type": "FinancialProduct", name: "EPulse", description: "Digital banking infrastructure." },
-            { "@type": "FinancialProduct", name: "PulseX", description: "Global cryptocurrency asset trading exchange." },
+            { "@type": "FinancialProduct", name: "PulseX", description: "Global digital asset trading exchange." },
           ],
         }),
       },
@@ -104,30 +104,30 @@ const HERO_STATS = [
   { value: "02", label: "Active Ventures" },
   { value: "99.99%", label: "Infrastructure SLA" },
   { value: "3", label: "Core Verticals" },
-  { value: "24/7", label: "Operational Posture" },
+  { value: "24/7", label: "Operations Coverage" },
 ];
 
 const VERTICALS = [
   {
     icon: Banknote,
-    kicker: "01 — Fintech",
+    kicker: "01 · Fintech",
     title: "Financial Infrastructure Systems",
-    desc: "High-throughput virtual transaction networks, secure ledger databases, and automated wallet infrastructures optimised for regional and cross-border payment deployment.",
-    bullets: ["Issuing & Wallets", "Treasury & Ledger", "Compliance Tooling"],
+    desc: "High-throughput transaction networks, secure ledger databases, and wallet infrastructure built for regional and cross-border payments.",
+    bullets: ["Issuing and Wallets", "Treasury and Ledger", "Compliance Tooling"],
   },
   {
     icon: BrainCircuit,
-    kicker: "02 — AI",
+    kicker: "02 · AI",
     title: "Autonomous Enterprise AI",
-    desc: "Multi-tenant conversational AI systems that automate customer relations, compliance tracking, and operations within telecommunications and banking.",
+    desc: "Multi-tenant conversational AI that automates customer support, compliance monitoring, and daily operations for banks and telecoms.",
     bullets: ["Autonomous Support", "Policy-Bound Agents", "Workflow Automation"],
   },
   {
     icon: Boxes,
-    kicker: "03 — Studio",
-    title: "Venture Studio & Project Lab",
-    desc: "Engineering and launching full-stack SaaS platforms — driving ventures from proof-of-concept through institutional deployment and global market expansion.",
-    bullets: ["Concept & Capitalization", "Product & Engineering", "Go-to-Market"],
+    kicker: "03 · Studio",
+    title: "Venture Studio and Product Lab",
+    desc: "We design and launch full-stack SaaS platforms, taking each venture from concept through institutional deployment and market expansion.",
+    bullets: ["Concept and Capitalization", "Product and Engineering", "Go-to-Market"],
   },
 ];
 
@@ -135,26 +135,26 @@ const CORE_MODULES = [
   {
     icon: Cpu,
     label: "01",
-    title: "Unified AI & Automation Pipeline",
-    desc: "Centralized LLM orchestration and vector search routing that powers predictive tools like PulseAssist.",
+    title: "Unified AI and Automation Pipeline",
+    desc: "Centralized LLM orchestration and vector search routing that powers products like PulseAssist.",
   },
   {
     icon: Database,
     label: "02",
-    title: "High-Velocity Ledger & Payment Core",
-    desc: "Low-latency transaction processing engine and virtual account infrastructure that anchors platforms like PulsePay.",
+    title: "High-Velocity Ledger and Payment Core",
+    desc: "A low-latency transaction engine and virtual account infrastructure that anchors platforms like PulsePay.",
   },
   {
     icon: FileCheck2,
     label: "03",
-    title: "Automated Compliance & KYC Layer",
-    desc: "Real-time identity verification, fraud detection, and regulatory screening shared across all sub-platforms.",
+    title: "Automated Compliance and KYC Layer",
+    desc: "Real-time identity verification, fraud detection, and regulatory screening shared across every product.",
   },
   {
     icon: Globe,
     label: "04",
     title: "Global Cloud Grid",
-    desc: "Optimised database clustering and serverless edge delivery yielding 99.99% uptime and microsecond execution.",
+    desc: "Optimised database clustering and serverless edge delivery that supports 99.99% uptime and low-latency execution.",
   },
 ];
 
@@ -162,17 +162,17 @@ const PORTFOLIO_PREVIEW = [
   {
     tag: "Venture · Fintech",
     name: "PulsePay",
-    desc: "Virtual payment infrastructure and digital wallet ecosystem — instant issuance, programmable controls, and embedded treasury for modern commerce.",
+    desc: "A virtual payment platform for modern commerce, offering instant issuance, programmable controls, and embedded treasury.",
   },
   {
     tag: "Venture · Enterprise AI",
     name: "PulseAssist",
-    desc: "AI-driven operational support platform for banking, fintech, and telecommunications — autonomous queue handling and policy-bound automations.",
+    desc: "An AI operations platform for banking, fintech, and telecoms, with autonomous queue handling and policy-bound automations.",
   },
 ];
 
 const COMPLIANCE_BADGES = [
-  { icon: Lock, label: "SOC2-Aligned" },
+  { icon: Lock, label: "SOC 2 Aligned" },
   { icon: ShieldCheck, label: "RLS Enforced" },
   { icon: Wifi, label: "Active-Active" },
   { icon: Check, label: "Audit Ready" },
@@ -232,15 +232,15 @@ function Landing() {
 
           {/* Headline */}
           <h1 className="mx-auto max-w-4xl text-balance text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl lg:text-[4.25rem]">
-            Engineering the Infrastructure for the{" "}
-            <span className="text-primary">Future of Global Commerce.</span>
+            The infrastructure powering the{" "}
+            <span className="text-primary">next era of global commerce.</span>
           </h1>
 
           {/* Subheadline */}
           <p className="mx-auto mt-8 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
-            ENICE Group architects, capitalises, and operates full-stack software
-            ventures — building the financial and AI infrastructure that powers
-            modern global industry.
+            ENICE Group designs, funds, and operates full-stack software
+            ventures that deliver the financial and AI infrastructure modern
+            institutions depend on.
           </p>
 
           {/* CTAs */}
@@ -298,14 +298,14 @@ function Landing() {
           <Reveal>
             <div className="mx-auto max-w-2xl text-center">
               <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Industrial Core Verticals
+                Core Verticals
               </div>
               <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
                 Three pillars. One operating standard.
               </h2>
               <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-                The ENICE Group portfolio is organised around three deliberate
-                competencies — each operated with institutional discipline.
+                The ENICE Group portfolio is organised around three focused
+                competencies, each run with institutional discipline.
               </p>
             </div>
           </Reveal>
@@ -360,9 +360,9 @@ function Landing() {
                 The ENICE Core.
               </h2>
               <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-                Every venture we operate is built on our proprietary high-performance
-                core — shared infrastructure that delivers enterprise-grade scale
-                from day one.
+                Every venture we operate runs on our shared high-performance
+                core, so each product inherits enterprise-grade scale from day
+                one.
               </p>
             </div>
           </Reveal>
@@ -476,7 +476,7 @@ function Landing() {
                   Compliance
                 </div>
                 <div className="mt-0.5 text-sm font-semibold tracking-tight text-foreground">
-                  Regulated · Federal Republic of Nigeria
+                  Regulated in the Federal Republic of Nigeria
                 </div>
               </div>
             </div>

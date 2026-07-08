@@ -23,7 +23,7 @@ const MILESTONES: Milestone[] = [
     status: "completed",
     product: "ENICE Core",
     title: "Shared Ecosystem Framework",
-    body: "Unified AI pipeline, high-velocity ledger, and automated compliance backbone now underpins every ENICE venture.",
+    body: "The unified AI pipeline, high-velocity ledger, and automated compliance backbone that now underpins every ENICE venture.",
     tags: ["Infrastructure", "AI", "Compliance"],
   },
   {
@@ -31,8 +31,8 @@ const MILESTONES: Milestone[] = [
     quarter: "Q3 2026",
     status: "completed",
     product: "PulsePay",
-    title: "Extended Pilot — Regional Treasury Partners",
-    body: "Programmable wallets, instant virtual card issuance, and embedded compliance controls deployed to a wider pilot cohort across West Africa.",
+    title: "Extended Pilot with Regional Treasury Partners",
+    body: "Programmable wallets, instant virtual card issuance, and embedded compliance controls rolled out to a wider pilot cohort across West Africa.",
     tags: ["Fintech", "Wallets", "KYC"],
   },
   {
@@ -41,7 +41,7 @@ const MILESTONES: Milestone[] = [
     status: "in-progress",
     product: "PulseAssist",
     title: "Enterprise B2B Launch",
-    body: "First-wave rollout of autonomous support modules to banking, fintech, and telecommunications partners. Policy-bound agents deployed with live-agent failover.",
+    body: "First-wave rollout of autonomous support modules to banking, fintech, and telecom partners, with policy-bound agents and live-agent failover.",
     tags: ["AI", "B2B", "Telecom"],
   },
   {
@@ -49,8 +49,8 @@ const MILESTONES: Milestone[] = [
     quarter: "Q2 2026",
     status: "in-progress",
     product: "PulsePay",
-    title: "Developer API — Public Beta",
-    body: "ENICE Core API opens to verified integration partners. Includes wallet issuance, ledger, KYC, and Assist endpoints with sandbox environment.",
+    title: "Developer API Public Beta",
+    body: "The ENICE Core API opens to verified integration partners, with wallet issuance, ledger, KYC, and Assist endpoints available in a sandbox environment.",
     tags: ["API", "Developer", "Fintech"],
   },
   {
@@ -59,7 +59,7 @@ const MILESTONES: Milestone[] = [
     status: "planned",
     product: "PulsePay",
     title: "Multi-Currency Expansion",
-    body: "Scale the virtual payment infrastructure with multi-currency wallet rails, programmable spend controls, and embedded treasury operations.",
+    body: "Scaling the virtual payment platform with multi-currency wallet rails, programmable spend controls, and embedded treasury operations.",
     tags: ["Fintech", "Multi-Currency", "Treasury"],
   },
   {
@@ -67,8 +67,8 @@ const MILESTONES: Milestone[] = [
     quarter: "Q4 2027",
     status: "planned",
     product: "ePulse",
-    title: "Digital Banking Infrastructure — Closed Alpha",
-    body: "ePulse begins closed alpha testing with select institutional partners, covering digital banking core, account management, and statement APIs.",
+    title: "Digital Banking Infrastructure Closed Alpha",
+    body: "ePulse begins closed alpha with select institutional partners, covering the digital banking core, account management, and statement APIs.",
     tags: ["Banking", "Alpha"],
   },
   {
@@ -76,7 +76,7 @@ const MILESTONES: Milestone[] = [
     quarter: "2027",
     status: "planned",
     product: "PulseX",
-    title: "Global Digital Asset Exchange — Private Beta",
+    title: "Global Digital Asset Exchange Private Beta",
     body: "PulseX opens to institutional and qualified retail participants with support for major digital asset pairs, custody, and compliance reporting.",
     tags: ["Crypto", "Exchange", "Global"],
   },
@@ -86,7 +86,7 @@ const MILESTONES: Milestone[] = [
     status: "planned",
     product: "ENICE Core",
     title: "Universal Financial Hub",
-    body: "Unified global virtual-dollar and asset-infrastructure layer connecting institutional liquidity across markets via a single API gateway.",
+    body: "A unified global virtual-dollar and asset-infrastructure layer connecting institutional liquidity across markets through a single API gateway.",
     tags: ["Infrastructure", "Global", "Liquidity"],
   },
 ];
@@ -206,8 +206,8 @@ export function Roadmap() {
               A scaling trajectory built for global reach.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              Our infrastructure roadmap mirrors the maturity curve of the platforms
-              we operate — sequenced for compounding execution.
+              Our infrastructure roadmap follows the maturity curve of the
+              platforms we operate, sequenced for steady, compounding execution.
             </p>
           </div>
           <Link

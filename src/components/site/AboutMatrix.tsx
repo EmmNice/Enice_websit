@@ -28,13 +28,13 @@ const TERMINAL_LINES = [
 const VENTURES = [
   {
     icon: Banknote,
-    tag: "Fintech & Digital Rails",
+    tag: "Fintech and Digital Rails",
     title: "PulsePay",
     desc: "Virtual card issuance, programmable wallets, multi-currency rails, and embedded treasury for modern commerce.",
   },
   {
     icon: BrainCircuit,
-    tag: "Enterprise AI & Telecom",
+    tag: "Enterprise AI and Telecom",
     title: "PulseAssist",
     desc: "Autonomous support agents, policy-bound automations, and AI-driven workflow orchestration for institutions.",
   },
@@ -63,12 +63,12 @@ export function AboutMatrix() {
             About · Venture Matrix
           </div>
           <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
-            Engineering the systems that power tomorrow.
+            Building the systems that power what's next.
           </h2>
           <p className="mt-5 text-base leading-relaxed text-muted-foreground sm:text-lg">
-            ENICE Group is a technology venture studio and parent ecosystem. We design
-            high-velocity infrastructure from the ground up — so every sub-platform we
-            incubate scales seamlessly from day one.
+            ENICE Group is a technology venture studio and parent ecosystem. We
+            design our infrastructure from the ground up so every platform we
+            incubate scales cleanly from day one.
           </p>
         </div>
 
@@ -174,14 +174,15 @@ export function AboutMatrix() {
               ENICE Core · Developer Reference
             </h3>
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-              The full developer reference is being finalized. The ENICE Core gateway
-              exposes unified endpoints for ledger operations, AI orchestration,
-              KYC/compliance, and edge delivery — accessible via REST and signed webhooks.
+              The full developer reference is being finalized. The ENICE Core
+              gateway exposes unified endpoints for ledger operations, AI
+              orchestration, KYC and compliance, and edge delivery, accessible
+              via REST and signed webhooks.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {[
-                ["GET /v1/core", "Ecosystem health & topology"],
+                ["GET /v1/core", "Ecosystem health and topology"],
                 ["POST /v1/ledger/tx", "Submit a ledger transaction"],
                 ["POST /v1/ai/query", "Invoke a tenant AI agent"],
                 ["POST /v1/kyc/verify", "Run KYC verification"],
@@ -197,7 +198,7 @@ export function AboutMatrix() {
             </div>
 
             <p className="mt-6 text-[12px] text-muted-foreground">
-              Request developer access via the Corporate Inquiries form.
+              Request developer access through the Corporate Inquiries form.
             </p>
           </div>
         </div>
