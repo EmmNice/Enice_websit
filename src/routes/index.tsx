@@ -285,10 +285,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════
-          ECOSYSTEM ROADMAP
-      ══════════════════════════════════════════════════════════════ */}
-      <EcosystemRoadmap />
+      {/* Ecosystem roadmap moved to /roadmap to keep the homepage focused. */}
 
       {/* ══════════════════════════════════════════════════════════════
           CORE VERTICALS
