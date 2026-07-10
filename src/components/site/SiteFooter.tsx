@@ -36,10 +36,10 @@ const FOOTER_COLS = [
   {
     heading: "Ventures",
     links: [
-      { label: "PulsePay", to: "/portfolio" },
-      { label: "PulseAssist", to: "/portfolio" },
-      { label: "ePulse", to: "/portfolio" },
-      { label: "PulseX", to: "/portfolio" },
+      { label: "PulsePay", to: "/portfolio/pulsepay" },
+      { label: "PulseAssist", to: "/portfolio/pulseassist" },
+      { label: "ePulse", to: "/portfolio/epulse" },
+      { label: "PulseX", to: "/portfolio/pulsex" },
     ],
   },
   {
@@ -48,7 +48,7 @@ const FOOTER_COLS = [
       { label: "Blog", to: "/blog/" },
       { label: "Announcement", to: "/blog/" },
       { label: "Roadmap", to: "/roadmap" },
-      { label: "System Status", href: "https://status.enice.group" },
+      { label: "System Status", to: "/status" },
     ],
   },
   {
