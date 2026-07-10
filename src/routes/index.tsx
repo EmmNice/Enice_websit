@@ -502,7 +502,6 @@ function Landing() {
       ══════════════════════════════════════════════════════════════ */}
       <AboutMatrix />
       <NetworkMetrics />
-      <Roadmap />
       <InfraStack />
       <FAQSection />
       <Careers />
