@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as StatusRouteImport } from './routes/status'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
@@ -21,6 +22,10 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as PortfolioPulsexRouteImport } from './routes/portfolio.pulsex'
+import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
+import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pulseassist'
+import { Route as PortfolioEpulseRouteImport } from './routes/portfolio.epulse'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AdminWatchlistRouteImport } from './routes/admin/watchlist'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -30,6 +35,11 @@ import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RoadmapRoute = RoadmapRouteImport.update({
@@ -87,6 +97,26 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PortfolioPulsexRoute = PortfolioPulsexRouteImport.update({
+  id: '/pulsex',
+  path: '/pulsex',
+  getParentRoute: () => PortfolioRoute,
+} as any)
+const PortfolioPulsepayRoute = PortfolioPulsepayRouteImport.update({
+  id: '/pulsepay',
+  path: '/pulsepay',
+  getParentRoute: () => PortfolioRoute,
+} as any)
+const PortfolioPulseassistRoute = PortfolioPulseassistRouteImport.update({
+  id: '/pulseassist',
+  path: '/pulseassist',
+  getParentRoute: () => PortfolioRoute,
+} as any)
+const PortfolioEpulseRoute = PortfolioEpulseRouteImport.update({
+  id: '/epulse',
+  path: '/epulse',
+  getParentRoute: () => PortfolioRoute,
+} as any)
 const BlogSlugRoute = BlogSlugRouteImport.update({
   id: '/blog/$slug',
   path: '/blog/$slug',
@@ -124,14 +154,19 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
   '/mcp': typeof McpRoute
-  '/portfolio': typeof PortfolioRoute
+  '/portfolio': typeof PortfolioRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
+  '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/portfolio/epulse': typeof PortfolioEpulseRoute
+  '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
+  '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
+  '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/blog/': typeof BlogIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -143,14 +178,19 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
   '/mcp': typeof McpRoute
-  '/portfolio': typeof PortfolioRoute
+  '/portfolio': typeof PortfolioRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
+  '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/portfolio/epulse': typeof PortfolioEpulseRoute
+  '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
+  '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
+  '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/blog': typeof BlogIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -163,14 +203,19 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
   '/mcp': typeof McpRoute
-  '/portfolio': typeof PortfolioRoute
+  '/portfolio': typeof PortfolioRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
+  '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
+  '/portfolio/epulse': typeof PortfolioEpulseRoute
+  '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
+  '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
+  '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/blog/': typeof BlogIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
@@ -187,11 +232,16 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/privacy'
     | '/roadmap'
+    | '/status'
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/watchlist'
     | '/blog/$slug'
+    | '/portfolio/epulse'
+    | '/portfolio/pulseassist'
+    | '/portfolio/pulsepay'
+    | '/portfolio/pulsex'
     | '/blog/'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesByTo: FileRoutesByTo
@@ -206,11 +256,16 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/privacy'
     | '/roadmap'
+    | '/status'
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/watchlist'
     | '/blog/$slug'
+    | '/portfolio/epulse'
+    | '/portfolio/pulseassist'
+    | '/portfolio/pulsepay'
+    | '/portfolio/pulsex'
     | '/blog'
     | '/.mcp/invoke-tool/$tool'
   id:
@@ -225,11 +280,16 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/privacy'
     | '/roadmap'
+    | '/status'
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/admin/watchlist'
     | '/blog/$slug'
+    | '/portfolio/epulse'
+    | '/portfolio/pulseassist'
+    | '/portfolio/pulsepay'
+    | '/portfolio/pulsex'
     | '/blog/'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
@@ -242,9 +302,10 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DocsRoute: typeof DocsRoute
   McpRoute: typeof McpRoute
-  PortfolioRoute: typeof PortfolioRoute
+  PortfolioRoute: typeof PortfolioRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   RoadmapRoute: typeof RoadmapRoute
+  StatusRoute: typeof StatusRoute
   TermsRoute: typeof TermsRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
@@ -261,6 +322,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/roadmap': {
@@ -340,6 +408,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portfolio/pulsex': {
+      id: '/portfolio/pulsex'
+      path: '/pulsex'
+      fullPath: '/portfolio/pulsex'
+      preLoaderRoute: typeof PortfolioPulsexRouteImport
+      parentRoute: typeof PortfolioRoute
+    }
+    '/portfolio/pulsepay': {
+      id: '/portfolio/pulsepay'
+      path: '/pulsepay'
+      fullPath: '/portfolio/pulsepay'
+      preLoaderRoute: typeof PortfolioPulsepayRouteImport
+      parentRoute: typeof PortfolioRoute
+    }
+    '/portfolio/pulseassist': {
+      id: '/portfolio/pulseassist'
+      path: '/pulseassist'
+      fullPath: '/portfolio/pulseassist'
+      preLoaderRoute: typeof PortfolioPulseassistRouteImport
+      parentRoute: typeof PortfolioRoute
+    }
+    '/portfolio/epulse': {
+      id: '/portfolio/epulse'
+      path: '/epulse'
+      fullPath: '/portfolio/epulse'
+      preLoaderRoute: typeof PortfolioEpulseRouteImport
+      parentRoute: typeof PortfolioRoute
+    }
     '/blog/$slug': {
       id: '/blog/$slug'
       path: '/blog/$slug'
@@ -378,6 +474,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface PortfolioRouteChildren {
+  PortfolioEpulseRoute: typeof PortfolioEpulseRoute
+  PortfolioPulseassistRoute: typeof PortfolioPulseassistRoute
+  PortfolioPulsepayRoute: typeof PortfolioPulsepayRoute
+  PortfolioPulsexRoute: typeof PortfolioPulsexRoute
+}
+
+const PortfolioRouteChildren: PortfolioRouteChildren = {
+  PortfolioEpulseRoute: PortfolioEpulseRoute,
+  PortfolioPulseassistRoute: PortfolioPulseassistRoute,
+  PortfolioPulsepayRoute: PortfolioPulsepayRoute,
+  PortfolioPulsexRoute: PortfolioPulsexRoute,
+}
+
+const PortfolioRouteWithChildren = PortfolioRoute._addFileChildren(
+  PortfolioRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
@@ -386,9 +500,10 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DocsRoute: DocsRoute,
   McpRoute: McpRoute,
-  PortfolioRoute: PortfolioRoute,
+  PortfolioRoute: PortfolioRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   RoadmapRoute: RoadmapRoute,
+  StatusRoute: StatusRoute,
   TermsRoute: TermsRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:

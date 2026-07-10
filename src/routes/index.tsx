@@ -19,9 +19,7 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { AboutMatrix } from "@/components/site/AboutMatrix";
 import { NetworkMetrics } from "@/components/site/NetworkMetrics";
-import { Roadmap } from "@/components/site/Roadmap";
 import { Careers } from "@/components/site/Careers";
-import { EcosystemRoadmap } from "@/components/site/EcosystemRoadmap";
 import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
@@ -285,10 +283,7 @@ function Landing() {
         </div>
       </section>
 
-      {/* ══════════════════════════════════════════════════════════════
-          ECOSYSTEM ROADMAP
-      ══════════════════════════════════════════════════════════════ */}
-      <EcosystemRoadmap />
+      {/* Ecosystem roadmap moved to /roadmap to keep the homepage focused. */}
 
       {/* ══════════════════════════════════════════════════════════════
           CORE VERTICALS
@@ -502,7 +497,6 @@ function Landing() {
       ══════════════════════════════════════════════════════════════ */}
       <AboutMatrix />
       <NetworkMetrics />
-      <Roadmap />
       <InfraStack />
       <FAQSection />
       <Careers />
