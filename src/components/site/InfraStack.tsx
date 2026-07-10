@@ -4,30 +4,18 @@ import { Reveal } from "./Reveal";
 
 const STACK = [
   {
-    name: "Monnify",
-    provider: "by Moniepoint",
-    label: "Primary Banking and Virtual Account Rails",
-    index: "01",
-  },
-  {
-    name: "Paystack",
-    provider: "by Stripe",
-    label: "Card Processing and Collection Gateway",
-    index: "02",
-  },
-  {
     name: "Amazon Web Services",
     abbr: "AWS",
     provider: null,
     label: "Cloud Infrastructure and Security Architecture",
-    index: "03",
+    index: "01",
   },
   {
     name: "Google Cloud",
     provider: "and Gemini AI",
     label: "Core AI Engine and Computational Intelligence",
     sub: "Powering PulseAssist",
-    index: "04",
+    index: "02",
   },
 ] as const;
 
