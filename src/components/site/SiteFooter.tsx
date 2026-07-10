@@ -146,23 +146,12 @@ export function SiteFooter() {
               <ul className="mt-4 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
-                    {"href" in l ? (
-                      <a
-                        href={l.href}
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        className="text-[13px] text-foreground/75 transition-colors hover:text-foreground"
-                      >
-                        {l.label}
-                      </a>
-                    ) : (
-                      <Link
-                        to={l.to as "/"}
-                        className="text-[13px] text-foreground/75 transition-colors hover:text-foreground"
-                      >
-                        {l.label}
-                      </Link>
-                    )}
+                    <Link
+                      to={l.to as "/"}
+                      className="text-[13px] text-foreground/75 transition-colors hover:text-foreground"
+                    >
+                      {l.label}
+                    </Link>
                   </li>
                 ))}
               </ul>
