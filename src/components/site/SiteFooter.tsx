@@ -2,8 +2,6 @@ import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { Mail, MapPin } from "lucide-react";
 
-// ─── Social icon components ───────────────────────────────────────────────────
-
 function XIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill="currentColor">
@@ -30,8 +28,6 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
-// ─── Navigation columns ───────────────────────────────────────────────────────
-
 const FOOTER_COLS = [
   {
     heading: "Ventures",
@@ -46,14 +42,16 @@ const FOOTER_COLS = [
     heading: "Updates",
     links: [
       { label: "Blog", to: "/blog/" },
-      { label: "Announcement", to: "/blog/" },
+      { label: "Announcements", to: "/blog/" },
       { label: "Roadmap", to: "/roadmap" },
       { label: "System Status", to: "/status" },
     ],
   },
   {
-    heading: "Legal",
+    heading: "Company",
     links: [
+      { label: "About ENICE Group", to: "/about" },
+      { label: "Contact", to: "/contact" },
       { label: "Privacy Policy", to: "/privacy" },
       { label: "Terms of Service", to: "/terms" },
       { label: "Regulatory Compliance", to: "/compliance" },
@@ -67,8 +65,6 @@ const SOCIAL_LINKS = [
   { href: "https://www.facebook.com/share/1Nx7q11BZK/", label: "Facebook", Icon: FacebookIcon },
 ];
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
@@ -76,7 +72,7 @@ export function SiteFooter() {
     <footer className="border-t border-border bg-background">
 
       {/* System status ribbon */}
-      <div className="border-b border-border bg-secondary/60">
+      <div className="border-b border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-medium text-muted-foreground">
             <span className="inline-flex items-center gap-2">
@@ -93,18 +89,28 @@ export function SiteFooter() {
               <span className="font-semibold text-foreground">Operational</span>
             </span>
           </div>
-          <span className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-            status.enice.group
-          </span>
+          <Link
+            to="/status"
+            className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
+          >
+            View Status Page →
+          </Link>
         </div>
       </div>
 
-      {/* Main body */}
+      {/* Main footer body */}
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.6fr_repeat(3,1fr)]">
+        <div className="grid gap-12 lg:grid-cols-[1.8fr_repeat(3,1fr)]">
 
           {/* Brand column */}
           <div>
+            <Logo />
+            <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
+              A technology venture studio and infrastructure holding company —
+              building the financial and AI platforms that power global
+              commerce.
+            </p>
+
             {/* Social icons */}
             <div className="mt-6 flex items-center gap-2">
               {SOCIAL_LINKS.map((s) => (
@@ -114,7 +120,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noreferrer noopener"
                   aria-label={s.label}
-                  className="grid h-9 w-9 place-items-center rounded-md border border-border bg-background text-foreground/70 transition-colors hover:border-primary hover:text-primary"
+                  className="grid h-9 w-9 place-items-center rounded-md border border-border bg-background text-foreground/60 transition-colors hover:border-primary hover:text-primary"
                 >
                   <s.Icon className="h-3.5 w-3.5" />
                 </a>
@@ -122,7 +128,7 @@ export function SiteFooter() {
             </div>
 
             {/* Contact */}
-            <div className="mt-8 space-y-2.5">
+            <div className="mt-6 space-y-2.5">
               <a
                 href="mailto:corporate@enicehq.com"
                 className="flex items-center gap-2.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
@@ -140,15 +146,15 @@ export function SiteFooter() {
           {/* Navigation columns */}
           {FOOTER_COLS.map((col) => (
             <div key={col.heading}>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground">
                 {col.heading}
               </div>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-5 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
                     <Link
                       to={l.to as "/"}
-                      className="text-[13px] text-foreground/75 transition-colors hover:text-foreground"
+                      className="text-[13px] text-foreground/65 transition-colors hover:text-foreground"
                     >
                       {l.label}
                     </Link>

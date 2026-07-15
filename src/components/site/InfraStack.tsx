@@ -1,88 +1,92 @@
 import { Reveal } from "./Reveal";
 
-// ─── Stack items ──────────────────────────────────────────────────────────────
-
 const STACK = [
   {
     name: "Amazon Web Services",
     abbr: "AWS",
-    provider: null,
     label: "Cloud Infrastructure and Security Architecture",
+    detail: "Primary cloud backbone powering compute, storage, and global edge delivery across ENICE Group platforms.",
     index: "01",
   },
   {
     name: "Google Cloud",
+    abbr: "GCP",
     provider: "and Gemini AI",
     label: "Core AI Engine and Computational Intelligence",
-    sub: "Powering PulseAssist",
+    detail: "Powers PulseAssist's multi-tenant AI pipeline, LLM orchestration, and enterprise workflow automation.",
     index: "02",
+  },
+  {
+    name: "Supabase",
+    abbr: "PG",
+    label: "Database Infrastructure and Auth Layer",
+    detail: "Row-level security, real-time data streams, and managed Postgres for PulsePay's transactional systems.",
+    index: "03",
+  },
+  {
+    name: "Cloudflare",
+    abbr: "CDN",
+    label: "Global Edge, DNS, and DDoS Protection",
+    detail: "Enterprise-grade edge delivery, WAF, and DDoS mitigation ensuring sub-20ms response times globally.",
+    index: "04",
   },
 ] as const;
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export function InfraStack() {
   return (
-    <section className="border-t border-border bg-background py-24 sm:py-32">
+    <section className="border-t border-border bg-background py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
 
-        {/* Header */}
         <Reveal>
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+          <div className="mb-16 max-w-3xl">
+            <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">
               Technology Foundation
             </div>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
-              Core infrastructure and technology stack.
+            <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
+              Core infrastructure
+              <br />
+              and technology stack.
             </h2>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
               Every ENICE Group venture runs on the same institutional-grade
-              backbone, chosen for reliability, compliance, and global scale.
+              backbone — chosen for reliability, compliance, and global scale,
+              not convenience.
             </p>
           </div>
         </Reveal>
 
-        {/* Stack grid */}
-        <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
           {STACK.map((s, i) => (
             <Reveal key={s.name} delay={i * 70}>
-              <div className="group flex h-full flex-col bg-background p-8 transition-colors hover:bg-secondary/60">
+              <div className="group flex h-full flex-col bg-background p-8 transition-colors hover:bg-secondary/50 xl:p-10">
 
-                {/* Index */}
-                <span className="font-mono text-[10px] font-semibold tracking-[0.2em] text-muted-foreground/50">
+                <span className="font-mono text-[10px] font-bold tracking-[0.22em] text-muted-foreground/40">
                   /{s.index}
                 </span>
 
-                {/* Name block */}
                 <div className="mt-6 flex-1">
-                  <p className="text-[22px] font-semibold leading-tight tracking-tight text-foreground">
+                  <p className="text-[1.35rem] font-bold leading-tight tracking-tight text-foreground">
                     {s.name}
                   </p>
-                  {s.provider && (
+                  {"provider" in s && s.provider && (
                     <p className="mt-1 text-[13px] font-medium text-muted-foreground">
                       {s.provider}
                     </p>
                   )}
-                  {"abbr" in s && s.abbr && (
-                    <p className="mt-1 font-mono text-[11px] font-semibold tracking-[0.18em] text-muted-foreground/60">
-                      {s.abbr}
-                    </p>
-                  )}
+                  <p className="mt-1 font-mono text-[11px] font-bold tracking-[0.20em] text-muted-foreground/50">
+                    {s.abbr}
+                  </p>
                 </div>
 
-                {/* Divider */}
                 <div className="my-6 h-px w-full bg-border" />
 
-                {/* Label */}
                 <div>
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
                     {s.label}
                   </p>
-                  {"sub" in s && s.sub && (
-                    <p className="mt-2 text-[11px] font-medium text-primary/70">
-                      {s.sub}
-                    </p>
-                  )}
+                  <p className="mt-2.5 text-[12px] leading-relaxed text-muted-foreground/70">
+                    {s.detail}
+                  </p>
                 </div>
 
               </div>
