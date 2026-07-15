@@ -5,17 +5,59 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About | ENICE Group" },
+      { title: "About ENICE Group | Venture Studio & Infrastructure Firm" },
       {
         name: "description",
         content:
-          "ENICE Group is a technology venture studio and infrastructure holding firm that engineers software ecosystems for modern digital commerce.",
+          "ENICE Group is a technology venture studio and infrastructure holding firm based in Nigeria. We engineer software ecosystems — fintech, enterprise AI, and digital banking — for modern global commerce.",
       },
-      { property: "og:title", content: "About ENICE Group" },
+      { property: "og:title", content: "About ENICE Group — Venture Studio & Infrastructure Firm" },
       {
         property: "og:description",
         content:
-          "Corporate thesis, operating standards, and ecosystem strategy of ENICE Group.",
+          "ENICE Group's corporate thesis, operating standards, and ecosystem strategy. A venture studio building the next generation of financial and AI infrastructure.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ENICE Group" },
+      { property: "og:url", content: "https://enicegroup.com/about" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@ENICEHQ" },
+      { name: "twitter:title", content: "About ENICE Group" },
+      {
+        name: "twitter:description",
+        content:
+          "Corporate thesis, operating standards, and ecosystem strategy of ENICE Group — Nigeria's fintech and AI venture studio.",
+      },
+      { name: "robots", content: "index, follow" },
+    ],
+    links: [{ rel: "canonical", href: "https://enicegroup.com/about" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "AboutPage",
+          name: "About ENICE Group",
+          description:
+            "ENICE Group is a technology venture studio and infrastructure holding firm based in Abuja and Kaduna, Nigeria. We build fintech platforms and enterprise AI systems.",
+          url: "https://enicegroup.com/about",
+          publisher: {
+            "@type": "Organization",
+            name: "ENICE Group",
+            url: "https://enicegroup.com",
+            logo: "https://enicegroup.com/favicon.svg",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Abuja",
+              addressCountry: "NG",
+            },
+            founder: {
+              "@type": "Person",
+              name: "Godson Chukwukemeka",
+              jobTitle: "Founder & CEO",
+            },
+          },
+        }),
       },
     ],
   }),

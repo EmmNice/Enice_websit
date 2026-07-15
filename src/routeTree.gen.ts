@@ -21,6 +21,7 @@ import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as PortfolioPulsexRouteImport } from './routes/portfolio.pulsex'
 import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
@@ -91,6 +92,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioIndexRoute = PortfolioIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PortfolioRoute,
 } as any)
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
@@ -168,6 +174,7 @@ export interface FileRoutesByFullPath {
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/blog/': typeof BlogIndexRoute
+  '/portfolio/': typeof PortfolioIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesByTo {
@@ -178,7 +185,6 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
   '/mcp': typeof McpRoute
-  '/portfolio': typeof PortfolioRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
@@ -192,6 +198,7 @@ export interface FileRoutesByTo {
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/blog': typeof BlogIndexRoute
+  '/portfolio': typeof PortfolioIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRoutesById {
@@ -217,6 +224,7 @@ export interface FileRoutesById {
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/blog/': typeof BlogIndexRoute
+  '/portfolio/': typeof PortfolioIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
 }
 export interface FileRouteTypes {
@@ -243,6 +251,7 @@ export interface FileRouteTypes {
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
     | '/blog/'
+    | '/portfolio/'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -253,7 +262,6 @@ export interface FileRouteTypes {
     | '/contact'
     | '/docs'
     | '/mcp'
-    | '/portfolio'
     | '/privacy'
     | '/roadmap'
     | '/status'
@@ -267,6 +275,7 @@ export interface FileRouteTypes {
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
     | '/blog'
+    | '/portfolio'
     | '/.mcp/invoke-tool/$tool'
   id:
     | '__root__'
@@ -291,6 +300,7 @@ export interface FileRouteTypes {
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
     | '/blog/'
+    | '/portfolio/'
     | '/.mcp/invoke-tool/$tool'
   fileRoutesById: FileRoutesById
 }
@@ -401,6 +411,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/portfolio/': {
+      id: '/portfolio/'
+      path: '/'
+      fullPath: '/portfolio/'
+      preLoaderRoute: typeof PortfolioIndexRouteImport
+      parentRoute: typeof PortfolioRoute
+    }
     '/blog/': {
       id: '/blog/'
       path: '/blog'
@@ -479,6 +496,7 @@ interface PortfolioRouteChildren {
   PortfolioPulseassistRoute: typeof PortfolioPulseassistRoute
   PortfolioPulsepayRoute: typeof PortfolioPulsepayRoute
   PortfolioPulsexRoute: typeof PortfolioPulsexRoute
+  PortfolioIndexRoute: typeof PortfolioIndexRoute
 }
 
 const PortfolioRouteChildren: PortfolioRouteChildren = {
@@ -486,6 +504,7 @@ const PortfolioRouteChildren: PortfolioRouteChildren = {
   PortfolioPulseassistRoute: PortfolioPulseassistRoute,
   PortfolioPulsepayRoute: PortfolioPulsepayRoute,
   PortfolioPulsexRoute: PortfolioPulsexRoute,
+  PortfolioIndexRoute: PortfolioIndexRoute,
 }
 
 const PortfolioRouteWithChildren = PortfolioRoute._addFileChildren(

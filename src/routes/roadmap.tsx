@@ -6,17 +6,48 @@ import { Roadmap } from "@/components/site/Roadmap";
 export const Route = createFileRoute("/roadmap")({
   head: () => ({
     meta: [
-      { title: "Roadmap | ENICE Group" },
+      { title: "Product Roadmap | ENICE Group" },
       {
         name: "description",
         content:
-          "The ENICE Group product roadmap: milestones completed, ventures in progress, and the infrastructure we are building next.",
+          "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist in active operation, and the infrastructure we are building next — ePulse, PulseX, and the ENICE Core.",
       },
-      { property: "og:title", content: "ENICE Group Roadmap" },
+      { property: "og:title", content: "ENICE Group Product Roadmap" },
       {
         property: "og:description",
         content:
-          "Milestones completed, ventures in progress, and the infrastructure we are building next.",
+          "From PulsePay and PulseAssist today to ePulse, PulseX, and global infrastructure expansion tomorrow — our public product roadmap.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ENICE Group" },
+      { property: "og:url", content: "https://enicegroup.com/roadmap" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@ENICEHQ" },
+      { name: "twitter:title", content: "ENICE Group Product Roadmap" },
+      {
+        name: "twitter:description",
+        content:
+          "Milestones completed and what we are building next — the public ENICE Group product roadmap.",
+      },
+      { name: "robots", content: "index, follow" },
+    ],
+    links: [{ rel: "canonical", href: "https://enicegroup.com/roadmap" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          name: "ENICE Group Product Roadmap",
+          description:
+            "Public product roadmap for ENICE Group — completed milestones, active ventures, and planned infrastructure for 2026-2027.",
+          url: "https://enicegroup.com/roadmap",
+          publisher: {
+            "@type": "Organization",
+            name: "ENICE Group",
+            url: "https://enicegroup.com",
+          },
+        }),
       },
     ],
   }),

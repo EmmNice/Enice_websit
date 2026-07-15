@@ -7,16 +7,54 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact | ENICE Group" },
+      { title: "Contact ENICE Group | Enterprise Inquiries & Partnerships" },
       {
         name: "description",
         content:
-          "Reach the ENICE Group executive and engineering office about integration, enterprise licensing, or venture partnerships.",
+          "Contact the ENICE Group executive and engineering office. Reach us about platform integration, enterprise licensing, venture partnerships, or general inquiries at corporate@enicehq.com.",
       },
-      { property: "og:title", content: "Contact ENICE Group" },
+      { property: "og:title", content: "Contact ENICE Group — Enterprise Inquiries & Partnerships" },
       {
         property: "og:description",
-        content: "Enterprise engagement and corporate inquiries at ENICE Group.",
+        content:
+          "Enterprise integration, licensing, and partnership inquiries for ENICE Group. Contact us at corporate@enicehq.com.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ENICE Group" },
+      { property: "og:url", content: "https://enicegroup.com/contact" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@ENICEHQ" },
+      { name: "twitter:title", content: "Contact ENICE Group" },
+      {
+        name: "twitter:description",
+        content:
+          "Enterprise integration, licensing, and partnership inquiries. Contact us at corporate@enicehq.com.",
+      },
+      { name: "robots", content: "index, follow" },
+    ],
+    links: [{ rel: "canonical", href: "https://enicegroup.com/contact" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ContactPage",
+          name: "Contact ENICE Group",
+          description:
+            "Enterprise engagement and corporate inquiries for ENICE Group — platform integration, licensing, and venture partnerships.",
+          url: "https://enicegroup.com/contact",
+          publisher: {
+            "@type": "Organization",
+            name: "ENICE Group",
+            url: "https://enicegroup.com",
+            email: "corporate@enicehq.com",
+            address: {
+              "@type": "PostalAddress",
+              addressLocality: "Abuja",
+              addressCountry: "NG",
+            },
+          },
+        }),
       },
     ],
   }),

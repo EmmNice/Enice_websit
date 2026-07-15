@@ -54,17 +54,28 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "ENICE Group is a technology venture studio and infrastructure holding firm. We build fintech platforms and enterprise AI systems, including PulsePay and PulseAssist.",
+          "ENICE Group is a technology venture studio and infrastructure holding firm building fintech platforms and enterprise AI systems — PulsePay, PulseAssist, ePulse, and PulseX.",
       },
-      { property: "og:title", content: "ENICE Group" },
+      { property: "og:title", content: "ENICE Group — Infrastructure for Global Commerce" },
       {
         property: "og:description",
         content:
-          "A venture ecosystem building fintech and enterprise AI infrastructure for institutions.",
+          "A venture ecosystem building fintech and enterprise AI infrastructure — PulsePay, PulseAssist, ePulse, and PulseX.",
       },
-      { property: "og:url", content: "/" },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ENICE Group" },
+      { property: "og:url", content: "https://enicegroup.com/" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@ENICEHQ" },
+      { name: "twitter:title", content: "ENICE Group — Infrastructure for Global Commerce" },
+      {
+        name: "twitter:description",
+        content:
+          "Venture studio building fintech and enterprise AI infrastructure for institutions. PulsePay · PulseAssist · ePulse · PulseX.",
+      },
+      { name: "robots", content: "index, follow" },
     ],
-    links: [{ rel: "canonical", href: "/" }],
+    links: [{ rel: "canonical", href: "https://enicegroup.com/" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -161,11 +172,13 @@ const PORTFOLIO_PREVIEW = [
     tag: "Venture · Fintech",
     name: "PulsePay",
     desc: "A virtual payment platform for modern commerce, offering instant issuance, programmable controls, and embedded treasury.",
+    to: "/portfolio/pulsepay" as const,
   },
   {
     tag: "Venture · Enterprise AI",
     name: "PulseAssist",
     desc: "An AI operations platform for banking, fintech, and telecoms, with autonomous queue handling and policy-bound automations.",
+    to: "/portfolio/pulseassist" as const,
   },
 ];
 
@@ -440,10 +453,11 @@ function Landing() {
                     {p.desc}
                   </p>
                   <Link
-                    to="/portfolio"
+                    to={p.to}
                     className="group/btn mt-8 inline-flex w-fit items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+                    aria-label={`View ${p.name} platform details`}
                   >
-                    View details
+                    View Platform
                     <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover/btn:-translate-y-px group-hover/btn:translate-x-px" />
                   </Link>
                 </article>
