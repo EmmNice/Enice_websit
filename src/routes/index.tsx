@@ -79,7 +79,6 @@ export const Route = createFileRoute("/")({
           name: "ENICE Group",
           url: "https://enicegroup.com",
           logo: "/logo.png",
-          founder: { "@type": "Person", name: "Godson Chukwukemeka", jobTitle: "Founder & CEO" },
           subOrganization: [
             { "@type": "FinancialProduct", name: "PulsePay", description: "Virtual card issuance, programmable wallets, and embedded treasury." },
             { "@type": "Organization", name: "PulseAssist", description: "Multi-tenant AI conversational SaaS for banking and telecom." },
@@ -716,7 +715,7 @@ function Landing() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════
-          MISSION STATEMENT — Full-width premium pull quote
+          FROM THE FOUNDERS
       ══════════════════════════════════════════════════════════════ */}
       <section className="border-b border-border bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
@@ -728,20 +727,23 @@ function Landing() {
                 style={{ background: "radial-gradient(ellipse at 100% 0%, rgba(37,99,235,0.08) 0%, transparent 60%)" }}
               />
               <div className="relative max-w-4xl">
-                <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">Our Purpose</div>
-                <blockquote className="mt-6 text-xl font-semibold leading-relaxed tracking-[-0.02em] text-foreground sm:text-3xl md:text-4xl">
-                  "ENICE Group exists to build the foundational infrastructure
-                  that powers the next generation of African and global
-                  commerce — one institutional-grade platform at a time."
-                </blockquote>
-                <div className="mt-8 flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-primary/10 ring-2 ring-primary/20 grid place-items-center">
-                    <span className="text-[12px] font-bold text-primary">GC</span>
-                  </div>
-                  <div>
-                    <div className="text-[14px] font-bold text-foreground">Godson Chukwukemeka</div>
-                    <div className="text-[12px] text-muted-foreground">Founder & Chief Executive Officer, ENICE Group</div>
-                  </div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">From the Founders</div>
+                <div className="mt-6 space-y-5 text-[16px] leading-[1.8] text-muted-foreground">
+                  <p>
+                    Every great business depends on great infrastructure. That's the belief that inspired ENICE Group. We aren't here to build technology for its own sake — we're here to build products that solve meaningful problems, empower businesses to grow, and create the digital infrastructure that people and organizations can rely on for years to come.
+                  </p>
+                  <p>
+                    That vision wasn't born in a boardroom. It came from lived experience. We experienced the frustrations of everyday life in Nigeria — reaching out to companies for help only to face long wait times, poor customer service, and unnecessary friction. We experienced financial platforms that failed when they mattered most, from declined international cards to everyday payment challenges that made simple tasks unnecessarily difficult.
+                  </p>
+                  <p>
+                    We refused to accept that these experiences should be normal. ENICE Group was founded on the belief that African businesses and consumers deserve technology that is reliable, secure, and built to global standards. Every venture we launch is another step toward making that belief a reality — not only for Africa, but for the world.
+                  </p>
+                </div>
+                <div className="mt-8 flex items-center gap-4 border-t border-border pt-6">
+                  <div className="h-px flex-1 bg-border" />
+                  <p className="font-mono text-[12px] font-medium tracking-[0.14em] text-muted-foreground/70">
+                    — The Founders, ENICE Group
+                  </p>
                 </div>
               </div>
             </div>
