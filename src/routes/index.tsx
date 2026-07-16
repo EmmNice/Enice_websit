@@ -619,30 +619,57 @@ function Landing() {
                     />
                     {i === 0 ? (
                       /* PulsePay card visual */
-                      <div className="absolute left-1/2 top-1/2 w-[52%] max-w-[220px] -translate-x-1/2 -translate-y-[58%] rotate-[-4deg]">
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        {/* Shadow card */}
                         <div
-                          className="relative aspect-[1.586/1] w-full overflow-hidden rounded-xl p-4 text-white"
+                          aria-hidden
+                          className="absolute rounded-2xl"
                           style={{
-                            background: "linear-gradient(135deg, oklch(0.32 0.13 264) 0%, oklch(0.22 0.09 264) 60%, oklch(0.28 0.11 264) 100%)",
-                            boxShadow: "0 20px 40px rgba(17,24,39,0.25)",
+                            width: "62%",
+                            maxWidth: "250px",
+                            aspectRatio: "1.586/1",
+                            background: "linear-gradient(135deg, #b0b8c8 0%, #8a94a6 100%)",
+                            opacity: 0.55,
+                            transform: "rotate(6deg) translate(12%, -16%)",
+                            boxShadow: "0 12px 30px rgba(17,24,39,0.18)",
+                          }}
+                        />
+                        {/* Main card */}
+                        <div
+                          className="relative flex flex-col justify-between rounded-2xl p-4 text-white"
+                          style={{
+                            width: "62%",
+                            maxWidth: "250px",
+                            aspectRatio: "1.586/1",
+                            background: "linear-gradient(135deg, #1a2e6b 0%, #0f1f52 55%, #162560 100%)",
+                            transform: "rotate(-4deg)",
+                            boxShadow: "0 20px 50px rgba(17,24,39,0.35)",
                           }}
                         >
+                          {/* Top row: brand + NFC */}
                           <div className="flex items-start justify-between">
-                            <div className="text-[8px] font-semibold uppercase tracking-[0.28em] text-white/70">PulsePay</div>
-                            <Wifi className="h-3 w-3 rotate-90 text-white/70" />
+                            <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-white/90">
+                              PulsePay
+                            </span>
+                            <Wifi className="h-3.5 w-3.5 rotate-90 text-white/70" />
                           </div>
-                          <div className="mt-5 h-5 w-7 rounded-sm bg-gradient-to-br from-yellow-100 to-amber-300" />
-                          <div className="mt-3 font-mono text-[9px] tracking-[0.18em] text-white/90">•••• •••• •••• ••••</div>
-                          <div className="mt-2 flex items-end justify-between">
-                            <div className="text-[7px] uppercase tracking-[0.2em] text-white/80">ENICE GROUP</div>
-                            <CreditCard className="h-3.5 w-3.5 text-white/70" strokeWidth={1.5} />
+                          {/* Chip */}
+                          <div className="h-6 w-9 rounded-md bg-gradient-to-br from-yellow-100 to-amber-400" />
+                          {/* Card number */}
+                          <div className="font-mono text-[9px] tracking-[0.2em] text-white/80">
+                            •••• •••• •••• ••••
+                          </div>
+                          {/* Bottom row: name + card icon */}
+                          <div className="flex items-end justify-between">
+                            <div>
+                              <div className="text-[6px] uppercase tracking-[0.2em] text-white/50">Cardholder</div>
+                              <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/95">
+                                ENICE GROUP
+                              </div>
+                            </div>
+                            <CreditCard className="h-4 w-4 text-white/60" strokeWidth={1.5} />
                           </div>
                         </div>
-                        <div
-                          className="absolute left-1/2 top-1/2 -z-10 w-[90%] -translate-x-1/2 -translate-y-[40%] rotate-[8deg] rounded-xl"
-                          style={{ background: "oklch(0.22 0.09 264)", aspectRatio: "1.586/1", opacity: 0.3, boxShadow: "0 10px 20px rgba(0,0,0,0.2)" }}
-                          aria-hidden
-                        />
                       </div>
                     ) : (
                       /* PulseAssist queue visual */
