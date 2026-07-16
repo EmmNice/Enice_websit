@@ -195,7 +195,7 @@ function PulsePayPage() {
           {/* Card visual */}
           <div
             className="relative overflow-hidden rounded-xl border border-border bg-background"
-            style={{ boxShadow: SHADOW_CARD, minHeight: "320px" }}
+            style={{ boxShadow: SHADOW_CARD, minHeight: "300px" }}
           >
             {/* Dot grid background */}
             <div
@@ -209,58 +209,59 @@ function PulsePayPage() {
               }}
             />
 
-            {/* Card stack — absolutely centred so it never bleeds past the container */}
+            {/* Card stack — fixed pixel size so it never grows too large on mobile */}
             <div className="absolute inset-0 flex items-center justify-center">
-              {/* Shadow card */}
+              {/* Shadow card — peeking from upper-right */}
               <div
                 aria-hidden
-                className="absolute rounded-xl"
+                className="absolute rounded-2xl"
                 style={{
-                  width: "58%",
-                  maxWidth: "230px",
+                  width: "200px",
                   aspectRatio: "1.586/1",
-                  background:
-                    "linear-gradient(135deg, oklch(0.72 0.03 264) 0%, oklch(0.60 0.04 264) 100%)",
-                  opacity: 0.55,
-                  transform: "rotate(6deg) translate(14%, -18%)",
+                  background: "linear-gradient(135deg, #c5cad4 0%, #9aa0ad 100%)",
+                  opacity: 0.6,
+                  transform: "rotate(7deg) translate(22px, -18px)",
                   boxShadow: SHADOW_LIFT,
                 }}
               />
 
               {/* Main blue card */}
               <div
-                className="relative rounded-xl p-5 text-white"
+                className="relative flex flex-col justify-between rounded-2xl p-4 text-white"
                 style={{
-                  width: "60%",
-                  maxWidth: "240px",
+                  width: "200px",
                   aspectRatio: "1.586/1",
                   background:
-                    "linear-gradient(135deg, oklch(0.32 0.13 264) 0%, oklch(0.22 0.09 264) 60%, oklch(0.28 0.11 264) 100%)",
+                    "linear-gradient(135deg, #1a2e6b 0%, #0f1f52 55%, #162560 100%)",
                   transform: "rotate(-4deg)",
-                  boxShadow: SHADOW_LIFT,
+                  boxShadow: "0 16px 40px rgba(17,24,39,0.30)",
                 }}
               >
+                {/* Top: brand + NFC */}
                 <div className="flex items-start justify-between">
-                  <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-white/90">
                     PulsePay
-                  </div>
-                  <Wifi className="h-4 w-4 rotate-90 text-white/80" aria-hidden />
+                  </span>
+                  <Wifi className="h-3.5 w-3.5 rotate-90 text-white/70" aria-hidden />
                 </div>
-                <div className="mt-6 h-6 w-9 rounded-sm bg-gradient-to-br from-yellow-100 to-amber-300" />
-                <div className="mt-4 font-mono text-[11px] tracking-[0.18em] text-white/90">
+                {/* Chip */}
+                <div className="h-6 w-9 rounded-md bg-gradient-to-br from-yellow-100 to-amber-400" />
+                {/* Card number */}
+                <div className="font-mono text-[9px] tracking-[0.2em] text-white/80">
                   •••• •••• •••• ••••
                 </div>
-                <div className="mt-3 flex items-end justify-between">
+                {/* Bottom: cardholder + icon */}
+                <div className="flex items-end justify-between">
                   <div>
-                    <div className="text-[7px] uppercase tracking-[0.28em] text-white/60">
+                    <div className="text-[6px] uppercase tracking-[0.2em] text-white/50">
                       Cardholder
                     </div>
-                    <div className="text-[10px] uppercase tracking-[0.18em] text-white/95">
+                    <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/95">
                       ENICE GROUP
                     </div>
                   </div>
                   <CreditCard
-                    className="h-4 w-4 text-white/80"
+                    className="h-4 w-4 text-white/60"
                     strokeWidth={1.5}
                     aria-label="Virtual payment card"
                   />
