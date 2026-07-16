@@ -152,7 +152,7 @@ function PortfolioIndexPage() {
               className="flex flex-col overflow-hidden rounded-xl border border-border bg-background"
               style={{ boxShadow: SHADOW_CARD }}
             >
-              <div className="relative overflow-hidden border-b border-border bg-secondary" style={{ aspectRatio: "16 / 10", minHeight: "200px" }}>
+              <div className="relative aspect-[4/3] overflow-hidden border-b border-border bg-secondary sm:aspect-[8/5]">
                 <div
                   aria-hidden
                   className="absolute inset-0 opacity-[0.6]"

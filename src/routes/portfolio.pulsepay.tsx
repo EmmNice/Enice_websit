@@ -194,8 +194,8 @@ function PulsePayPage() {
 
           {/* Card visual */}
           <div
-            className="relative overflow-hidden rounded-xl border border-border bg-background"
-            style={{ boxShadow: SHADOW_CARD, aspectRatio: "16 / 10", minHeight: "220px" }}
+            className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-background sm:aspect-[8/5]"
+            style={{ boxShadow: SHADOW_CARD }}
           >
             <div
               aria-hidden

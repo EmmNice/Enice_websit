@@ -241,8 +241,8 @@ function Landing() {
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-60" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
                   </span>
-                  <span className="text-[11px] font-semibold tracking-[0.12em] text-white/60">
-                    Enterprise Venture Ecosystem · Est. 2026
+                  <span className="whitespace-nowrap text-[11px] font-semibold tracking-[0.06em] text-white/60 sm:tracking-[0.12em]">
+                    Enterprise Venture Ecosystem<span className="hidden sm:inline"> · Est. 2026</span>
                   </span>
                 </div>
 
