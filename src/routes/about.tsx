@@ -326,7 +326,42 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* ── 8. LOOKING AHEAD ────────────────────────────────────────────── */}
+      {/* ── 8. FROM THE FOUNDERS ────────────────────────────────────────── */}
+      <section className="border-b border-border py-14 sm:py-28">
+        <div className="mx-auto max-w-5xl px-5 sm:px-8">
+          <div className="grid gap-8 lg:grid-cols-[1fr_2fr] lg:gap-16">
+            <div>
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">/08</span>
+              <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
+                From the Founders
+              </h2>
+            </div>
+            <div>
+              <div className="space-y-6 text-[16px] leading-[1.8] text-muted-foreground">
+                <p>
+                  Every great business depends on great infrastructure. That's the belief that inspired ENICE Group. We aren't here to build technology for its own sake — we're here to build products that solve meaningful problems, empower businesses to grow, and create the digital infrastructure that people and organizations can rely on for years to come.
+                </p>
+                <p>
+                  That vision wasn't born in a boardroom. It came from lived experience. We experienced the frustrations of everyday life in Nigeria — reaching out to companies for help only to face long wait times, poor customer service, and unnecessary friction. We experienced financial platforms that failed when they mattered most, from declined international cards to everyday payment challenges that made simple tasks unnecessarily difficult.
+                </p>
+                <p>
+                  We refused to accept that these experiences should be normal. ENICE Group was founded on the belief that African businesses and consumers deserve technology that is reliable, secure, and built to global standards. Every venture we launch is another step toward making that belief a reality — not only for Africa, but for the world.
+                </p>
+              </div>
+
+              {/* Signature */}
+              <div className="mt-10 flex items-center gap-4 border-t border-border pt-8">
+                <div className="h-px flex-1 bg-border" />
+                <p className="font-mono text-[12px] font-medium tracking-[0.14em] text-muted-foreground/70">
+                  — The Founders, ENICE Group
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── 9. LOOKING AHEAD ────────────────────────────────────────────── */}
       <section className="border-b border-border bg-[#060912] py-24 sm:py-32">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
