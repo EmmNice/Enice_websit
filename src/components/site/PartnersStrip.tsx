@@ -3,17 +3,15 @@
  * Duplicates the list so the scroll loops seamlessly.
  */
 
-import { Cpu, Cloud, Database, Zap, ShieldCheck, Globe, Building2, Layers } from "lucide-react";
+import { Cpu, Cloud, Database, Zap, Globe, Building2 } from "lucide-react";
 
 const PARTNERS = [
-  { icon: Cloud,       label: "Amazon Web Services", sub: "Cloud Infrastructure" },
-  { icon: Cpu,         label: "Google Cloud",         sub: "AI & Compute"        },
-  { icon: Database,    label: "Supabase",              sub: "Database & Auth"     },
-  { icon: Globe,       label: "Vercel",                sub: "Edge Delivery"       },
-  { icon: ShieldCheck, label: "SMEDAN",                sub: "Institutional"       },
-  { icon: Building2,   label: "AWS Activate",          sub: "Startup Program"     },
-  { icon: Layers,      label: "NDPC",                  sub: "Data Compliance"     },
-  { icon: Zap,         label: "Resend",                sub: "Transactional Email" },
+  { icon: Cloud,    label: "Amazon Web Services", sub: "Cloud Infrastructure" },
+  { icon: Cpu,      label: "Google Cloud",         sub: "AI & Compute"        },
+  { icon: Database, label: "Supabase",              sub: "Database & Auth"     },
+  { icon: Globe,    label: "Vercel",                sub: "Edge Delivery"       },
+  { icon: Building2,label: "AWS Activate",          sub: "Startup Program"     },
+  { icon: Zap,      label: "Resend",                sub: "Transactional Email" },
 ] as const;
 
 // Duplicate for seamless loop
