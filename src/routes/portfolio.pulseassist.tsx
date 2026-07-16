@@ -227,114 +227,106 @@ function PulseAssistPage() {
           {/* Dashboard mockup */}
           <div
             className="relative overflow-hidden rounded-xl border border-white/10"
-            style={{ boxShadow: SHADOW_CARD, background: "#0b0f1a", minHeight: "340px" }}
+            style={{ boxShadow: SHADOW_CARD, background: "#0b0f1a" }}
           >
-            <div className="flex h-full min-h-[340px]">
+            <div className="flex" style={{ minHeight: "clamp(260px, 45vw, 340px)" }}>
 
-              {/* ── Sidebar — desktop only ── */}
-              <div className="hidden sm:flex w-[130px] shrink-0 flex-col border-r border-white/8 bg-[#080c15] p-3">
+              {/* ── Sidebar ── */}
+              {/* Mobile: icon-only narrow strip · Desktop: icons + labels */}
+              <div className="flex w-9 shrink-0 flex-col border-r border-white/8 bg-[#080c15] py-3 sm:w-[130px] sm:p-3">
                 {/* Logo */}
-                <div className="mb-4 flex items-center gap-1.5 px-1">
+                <div className="mb-3 flex items-center justify-center sm:mb-4 sm:justify-start sm:gap-1.5 sm:px-1">
                   <div className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-violet-500/25">
                     <BrainCircuit className="h-3 w-3 text-violet-400" />
                   </div>
-                  <span className="text-[9px] font-bold tracking-tight text-white">PulseAssist</span>
+                  <span className="hidden text-[9px] font-bold tracking-tight text-white sm:block">PulseAssist</span>
                 </div>
 
                 {/* Nav */}
-                <nav className="flex-1 space-y-0.5">
-                  <p className="mb-1 px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/30">Overview</p>
-                  <div className="flex items-center gap-1.5 rounded-md bg-white/8 px-2 py-1.5">
-                    <BarChart3 className="h-2.5 w-2.5 text-white" strokeWidth={2} />
-                    <span className="text-[8px] font-semibold text-white">Dashboard</span>
-                    <span className="ml-auto h-1 w-1 rounded-full bg-violet-400" />
+                <nav className="flex flex-1 flex-col items-center gap-0.5 sm:items-stretch sm:space-y-0.5">
+                  {/* section label desktop only */}
+                  <p className="mb-1 hidden px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/30 sm:block">Overview</p>
+
+                  {/* Dashboard — active */}
+                  <div className="flex w-full items-center justify-center rounded-md bg-white/8 py-1.5 sm:justify-start sm:gap-1.5 sm:px-2">
+                    <BarChart3 className="h-3 w-3 text-white sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+                    <span className="hidden text-[8px] font-semibold text-white sm:block">Dashboard</span>
+                    <span className="ml-auto hidden h-1 w-1 rounded-full bg-violet-400 sm:block" />
                   </div>
-                  <div className="flex items-center gap-1.5 px-2 py-1.5">
-                    <TrendingUp className="h-2.5 w-2.5 text-white/35" strokeWidth={2} />
-                    <span className="text-[8px] text-white/40">Analytics</span>
+
+                  <div className="flex w-full items-center justify-center py-1.5 sm:justify-start sm:gap-1.5 sm:px-2">
+                    <TrendingUp className="h-3 w-3 text-white/35 sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+                    <span className="hidden text-[8px] text-white/40 sm:block">Analytics</span>
                   </div>
-                  <p className="mb-1 mt-2 px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/30">Helpdesk</p>
+
+                  <p className="mb-1 mt-1 hidden px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/30 sm:block">Helpdesk</p>
+
                   {[
-                    { label: "Tickets", Icon: Ticket },
-                    { label: "Contacts", Icon: UserCircle },
+                    { label: "Tickets",    Icon: Ticket },
+                    { label: "Contacts",   Icon: UserCircle },
                     { label: "Live Inbox", Icon: Inbox },
-                    { label: "Team", Icon: Users },
-                    { label: "Canned", Icon: BookOpen },
+                    { label: "Team",       Icon: Users },
+                    { label: "Canned",     Icon: BookOpen },
                   ].map(({ label, Icon }) => (
-                    <div key={label} className="flex items-center gap-1.5 px-2 py-1.5">
-                      <Icon className="h-2.5 w-2.5 text-white/35" strokeWidth={2} />
-                      <span className="text-[8px] text-white/40">{label}</span>
+                    <div key={label} className="flex w-full items-center justify-center py-1.5 sm:justify-start sm:gap-1.5 sm:px-2">
+                      <Icon className="h-3 w-3 text-white/35 sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+                      <span className="hidden text-[8px] text-white/40 sm:block">{label}</span>
                     </div>
                   ))}
                 </nav>
 
-                <div className="border-t border-white/8 pt-3">
-                  <p className="px-1 text-[6px] text-white/20">by ENICE Group</p>
+                <div className="border-t border-white/8 pt-2 sm:pt-3">
+                  <p className="hidden px-1 text-[6px] text-white/20 sm:block">by ENICE Group</p>
                 </div>
               </div>
 
               {/* ── Main content ── */}
-              <div className="flex-1 overflow-hidden p-3 sm:p-4">
-
-                {/* Mobile logo strip */}
-                <div className="mb-3 flex items-center gap-1.5 sm:hidden">
-                  <div className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-violet-500/25">
-                    <BrainCircuit className="h-3 w-3 text-violet-400" />
-                  </div>
-                  <span className="text-[10px] font-bold text-white">PulseAssist</span>
-                  <span className="ml-auto flex items-center gap-1 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-2 py-0.5 text-[8px] font-semibold text-emerald-400">
-                    <span className="h-1 w-1 rounded-full bg-emerald-400" />
-                    Live
-                  </span>
-                </div>
+              <div className="flex-1 overflow-hidden p-2.5 sm:p-4">
 
                 {/* Header */}
-                <div className="mb-3 flex items-center justify-between gap-2">
+                <div className="mb-2 flex items-center justify-between gap-2 sm:mb-3">
                   <div>
-                    <h3 className="text-[13px] font-bold leading-tight text-white">Welcome back</h3>
+                    <h3 className="text-[11px] font-bold leading-tight text-white sm:text-[13px]">Welcome back</h3>
                     <p className="mt-0.5 hidden text-[8px] text-white/45 sm:block">Here's what's happening with your AI agents today.</p>
                   </div>
-                  <button className="inline-flex shrink-0 items-center gap-1 rounded-md bg-primary px-2.5 py-1.5 text-[8px] font-semibold text-white">
-                    <Plus className="h-2.5 w-2.5" strokeWidth={2.5} />
+                  <button className="inline-flex shrink-0 items-center gap-1 rounded-md bg-primary px-2 py-1 text-[7px] font-semibold text-white sm:px-2.5 sm:py-1.5 sm:text-[8px]">
+                    <Plus className="h-2 w-2 sm:h-2.5 sm:w-2.5" strokeWidth={2.5} />
                     <span className="hidden sm:inline">Create AI Agent</span>
                     <span className="sm:hidden">New Agent</span>
                   </button>
                 </div>
 
                 {/* Agent config banner */}
-                <div className="mb-3 flex items-center gap-2 rounded-lg border border-white/8 bg-white/[0.04] px-2.5 py-2">
-                  <div className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-violet-500/20">
-                    <BrainCircuit className="h-3.5 w-3.5 text-violet-400" />
+                <div className="mb-2 flex items-center gap-1.5 rounded-lg border border-white/8 bg-white/[0.04] px-2 py-1.5 sm:mb-3 sm:gap-2 sm:px-2.5 sm:py-2">
+                  <div className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-violet-500/20 sm:h-6 sm:w-6">
+                    <BrainCircuit className="h-3 w-3 text-violet-400 sm:h-3.5 sm:w-3.5" />
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[8px] text-white/55">
-                      Configured for:{" "}
-                      <span className="font-semibold text-violet-400">General Commercial</span>
-                    </p>
-                    <p className="hidden text-[7px] text-white/35 sm:block">Optimised for industry-specific tone and knowledge.</p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[7px] text-white/45">
-                    <Settings className="h-2.5 w-2.5" strokeWidth={2} />
+                  <p className="min-w-0 flex-1 truncate text-[7px] text-white/55 sm:text-[8px]">
+                    Configured for:{" "}
+                    <span className="font-semibold text-violet-400">General Commercial</span>
+                  </p>
+                  <div className="flex shrink-0 items-center gap-1 rounded-md border border-white/10 px-1.5 py-0.5 text-[6px] text-white/45 sm:px-2 sm:py-1 sm:text-[7px]">
+                    <Settings className="h-2 w-2 sm:h-2.5 sm:w-2.5" strokeWidth={2} />
                     <span className="hidden sm:inline">Configure</span>
                   </div>
                 </div>
 
                 {/* Stats row 1 */}
-                <div className="mb-2 grid grid-cols-3 gap-1.5">
+                <div className="mb-1.5 grid grid-cols-3 gap-1.5">
                   {[
-                    { label: "Active AI Agents", value: "1", sub: "+2 WEEK", subOk: true, Icon: BrainCircuit, ic: "text-violet-400", ib: "bg-violet-500/15" },
-                    { label: "Total Interactions", value: "7", sub: "85% AI", subOk: true, Icon: MessageSquare, ic: "text-blue-400", ib: "bg-blue-500/15" },
-                    { label: "Human Handoffs", value: "0", sub: "ATTENTION", subOk: false, Icon: Users, ic: "text-red-400", ib: "bg-red-500/15" },
+                    { label: "Active AI Agents",   value: "1", sub: "+2 WEEK", subOk: true,  Icon: BrainCircuit,  ic: "text-violet-400", ib: "bg-violet-500/15" },
+                    { label: "Total Interactions",  value: "7", sub: "85% AI",  subOk: true,  Icon: MessageSquare, ic: "text-blue-400",   ib: "bg-blue-500/15" },
+                    { label: "Human Handoffs",      value: "0", sub: "ATTN",    subOk: false, Icon: Users,         ic: "text-red-400",    ib: "bg-red-500/15" },
                   ].map(({ label, value, sub, subOk, Icon, ic, ib }) => (
-                    <div key={label} className="rounded-lg border border-white/8 bg-white/[0.04] p-2">
-                      <div className="mb-1.5 flex items-start justify-between gap-1">
-                        <span className="text-[6px] font-semibold uppercase leading-tight tracking-[0.08em] text-white/35">{label}</span>
-                        <div className={`grid h-4 w-4 shrink-0 place-items-center rounded ${ib}`}>
-                          <Icon className={`h-2.5 w-2.5 ${ic}`} strokeWidth={2} />
+                    <div key={label} className="rounded-lg border border-white/8 bg-white/[0.04] p-1.5 sm:p-2">
+                      <div className="mb-1 flex items-start justify-between gap-1">
+                        <span className="text-[5.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-white/35 sm:text-[6px]">{label}</span>
+                        <div className={`grid h-3.5 w-3.5 shrink-0 place-items-center rounded sm:h-4 sm:w-4 ${ib}`}>
+                          <Icon className={`h-2 w-2 sm:h-2.5 sm:w-2.5 ${ic}`} strokeWidth={2} />
                         </div>
                       </div>
-                      <p className="text-[18px] font-bold leading-none text-white">{value}</p>
-                      <p className={`mt-1 text-[6px] font-semibold ${subOk ? "text-emerald-400" : "text-red-400"}`}>↗ {sub}</p>
+                      <p className="text-[15px] font-bold leading-none text-white sm:text-[18px]">{value}</p>
+                      <p className={`mt-0.5 text-[5.5px] font-semibold sm:mt-1 sm:text-[6px] ${subOk ? "text-emerald-400" : "text-red-400"}`}>↗ {sub}</p>
                     </div>
                   ))}
                 </div>
@@ -342,18 +334,18 @@ function PulseAssistPage() {
                 {/* Stats row 2 */}
                 <div className="grid grid-cols-3 gap-1.5">
                   {[
-                    { label: "Cost Saved", value: "₦8,400", Icon: TrendingUp, ic: "text-emerald-400", ib: "bg-emerald-500/15" },
-                    { label: "Hours Delegated", value: "2 hrs", Icon: Clock, ic: "text-blue-400", ib: "bg-blue-500/15" },
-                    { label: "Knowledge Base", value: "0", Icon: Database, ic: "text-amber-400", ib: "bg-amber-500/15" },
+                    { label: "Cost Saved",      value: "₦8,400", Icon: TrendingUp, ic: "text-emerald-400", ib: "bg-emerald-500/15" },
+                    { label: "Hrs Delegated",   value: "2 hrs",  Icon: Clock,      ic: "text-blue-400",   ib: "bg-blue-500/15" },
+                    { label: "Knowledge Base",  value: "0",      Icon: Database,   ic: "text-amber-400",  ib: "bg-amber-500/15" },
                   ].map(({ label, value, Icon, ic, ib }) => (
-                    <div key={label} className="rounded-lg border border-white/8 bg-white/[0.04] p-2">
-                      <div className="mb-1.5 flex items-start justify-between gap-1">
-                        <span className="text-[6px] font-semibold uppercase leading-tight tracking-[0.08em] text-white/35">{label}</span>
-                        <div className={`grid h-4 w-4 shrink-0 place-items-center rounded ${ib}`}>
-                          <Icon className={`h-2.5 w-2.5 ${ic}`} strokeWidth={2} />
+                    <div key={label} className="rounded-lg border border-white/8 bg-white/[0.04] p-1.5 sm:p-2">
+                      <div className="mb-1 flex items-start justify-between gap-1">
+                        <span className="text-[5.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-white/35 sm:text-[6px]">{label}</span>
+                        <div className={`grid h-3.5 w-3.5 shrink-0 place-items-center rounded sm:h-4 sm:w-4 ${ib}`}>
+                          <Icon className={`h-2 w-2 sm:h-2.5 sm:w-2.5 ${ic}`} strokeWidth={2} />
                         </div>
                       </div>
-                      <p className="text-[18px] font-bold leading-none text-white">{value}</p>
+                      <p className="text-[15px] font-bold leading-none text-white sm:text-[18px]">{value}</p>
                     </div>
                   ))}
                 </div>
