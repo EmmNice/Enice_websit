@@ -28,6 +28,7 @@ import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
+import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { AIChatbot } from "@/components/site/AIChatbot";
 import { ComingSoon } from "@/components/site/ComingSoon";
 import { isPreLaunch } from "@/lib/launch";
@@ -437,6 +438,9 @@ function Landing() {
         </div>
       </section>
 
+      {/* Partners marquee — right after hero */}
+      <PartnersStrip />
+
       {/* ══════════════════════════════════════════════════════════════
           CORE VERTICALS — Light, premium numbered cards
       ══════════════════════════════════════════════════════════════ */}
@@ -544,13 +548,10 @@ function Landing() {
             </div>
           </Reveal>
 
-          <Reveal delay={80}>
-            <div className="grid gap-px overflow-hidden rounded-2xl border border-white/8 bg-white/8 sm:grid-cols-2">
-              {CORE_MODULES.map((c, i) => (
-                <div
-                  key={c.title}
-                  className="group flex flex-col bg-[#060912] p-10 transition-colors hover:bg-white/[0.03] xl:p-12"
-                >
+          <div className="grid gap-px overflow-hidden rounded-2xl border border-white/8 bg-white/8 sm:grid-cols-2">
+            {CORE_MODULES.map((c, i) => (
+              <Reveal key={c.title} delay={i * 90} direction={i % 2 === 0 ? "left" : "right"}>
+                <div className="group flex h-full flex-col bg-[#060912] p-10 transition-colors hover:bg-white/[0.03] xl:p-12">
                   <div className="flex items-start justify-between">
                     <div className="grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-white/5 text-blue-400">
                       <c.icon className="h-6 w-6" strokeWidth={1.5} />
@@ -566,9 +567,9 @@ function Landing() {
                     {c.desc}
                   </p>
                 </div>
-              ))}
-            </div>
-          </Reveal>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
