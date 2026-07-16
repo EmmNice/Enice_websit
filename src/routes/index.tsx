@@ -236,7 +236,10 @@ function Landing() {
               {/* ── Left: Copy ── */}
               <div className="max-w-2xl">
                 {/* Badge */}
-                <div className="mb-8 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm">
+                <div
+                  className="animate-hero-up mb-8 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 backdrop-blur-sm"
+                  style={{ animationDelay: "0ms" }}
+                >
                   <span className="relative flex h-1.5 w-1.5 shrink-0">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-blue-400 opacity-60" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
@@ -247,7 +250,10 @@ function Landing() {
                 </div>
 
                 {/* Headline */}
-                <h1 className="text-[2.1rem] font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem]">
+                <h1
+                  className="animate-hero-up text-[2.1rem] font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem]"
+                  style={{ animationDelay: "100ms" }}
+                >
                   The infrastructure
                   <br />
                   <span className="text-blue-400">powering the next</span>
@@ -258,14 +264,20 @@ function Landing() {
                 </h1>
 
                 {/* Subheadline */}
-                <p className="mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:mt-8 sm:text-lg">
+                <p
+                  className="animate-hero-up mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:mt-8 sm:text-lg"
+                  style={{ animationDelay: "200ms" }}
+                >
                   ENICE Group designs, funds, and operates full-stack software
                   ventures that deliver the financial and AI infrastructure
                   modern institutions depend on.
                 </p>
 
                 {/* CTAs */}
-                <div className="mt-7 flex flex-wrap gap-3 sm:mt-10">
+                <div
+                  className="animate-hero-up mt-7 flex flex-wrap gap-3 sm:mt-10"
+                  style={{ animationDelay: "300ms" }}
+                >
                   <Link
                     to="/portfolio"
                     className="group inline-flex h-11 items-center gap-2 rounded-md bg-white px-6 text-[13px] font-semibold text-[#060912] transition-all hover:bg-white/90 sm:h-12 sm:px-7"
@@ -282,7 +294,10 @@ function Landing() {
                 </div>
 
                 {/* Trust signals */}
-                <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <div
+                  className="animate-hero-fade mt-10 flex flex-wrap items-center gap-x-6 gap-y-3"
+                  style={{ animationDelay: "450ms" }}
+                >
                   {["SOC 2 Aligned", "RLS Enforced", "NDPC Compliant", "99.99% SLA"].map((t) => (
                     <span key={t} className="flex items-center gap-1.5 text-[11px] font-medium text-white/40">
                       <Check className="h-3 w-3 text-blue-400" strokeWidth={2.5} />
@@ -293,7 +308,7 @@ function Landing() {
               </div>
 
               {/* ── Right: Live ecosystem dashboard ── */}
-              <div className="hidden lg:flex lg:justify-end">
+              <div className="hidden lg:flex lg:justify-end" style={{ animation: "heroRight 1.1s cubic-bezier(0.16,1,0.3,1) 250ms both" }}>
                 <div className="relative w-full max-w-[480px]">
                   {/* Outer glow halo */}
                   <div
@@ -420,10 +435,11 @@ function Landing() {
         <div className="relative z-10 border-t border-white/8">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
             <div className="grid grid-cols-2 divide-x divide-y divide-white/8 md:grid-cols-4 md:divide-y-0">
-              {HERO_STATS.map((s) => (
+              {HERO_STATS.map((s, i) => (
                 <div
                   key={s.label}
-                  className="p-5 sm:p-7"
+                  className="animate-hero-up p-5 sm:p-7"
+                  style={{ animationDelay: `${500 + i * 80}ms` }}
                 >
                   <div className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                     {s.value}

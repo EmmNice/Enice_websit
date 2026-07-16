@@ -32,8 +32,8 @@ export function Reveal({
   className = "",
   as: Tag = "div",
   direction = "up",
-  distance = 24,
-  duration = 750,
+  distance = 44,
+  duration = 850,
 }: RevealProps) {
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -63,8 +63,12 @@ export function Reveal({
         transition: `opacity ${duration}ms ${ease}, transform ${duration}ms ${ease}, filter ${duration}ms ${ease}`,
         transitionDelay: `${delay}ms`,
         opacity: visible ? 1 : 0,
-        transform: visible ? (direction === "scale" ? "scale(1)" : "none") : getInitialTransform(direction, distance),
-        filter: visible ? "blur(0px)" : "blur(4px)",
+        transform: visible
+          ? "translateY(0) translateX(0) scale(1)"
+          : direction === "scale"
+            ? "scale(0.92)"
+            : `${getInitialTransform(direction, distance)} scale(0.98)`,
+        filter: visible ? "blur(0px)" : "blur(8px)",
         willChange: "opacity, transform, filter",
       }}
       className={className}
