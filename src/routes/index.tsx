@@ -607,7 +607,7 @@ function Landing() {
                   style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 12px rgba(17,24,39,0.06)" }}
                 >
                   {/* Product visual strip */}
-                  <div className="relative h-64 overflow-hidden border-b border-border bg-secondary">
+                  <div className="relative h-72 overflow-hidden border-b border-border bg-secondary">
                     <div
                       aria-hidden
                       className="absolute inset-0 opacity-50"
@@ -619,7 +619,7 @@ function Landing() {
                     />
                     {i === 0 ? (
                       /* PulsePay card visual */
-                      <div className="absolute left-1/2 top-1/2 w-[56%] max-w-[240px] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg]">
+                      <div className="absolute left-1/2 top-1/2 w-[52%] max-w-[220px] -translate-x-1/2 -translate-y-[58%] rotate-[-4deg]">
                         <div
                           className="relative aspect-[1.586/1] w-full overflow-hidden rounded-xl p-4 text-white"
                           style={{
