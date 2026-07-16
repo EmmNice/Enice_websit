@@ -171,7 +171,7 @@ function PulsePayPage() {
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-medium text-muted-foreground">
                 <Globe className="h-3 w-3" />
-                Nigeria · Multi-currency
+                Nigeria Only
               </span>
             </div>
 
@@ -194,8 +194,8 @@ function PulsePayPage() {
 
           {/* Card visual */}
           <div
-            className="relative h-72 overflow-hidden rounded-xl border border-border bg-background"
-            style={{ boxShadow: SHADOW_CARD }}
+            className="relative overflow-hidden rounded-xl border border-border bg-background"
+            style={{ boxShadow: SHADOW_CARD, aspectRatio: "16 / 10", minHeight: "220px" }}
           >
             <div
               aria-hidden

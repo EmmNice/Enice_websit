@@ -230,8 +230,8 @@ function Landing() {
 
         {/* Main content */}
         <div className="relative z-10 flex flex-1 items-center">
-          <div className="mx-auto w-full max-w-7xl px-5 py-28 sm:px-8 sm:py-36">
-            <div className="grid items-center gap-16 lg:grid-cols-2 xl:gap-24">
+          <div className="mx-auto w-full max-w-7xl px-5 py-14 sm:px-8 sm:py-36">
+            <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-24">
 
               {/* ── Left: Copy ── */}
               <div className="max-w-2xl">
@@ -247,7 +247,7 @@ function Landing() {
                 </div>
 
                 {/* Headline */}
-                <h1 className="text-5xl font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem]">
+                <h1 className="text-[2.1rem] font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem]">
                   The infrastructure
                   <br />
                   <span className="text-blue-400">powering the next</span>
@@ -258,24 +258,24 @@ function Landing() {
                 </h1>
 
                 {/* Subheadline */}
-                <p className="mt-8 max-w-xl text-lg leading-relaxed text-white/55">
+                <p className="mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:mt-8 sm:text-lg">
                   ENICE Group designs, funds, and operates full-stack software
                   ventures that deliver the financial and AI infrastructure
                   modern institutions depend on.
                 </p>
 
                 {/* CTAs */}
-                <div className="mt-10 flex flex-wrap gap-3">
+                <div className="mt-7 flex flex-wrap gap-3 sm:mt-10">
                   <Link
                     to="/portfolio"
-                    className="group inline-flex h-12 items-center gap-2 rounded-md bg-white px-7 text-[13px] font-semibold text-[#060912] transition-all hover:bg-white/90"
+                    className="group inline-flex h-11 items-center gap-2 rounded-md bg-white px-6 text-[13px] font-semibold text-[#060912] transition-all hover:bg-white/90 sm:h-12 sm:px-7"
                   >
                     Explore Portfolio
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <Link
                     to="/about"
-                    className="inline-flex h-12 items-center gap-2 rounded-md border border-white/15 bg-white/5 px-7 text-[13px] font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white"
+                    className="inline-flex h-11 items-center gap-2 rounded-md border border-white/15 bg-white/5 px-6 text-[13px] font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white sm:h-12 sm:px-7"
                   >
                     Corporate Overview
                   </Link>
@@ -419,11 +419,11 @@ function Landing() {
         {/* Stats strip — bottom of hero */}
         <div className="relative z-10 border-t border-white/8">
           <div className="mx-auto max-w-7xl px-5 sm:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4">
-              {HERO_STATS.map((s, i) => (
+            <div className="grid grid-cols-2 divide-x divide-y divide-white/8 md:grid-cols-4 md:divide-y-0">
+              {HERO_STATS.map((s) => (
                 <div
                   key={s.label}
-                  className={`p-7 ${i !== 0 ? "border-l border-white/8" : ""}`}
+                  className="p-5 sm:p-7"
                 >
                   <div className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
                     {s.value}
@@ -721,7 +721,7 @@ function Landing() {
       <section className="border-b border-border bg-white py-24 sm:py-32">
         <div className="mx-auto max-w-6xl px-5 sm:px-8">
           <Reveal>
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-secondary/40 p-12 sm:p-16">
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-secondary/40 p-6 sm:p-16">
               <div
                 aria-hidden
                 className="pointer-events-none absolute right-0 top-0 h-64 w-64 opacity-60"
@@ -729,7 +729,7 @@ function Landing() {
               />
               <div className="relative max-w-4xl">
                 <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">Our Purpose</div>
-                <blockquote className="mt-6 text-2xl font-semibold leading-relaxed tracking-[-0.02em] text-foreground sm:text-3xl md:text-4xl">
+                <blockquote className="mt-6 text-xl font-semibold leading-relaxed tracking-[-0.02em] text-foreground sm:text-3xl md:text-4xl">
                   "ENICE Group exists to build the foundational infrastructure
                   that powers the next generation of African and global
                   commerce — one institutional-grade platform at a time."
@@ -754,7 +754,7 @@ function Landing() {
       ══════════════════════════════════════════════════════════════ */}
       <section className="border-b border-border bg-white py-14">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="flex flex-col items-start justify-between gap-8 lg:flex-row lg:items-center">
+          <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center lg:gap-8">
             <div className="flex items-center gap-4">
               <div className="grid h-13 w-13 place-items-center rounded-xl border border-border bg-secondary shadow-sm">
                 <ShieldCheck className="h-5 w-5 text-primary" strokeWidth={1.75} />

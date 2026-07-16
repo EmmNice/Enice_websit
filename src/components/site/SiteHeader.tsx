@@ -101,7 +101,7 @@ export function SiteHeader() {
             <button
               aria-label="Open navigation"
               onClick={() => setOpen(true)}
-              className="grid h-9 w-9 place-items-center rounded-md border border-border bg-background text-foreground transition-colors hover:bg-secondary md:hidden"
+              className="grid h-11 w-11 place-items-center rounded-md border border-border bg-background text-foreground transition-colors hover:bg-secondary md:hidden"
             >
               <Menu className="h-4 w-4" strokeWidth={2} />
             </button>

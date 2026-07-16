@@ -216,8 +216,8 @@ function PulseAssistPage() {
 
           {/* Queue visual */}
           <div
-            className="relative h-72 overflow-hidden rounded-xl border border-border bg-background"
-            style={{ boxShadow: SHADOW_CARD }}
+            className="relative overflow-hidden rounded-xl border border-border bg-background"
+            style={{ boxShadow: SHADOW_CARD, aspectRatio: "16 / 10", minHeight: "220px" }}
           >
             <div
               aria-hidden

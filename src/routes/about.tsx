@@ -127,17 +127,17 @@ function AboutPage() {
       <SiteHeader />
 
       {/* ── 1. HERO ─────────────────────────────────────────────────────── */}
-      <section className="border-b border-border bg-[#060912] pb-28 pt-24 sm:pb-36 sm:pt-32">
+      <section className="border-b border-border bg-[#060912] pb-16 pt-16 sm:pb-36 sm:pt-32">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-400">
             <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
             About ENICE Group
           </div>
-          <h1 className="mt-8 max-w-4xl text-5xl font-bold leading-[1.04] tracking-[-0.035em] text-white sm:text-6xl md:text-7xl">
+          <h1 className="mt-6 max-w-4xl text-[2rem] font-bold leading-[1.04] tracking-[-0.035em] text-white sm:text-6xl md:text-7xl">
             We are not building a startup.{" "}
             <span className="text-blue-400">We are building the infrastructure.</span>
           </h1>
-          <p className="mt-8 max-w-2xl text-lg leading-relaxed text-white/60 sm:text-xl">
+          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/60 sm:mt-8 sm:text-xl">
             ENICE Group is a technology venture studio and infrastructure holding company. We design, fund, engineer, and operate a compounding ecosystem of software platforms — each one purpose-built to close a critical gap in financial infrastructure, enterprise intelligence, or digital commerce.
           </p>
         </div>
@@ -263,7 +263,7 @@ function AboutPage() {
       {/* ── 6. OUR PRINCIPLES ───────────────────────────────────────────── */}
       <section className="border-b border-border py-24 sm:py-32">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
-          <div className="mb-16">
+          <div className="mb-10 sm:mb-16">
             <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">/06</span>
             <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
               Our Principles
@@ -273,7 +273,7 @@ function AboutPage() {
             </p>
           </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
             {PRINCIPLES.map((p) => (
               <article
                 key={p.index}
@@ -353,8 +353,8 @@ function AboutPage() {
           </div>
 
           {/* Closing statement */}
-          <div className="mt-20 rounded-2xl border border-white/10 bg-white/[0.03] p-12 sm:p-16 text-center">
-            <p className="mx-auto max-w-3xl text-2xl font-semibold leading-snug tracking-tight text-white sm:text-3xl">
+          <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.03] p-7 sm:mt-20 sm:p-16 text-center">
+            <p className="mx-auto max-w-3xl text-xl font-semibold leading-snug tracking-tight text-white sm:text-3xl">
               "The infrastructure a society depends on is the most durable thing it can build. We are here to build it."
             </p>
             <div className="mt-6 text-sm font-medium text-white/40">
