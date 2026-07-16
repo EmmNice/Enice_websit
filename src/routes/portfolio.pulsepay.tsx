@@ -192,85 +192,78 @@ function PulsePayPage() {
             </div>
           </div>
 
-          {/* Card visual — no overflow-hidden on outer; dot grid clipped in its own layer */}
+          {/* Card visual */}
           <div
-            className="relative rounded-xl border border-border bg-background"
-            style={{ boxShadow: SHADOW_CARD }}
+            className="relative overflow-hidden rounded-xl border border-border bg-background"
+            style={{ boxShadow: SHADOW_CARD, minHeight: "320px" }}
           >
-            {/* Dot grid background — clipped to container bounds only */}
+            {/* Dot grid background */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl"
-            >
-              <div
-                className="absolute inset-0 opacity-[0.6]"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(to right, rgba(17,24,39,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(17,24,39,0.05) 1px, transparent 1px)",
-                  backgroundSize: "28px 28px",
-                }}
-              />
-            </div>
+              className="pointer-events-none absolute inset-0"
+              style={{
+                backgroundImage:
+                  "linear-gradient(to right, rgba(17,24,39,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(17,24,39,0.05) 1px, transparent 1px)",
+                backgroundSize: "28px 28px",
+                opacity: 0.6,
+              }}
+            />
 
-            {/* Card stack — padding provides drop-shadow and rotation breathing room */}
-            <div className="relative flex items-center justify-center px-8 py-16 sm:px-12 sm:py-14">
-              {/* Shadow card — centred, shifted up-right, no clipping possible */}
+            {/* Card stack — absolutely centred so it never bleeds past the container */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {/* Shadow card */}
               <div
                 aria-hidden
-                className="pointer-events-none absolute inset-0 flex items-center justify-center"
-              >
-                <div
-                  className="-translate-y-[28%] rotate-[6deg] rounded-xl"
-                  style={{
-                    width: "62%",
-                    maxWidth: "260px",
-                    background:
-                      "linear-gradient(135deg, oklch(0.25 0.08 264) 0%, oklch(0.18 0.06 264) 100%)",
-                    aspectRatio: "1.586/1",
-                    opacity: 0.38,
-                    boxShadow: SHADOW_LIFT,
-                  }}
-                />
-              </div>
+                className="absolute rounded-xl"
+                style={{
+                  width: "58%",
+                  maxWidth: "230px",
+                  aspectRatio: "1.586/1",
+                  background:
+                    "linear-gradient(135deg, oklch(0.72 0.03 264) 0%, oklch(0.60 0.04 264) 100%)",
+                  opacity: 0.55,
+                  transform: "rotate(6deg) translate(14%, -18%)",
+                  boxShadow: SHADOW_LIFT,
+                }}
+              />
 
-              {/* Main blue card — sets natural container height */}
-              <div className="relative w-[78%] max-w-sm rotate-[-6deg]">
-                <div
-                  className="relative aspect-[1.586/1] w-full overflow-hidden rounded-xl p-5 text-white"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, oklch(0.32 0.13 264) 0%, oklch(0.22 0.09 264) 60%, oklch(0.28 0.11 264) 100%)",
-                    boxShadow: SHADOW_LIFT,
-                  }}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80">
-                      PulsePay
+              {/* Main blue card */}
+              <div
+                className="relative rounded-xl p-5 text-white"
+                style={{
+                  width: "60%",
+                  maxWidth: "240px",
+                  aspectRatio: "1.586/1",
+                  background:
+                    "linear-gradient(135deg, oklch(0.32 0.13 264) 0%, oklch(0.22 0.09 264) 60%, oklch(0.28 0.11 264) 100%)",
+                  transform: "rotate(-4deg)",
+                  boxShadow: SHADOW_LIFT,
+                }}
+              >
+                <div className="flex items-start justify-between">
+                  <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80">
+                    PulsePay
+                  </div>
+                  <Wifi className="h-4 w-4 rotate-90 text-white/80" aria-hidden />
+                </div>
+                <div className="mt-6 h-6 w-9 rounded-sm bg-gradient-to-br from-yellow-100 to-amber-300" />
+                <div className="mt-4 font-mono text-[11px] tracking-[0.18em] text-white/90">
+                  •••• •••• •••• ••••
+                </div>
+                <div className="mt-3 flex items-end justify-between">
+                  <div>
+                    <div className="text-[7px] uppercase tracking-[0.28em] text-white/60">
+                      Cardholder
                     </div>
-                    <Wifi
-                      className="h-4 w-4 rotate-90 text-white/80"
-                      aria-hidden
-                    />
-                  </div>
-                  <div className="mt-8 h-7 w-10 rounded-sm bg-gradient-to-br from-yellow-100 to-amber-300" />
-                  <div className="mt-5 font-mono text-sm tracking-[0.18em] text-white/95">
-                    •••• •••• •••• ••••
-                  </div>
-                  <div className="mt-3 flex items-end justify-between">
-                    <div>
-                      <div className="text-[8px] uppercase tracking-[0.28em] text-white/60">
-                        Cardholder
-                      </div>
-                      <div className="text-[11px] uppercase tracking-[0.18em] text-white/95">
-                        ENICE GROUP
-                      </div>
+                    <div className="text-[10px] uppercase tracking-[0.18em] text-white/95">
+                      ENICE GROUP
                     </div>
-                    <CreditCard
-                      className="h-5 w-5 text-white/80"
-                      strokeWidth={1.5}
-                      aria-label="Virtual payment card"
-                    />
                   </div>
+                  <CreditCard
+                    className="h-4 w-4 text-white/80"
+                    strokeWidth={1.5}
+                    aria-label="Virtual payment card"
+                  />
                 </div>
               </div>
             </div>
