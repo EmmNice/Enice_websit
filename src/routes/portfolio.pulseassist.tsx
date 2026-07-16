@@ -270,22 +270,9 @@ function PulseAssistPage() {
                   ))}
                 </nav>
 
-                {/* Bottom */}
+                {/* Bottom branding */}
                 <div className="border-t border-white/8 pt-3">
-                  <div className="flex items-center gap-1.5 px-1 py-1">
-                    <div className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violet-500/25">
-                      <span className="text-[7px] font-bold text-violet-300">SA</span>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-[8px] font-semibold text-white/80">Super Admin</p>
-                      <p className="text-[7px] text-white/35">Corporate</p>
-                    </div>
-                  </div>
-                  <div className="mt-1 flex items-center gap-1 px-1 py-1">
-                    <LogOut className="h-2.5 w-2.5 text-white/30" />
-                    <span className="text-[8px] text-white/30">Log out</span>
-                  </div>
-                  <p className="mt-1 px-1 text-[6px] text-white/20">by ENICE Group</p>
+                  <p className="px-1 text-[6px] text-white/20">by ENICE Group</p>
                 </div>
               </div>
 
