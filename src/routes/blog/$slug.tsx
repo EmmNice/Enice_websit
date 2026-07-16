@@ -195,7 +195,10 @@ function ArticlePage() {
                 {post.body?.length > 0 ? (
                   <PortableText value={post.body as Parameters<typeof PortableText>[0]["value"]} components={ptComponents} />
                 ) : (
-                  <p className="text-zinc-500 italic">Full article coming soon.</p>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.03] px-8 py-10 text-center">
+                    <p className="text-base font-semibold text-white/80">This article is being prepared.</p>
+                    <p className="mt-2 text-sm text-zinc-500">The full piece will be published here shortly. Check back soon.</p>
+                  </div>
                 )}
               </div>
             </article>

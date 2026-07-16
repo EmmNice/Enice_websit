@@ -23,13 +23,6 @@ const STACK = [
     detail: "Row-level security, real-time data streams, and managed Postgres for PulsePay's transactional systems.",
     index: "03",
   },
-  {
-    name: "Cloudflare",
-    abbr: "CDN",
-    label: "Global Edge, DNS, and DDoS Protection",
-    detail: "Enterprise-grade edge delivery, WAF, and DDoS mitigation ensuring sub-20ms response times globally.",
-    index: "04",
-  },
 ] as const;
 
 export function InfraStack() {
@@ -55,7 +48,7 @@ export function InfraStack() {
           </div>
         </Reveal>
 
-        <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
           {STACK.map((s, i) => (
             <Reveal key={s.name} delay={i * 70}>
               <div className="group flex h-full flex-col bg-background p-8 transition-colors hover:bg-secondary/50 xl:p-10">

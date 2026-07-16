@@ -31,7 +31,7 @@ export function LegalPage({
             {intro}
           </p>
           <div className="mt-6 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-            Last updated · {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+            Last updated · July 16, 2026
           </div>
         </div>
       </section>

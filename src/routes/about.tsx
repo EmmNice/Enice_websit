@@ -326,7 +326,7 @@ function AboutPage() {
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
             <div>
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-400/70">/08</span>
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-400/70">/09</span>
               <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-white sm:text-4xl">
                 Looking Ahead
               </h2>

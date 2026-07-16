@@ -245,7 +245,7 @@ function ContactPage() {
                     label="Full Name"
                     value={form.name}
                     onChange={(v) => setForm({ ...form, name: v })}
-                    placeholder="Jane Doe"
+                    placeholder="Your full name"
                     required
                   />
                   <Field
@@ -262,7 +262,7 @@ function ContactPage() {
                   label="Company / Institution"
                   value={form.company}
                   onChange={(v) => setForm({ ...form, company: v })}
-                  placeholder="Acme Bank PLC"
+                  placeholder="Your company or institution"
                   required
                 />
 
