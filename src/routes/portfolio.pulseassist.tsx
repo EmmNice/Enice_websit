@@ -11,6 +11,16 @@ import {
   MessageSquare,
   FileCheck2,
   Network,
+  Plus,
+  Settings,
+  TrendingUp,
+  Clock,
+  Database,
+  LogOut,
+  Inbox,
+  BookOpen,
+  UserCircle,
+  Ticket,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -214,49 +224,145 @@ function PulseAssistPage() {
             </div>
           </div>
 
-          {/* Queue visual */}
+          {/* Dashboard mockup */}
           <div
-            className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-background sm:aspect-[8/5]"
-            style={{ boxShadow: SHADOW_CARD }}
+            className="relative overflow-hidden rounded-xl border border-white/10"
+            style={{ boxShadow: SHADOW_CARD, background: "#0b0f1a", minHeight: "340px" }}
           >
-            <div
-              aria-hidden
-              className="absolute inset-0 opacity-[0.6]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(to right, rgba(17,24,39,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(17,24,39,0.05) 1px, transparent 1px)",
-                backgroundSize: "28px 28px",
-              }}
-            />
-            <div className="absolute inset-0 flex items-center justify-center p-8">
-              <div className="w-full max-w-sm space-y-2.5">
-                {QUEUE_ROWS.map((row) => (
-                  <div
-                    key={row.id}
-                    className="flex items-center gap-3 rounded-md border border-border bg-background px-3 py-2"
-                  >
-                    <span
-                      className={`relative flex h-1.5 w-1.5 shrink-0 ${!row.isLive && "opacity-50"}`}
-                    >
-                      {row.isLive && (
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                      )}
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-                    </span>
-                    <span className="font-mono text-[10px] tracking-wider text-muted-foreground">
-                      {row.id}
-                    </span>
-                    <div className="relative ml-1 h-1 flex-1 overflow-hidden rounded-full bg-border">
-                      <div
-                        className={`h-full rounded-full bg-primary ${row.width}`}
-                      />
-                    </div>
-                    <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      {row.state}
-                    </span>
+            <div className="flex h-full min-h-[340px]">
+
+              {/* ── Sidebar ── */}
+              <div className="flex w-[130px] shrink-0 flex-col border-r border-white/8 bg-[#080c15] p-3">
+                {/* Logo */}
+                <div className="mb-4 flex items-center gap-1.5 px-1">
+                  <div className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-violet-500/25">
+                    <BrainCircuit className="h-3 w-3 text-violet-400" />
                   </div>
-                ))}
+                  <span className="text-[9px] font-bold tracking-tight text-white">PulseAssist</span>
+                </div>
+
+                {/* Nav */}
+                <nav className="flex-1 space-y-0.5">
+                  <p className="mb-1 px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/30">Overview</p>
+                  {/* Dashboard — active */}
+                  <div className="flex items-center gap-1.5 rounded-md bg-white/8 px-2 py-1.5">
+                    <BarChart3 className="h-2.5 w-2.5 text-white" strokeWidth={2} />
+                    <span className="text-[8px] font-semibold text-white">Dashboard</span>
+                    <span className="ml-auto h-1 w-1 rounded-full bg-violet-400" />
+                  </div>
+                  <div className="flex items-center gap-1.5 px-2 py-1.5">
+                    <TrendingUp className="h-2.5 w-2.5 text-white/35" strokeWidth={2} />
+                    <span className="text-[8px] text-white/40">Analytics</span>
+                  </div>
+
+                  <p className="mb-1 mt-2 px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/30">Helpdesk</p>
+                  {[
+                    { label: "Tickets", Icon: Ticket },
+                    { label: "Contacts", Icon: UserCircle },
+                    { label: "Live Inbox", Icon: Inbox },
+                    { label: "Team", Icon: Users },
+                    { label: "Canned", Icon: BookOpen },
+                  ].map(({ label, Icon }) => (
+                    <div key={label} className="flex items-center gap-1.5 px-2 py-1.5">
+                      <Icon className="h-2.5 w-2.5 text-white/35" strokeWidth={2} />
+                      <span className="text-[8px] text-white/40">{label}</span>
+                    </div>
+                  ))}
+                </nav>
+
+                {/* Bottom */}
+                <div className="border-t border-white/8 pt-3">
+                  <div className="flex items-center gap-1.5 px-1 py-1">
+                    <div className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-violet-500/25">
+                      <span className="text-[7px] font-bold text-violet-300">SA</span>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-[8px] font-semibold text-white/80">Super Admin</p>
+                      <p className="text-[7px] text-white/35">Corporate</p>
+                    </div>
+                  </div>
+                  <div className="mt-1 flex items-center gap-1 px-1 py-1">
+                    <LogOut className="h-2.5 w-2.5 text-white/30" />
+                    <span className="text-[8px] text-white/30">Log out</span>
+                  </div>
+                  <p className="mt-1 px-1 text-[6px] text-white/20">by ENICE Group</p>
+                </div>
               </div>
+
+              {/* ── Main content ── */}
+              <div className="flex-1 overflow-hidden p-4">
+                {/* Header */}
+                <div className="mb-3 flex items-start justify-between gap-2">
+                  <div>
+                    <h3 className="text-[13px] font-bold leading-tight text-white">Welcome back</h3>
+                    <p className="mt-0.5 text-[8px] text-white/45">Here's what's happening with your AI agents today.</p>
+                  </div>
+                  <button className="inline-flex shrink-0 items-center gap-1 rounded-md bg-primary px-2.5 py-1.5 text-[8px] font-semibold text-white">
+                    <Plus className="h-2.5 w-2.5" strokeWidth={2.5} />
+                    Create AI Agent
+                  </button>
+                </div>
+
+                {/* Agent config banner */}
+                <div className="mb-3 flex items-center gap-2 rounded-lg border border-white/8 bg-white/[0.04] px-3 py-2">
+                  <div className="grid h-6 w-6 shrink-0 place-items-center rounded-md bg-violet-500/20">
+                    <BrainCircuit className="h-3.5 w-3.5 text-violet-400" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[8px] text-white/55">
+                      AI Agents configured for:{" "}
+                      <span className="font-semibold text-violet-400">General Commercial</span>
+                    </p>
+                    <p className="text-[7px] text-white/35">Optimised for industry-specific tone and knowledge.</p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-1 rounded-md border border-white/10 px-2 py-1 text-[7px] text-white/45">
+                    <Settings className="h-2.5 w-2.5" strokeWidth={2} />
+                    Configure
+                  </div>
+                </div>
+
+                {/* Stats row 1 */}
+                <div className="mb-2 grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Active AI Agents", value: "1", sub: "+2 THIS WEEK", subOk: true, Icon: BrainCircuit, ic: "text-violet-400", ib: "bg-violet-500/15" },
+                    { label: "Total Interactions", value: "7", sub: "85% AI RESOLVED", subOk: true, Icon: MessageSquare, ic: "text-blue-400", ib: "bg-blue-500/15" },
+                    { label: "Human Handoffs", value: "0", sub: "REQUIRES ATTENTION", subOk: false, Icon: Users, ic: "text-red-400", ib: "bg-red-500/15" },
+                  ].map(({ label, value, sub, subOk, Icon, ic, ib }) => (
+                    <div key={label} className="rounded-lg border border-white/8 bg-white/[0.04] p-2.5">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-[6.5px] font-semibold uppercase tracking-[0.1em] text-white/35 leading-tight">{label}</span>
+                        <div className={`grid h-4 w-4 shrink-0 place-items-center rounded ${ib}`}>
+                          <Icon className={`h-2.5 w-2.5 ${ic}`} strokeWidth={2} />
+                        </div>
+                      </div>
+                      <p className="text-[20px] font-bold leading-none text-white">{value}</p>
+                      <p className={`mt-1 text-[6.5px] font-semibold ${subOk ? "text-emerald-400" : "text-red-400"}`}>
+                        ↗ {sub}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Stats row 2 */}
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { label: "Cost Saved", value: "₦8,400", Icon: TrendingUp, ic: "text-emerald-400", ib: "bg-emerald-500/15" },
+                    { label: "Human Hrs Delegated", value: "2 hrs", Icon: Clock, ic: "text-blue-400", ib: "bg-blue-500/15" },
+                    { label: "Knowledge Base", value: "0", Icon: Database, ic: "text-amber-400", ib: "bg-amber-500/15" },
+                  ].map(({ label, value, Icon, ic, ib }) => (
+                    <div key={label} className="rounded-lg border border-white/8 bg-white/[0.04] p-2.5">
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-[6.5px] font-semibold uppercase tracking-[0.1em] text-white/35 leading-tight">{label}</span>
+                        <div className={`grid h-4 w-4 shrink-0 place-items-center rounded ${ib}`}>
+                          <Icon className={`h-2.5 w-2.5 ${ic}`} strokeWidth={2} />
+                        </div>
+                      </div>
+                      <p className="text-[20px] font-bold leading-none text-white">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
             </div>
           </div>
         </div>
