@@ -84,9 +84,17 @@ async function signRequest(opts: {
 
   const signedHeaders = "content-type;host;x-amz-date";
 
+  // Per AWS SigV4 spec, each path segment must be URI-encoded (unreserved chars exempt).
+  // The colon in model IDs like "amazon.nova-lite-v1:0" must be encoded as %3A here,
+  // even though the actual HTTP URL can carry the raw colon.
+  const canonicalUri = opts.path
+    .split("/")
+    .map((seg) => encodeURIComponent(seg))
+    .join("/");
+
   const canonicalRequest = [
     opts.method,
-    opts.path,
+    canonicalUri,
     "",                  // no query string
     canonicalHeaders,
     signedHeaders,
