@@ -1,19 +1,15 @@
 /**
  * Vercel serverless function — POST /api/chat
  * Provider-agnostic AI chat endpoint for the ENICE Group chat widget.
- * Swap providers by changing AI_PROVIDER + AI_API_KEY env vars — no code changes needed.
- *
- * NOTE: The AI module is loaded via dynamic import() inside the try/catch so that
- * any module-initialisation error is caught and returned as a JSON 500 rather than
- * producing a bare FUNCTION_INVOCATION_FAILED response.
  */
+
+import { createAIProvider, SYSTEM_PROMPT } from "../src/lib/ai/index";
+import type { AIMessage } from "../src/lib/ai/types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyReq = any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRes = any;
-
-type AIMessage = { role: "user" | "assistant" | "system"; content: string };
 
 // ── Rate limiter (10 requests / 5 min per IP) ─────────────────────────────────
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -47,12 +43,10 @@ export default async function handler(req: AnyReq, res: AnyRes) {
 
     const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
 
-    // Validate messages array
     if (!Array.isArray(body.messages) || body.messages.length === 0) {
       return res.status(400).json({ ok: false, error: "messages array is required." });
     }
 
-    // Sanitise and cap history to last 20 turns
     const history: AIMessage[] = (body.messages as unknown[])
       .filter(
         (m): m is { role: string; content: string } =>
@@ -71,12 +65,6 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       return res.status(400).json({ ok: false, error: "No valid messages provided." });
     }
 
-    // ── Dynamic import — errors here are caught by the outer try/catch ─────────
-    // This converts any module-load failure into a handled JSON 500 rather than
-    // a bare FUNCTION_INVOCATION_FAILED from Vercel.
-    const { createAIProvider, SYSTEM_PROMPT } = await import("../src/lib/ai/index.js");
-
-    // Prepend system prompt
     const messages: AIMessage[] = [
       { role: "system", content: SYSTEM_PROMPT },
       ...history,
@@ -85,21 +73,14 @@ export default async function handler(req: AnyReq, res: AnyRes) {
     const provider = createAIProvider();
     const result = await provider.complete(messages);
 
-    return res.status(200).json({
-      ok: true,
-      text: result.text,
-      model: result.model,
-      provider: result.provider,
-    });
+    return res.status(200).json({ ok: true, text: result.text, model: result.model, provider: result.provider });
   } catch (err) {
     const ref = `C${Date.now().toString(36).toUpperCase()}`;
-    console.error(`[api/chat:unhandled:${ref}]`, err);
-    if (!res.headersSent) {
-      return res.status(500).json({
-        ok: false,
-        error: err instanceof Error ? err.message : String(err),
-        ref,
-      });
-    }
+    console.error(`[api/chat:${ref}]`, err);
+    return res.status(500).json({
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+      ref,
+    });
   }
 }
