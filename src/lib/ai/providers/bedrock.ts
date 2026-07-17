@@ -48,11 +48,13 @@ async function hmacSHA256(
   key: ArrayBuffer | Uint8Array,
   data: string,
 ): Promise<ArrayBuffer> {
-  const raw = key instanceof Uint8Array ? (key.buffer as ArrayBuffer) : key;
+  // Pass key directly — both Uint8Array and ArrayBuffer are valid BufferSource.
+  // Using key.buffer on a Uint8Array can reference a larger shared buffer in some
+  // Node.js builds (e.g. Vercel's runtime), corrupting the HMAC with extra bytes.
   const subtle = getSubtle();
   const cryptoKey = await subtle.importKey(
     "raw",
-    raw,
+    key,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],

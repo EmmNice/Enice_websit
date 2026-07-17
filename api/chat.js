@@ -18,11 +18,10 @@ async function sha256Hex(data) {
   return toHex(hash);
 }
 async function hmacSHA256(key, data) {
-  const raw = key instanceof Uint8Array ? key.buffer : key;
   const subtle = getSubtle();
   const cryptoKey = await subtle.importKey(
     "raw",
-    raw,
+    key,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"]
