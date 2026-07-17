@@ -79,21 +79,6 @@ function ENiceWordmark() {
       >
         NICE
       </span>
-      <span
-        style={{
-          marginLeft: 10,
-          fontFamily: "ui-sans-serif, system-ui, -apple-system, sans-serif",
-          fontWeight: 400,
-          fontSize: 11,
-          letterSpacing: "3px",
-          color: "rgba(255,255,255,0.5)",
-          textTransform: "uppercase" as const,
-          alignSelf: "center",
-          paddingTop: 2,
-        }}
-      >
-        GROUP
-      </span>
     </div>
   );
 }
