@@ -2,15 +2,18 @@
  * Vercel serverless function — POST /api/chat
  * Provider-agnostic AI chat endpoint for the ENICE Group chat widget.
  * Swap providers by changing AI_PROVIDER + AI_API_KEY env vars — no code changes needed.
+ *
+ * NOTE: The AI module is loaded via dynamic import() inside the try/catch so that
+ * any module-initialisation error is caught and returned as a JSON 500 rather than
+ * producing a bare FUNCTION_INVOCATION_FAILED response.
  */
-
-import { createAIProvider, SYSTEM_PROMPT } from "../src/lib/ai/index";
-import type { AIMessage, ChatResponse, ChatErrorResponse } from "../src/lib/ai/types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyReq = any;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyRes = any;
+
+type AIMessage = { role: "user" | "assistant" | "system"; content: string };
 
 // ── Rate limiter (10 requests / 5 min per IP) ─────────────────────────────────
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -26,18 +29,11 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
-// ── Lazy-initialised provider singleton ──────────────────────────────────────
-let _provider: ReturnType<typeof createAIProvider> | null = null;
-function getProvider() {
-  if (!_provider) _provider = createAIProvider();
-  return _provider;
-}
-
 // ── Handler ───────────────────────────────────────────────────────────────────
 export default async function handler(req: AnyReq, res: AnyRes) {
   try {
     if (req.method !== "POST") {
-      return res.status(405).json({ ok: false, error: "Method not allowed" } satisfies ChatErrorResponse);
+      return res.status(405).json({ ok: false, error: "Method not allowed" });
     }
 
     const ip =
@@ -46,14 +42,14 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       "unknown";
 
     if (isRateLimited(ip)) {
-      return res.status(429).json({ ok: false, error: "Too many requests. Please slow down." } satisfies ChatErrorResponse);
+      return res.status(429).json({ ok: false, error: "Too many requests. Please slow down." });
     }
 
     const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
 
     // Validate messages array
     if (!Array.isArray(body.messages) || body.messages.length === 0) {
-      return res.status(400).json({ ok: false, error: "messages array is required." } satisfies ChatErrorResponse);
+      return res.status(400).json({ ok: false, error: "messages array is required." });
     }
 
     // Sanitise and cap history to last 20 turns
@@ -72,8 +68,13 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       }));
 
     if (history.length === 0) {
-      return res.status(400).json({ ok: false, error: "No valid messages provided." } satisfies ChatErrorResponse);
+      return res.status(400).json({ ok: false, error: "No valid messages provided." });
     }
+
+    // ── Dynamic import — errors here are caught by the outer try/catch ─────────
+    // This converts any module-load failure into a handled JSON 500 rather than
+    // a bare FUNCTION_INVOCATION_FAILED from Vercel.
+    const { createAIProvider, SYSTEM_PROMPT } = await import("../src/lib/ai/index.js");
 
     // Prepend system prompt
     const messages: AIMessage[] = [
@@ -81,19 +82,24 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       ...history,
     ];
 
-    const result = await getProvider().complete(messages);
+    const provider = createAIProvider();
+    const result = await provider.complete(messages);
 
     return res.status(200).json({
       ok: true,
       text: result.text,
       model: result.model,
       provider: result.provider,
-    } satisfies ChatResponse);
+    });
   } catch (err) {
     const ref = `C${Date.now().toString(36).toUpperCase()}`;
     console.error(`[api/chat:unhandled:${ref}]`, err);
     if (!res.headersSent) {
-      return res.status(500).json({ ok: false, error: "Unexpected error.", ref } satisfies ChatErrorResponse);
+      return res.status(500).json({
+        ok: false,
+        error: err instanceof Error ? err.message : String(err),
+        ref,
+      });
     }
   }
 }

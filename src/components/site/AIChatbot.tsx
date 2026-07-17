@@ -64,15 +64,18 @@ export function AIChatbot() {
         }),
       });
 
-      const data = await res.json().catch(() => null) as
-        | { ok: boolean; text?: string; error?: string; provider?: string }
-        | null;
+      // Read body — show error details temporarily for diagnostics
+      const rawText = await res.text();
+      let data: { ok: boolean; text?: string; error?: string; ref?: string } | null = null;
+      try { data = JSON.parse(rawText); } catch { /* not JSON */ }
 
       setMessages((prev) => [
         ...prev,
         {
           from: "bot",
-          text: data?.ok && data.text ? data.text : FALLBACK_TEXT,
+          text: data?.ok && data.text
+            ? data.text
+            : `[ERR ${res.status}] ${data?.error ?? rawText.slice(0, 400)}`,
         },
       ]);
     } catch {
