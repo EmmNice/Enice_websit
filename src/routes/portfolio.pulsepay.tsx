@@ -34,12 +34,17 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
+      { property: "og:image", content: "https://enicehq.com/og.png" },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "PulsePay by ENICE Group" },
       {
         property: "og:url",
         content: "https://enicegroup.com/portfolio/pulsepay",
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
+      { name: "twitter:image", content: "https://enicehq.com/og.png" },
       {
         name: "twitter:title",
         content: "PulsePay — Fintech Infrastructure Platform",
@@ -194,7 +199,7 @@ function PulsePayPage() {
 
           {/* Card visual */}
           <div
-            className="relative overflow-hidden rounded-xl border border-border bg-background"
+            className="relative rounded-xl border border-border bg-background"
             style={{ boxShadow: SHADOW_CARD, minHeight: "300px" }}
           >
             {/* Dot grid background */}

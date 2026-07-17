@@ -5,7 +5,7 @@ import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 
 type Message = { from: "bot" | "user"; text: string };
 
-// ─── Initial bot message ──────────────────────────────────────────────────────
+// ─── Seed message ─────────────────────────────────────────────────────────────
 
 const SEED_MESSAGES: Message[] = [
   {
@@ -14,11 +14,25 @@ const SEED_MESSAGES: Message[] = [
   },
 ];
 
-// ─── Bot reply ────────────────────────────────────────────────────────────────
-// This is a static fallback reply. Replace with a real AI endpoint when ready.
+// ─── Fallback (shown when the API is unavailable) ─────────────────────────────
 
-const BOT_REPLY =
+const FALLBACK_TEXT =
   "Thanks for reaching out. A member of our team will follow up shortly. For urgent matters, write to corporate@enicehq.com.";
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+/** Convert internal Message[] → API role/content format, excluding seed message */
+function toApiMessages(msgs: Message[], newText: string) {
+  return [
+    // History (skip the initial seed bot message — that's handled by system prompt)
+    ...msgs.slice(1).map((m) => ({
+      role: m.from === "bot" ? "assistant" : "user",
+      content: m.text,
+    })),
+    // The new user turn
+    { role: "user", content: newText },
+  ];
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -29,24 +43,38 @@ export function AIChatbot() {
   const [typing, setTyping] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to latest message whenever messages change or chat opens
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing, open]);
 
-  function handleSend() {
+  async function handleSend() {
     const text = input.trim();
-    if (!text) return;
+    if (!text || typing) return;
 
     setMessages((prev) => [...prev, { from: "user", text }]);
     setInput("");
     setTyping(true);
 
-    // Static reply — swap setTimeout for a real API call when ready
-    setTimeout(() => {
-      setMessages((prev) => [...prev, { from: "bot", text: BOT_REPLY }]);
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: toApiMessages(messages, text),
+        }),
+      });
+
+      const data = await res.json();
+
+      setMessages((prev) => [
+        ...prev,
+        { from: "bot", text: data.ok ? data.text : FALLBACK_TEXT },
+      ]);
+    } catch {
+      setMessages((prev) => [...prev, { from: "bot", text: FALLBACK_TEXT }]);
+    } finally {
       setTyping(false);
-    }, 1400);
+    }
   }
 
   return (
@@ -84,7 +112,7 @@ export function AIChatbot() {
               </div>
               <div className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground">
                 <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
-                Online, replies within one business day
+                Online · AI-powered assistant
               </div>
             </div>
           </div>
@@ -131,13 +159,15 @@ export function AIChatbot() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Send a message…"
-              className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-[13px] text-foreground outline-none focus:border-primary"
+              placeholder="Ask about our platforms…"
+              disabled={typing}
+              className="flex-1 rounded-md border border-border bg-background px-3 py-2 text-[13px] text-foreground outline-none focus:border-primary disabled:opacity-50"
             />
             <button
               type="submit"
+              disabled={typing || !input.trim()}
               aria-label="Send message"
-              className="grid h-9 w-9 place-items-center rounded-md bg-primary text-primary-foreground transition-colors hover:bg-primary/90"
+              className="grid h-9 w-9 place-items-center rounded-md bg-primary text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-40"
             >
               <Send className="h-4 w-4" />
             </button>
