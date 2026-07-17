@@ -5,81 +5,80 @@ import { MessageCircle, X, Send, Sparkles } from "lucide-react";
 
 type Message = { from: "bot" | "user"; text: string };
 
-// ─── Seed message ─────────────────────────────────────────────────────────────
-
-const SEED_MESSAGES: Message[] = [
-  {
-    from: "bot",
-    text: "Welcome to ENICE Group. Ask about PulsePay, PulseAssist, or partnership opportunities, or reach us directly at corporate@enicehq.com.",
-  },
-];
-
-// ─── Fallback (shown when the API is unavailable) ─────────────────────────────
-
-const FALLBACK_TEXT =
-  "Thanks for reaching out. A member of our team will follow up shortly. For urgent matters, write to corporate@enicehq.com.";
-
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Convert internal Message[] → API role/content format, excluding seed message */
-function toApiMessages(msgs: Message[], newText: string) {
-  return [
-    // History (skip the initial seed bot message — that's handled by system prompt)
-    ...msgs.slice(1).map((m) => ({
-      role: m.from === "bot" ? "assistant" : "user",
-      content: m.text,
-    })),
-    // The new user turn
-    { role: "user", content: newText },
-  ];
+async function callChat(messages: { role: string; content: string }[]) {
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages }),
+  });
+  const rawText = await res.text();
+  let data: { ok: boolean; text?: string; error?: string; ref?: string } | null = null;
+  try { data = JSON.parse(rawText); } catch { /* not JSON */ }
+  return { ok: res.ok && !!data?.ok, text: data?.text ?? null, error: data?.error ?? rawText.slice(0, 400), status: res.status };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AIChatbot() {
-  const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>(SEED_MESSAGES);
-  const [input, setInput] = useState("");
-  const [typing, setTyping] = useState(false);
-  const endRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen]       = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput]     = useState("");
+  const [typing, setTyping]   = useState(false);
+  const greetedRef            = useRef(false);
+  const endRef                = useRef<HTMLDivElement>(null);
 
+  // Scroll to bottom whenever messages change
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing, open]);
+
+  // Ask the AI to greet the user the first time the chat is opened
+  useEffect(() => {
+    if (!open || greetedRef.current) return;
+    greetedRef.current = true;
+
+    setTyping(true);
+    callChat([{ role: "user", content: "__greet__" }])
+      .then(({ ok, text, error, status }) => {
+        setMessages([{
+          from: "bot",
+          text: ok && text ? text : `[ERR ${status}] ${error}`,
+        }]);
+      })
+      .catch((err: unknown) => {
+        setMessages([{ from: "bot", text: `[NET ERR] ${err instanceof Error ? err.message : String(err)}` }]);
+      })
+      .finally(() => setTyping(false));
+  }, [open]);
 
   async function handleSend() {
     const text = input.trim();
     if (!text || typing) return;
 
-    setMessages((prev) => [...prev, { from: "user", text }]);
+    const newMsg: Message = { from: "user", text };
+    setMessages((prev) => [...prev, newMsg]);
     setInput("");
     setTyping(true);
 
     try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: toApiMessages(messages, text),
-        }),
-      });
+      // Build conversation history (skip internal __greet__ turn)
+      const history = messages
+        .filter((m) => m.text !== "__greet__")
+        .map((m) => ({ role: m.from === "bot" ? "assistant" : "user", content: m.text }));
+      history.push({ role: "user", content: text });
 
-      // Read body — show error details temporarily for diagnostics
-      const rawText = await res.text();
-      let data: { ok: boolean; text?: string; error?: string; ref?: string } | null = null;
-      try { data = JSON.parse(rawText); } catch { /* not JSON */ }
-
+      const { ok, text: reply, error, status } = await callChat(history);
       setMessages((prev) => [
         ...prev,
-        {
-          from: "bot",
-          text: data?.ok && data.text
-            ? data.text
-            : `[ERR ${res.status}] ${data?.error ?? rawText.slice(0, 400)}`,
-        },
+        { from: "bot", text: ok && reply ? reply : `[ERR ${status}] ${error}` },
       ]);
-    } catch {
-      setMessages((prev) => [...prev, { from: "bot", text: FALLBACK_TEXT }]);
+    } catch (err: unknown) {
+      setMessages((prev) => [
+        ...prev,
+        { from: "bot", text: `[NET ERR] ${err instanceof Error ? err.message : String(err)}` },
+      ]);
     } finally {
       setTyping(false);
     }
