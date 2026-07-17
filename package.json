@@ -9,7 +9,9 @@
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "build:api": "esbuild api-src/chat.ts api-src/contact.ts api-src/ping.ts api-src/watchlist.ts api-src/admin/watchlist.ts --bundle --platform=node --format=esm --outdir=api",
+    "vercel-build": "npm run build && npm run build:api"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
