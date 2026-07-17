@@ -68,7 +68,7 @@ export function AIChatbot() {
 
       setMessages((prev) => [
         ...prev,
-        { from: "bot", text: data.ok ? data.text : FALLBACK_TEXT },
+        { from: "bot", text: data.ok ? data.text : `[Debug] ${data.error ?? "unknown error"} ${data.ref ?? ""}`.trim() },
       ]);
     } catch {
       setMessages((prev) => [...prev, { from: "bot", text: FALLBACK_TEXT }]);

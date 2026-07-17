@@ -178,7 +178,9 @@ export class BedrockProvider implements AIProvider {
 
     const bodyStr = JSON.stringify(body);
     const host    = `bedrock-runtime.${this.region}.amazonaws.com`;
-    const path    = `/model/${encodeURIComponent(this.modelId)}/converse`;
+    // Do NOT use encodeURIComponent — Bedrock model IDs contain colons and dots
+    // that AWS expects unencoded in the URL path (e.g. amazon.nova-lite-v1:0)
+    const path    = `/model/${this.modelId}/converse`;
     const url     = `https://${host}${path}`;
 
     const headers = await signRequest({
