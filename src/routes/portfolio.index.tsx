@@ -152,7 +152,7 @@ function PortfolioIndexPage() {
               className="flex flex-col overflow-hidden rounded-xl border border-border bg-background"
               style={{ boxShadow: SHADOW_CARD }}
             >
-              <div className="relative aspect-[4/3] overflow-hidden border-b border-border bg-secondary sm:aspect-[8/5]">
+              <div className="relative aspect-[4/3] border-b border-border bg-secondary sm:aspect-[8/5]">
                 <div
                   aria-hidden
                   className="absolute inset-0 opacity-[0.6]"
@@ -164,7 +164,7 @@ function PortfolioIndexPage() {
                 />
                 <div className="absolute left-1/2 top-1/2 w-[78%] max-w-sm -translate-x-1/2 -translate-y-1/2 rotate-[-6deg]">
                   <div
-                    className="relative aspect-[1.586/1] w-full overflow-hidden rounded-xl p-5 text-white"
+                    className="relative aspect-[1.586/1] w-full rounded-xl p-5 text-white"
                     style={{
                       background:
                         "linear-gradient(135deg, oklch(0.32 0.13 264) 0%, oklch(0.22 0.09 264) 60%, oklch(0.28 0.11 264) 100%)",
