@@ -22,9 +22,16 @@ bun run dev   # starts on port 5000
 | Variable | Required | Purpose |
 |---|---|---|
 | `RESEND_API_KEY` | Yes (production) | Sends watchlist emails |
-| `RESEND_AUDIENCE_ID` | Yes (production) | Resend Audience used to detect duplicate submissions — create one in the Resend dashboard and paste its ID here |
+| `RESEND_AUDIENCE_ID` | Yes (production) | Resend Audience ID for duplicate detection |
+| `AI_PROVIDER` | Yes (chatbot) | One of: `bedrock`, `openai`, `anthropic`, `gemini`, `deepseek`, `grok`, `openrouter`, `custom`. Default: `bedrock` |
+| `AI_API_KEY` | Yes (chatbot) | AWS Access Key ID (Bedrock) or API key for other providers |
+| `AI_API_SECRET` | Bedrock only | AWS Secret Access Key |
+| `AI_REGION` | Bedrock only | AWS region, default `us-east-1` |
+| `AI_MODEL` | No | Override the provider's default model |
 
-In dev, if `RESEND_API_KEY` is absent the form returns a stub success so you can test the UI. Duplicate detection in dev uses an in-memory Set (resets on server restart).
+In dev, if `RESEND_API_KEY` is absent the form returns a stub success so you can test the UI. If AI credentials are absent, the chatbot falls back to a static contact message.
+
+The `/api/chat` Vercel serverless function is mirrored as a Vite dev middleware in `vite.config.ts` so the chatbot works in dev too.
 
 ## Watchlist duplicate detection
 

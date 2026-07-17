@@ -71,10 +71,8 @@ export function AIChatbot() {
         {
           from: "bot",
           text: data.ok
-            ? (data.provider === "fallback"
-                ? `[DEBUG: FallbackProvider active — env vars not loaded. provider=${data.provider}]`
-                : data.text)
-            : `[DEBUG error] ${data.error ?? "unknown"} ref=${data.ref ?? "none"}`,
+            ? data.text
+            : FALLBACK_TEXT,
         },
       ]);
     } catch {
