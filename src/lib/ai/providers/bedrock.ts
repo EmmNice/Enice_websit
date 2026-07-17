@@ -12,12 +12,21 @@
  *   AI_MODEL      = Bedrock model ID (optional override)
  */
 
-import { webcrypto } from "node:crypto";
 import type { AIMessage, AIProvider, AIResponse } from "../types";
 
-// Use the explicit Node.js Web Crypto implementation so this works in both
-// Vercel serverless functions and browsers (where crypto is a global).
-const subtle = webcrypto.subtle;
+// Use the Web Crypto global — available in Node.js 18+ (stable in 20+),
+// Vercel Edge Runtime, and all modern browsers.  Avoids a module-level
+// crash on runtimes where `import { webcrypto } from "node:crypto"` may
+// resolve but `webcrypto` is undefined (e.g. Node 14/16 or restricted envs).
+function getSubtle(): SubtleCrypto {
+  if (typeof globalThis.crypto !== "undefined" && globalThis.crypto.subtle) {
+    return globalThis.crypto.subtle;
+  }
+  throw new Error(
+    "[BedrockProvider] Web Crypto API (globalThis.crypto.subtle) is not available " +
+    "in this runtime. Ensure Node.js >= 18 is being used.",
+  );
+}
 
 // ── AWS SigV4 helpers (Web Crypto — no SDK) ───────────────────────────────────
 
@@ -28,7 +37,7 @@ function toHex(buf: ArrayBuffer): string {
 }
 
 async function sha256Hex(data: string): Promise<string> {
-  const hash = await subtle.digest(
+  const hash = await getSubtle().digest(
     "SHA-256",
     new TextEncoder().encode(data),
   );
@@ -40,6 +49,7 @@ async function hmacSHA256(
   data: string,
 ): Promise<ArrayBuffer> {
   const raw = key instanceof Uint8Array ? (key.buffer as ArrayBuffer) : key;
+  const subtle = getSubtle();
   const cryptoKey = await subtle.importKey(
     "raw",
     raw,
