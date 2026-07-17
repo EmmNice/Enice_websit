@@ -2,11 +2,6 @@
   "installCommand": "npm install",
   "buildCommand": "npm run vercel-build",
   "outputDirectory": "dist",
-  "functions": {
-    "api/**": {
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
