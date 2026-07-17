@@ -243,8 +243,8 @@ export default withErrorHandling(async function handler(req: any, res: any) {
       const created = await resend.contacts.create({
         audienceId,
         email,
-        unsubscribeOnClick: false,
-      }).catch((err) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any).catch((err) => {
         // Network-level throw. Log and continue — a failed contact create
         // should not block the confirmation email the user is expecting.
         console.warn("[watchlist] contacts.create threw:", err);
