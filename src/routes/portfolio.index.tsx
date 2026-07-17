@@ -162,39 +162,50 @@ function PortfolioIndexPage() {
                     backgroundSize: "28px 28px",
                   }}
                 />
-                <div className="absolute left-1/2 top-1/2 w-[78%] max-w-sm -translate-x-1/2 -translate-y-1/2 rotate-[-6deg]">
+                {/* Two-card stack — shadow + main */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Shadow card */}
                   <div
-                    className="relative aspect-[1.586/1] w-full rounded-xl p-5 text-white"
+                    aria-hidden
+                    className="absolute rounded-2xl"
                     style={{
-                      background:
-                        "linear-gradient(135deg, oklch(0.32 0.13 264) 0%, oklch(0.22 0.09 264) 60%, oklch(0.28 0.11 264) 100%)",
-                      boxShadow: SHADOW_LIFT,
+                      width: 220,
+                      aspectRatio: "1.586/1",
+                      background: "linear-gradient(135deg, #b0b8c8 0%, #8a94a6 100%)",
+                      opacity: 0.55,
+                      transform: "rotate(5deg) translate(10%, -8%)",
+                      boxShadow: "0 12px 30px rgba(17,24,39,0.18)",
+                    }}
+                  />
+                  {/* Main card */}
+                  <div
+                    className="relative flex flex-col justify-between rounded-2xl p-4 text-white"
+                    style={{
+                      width: 220,
+                      aspectRatio: "1.586/1",
+                      background: "linear-gradient(135deg, #1a2e6b 0%, #0f1f52 55%, #162560 100%)",
+                      transform: "rotate(-3deg)",
+                      boxShadow: "0 20px 50px rgba(17,24,39,0.35)",
                     }}
                   >
                     <div className="flex items-start justify-between">
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-white/80">
+                      <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-white/90">
                         PulsePay
-                      </div>
-                      <Wifi className="h-4 w-4 rotate-90 text-white/80" aria-hidden />
+                      </span>
+                      <Wifi className="h-3.5 w-3.5 rotate-90 text-white/70" aria-hidden />
                     </div>
-                    <div className="mt-8 h-7 w-10 rounded-sm bg-gradient-to-br from-yellow-100 to-amber-300" />
-                    <div className="mt-5 font-mono text-sm tracking-[0.18em] text-white/95">
+                    <div className="h-6 w-9 rounded-md bg-gradient-to-br from-yellow-100 to-amber-400" />
+                    <div className="font-mono text-[9px] tracking-[0.2em] text-white/80">
                       •••• •••• •••• ••••
                     </div>
-                    <div className="mt-3 flex items-end justify-between">
+                    <div className="flex items-end justify-between">
                       <div>
-                        <div className="text-[8px] uppercase tracking-[0.28em] text-white/60">
-                          Cardholder
-                        </div>
-                        <div className="text-[11px] uppercase tracking-[0.18em] text-white/95">
+                        <div className="text-[6px] uppercase tracking-[0.2em] text-white/50">Cardholder</div>
+                        <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/95">
                           ENICE GROUP
                         </div>
                       </div>
-                      <CreditCard
-                        className="h-5 w-5 text-white/80"
-                        strokeWidth={1.5}
-                        aria-label="Virtual payment card"
-                      />
+                      <CreditCard className="h-4 w-4 text-white/60" strokeWidth={1.5} aria-label="Virtual payment card" />
                     </div>
                   </div>
                 </div>
