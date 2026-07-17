@@ -37,8 +37,10 @@ import { FallbackProvider }         from "./providers/fallback";
 
 export function createAIProvider(): AIProvider {
   const provider  = (process.env.AI_PROVIDER ?? "bedrock").toLowerCase().trim();
-  const apiKey    = process.env.AI_API_KEY    ?? "";
-  const apiSecret = process.env.AI_API_SECRET ?? "";   // Bedrock secret access key
+  // Accept both AI_API_KEY and AWS_API_KEY (legacy alias)
+  const apiKey    = process.env.AI_API_KEY    || process.env.AWS_API_KEY    || "";
+  // Accept both AI_API_SECRET and AWS_API_SECRET (legacy alias)
+  const apiSecret = process.env.AI_API_SECRET || process.env.AWS_API_SECRET || "";
   const region    = process.env.AI_REGION     ?? "us-east-1";
   const model     = process.env.AI_MODEL      || undefined;
   const baseUrl   = process.env.AI_BASE_URL   || undefined;
