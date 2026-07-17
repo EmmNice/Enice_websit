@@ -12,7 +12,12 @@
  *   AI_MODEL      = Bedrock model ID (optional override)
  */
 
+import { webcrypto } from "node:crypto";
 import type { AIMessage, AIProvider, AIResponse } from "../types";
+
+// Use the explicit Node.js Web Crypto implementation so this works in both
+// Vercel serverless functions and browsers (where crypto is a global).
+const subtle = webcrypto.subtle;
 
 // ── AWS SigV4 helpers (Web Crypto — no SDK) ───────────────────────────────────
 
@@ -23,7 +28,7 @@ function toHex(buf: ArrayBuffer): string {
 }
 
 async function sha256Hex(data: string): Promise<string> {
-  const hash = await crypto.subtle.digest(
+  const hash = await subtle.digest(
     "SHA-256",
     new TextEncoder().encode(data),
   );
@@ -35,14 +40,14 @@ async function hmacSHA256(
   data: string,
 ): Promise<ArrayBuffer> {
   const raw = key instanceof Uint8Array ? (key.buffer as ArrayBuffer) : key;
-  const cryptoKey = await crypto.subtle.importKey(
+  const cryptoKey = await subtle.importKey(
     "raw",
     raw,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],
   );
-  return crypto.subtle.sign("HMAC", cryptoKey, new TextEncoder().encode(data));
+  return subtle.sign("HMAC", cryptoKey, new TextEncoder().encode(data));
 }
 
 async function deriveSigningKey(
