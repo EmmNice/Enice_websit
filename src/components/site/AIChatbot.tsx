@@ -25,7 +25,7 @@ async function callChat(messages: { role: string; content: string }[]) {
   };
 }
 
-// ENICE "E" logomark — matches the favicon exactly
+// ENICE "E" logomark — compact square, used in chat header + bot avatars
 function ENiceLogo({ size = 36 }: { size?: number }) {
   return (
     <svg
@@ -50,6 +50,51 @@ function ENiceLogo({ size = 36 }: { size?: number }) {
         E
       </text>
     </svg>
+  );
+}
+
+// Full wordmark for the home screen hero
+function ENiceWordmark() {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 0, lineHeight: 1 }}>
+      <span
+        style={{
+          fontFamily: "ui-sans-serif, system-ui, -apple-system, sans-serif",
+          fontWeight: 800,
+          fontSize: 26,
+          letterSpacing: "-0.5px",
+          color: "#ffffff",
+        }}
+      >
+        E
+      </span>
+      <span
+        style={{
+          fontFamily: "ui-sans-serif, system-ui, -apple-system, sans-serif",
+          fontWeight: 700,
+          fontSize: 26,
+          letterSpacing: "-0.5px",
+          color: "rgba(255,255,255,0.92)",
+        }}
+      >
+        NICE
+      </span>
+      <span
+        style={{
+          marginLeft: 10,
+          fontFamily: "ui-sans-serif, system-ui, -apple-system, sans-serif",
+          fontWeight: 400,
+          fontSize: 11,
+          letterSpacing: "3px",
+          color: "rgba(255,255,255,0.5)",
+          textTransform: "uppercase" as const,
+          alignSelf: "center",
+          paddingTop: 2,
+        }}
+      >
+        GROUP
+      </span>
+    </div>
   );
 }
 
@@ -218,7 +263,7 @@ export function AIChatbot() {
               />
 
               <div className="relative">
-                <ENiceLogo size={44} />
+                <ENiceWordmark />
                 <h2 className="mt-4 text-[22px] font-bold leading-snug text-white">
                   Hi, how can we help?
                 </h2>
