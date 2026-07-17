@@ -64,15 +64,18 @@ export function AIChatbot() {
         }),
       });
 
-      const data = await res.json();
+      // Read as text first so we can show the raw response on error
+      const rawText = await res.text();
+      let data: { ok: boolean; text?: string; error?: string; provider?: string } | null = null;
+      try { data = JSON.parse(rawText); } catch { /* not JSON */ }
 
       setMessages((prev) => [
         ...prev,
         {
           from: "bot",
-          text: data.ok
-            ? data.text
-            : FALLBACK_TEXT,
+          text: data?.ok
+            ? data.text!
+            : `[ERR ${res.status}] ${data?.error ?? rawText.slice(0, 300)}`,
         },
       ]);
     } catch {
