@@ -158,12 +158,97 @@ function adminWatchlistDevPlugin(): Plugin {
   };
 }
 
+// ── /api/chat dev middleware ──────────────────────────────────────────────────
+
+const chatRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function chatDevPlugin(): Plugin {
+  return {
+    name: "chat-dev-api",
+    configureServer(server) {
+      server.middlewares.use("/api/chat", async (req, res, next) => {
+        if (req.method !== "POST") return next();
+
+        // Rate limit (10 req / 5 min per IP)
+        const ip =
+          (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
+          "unknown";
+        const now = Date.now();
+        const entry = chatRateLimitMap.get(ip);
+        if (!entry || now > entry.resetAt) {
+          chatRateLimitMap.set(ip, { count: 1, resetAt: now + 300_000 });
+        } else if (entry.count >= 10) {
+          res.writeHead(429, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "Too many requests. Please slow down." }));
+          return;
+        } else {
+          entry.count++;
+        }
+
+        // Parse body
+        let raw = "";
+        for await (const chunk of req) raw += chunk;
+        let body: Record<string, unknown> = {};
+        try {
+          body = JSON.parse(raw || "{}");
+        } catch {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "Invalid request body." }));
+          return;
+        }
+
+        // Validate messages
+        if (!Array.isArray(body.messages) || body.messages.length === 0) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "messages array is required." }));
+          return;
+        }
+
+        const history = (body.messages as unknown[])
+          .filter(
+            (m): m is { role: string; content: string } =>
+              typeof m === "object" &&
+              m !== null &&
+              typeof (m as Record<string, unknown>).role === "string" &&
+              typeof (m as Record<string, unknown>).content === "string",
+          )
+          .slice(-20)
+          .map((m) => ({
+            role: (["user", "assistant"].includes(m.role) ? m.role : "user") as "user" | "assistant" | "system",
+            content: String(m.content).slice(0, 2000),
+          }));
+
+        if (history.length === 0) {
+          res.writeHead(400, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "No valid messages provided." }));
+          return;
+        }
+
+        try {
+          const { createAIProvider, SYSTEM_PROMPT } = await import("./src/lib/ai/index.js");
+          const provider = createAIProvider();
+          const messages = [{ role: "system" as const, content: SYSTEM_PROMPT }, ...history];
+          const result = await provider.complete(messages);
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: true, text: result.text, model: result.model, provider: result.provider }));
+        } catch (err) {
+          const ref = `C${Date.now().toString(36).toUpperCase()}`;
+          console.error(`[chat-dev:${ref}]`, err);
+          res.writeHead(500, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ ok: false, error: "Unexpected error.", ref }));
+        }
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     tsconfigPaths({ ignoreConfigErrors: true }),
     mcpPlugin(),
     watchlistDevPlugin(),
     adminWatchlistDevPlugin(),
+    chatDevPlugin(),
     TanStackRouterVite({ autoCodeSplitting: true }),
     react(),
     tailwindcss(),
