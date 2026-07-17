@@ -636,14 +636,13 @@ function Landing() {
                     />
                     {i === 0 ? (
                       /* PulsePay card visual */
-                      <div className="absolute inset-0 flex items-center justify-center px-6 py-8">
-                        {/* Shadow card */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        {/* Shadow card — same fixed width as main card */}
                         <div
                           aria-hidden
                           className="absolute rounded-2xl"
                           style={{
-                            width: "58%",
-                            maxWidth: "240px",
+                            width: 220,
                             aspectRatio: "1.586/1",
                             background: "linear-gradient(135deg, #b0b8c8 0%, #8a94a6 100%)",
                             opacity: 0.55,
@@ -655,8 +654,7 @@ function Landing() {
                         <div
                           className="relative flex flex-col justify-between rounded-2xl p-4 text-white"
                           style={{
-                            width: "58%",
-                            maxWidth: "240px",
+                            width: 220,
                             aspectRatio: "1.586/1",
                             background: "linear-gradient(135deg, #1a2e6b 0%, #0f1f52 55%, #162560 100%)",
                             transform: "rotate(-3deg)",
