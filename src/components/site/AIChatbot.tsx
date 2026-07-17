@@ -68,7 +68,14 @@ export function AIChatbot() {
 
       setMessages((prev) => [
         ...prev,
-        { from: "bot", text: data.ok ? data.text : `[Debug] ${data.error ?? "unknown error"} ${data.ref ?? ""}`.trim() },
+        {
+          from: "bot",
+          text: data.ok
+            ? (data.provider === "fallback"
+                ? `[DEBUG: FallbackProvider active — env vars not loaded. provider=${data.provider}]`
+                : data.text)
+            : `[DEBUG error] ${data.error ?? "unknown"} ref=${data.ref ?? "none"}`,
+        },
       ]);
     } catch {
       setMessages((prev) => [...prev, { from: "bot", text: FALLBACK_TEXT }]);
