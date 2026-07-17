@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Send, X, ChevronRight } from "lucide-react";
+import { ArrowLeft, Send, X, ChevronRight, MessageSquare } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -158,7 +158,7 @@ export function AIChatbot() {
         <span
           className={`absolute inset-0 grid place-items-center transition-all duration-200 ${open ? "opacity-0 -rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`}
         >
-          <ENiceLogo size={52} />
+          <MessageSquare className="h-6 w-6" fill="white" strokeWidth={0} />
         </span>
       </button>
 
