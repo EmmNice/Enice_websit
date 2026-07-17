@@ -90,7 +90,10 @@ var BedrockProvider = class {
   async complete(messages) {
     const systemMessages = messages.filter((m) => m.role === "system");
     const turns = messages.filter((m) => m.role !== "system");
-    const bedrockMessages = turns.map((m) => ({
+    const userFirstTurns = turns.slice(
+      turns.findIndex((m) => m.role === "user")
+    );
+    const bedrockMessages = (userFirstTurns.length > 0 ? userFirstTurns : turns).map((m) => ({
       role: m.role,
       content: [{ text: m.content }]
     }));

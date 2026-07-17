@@ -185,9 +185,16 @@ export class BedrockProvider implements AIProvider {
     const systemMessages = messages.filter((m) => m.role === "system");
     const turns          = messages.filter((m) => m.role !== "system");
 
-    // Bedrock Converse requires first turn to be "user"
-    // (our API always prepends system then user, so this should hold naturally)
-    const bedrockMessages: BedrockMessage[] = turns.map((m) => ({
+    // Bedrock Converse requires the conversation to start with a "user" message.
+    // Drop any leading assistant turns (e.g. a synthetic greeting prepended by
+    // the frontend) so we never violate this constraint.
+    const userFirstTurns = turns.slice(
+      turns.findIndex((m) => m.role === "user"),
+    );
+
+    const bedrockMessages: BedrockMessage[] = (
+      userFirstTurns.length > 0 ? userFirstTurns : turns
+    ).map((m) => ({
       role:    m.role as "user" | "assistant",
       content: [{ text: m.content }],
     }));
