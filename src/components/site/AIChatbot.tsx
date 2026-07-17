@@ -85,32 +85,49 @@ export function AIChatbot() {
   function enterChat(starter?: string) {
     setView("chat");
 
-    // If already chatted this session, don't re-greet
-    if (chattedRef.current) return;
-    chattedRef.current = true;
-
-    const firstUserMsg = starter ?? "__greet__";
-    const seedMessages: { role: string; content: string }[] = [
-      { role: "user", content: firstUserMsg },
-    ];
-
     if (starter) {
-      setMessages([{ from: "user", text: starter }]);
-    }
+      // Quick topic tap: always send the message, even mid-conversation
+      setMessages((prev) => [...prev, { from: "user", text: starter }]);
+      setTyping(true);
 
-    setTyping(true);
-    callChat(seedMessages)
-      .then(({ ok, text, error, status }) => {
-        const reply = ok && text ? text : `[ERR ${status}] ${error}`;
-        setMessages((prev) => [...prev, { from: "bot", text: reply }]);
-      })
-      .catch((err: unknown) => {
-        setMessages((prev) => [
-          ...prev,
-          { from: "bot", text: `[NET ERR] ${err instanceof Error ? err.message : String(err)}` },
-        ]);
-      })
-      .finally(() => setTyping(false));
+      // Build history including any prior messages
+      const history = messages.map((m) => ({
+        role: m.from === "bot" ? "assistant" : "user",
+        content: m.text,
+      }));
+      history.push({ role: "user", content: starter });
+
+      callChat(history)
+        .then(({ ok, text, error, status }) => {
+          const reply = ok && text ? text : `[ERR ${status}] ${error}`;
+          setMessages((prev) => [...prev, { from: "bot", text: reply }]);
+        })
+        .catch((err: unknown) => {
+          setMessages((prev) => [
+            ...prev,
+            { from: "bot", text: `[NET ERR] ${err instanceof Error ? err.message : String(err)}` },
+          ]);
+        })
+        .finally(() => setTyping(false));
+    } else {
+      // "Start a conversation" — send greeting only once per session
+      if (chattedRef.current) return;
+      chattedRef.current = true;
+
+      setTyping(true);
+      callChat([{ role: "user", content: "__greet__" }])
+        .then(({ ok, text, error, status }) => {
+          const reply = ok && text ? text : `[ERR ${status}] ${error}`;
+          setMessages((prev) => [...prev, { from: "bot", text: reply }]);
+        })
+        .catch((err: unknown) => {
+          setMessages((prev) => [
+            ...prev,
+            { from: "bot", text: `[NET ERR] ${err instanceof Error ? err.message : String(err)}` },
+          ]);
+        })
+        .finally(() => setTyping(false));
+    }
   }
 
   async function handleSend(overrideText?: string) {
