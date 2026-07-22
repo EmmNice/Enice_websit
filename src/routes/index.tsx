@@ -75,7 +75,7 @@ export const Route = createFileRoute("/")({
       },
       { name: "robots", content: "index, follow" },
     ],
-    links: [{ rel: "canonical", href: "https://enicegroup.com/" }],
+    links: [{ rel: "canonical", href: "https://enicehq.com/" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -83,7 +83,7 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "ENICE Group",
-          url: "https://enicegroup.com",
+          url: "https://enicehq.com",
           logo: "/logo.png",
           subOrganization: [
             { "@type": "FinancialProduct", name: "PulsePay", description: "Virtual card issuance, programmable wallets, and embedded treasury." },

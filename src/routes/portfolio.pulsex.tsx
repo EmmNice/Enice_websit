@@ -35,7 +35,7 @@ export const Route = createFileRoute("/portfolio/pulsex")({
       { property: "og:site_name", content: "ENICE Group" },
       {
         property: "og:url",
-        content: "https://enicegroup.com/portfolio/pulsex",
+        content: "https://enicehq.com/portfolio/pulsex",
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
@@ -52,7 +52,7 @@ export const Route = createFileRoute("/portfolio/pulsex")({
     links: [
       {
         rel: "canonical",
-        href: "https://enicegroup.com/portfolio/pulsex",
+        href: "https://enicehq.com/portfolio/pulsex",
       },
     ],
     scripts: [
@@ -64,14 +64,14 @@ export const Route = createFileRoute("/portfolio/pulsex")({
           name: "PulseX",
           description:
             "ENICE Group's next-generation digital asset platform for cryptocurrency trading, secure custody, and cross-ecosystem digital finance. Launching Q3 2027.",
-          url: "https://enicegroup.com/portfolio/pulsex",
+          url: "https://enicehq.com/portfolio/pulsex",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, iOS, Android",
           releaseNotes: "Expected Q3 2027",
           author: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicegroup.com",
+            url: "https://enicehq.com",
           },
           offers: {
             "@type": "Offer",

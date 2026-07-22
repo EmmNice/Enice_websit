@@ -6,7 +6,7 @@
 
   <!-- Homepage -->
   <url>
-    <loc>https://enicegroup.com/</loc>
+    <loc>https://enicehq.com/</loc>
     <lastmod>2026-07-18</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
@@ -14,7 +14,7 @@
 
   <!-- Portfolio -->
   <url>
-    <loc>https://enicegroup.com/portfolio</loc>
+    <loc>https://enicehq.com/portfolio</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -22,25 +22,25 @@
 
   <!-- Ventures -->
   <url>
-    <loc>https://enicegroup.com/portfolio/pulsepay</loc>
+    <loc>https://enicehq.com/portfolio/pulsepay</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://enicegroup.com/portfolio/pulseassist</loc>
+    <loc>https://enicehq.com/portfolio/pulseassist</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://enicegroup.com/portfolio/epulse</loc>
+    <loc>https://enicehq.com/portfolio/epulse</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://enicegroup.com/portfolio/pulsex</loc>
+    <loc>https://enicehq.com/portfolio/pulsex</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -48,19 +48,19 @@
 
   <!-- Corporate -->
   <url>
-    <loc>https://enicegroup.com/about</loc>
+    <loc>https://enicehq.com/about</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://enicegroup.com/contact</loc>
+    <loc>https://enicehq.com/contact</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://enicegroup.com/roadmap</loc>
+    <loc>https://enicehq.com/roadmap</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
@@ -68,7 +68,7 @@
 
   <!-- Blog -->
   <url>
-    <loc>https://enicegroup.com/blog/</loc>
+    <loc>https://enicehq.com/blog/</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
@@ -76,7 +76,7 @@
 
   <!-- System -->
   <url>
-    <loc>https://enicegroup.com/status</loc>
+    <loc>https://enicehq.com/status</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>always</changefreq>
     <priority>0.5</priority>
@@ -84,19 +84,19 @@
 
   <!-- Legal -->
   <url>
-    <loc>https://enicegroup.com/privacy</loc>
+    <loc>https://enicehq.com/privacy</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://enicegroup.com/terms</loc>
+    <loc>https://enicehq.com/terms</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>
   </url>
   <url>
-    <loc>https://enicegroup.com/compliance</loc>
+    <loc>https://enicehq.com/compliance</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.4</priority>

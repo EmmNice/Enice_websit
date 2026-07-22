@@ -37,7 +37,7 @@ export const Route = createFileRoute("/contact")({
       },
       { name: "robots", content: "index, follow" },
     ],
-    links: [{ rel: "canonical", href: "https://enicegroup.com/contact" }],
+    links: [{ rel: "canonical", href: "https://enicehq.com/contact" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -47,11 +47,11 @@ export const Route = createFileRoute("/contact")({
           name: "Contact ENICE Group",
           description:
             "Enterprise engagement and corporate inquiries for ENICE Group — platform integration, licensing, and venture partnerships.",
-          url: "https://enicegroup.com/contact",
+          url: "https://enicehq.com/contact",
           publisher: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicegroup.com",
+            url: "https://enicehq.com",
             email: "corporate@enicehq.com",
             address: {
               "@type": "PostalAddress",

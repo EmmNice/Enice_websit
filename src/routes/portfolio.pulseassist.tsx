@@ -55,7 +55,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
       { property: "og:image:alt", content: "PulseAssist by ENICE Group" },
       {
         property: "og:url",
-        content: "https://enicegroup.com/portfolio/pulseassist",
+        content: "https://enicehq.com/portfolio/pulseassist",
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
@@ -73,7 +73,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
     links: [
       {
         rel: "canonical",
-        href: "https://enicegroup.com/portfolio/pulseassist",
+        href: "https://enicehq.com/portfolio/pulseassist",
       },
     ],
     scripts: [
@@ -85,7 +85,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
           name: "PulseAssist",
           description:
             "ENICE Group's multi-tenant AI operations platform for banking, fintech, and telecom — autonomous customer support routing, policy-bound conversational agents, API-driven account management, and real-time handoff to live agents.",
-          url: "https://enicegroup.com/portfolio/pulseassist",
+          url: "https://enicehq.com/portfolio/pulseassist",
           applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
           offers: {
@@ -97,7 +97,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
           author: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicegroup.com",
+            url: "https://enicehq.com",
           },
           featureList: [
             "Autonomous customer support routing",

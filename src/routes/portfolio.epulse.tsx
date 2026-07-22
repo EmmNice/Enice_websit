@@ -36,7 +36,7 @@ export const Route = createFileRoute("/portfolio/epulse")({
       { property: "og:site_name", content: "ENICE Group" },
       {
         property: "og:url",
-        content: "https://enicegroup.com/portfolio/epulse",
+        content: "https://enicehq.com/portfolio/epulse",
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
@@ -53,7 +53,7 @@ export const Route = createFileRoute("/portfolio/epulse")({
     links: [
       {
         rel: "canonical",
-        href: "https://enicegroup.com/portfolio/epulse",
+        href: "https://enicehq.com/portfolio/epulse",
       },
     ],
     scripts: [
@@ -65,13 +65,13 @@ export const Route = createFileRoute("/portfolio/epulse")({
           name: "ePulse",
           description:
             "ENICE Group's upcoming global financial platform for people who earn, send, and spend money across borders. Multi-currency accounts, dedicated US/UK/EU receiving accounts, international transfers, gift cards, and lifestyle services.",
-          url: "https://enicegroup.com/portfolio/epulse",
+          url: "https://enicehq.com/portfolio/epulse",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, iOS, Android",
           author: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicegroup.com",
+            url: "https://enicehq.com",
           },
           offers: {
             "@type": "Offer",

@@ -40,7 +40,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
       { property: "og:image:alt", content: "PulsePay by ENICE Group" },
       {
         property: "og:url",
-        content: "https://enicegroup.com/portfolio/pulsepay",
+        content: "https://enicehq.com/portfolio/pulsepay",
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
@@ -58,7 +58,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
     links: [
       {
         rel: "canonical",
-        href: "https://enicegroup.com/portfolio/pulsepay",
+        href: "https://enicehq.com/portfolio/pulsepay",
       },
     ],
     scripts: [
@@ -70,7 +70,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
           name: "PulsePay",
           description:
             "ENICE Group's virtual payment platform — instant Naira and USD card issuance, built-in KYC verification, peer-to-peer transfers, programmable spend controls, and enterprise-grade fraud monitoring.",
-          url: "https://enicegroup.com/portfolio/pulsepay",
+          url: "https://enicehq.com/portfolio/pulsepay",
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, iOS, Android",
           offers: {
@@ -81,7 +81,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
           author: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicegroup.com",
+            url: "https://enicehq.com",
           },
           featureList: [
             "Instant virtual Naira and USD card issuance",

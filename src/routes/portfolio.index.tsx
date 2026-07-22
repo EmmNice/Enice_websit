@@ -47,7 +47,7 @@ export const Route = createFileRoute("/portfolio/")({
       },
     ],
     links: [
-      { rel: "canonical", href: "https://enicegroup.com/portfolio" },
+      { rel: "canonical", href: "https://enicehq.com/portfolio" },
     ],
     scripts: [
       {
@@ -58,35 +58,35 @@ export const Route = createFileRoute("/portfolio/")({
           name: "ENICE Group Venture Portfolio",
           description:
             "Proprietary software products and infrastructure networks built by ENICE Group.",
-          url: "https://enicegroup.com/portfolio",
+          url: "https://enicehq.com/portfolio",
           publisher: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicegroup.com",
+            url: "https://enicehq.com",
           },
           hasPart: [
             {
               "@type": "SoftwareApplication",
               name: "PulsePay",
-              url: "https://enicegroup.com/portfolio/pulsepay",
+              url: "https://enicehq.com/portfolio/pulsepay",
               applicationCategory: "FinanceApplication",
             },
             {
               "@type": "SoftwareApplication",
               name: "PulseAssist",
-              url: "https://enicegroup.com/portfolio/pulseassist",
+              url: "https://enicehq.com/portfolio/pulseassist",
               applicationCategory: "BusinessApplication",
             },
             {
               "@type": "SoftwareApplication",
               name: "ePulse",
-              url: "https://enicegroup.com/portfolio/epulse",
+              url: "https://enicehq.com/portfolio/epulse",
               applicationCategory: "FinanceApplication",
             },
             {
               "@type": "SoftwareApplication",
               name: "PulseX",
-              url: "https://enicegroup.com/portfolio/pulsex",
+              url: "https://enicehq.com/portfolio/pulsex",
               applicationCategory: "FinanceApplication",
             },
           ],

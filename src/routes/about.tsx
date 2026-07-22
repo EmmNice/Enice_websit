@@ -35,7 +35,7 @@ export const Route = createFileRoute("/about")({
       },
       { name: "robots", content: "index, follow" },
     ],
-    links: [{ rel: "canonical", href: "https://enicegroup.com/about" }],
+    links: [{ rel: "canonical", href: "https://enicehq.com/about" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -45,12 +45,12 @@ export const Route = createFileRoute("/about")({
           name: "About ENICE Group",
           description:
             "ENICE Group is a technology venture studio and infrastructure holding firm. We design, engineer, and operate software systems for financial infrastructure, enterprise AI, and digital commerce.",
-          url: "https://enicegroup.com/about",
+          url: "https://enicehq.com/about",
           publisher: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicegroup.com",
-            logo: "https://enicegroup.com/favicon.svg",
+            url: "https://enicehq.com",
+            logo: "https://enicehq.com/favicon.svg",
             foundingDate: "2026",
             address: {
               "@type": "PostalAddress",
