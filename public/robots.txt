@@ -31,4 +31,4 @@ Allow: /
 User-agent: LinkedInBot
 Allow: /
 
-Sitemap: https://enicegroup.com/sitemap.xml
+Sitemap: https://enicehq.com/sitemap.xml
