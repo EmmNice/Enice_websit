@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
@@ -19,14 +20,14 @@ export const Route = createFileRoute("/about")({
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: "https://enicehq.com/about" },
-      { property: "og:image", content: "https://enicehq.com/og.png" },
+      { property: "og:url", content: `${SITE_URL}/about` },
+      { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: "About ENICE Group" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: "https://enicehq.com/og.png" },
+      { name: "twitter:image", content: `${SITE_URL}/og.png` },
       { name: "twitter:title", content: "About ENICE Group" },
       {
         name: "twitter:description",
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/about")({
       },
       { name: "robots", content: "index, follow" },
     ],
-    links: [{ rel: "canonical", href: "https://enicehq.com/about" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -45,12 +46,12 @@ export const Route = createFileRoute("/about")({
           name: "About ENICE Group",
           description:
             "ENICE Group is a technology venture studio and infrastructure holding firm. We design, engineer, and operate software systems for financial infrastructure, enterprise AI, and digital commerce.",
-          url: "https://enicehq.com/about",
+          url: `${SITE_URL}/about`,
           publisher: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicehq.com",
-            logo: "https://enicehq.com/favicon.svg",
+            url: SITE_URL,
+            logo: `${SITE_URL}/favicon.svg`,
             foundingDate: "2026",
             address: {
               "@type": "PostalAddress",

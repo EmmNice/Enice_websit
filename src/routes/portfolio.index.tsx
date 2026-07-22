@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import {
   ArrowUpRight,
   Wifi,
@@ -31,14 +32,14 @@ export const Route = createFileRoute("/portfolio/")({
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: "https://enicehq.com/portfolio" },
-      { property: "og:image", content: "https://enicehq.com/og.png" },
+      { property: "og:url", content: `${SITE_URL}/portfolio` },
+      { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: "ENICE Group Portfolio" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: "https://enicehq.com/og.png" },
+      { name: "twitter:image", content: `${SITE_URL}/og.png` },
       { name: "twitter:title", content: "ENICE Group Portfolio" },
       {
         name: "twitter:description",
@@ -47,7 +48,7 @@ export const Route = createFileRoute("/portfolio/")({
       },
     ],
     links: [
-      { rel: "canonical", href: "https://enicehq.com/portfolio" },
+      { rel: "canonical", href: `${SITE_URL}/portfolio` },
     ],
     scripts: [
       {
@@ -58,35 +59,35 @@ export const Route = createFileRoute("/portfolio/")({
           name: "ENICE Group Venture Portfolio",
           description:
             "Proprietary software products and infrastructure networks built by ENICE Group.",
-          url: "https://enicehq.com/portfolio",
+          url: `${SITE_URL}/portfolio`,
           publisher: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicehq.com",
+            url: SITE_URL,
           },
           hasPart: [
             {
               "@type": "SoftwareApplication",
               name: "PulsePay",
-              url: "https://enicehq.com/portfolio/pulsepay",
+              url: `${SITE_URL}/portfolio/pulsepay`,
               applicationCategory: "FinanceApplication",
             },
             {
               "@type": "SoftwareApplication",
               name: "PulseAssist",
-              url: "https://enicehq.com/portfolio/pulseassist",
+              url: `${SITE_URL}/portfolio/pulseassist`,
               applicationCategory: "BusinessApplication",
             },
             {
               "@type": "SoftwareApplication",
               name: "ePulse",
-              url: "https://enicehq.com/portfolio/epulse",
+              url: `${SITE_URL}/portfolio/epulse`,
               applicationCategory: "FinanceApplication",
             },
             {
               "@type": "SoftwareApplication",
               name: "PulseX",
-              url: "https://enicehq.com/portfolio/pulsex",
+              url: `${SITE_URL}/portfolio/pulsex`,
               applicationCategory: "FinanceApplication",
             },
           ],

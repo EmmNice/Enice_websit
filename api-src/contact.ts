@@ -14,7 +14,11 @@ const FROM = "ENICE Contact <noreply@enicehq.com>";
 const TO = "corporate@enicehq.com";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Simple in-memory rate limiter (5 requests / 10 min per IP)
+// IP-based rate limiter (5 submissions / 10 min per IP).
+// Note: in-memory — resets on cold start and is not shared across Vercel
+// instances. For production-grade distributed rate limiting, replace this
+// with an Upstash/Redis-backed solution. The email-based limiter below
+// provides a complementary per-address guard within each warm instance.
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -24,6 +28,21 @@ function isRateLimited(ip: string): boolean {
     return false;
   }
   if (entry.count >= 5) return true;
+  entry.count++;
+  return false;
+}
+
+// Email-based rate limiter (3 submissions per address per 60 min per instance).
+// Guards against the same sender submitting the contact form repeatedly.
+const emailRateLimitMap = new Map<string, { count: number; resetAt: number }>();
+function isEmailRateLimited(email: string): boolean {
+  const now = Date.now();
+  const entry = emailRateLimitMap.get(email);
+  if (!entry || now > entry.resetAt) {
+    emailRateLimitMap.set(email, { count: 1, resetAt: now + 3_600_000 });
+    return false;
+  }
+  if (entry.count >= 3) return true;
   entry.count++;
   return false;
 }
@@ -112,6 +131,11 @@ export default async function handler(req: AnyReq, res: AnyRes) {
     }
     if (!EMAIL_RE.test(email)) {
       res.status(400).json({ ok: false, error: "Invalid email address." });
+      return;
+    }
+
+    if (isEmailRateLimited(email)) {
+      res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
       return;
     }
 

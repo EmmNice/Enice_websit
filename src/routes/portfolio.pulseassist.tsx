@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import {
   ArrowUpRight,
   BrainCircuit,
@@ -49,17 +50,17 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:image", content: "https://enicehq.com/og.png" },
+      { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: "PulseAssist by ENICE Group" },
       {
         property: "og:url",
-        content: "https://enicehq.com/portfolio/pulseassist",
+        content: `${SITE_URL}/portfolio/pulseassist`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: "https://enicehq.com/og.png" },
+      { name: "twitter:image", content: `${SITE_URL}/og.png` },
       {
         name: "twitter:title",
         content: "PulseAssist — Enterprise AI by ENICE Group",
@@ -73,7 +74,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
     links: [
       {
         rel: "canonical",
-        href: "https://enicehq.com/portfolio/pulseassist",
+        href: `${SITE_URL}/portfolio/pulseassist`,
       },
     ],
     scripts: [
@@ -85,7 +86,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
           name: "PulseAssist",
           description:
             "ENICE Group's multi-tenant AI operations platform for banking, fintech, and telecom — autonomous customer support routing, policy-bound conversational agents, API-driven account management, and real-time handoff to live agents.",
-          url: "https://enicehq.com/portfolio/pulseassist",
+          url: `${SITE_URL}/portfolio/pulseassist`,
           applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
           offers: {
@@ -97,7 +98,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
           author: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicehq.com",
+            url: SITE_URL,
           },
           featureList: [
             "Autonomous customer support routing",

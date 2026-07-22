@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import {
   ArrowUpRight,
   Bitcoin,
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/portfolio/pulsex")({
       { property: "og:site_name", content: "ENICE Group" },
       {
         property: "og:url",
-        content: "https://enicehq.com/portfolio/pulsex",
+        content: `${SITE_URL}/portfolio/pulsex`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
@@ -52,7 +53,7 @@ export const Route = createFileRoute("/portfolio/pulsex")({
     links: [
       {
         rel: "canonical",
-        href: "https://enicehq.com/portfolio/pulsex",
+        href: `${SITE_URL}/portfolio/pulsex`,
       },
     ],
     scripts: [
@@ -64,14 +65,14 @@ export const Route = createFileRoute("/portfolio/pulsex")({
           name: "PulseX",
           description:
             "ENICE Group's next-generation digital asset platform for cryptocurrency trading, secure custody, and cross-ecosystem digital finance. Launching Q3 2027.",
-          url: "https://enicehq.com/portfolio/pulsex",
+          url: `${SITE_URL}/portfolio/pulsex`,
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, iOS, Android",
           releaseNotes: "Expected Q3 2027",
           author: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicehq.com",
+            url: SITE_URL,
           },
           offers: {
             "@type": "Offer",

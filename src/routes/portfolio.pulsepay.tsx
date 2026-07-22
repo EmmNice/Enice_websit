@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import {
   ArrowUpRight,
   Wifi,
@@ -34,17 +35,17 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:image", content: "https://enicehq.com/og.png" },
+      { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: "PulsePay by ENICE Group" },
       {
         property: "og:url",
-        content: "https://enicehq.com/portfolio/pulsepay",
+        content: `${SITE_URL}/portfolio/pulsepay`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: "https://enicehq.com/og.png" },
+      { name: "twitter:image", content: `${SITE_URL}/og.png` },
       {
         name: "twitter:title",
         content: "PulsePay — Fintech Infrastructure Platform",
@@ -58,7 +59,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
     links: [
       {
         rel: "canonical",
-        href: "https://enicehq.com/portfolio/pulsepay",
+        href: `${SITE_URL}/portfolio/pulsepay`,
       },
     ],
     scripts: [
@@ -70,7 +71,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
           name: "PulsePay",
           description:
             "ENICE Group's virtual payment platform — instant Naira and USD card issuance, built-in KYC verification, peer-to-peer transfers, programmable spend controls, and enterprise-grade fraud monitoring.",
-          url: "https://enicehq.com/portfolio/pulsepay",
+          url: `${SITE_URL}/portfolio/pulsepay`,
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, iOS, Android",
           offers: {
@@ -81,7 +82,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
           author: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicehq.com",
+            url: SITE_URL,
           },
           featureList: [
             "Instant virtual Naira and USD card issuance",

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { useState } from "react";
 import {
   ArrowRight,
@@ -59,14 +60,14 @@ export const Route = createFileRoute("/")({
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: "https://enicehq.com/" },
-      { property: "og:image", content: "https://enicehq.com/og.png" },
+      { property: "og:url", content: `${SITE_URL}/` },
+      { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: "ENICE Group — Infrastructure for Global Commerce" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: "https://enicehq.com/og.png" },
+      { name: "twitter:image", content: `${SITE_URL}/og.png` },
       { name: "twitter:title", content: "ENICE Group — Infrastructure for Global Commerce" },
       {
         name: "twitter:description",
@@ -75,7 +76,7 @@ export const Route = createFileRoute("/")({
       },
       { name: "robots", content: "index, follow" },
     ],
-    links: [{ rel: "canonical", href: "https://enicehq.com/" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -83,8 +84,8 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@type": "Organization",
           name: "ENICE Group",
-          url: "https://enicehq.com",
-          logo: "/logo.png",
+          url: SITE_URL,
+          logo: `${SITE_URL}/favicon.svg`,
           subOrganization: [
             { "@type": "FinancialProduct", name: "PulsePay", description: "Virtual card issuance, programmable wallets, and embedded treasury." },
             { "@type": "Organization", name: "PulseAssist", description: "Multi-tenant AI conversational SaaS for banking and telecom." },

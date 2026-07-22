@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import {
   ArrowUpRight,
   Wallet,
@@ -36,7 +37,7 @@ export const Route = createFileRoute("/portfolio/epulse")({
       { property: "og:site_name", content: "ENICE Group" },
       {
         property: "og:url",
-        content: "https://enicehq.com/portfolio/epulse",
+        content: `${SITE_URL}/portfolio/epulse`,
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
@@ -53,7 +54,7 @@ export const Route = createFileRoute("/portfolio/epulse")({
     links: [
       {
         rel: "canonical",
-        href: "https://enicehq.com/portfolio/epulse",
+        href: `${SITE_URL}/portfolio/epulse`,
       },
     ],
     scripts: [
@@ -65,13 +66,13 @@ export const Route = createFileRoute("/portfolio/epulse")({
           name: "ePulse",
           description:
             "ENICE Group's upcoming global financial platform for people who earn, send, and spend money across borders. Multi-currency accounts, dedicated US/UK/EU receiving accounts, international transfers, gift cards, and lifestyle services.",
-          url: "https://enicehq.com/portfolio/epulse",
+          url: `${SITE_URL}/portfolio/epulse`,
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, iOS, Android",
           author: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicehq.com",
+            url: SITE_URL,
           },
           offers: {
             "@type": "Offer",

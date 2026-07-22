@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap } from "@/components/site/Roadmap";
@@ -20,7 +21,7 @@ export const Route = createFileRoute("/roadmap")({
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: "https://enicehq.com/roadmap" },
+      { property: "og:url", content: `${SITE_URL}/roadmap` },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
       { name: "twitter:title", content: "ENICE Group Product Roadmap" },
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/roadmap")({
       },
       { name: "robots", content: "index, follow" },
     ],
-    links: [{ rel: "canonical", href: "https://enicehq.com/roadmap" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/roadmap` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -41,11 +42,11 @@ export const Route = createFileRoute("/roadmap")({
           name: "ENICE Group Product Roadmap",
           description:
             "Public product roadmap for ENICE Group — completed milestones, active ventures, and planned infrastructure for 2026-2027.",
-          url: "https://enicehq.com/roadmap",
+          url: `${SITE_URL}/roadmap`,
           publisher: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicehq.com",
+            url: SITE_URL,
           },
         }),
       },

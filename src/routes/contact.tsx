@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { useState } from "react";
 import { ArrowRight, Check, Mail, MapPin, AlertCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
@@ -21,14 +22,14 @@ export const Route = createFileRoute("/contact")({
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: "https://enicehq.com/contact" },
-      { property: "og:image", content: "https://enicehq.com/og.png" },
+      { property: "og:url", content: `${SITE_URL}/contact` },
+      { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
       { property: "og:image:alt", content: "Contact ENICE Group" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: "https://enicehq.com/og.png" },
+      { name: "twitter:image", content: `${SITE_URL}/og.png` },
       { name: "twitter:title", content: "Contact ENICE Group" },
       {
         name: "twitter:description",
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/contact")({
       },
       { name: "robots", content: "index, follow" },
     ],
-    links: [{ rel: "canonical", href: "https://enicehq.com/contact" }],
+    links: [{ rel: "canonical", href: `${SITE_URL}/contact` }],
     scripts: [
       {
         type: "application/ld+json",
@@ -47,11 +48,11 @@ export const Route = createFileRoute("/contact")({
           name: "Contact ENICE Group",
           description:
             "Enterprise engagement and corporate inquiries for ENICE Group — platform integration, licensing, and venture partnerships.",
-          url: "https://enicehq.com/contact",
+          url: `${SITE_URL}/contact`,
           publisher: {
             "@type": "Organization",
             name: "ENICE Group",
-            url: "https://enicehq.com",
+            url: SITE_URL,
             email: "corporate@enicehq.com",
             address: {
               "@type": "PostalAddress",

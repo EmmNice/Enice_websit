@@ -7,6 +7,7 @@
  *   4. Launch moment (scheduled)
  */
 import { Resend } from "resend";
+import { LAUNCH_EMAILS as LAUNCH } from "../src/lib/launch";
 
 // Inlined from api/lib/handler.ts — Vercel treats every file under api/ as its
 // own serverless function and does not reliably bundle sibling imports, so an
@@ -34,15 +35,14 @@ function withErrorHandling(handler: ApiHandler): ApiHandler {
 }
 
 const FROM = "ENICE Group <noreply@enicehq.com>";
-const LAUNCH = {
-  threeDayReminder: "2026-07-15T09:00:00.000Z",
-  oneDayReminder: "2026-07-17T09:00:00.000Z",
-  launchMoment: "2026-07-18T00:00:00.000Z",
-};
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// Simple in-memory rate limiter (3 requests / 10 min per IP)
+// IP-based rate limiter (3 submissions / 10 min per IP).
+// Note: in-memory — resets on cold start and is not shared across Vercel
+// instances. For production-grade distributed rate limiting, replace this
+// with an Upstash/Redis-backed solution. The email-based limiter below
+// provides a complementary per-address guard within each warm instance.
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 function isRateLimited(ip: string): boolean {
   const now = Date.now();
@@ -56,13 +56,24 @@ function isRateLimited(ip: string): boolean {
   return false;
 }
 
+// Email-based rate limiter (1 submission per address per 60 min per instance).
+// Prevents rapid re-submissions from the same email even across different IPs.
+const emailRateLimitMap = new Map<string, number>();
+function isEmailRateLimited(email: string): boolean {
+  const now = Date.now();
+  const lastAt = emailRateLimitMap.get(email);
+  if (lastAt !== undefined && now - lastAt < 3_600_000) return true;
+  emailRateLimitMap.set(email, now);
+  return false;
+}
+
 // Note: We no longer paginate through the Resend audience to pre-check for
 // duplicates. That approach scaled O(N) per signup and would time out the
 // 10s Vercel function once the audience grew past a few hundred contacts.
 // Instead we rely on `resend.contacts.create` being idempotent on
 // (audienceId, email) — creating an already-existing contact is a no-op that
 // returns the existing contact's id without error. Abuse from a single user
-// resubmitting is bounded by the in-memory rate limiter above (3 / 10min / IP).
+// resubmitting is bounded by the rate limiters above.
 
 // ─── Email templates ──────────────────────────────────────────────────────────
 
@@ -208,6 +219,11 @@ export default withErrorHandling(async function handler(req: any, res: any) {
     typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   if (!email || !EMAIL_RE.test(email) || email.length > 320) {
     res.status(400).json({ ok: false, error: "Please enter a valid email address." });
+    return;
+  }
+
+  if (isEmailRateLimited(email)) {
+    res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
     return;
   }
 
