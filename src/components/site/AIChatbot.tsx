@@ -209,18 +209,35 @@ export function AIChatbot() {
       <button
         onClick={() => (open ? handleClose() : setOpen(true))}
         aria-label="Open ENICE Group chat"
-        className="fixed bottom-5 right-5 z-40 grid place-items-center rounded-full bg-[#1e3a8a] text-white shadow-[0_12px_32px_-8px_rgba(30,58,138,0.65)] transition-all duration-200 hover:scale-105 hover:shadow-[0_16px_40px_-8px_rgba(30,58,138,0.75)] sm:bottom-6 sm:right-6"
-        style={{ width: 52, height: 52 }}
+        className="fixed bottom-5 right-5 z-40 grid place-items-center rounded-2xl text-white shadow-[0_12px_32px_-8px_rgba(30,58,138,0.65)] transition-all duration-200 hover:scale-105 hover:shadow-[0_16px_40px_-8px_rgba(30,58,138,0.80)] sm:bottom-6 sm:right-6"
+        style={{
+          width: 52,
+          height: 52,
+          background: "linear-gradient(145deg, #0c1f5e 0%, #1e3a8a 55%, #1d4ed8 100%)",
+        }}
       >
+        {/* Close icon — shown when open */}
         <span
           className={`absolute inset-0 grid place-items-center transition-all duration-200 ${open ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-90 scale-75"}`}
         >
           <X className="h-5 w-5" />
         </span>
+        {/* ENICE "E" lettermark — shown when closed */}
         <span
           className={`absolute inset-0 grid place-items-center transition-all duration-200 ${open ? "opacity-0 -rotate-90 scale-75" : "opacity-100 rotate-0 scale-100"}`}
         >
-          <MessageSquare className="h-6 w-6" fill="white" strokeWidth={0} />
+          <span
+            style={{
+              fontFamily: "ui-sans-serif, system-ui, -apple-system, sans-serif",
+              fontWeight: 800,
+              fontSize: 22,
+              letterSpacing: "-0.5px",
+              color: "#ffffff",
+              lineHeight: 1,
+            }}
+          >
+            E
+          </span>
         </span>
       </button>
 

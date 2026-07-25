@@ -125,8 +125,8 @@ function PortfolioIndexPage() {
             The ENICE Group Ecosystem
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Four purpose-built platforms — from virtual payments and enterprise
-            AI to global banking and digital assets. Each venture shares the
+            Four purpose-built platforms — payments infrastructure, enterprise
+            AI, digital banking, and asset exchange. Each venture shares the
             same infrastructure backbone and operates to institutional
             standards.
           </p>
@@ -134,7 +134,7 @@ function PortfolioIndexPage() {
       </section>
 
       {/* ── Active Ventures ── */}
-      <section className="bg-secondary py-20 sm:py-28">
+      <section className="bg-secondary py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="mb-12">
             <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-600">
