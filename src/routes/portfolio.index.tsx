@@ -116,7 +116,7 @@ function PortfolioIndexPage() {
       <SiteHeader />
 
       {/* ── Page header ── */}
-      <section className="border-b border-border bg-background py-20 sm:py-28">
+      <section className="border-b border-border bg-background py-12 sm:py-16">
         <div className="mx-auto max-w-5xl px-5 text-center sm:px-8">
           <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
             Ecosystem Portfolio

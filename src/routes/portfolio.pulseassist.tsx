@@ -323,9 +323,9 @@ function PulseAssistPage() {
                 {/* Stats row 1 */}
                 <div className="mb-1.5 grid grid-cols-3 gap-1.5">
                   {[
-                    { label: "Active AI Agents",   value: "1", sub: "+2 WEEK", subOk: true,  Icon: BrainCircuit,  ic: "text-violet-400", ib: "bg-violet-500/15" },
-                    { label: "Total Interactions",  value: "7", sub: "85% AI",  subOk: true,  Icon: MessageSquare, ic: "text-blue-400",   ib: "bg-blue-500/15" },
-                    { label: "Human Handoffs",      value: "0", sub: "ATTN",    subOk: false, Icon: Users,         ic: "text-red-400",    ib: "bg-red-500/15" },
+                    { label: "Active AI Agents",   value: "12", sub: "+3 WEEK", subOk: true,  Icon: BrainCircuit,  ic: "text-violet-400", ib: "bg-violet-500/15" },
+                    { label: "Total Interactions",  value: "4.2K", sub: "91% AI",  subOk: true,  Icon: MessageSquare, ic: "text-blue-400",   ib: "bg-blue-500/15" },
+                    { label: "Human Handoffs",      value: "9", sub: "↓ 62%",    subOk: true, Icon: Users,         ic: "text-emerald-400",    ib: "bg-emerald-500/15" },
                   ].map(({ label, value, sub, subOk, Icon, ic, ib }) => (
                     <div key={label} className="rounded-lg border border-white/8 bg-white/[0.04] p-1.5 sm:p-2">
                       <div className="mb-1 flex items-start justify-between gap-1">
@@ -343,9 +343,9 @@ function PulseAssistPage() {
                 {/* Stats row 2 */}
                 <div className="grid grid-cols-3 gap-1.5">
                   {[
-                    { label: "Cost Saved",      value: "₦8,400", Icon: TrendingUp, ic: "text-emerald-400", ib: "bg-emerald-500/15" },
-                    { label: "Hrs Delegated",   value: "2 hrs",  Icon: Clock,      ic: "text-blue-400",   ib: "bg-blue-500/15" },
-                    { label: "Knowledge Base",  value: "0",      Icon: Database,   ic: "text-amber-400",  ib: "bg-amber-500/15" },
+                    { label: "Cost Saved",      value: "₦4.2M", Icon: TrendingUp, ic: "text-emerald-400", ib: "bg-emerald-500/15" },
+                    { label: "Hrs Delegated",   value: "1,240", Icon: Clock,      ic: "text-blue-400",   ib: "bg-blue-500/15" },
+                    { label: "Knowledge Base",  value: "48",    Icon: Database,   ic: "text-amber-400",  ib: "bg-amber-500/15" },
                   ].map(({ label, value, Icon, ic, ib }) => (
                     <div key={label} className="rounded-lg border border-white/8 bg-white/[0.04] p-1.5 sm:p-2">
                       <div className="mb-1 flex items-start justify-between gap-1">

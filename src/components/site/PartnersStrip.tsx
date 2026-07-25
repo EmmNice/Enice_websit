@@ -22,7 +22,7 @@ export function PartnersStrip() {
     <section className="overflow-hidden border-b border-border bg-background py-12">
       {/* Heading */}
       <p className="mb-8 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground/60">
-        Ecosystem &amp; Infrastructure Partners
+        Powered by world-class infrastructure partners
       </p>
 
       {/* Marquee — fade edges with mask */}

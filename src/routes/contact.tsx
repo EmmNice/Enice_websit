@@ -137,15 +137,15 @@ function ContactPage() {
       <SiteHeader />
 
       {/* Page header */}
-      <section className="border-b border-border py-20 sm:py-28">
+      <section className="border-b border-border bg-[#060912] py-12 sm:py-16">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-400">
             Corporate Engagement
           </div>
-          <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
+          <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl md:text-6xl">
             Get in Touch
           </h1>
-          <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
+          <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">
             Reach the ENICE Group executive and engineering office about
             integration, enterprise licensing, or venture partnerships.
           </p>
@@ -158,6 +158,7 @@ function ContactPage() {
 
           {/* Sidebar */}
           <aside className="flex flex-col gap-6">
+            {/* Direct channels */}
             <div
               className="rounded-xl border border-border bg-background p-8"
               style={{ boxShadow: SHADOW_CARD }}
@@ -184,27 +185,56 @@ function ContactPage() {
                   <MapPin className="mt-0.5 h-4 w-4 text-primary" strokeWidth={2} />
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Offices
+                      Headquarters
                     </div>
                     <div className="mt-1 text-sm text-foreground">
-                      Abuja and Kaduna, Nigeria
+                      Abuja, Nigeria
+                    </div>
+                    <div className="mt-0.5 text-[11px] text-muted-foreground">
+                      WAT — UTC+1 · Business hours 9am–6pm
                     </div>
                   </div>
                 </li>
               </ul>
             </div>
 
+            {/* What to expect */}
             <div
               className="rounded-xl border border-border bg-background p-8"
               style={{ boxShadow: SHADOW_CARD }}
             >
               <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                Response SLA
+                What to Expect
               </div>
-              <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                Inquiries are reviewed by an ENICE partner and answered within
-                two business days.
-              </p>
+              <ol className="mt-6 space-y-5">
+                {[
+                  { step: "01", title: "Review", body: "A partner reviews your inquiry within one business day." },
+                  { step: "02", title: "Routing", body: "Your message is routed to the most relevant team — engineering, commercial, or executive." },
+                  { step: "03", title: "Response", body: "You receive a substantive reply within two business days — no auto-responses." },
+                ].map((s) => (
+                  <li key={s.step} className="flex gap-4">
+                    <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-primary/60 mt-0.5 shrink-0">{s.step}</span>
+                    <div>
+                      <div className="text-[12px] font-semibold text-foreground">{s.title}</div>
+                      <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{s.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ol>
+            </div>
+
+            {/* Compliance note */}
+            <div
+              className="rounded-xl border border-border bg-secondary/60 px-6 py-5"
+              style={{ boxShadow: SHADOW_CARD }}
+            >
+              <div className="flex items-start gap-3">
+                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={2.5} />
+                <p className="text-[12px] leading-relaxed text-muted-foreground">
+                  All inquiries are handled under ENICE Group's privacy policy.
+                  Data is never shared with third parties without explicit consent.
+                </p>
+              </div>
             </div>
           </aside>
 

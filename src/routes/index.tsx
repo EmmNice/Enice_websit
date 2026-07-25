@@ -102,10 +102,10 @@ export const Route = createFileRoute("/")({
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const HERO_STATS = [
-  { value: "02", label: "Active Ventures" },
+  { value: "4", label: "Ventures Built" },
   { value: "99.99%", label: "Infrastructure SLA" },
-  { value: "14ms", label: "API Latency P50" },
-  { value: "24/7", label: "Operations Coverage" },
+  { value: "< 14ms", label: "API Latency P50" },
+  { value: "AES-256", label: "Encryption Standard" },
 ];
 
 const VERTICALS = [
@@ -251,7 +251,7 @@ function Landing() {
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
                   </span>
                   <span className="whitespace-nowrap text-[11px] font-semibold tracking-[0.06em] text-white/60 sm:tracking-[0.12em]">
-                    Enterprise Venture Ecosystem<span className="hidden sm:inline"> · Est. 2026</span>
+                    Enterprise Venture Ecosystem · West Africa
                   </span>
                 </div>
 

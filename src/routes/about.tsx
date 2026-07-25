@@ -261,6 +261,77 @@ function AboutPage() {
         </div>
       </section>
 
+      {/* ── LEADERSHIP ──────────────────────────────────────────────────── */}
+      <section className="border-b border-border py-24 sm:py-32">
+        <div className="mx-auto max-w-5xl px-5 sm:px-8">
+          <div className="mb-12">
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">/05b</span>
+            <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
+              The Founding Team
+            </h2>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+              ENICE Group was founded by operators, engineers, and strategists
+              who spent years inside the problems they now build solutions for.
+            </p>
+          </div>
+
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                role: "Founder & Chief Executive Officer",
+                scope: "Corporate strategy, venture direction, and ecosystem growth.",
+                initial: "CEO",
+              },
+              {
+                role: "Chief Technology Officer",
+                scope: "Platform architecture, engineering standards, and infrastructure design.",
+                initial: "CTO",
+              },
+              {
+                role: "Chief Operations Officer",
+                scope: "Product delivery, partner operations, and compliance execution.",
+                initial: "COO",
+              },
+            ].map((m) => (
+              <div
+                key={m.role}
+                className="flex flex-col gap-5 rounded-xl border border-border bg-background p-7"
+                style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)" }}
+              >
+                {/* Avatar placeholder */}
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/8 ring-1 ring-primary/15">
+                  <span className="font-mono text-[11px] font-bold tracking-[0.18em] text-primary">
+                    {m.initial}
+                  </span>
+                </div>
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
+                    {m.role}
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {m.scope}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 rounded-xl border border-border bg-secondary/60 px-6 py-5">
+            <p className="text-sm leading-relaxed text-muted-foreground">
+              Our founding team operates with a preference for substance over
+              visibility. Executive contact is available through{" "}
+              <a
+                href="mailto:corporate@enicehq.com"
+                className="font-medium text-foreground underline-offset-2 hover:underline"
+              >
+                corporate@enicehq.com
+              </a>{" "}
+              for qualified enterprise and partnership inquiries.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* ── 6. OUR PRINCIPLES ───────────────────────────────────────────── */}
       <section className="border-b border-border py-24 sm:py-32">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
