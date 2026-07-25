@@ -215,18 +215,21 @@ function PulseAssistPage() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <a
-                href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
+                href="https://www.getpulseassist.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
               >
-                Request Integration Access
+                Visit PulseAssist
                 <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
               </a>
-              <Link
-                to="/portfolio"
+              <a
+                href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
                 className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
               >
-                All Ventures
-              </Link>
+                Request Integration
+                <ArrowUpRight className="h-4 w-4" />
+              </a>
             </div>
           </div>
 
@@ -514,18 +517,21 @@ function PulseAssistPage() {
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <a
-              href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
+              href="https://www.getpulseassist.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
             >
-              Request Integration Access
+              Visit PulseAssist
               <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
             </a>
-            <Link
-              to="/portfolio"
+            <a
+              href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
               className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-7 py-3.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
             >
-              View All Ventures
-            </Link>
+              Request Integration
+              <ArrowUpRight className="h-4 w-4" />
+            </a>
           </div>
         </div>
       </section>

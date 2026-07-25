@@ -312,21 +312,24 @@ function PortfolioIndexPage() {
                   live agents in real time when needed.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
+                  <a
+                    href="https://www.getpulseassist.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+                    aria-label="Visit PulseAssist platform"
+                  >
+                    Visit Platform
+                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
+                  </a>
                   <Link
                     to="/portfolio/pulseassist"
-                    className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+                    className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-[12px] font-semibold text-foreground transition-colors hover:bg-secondary"
                     aria-label="View PulseAssist platform details"
                   >
-                    View Platform
-                    <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                    Learn More
+                    <ChevronRight className="h-3.5 w-3.5" />
                   </Link>
-                  <a
-                    href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
-                    className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-[12px] font-semibold text-foreground transition-colors hover:bg-secondary"
-                  >
-                    Request Integration
-                    <ArrowUpRight className="h-3.5 w-3.5" />
-                  </a>
                 </div>
               </div>
             </article>
