@@ -23,7 +23,7 @@ const MILESTONES: Milestone[] = [
     status: "completed",
     product: "ENICE Core",
     title: "Shared Ecosystem Framework",
-    body: "The unified AI pipeline, high-velocity ledger, and automated compliance backbone that now underpins every ENICE venture.",
+    body: "The unified AI pipeline, ledger, and compliance backbone that now underpins every ENICE product.",
     tags: ["Infrastructure", "AI", "Compliance"],
   },
   {
@@ -32,7 +32,7 @@ const MILESTONES: Milestone[] = [
     status: "completed",
     product: "PulsePay",
     title: "Extended Pilot with Regional Treasury Partners",
-    body: "Programmable wallets, instant virtual card issuance, and embedded compliance controls rolled out to a wider pilot cohort across West Africa.",
+    body: "Programmable wallets, instant virtual card issuance, and embedded compliance controls, rolled out to a wider pilot group across West Africa.",
     tags: ["Fintech", "Wallets", "KYC"],
   },
   {
@@ -41,7 +41,7 @@ const MILESTONES: Milestone[] = [
     status: "in-progress",
     product: "PulseAssist",
     title: "Enterprise B2B Launch",
-    body: "First-wave rollout of autonomous support modules to banking, fintech, and telecom partners, with policy-bound agents and live-agent failover.",
+    body: "First rollout of support automation to banking, fintech, and telecom partners, with policy-bound agents and live-agent failover.",
     tags: ["AI", "B2B", "Telecom"],
   },
   {
@@ -50,7 +50,7 @@ const MILESTONES: Milestone[] = [
     status: "in-progress",
     product: "PulsePay",
     title: "Developer API Public Beta",
-    body: "The ENICE Core API opens to verified integration partners, with wallet issuance, ledger, KYC, and Assist endpoints available in a sandbox environment.",
+    body: "The ENICE Core API opens to verified integration partners, with wallet issuance, ledger, KYC, and Assist endpoints available in a sandbox.",
     tags: ["API", "Developer", "Fintech"],
   },
   {
@@ -59,7 +59,7 @@ const MILESTONES: Milestone[] = [
     status: "planned",
     product: "PulsePay",
     title: "Multi-Currency Expansion",
-    body: "Scaling the virtual payment platform with multi-currency wallet rails, programmable spend controls, and embedded treasury operations.",
+    body: "Multi-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform.",
     tags: ["Fintech", "Multi-Currency", "Treasury"],
   },
   {
@@ -68,7 +68,7 @@ const MILESTONES: Milestone[] = [
     status: "planned",
     product: "ePulse",
     title: "Digital Banking Infrastructure Closed Alpha",
-    body: "ePulse begins closed alpha with select institutional partners, covering the digital banking core, account management, and statement APIs.",
+    body: "ePulse begins closed alpha with select institutional partners: digital banking core, account management, and statement APIs.",
     tags: ["Banking", "Alpha"],
   },
   {
@@ -77,7 +77,7 @@ const MILESTONES: Milestone[] = [
     status: "planned",
     product: "PulseX",
     title: "Global Digital Asset Exchange Private Beta",
-    body: "PulseX opens to institutional and qualified retail participants with support for major digital asset pairs, custody, and compliance reporting.",
+    body: "PulseX opens to institutional and qualified retail participants, with support for major digital asset pairs, custody, and compliance reporting.",
     tags: ["Crypto", "Exchange", "Global"],
   },
   {
@@ -86,7 +86,7 @@ const MILESTONES: Milestone[] = [
     status: "planned",
     product: "ENICE Core",
     title: "Universal Financial Hub",
-    body: "A unified global virtual-dollar and asset-infrastructure layer connecting institutional liquidity across markets through a single API gateway.",
+    body: "A global virtual-dollar and asset infrastructure layer connecting institutional liquidity across markets through a single API.",
     tags: ["Infrastructure", "Global", "Liquidity"],
   },
 ];
@@ -203,11 +203,11 @@ export function Roadmap() {
               Strategic Roadmap
             </div>
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
-              A scaling trajectory built for global reach.
+              Built step by step, for the long run.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              Our infrastructure roadmap follows the maturity curve of the
-              platforms we operate, sequenced for steady, compounding execution.
+              Our roadmap follows the maturity of the platforms we operate,
+              sequenced so each step builds on the last.
             </p>
           </div>
           <Link
