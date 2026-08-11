@@ -18,7 +18,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/portfolio/epulse")({
   head: () => ({
     meta: [
-      { title: "ePulse | Global Financial Platform — ENICE Group" },
+      { title: "ePulse | Global Financial Platform by ENICE Group" },
       {
         name: "description",
         content:
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/portfolio/epulse")({
       },
       {
         property: "og:title",
-        content: "ePulse — Global Financial Platform by ENICE Group",
+        content: "ePulse: Global Financial Platform by ENICE Group",
       },
       {
         property: "og:description",
@@ -43,7 +43,7 @@ export const Route = createFileRoute("/portfolio/epulse")({
       { name: "twitter:site", content: "@ENICEHQ" },
       {
         name: "twitter:title",
-        content: "ePulse — Global Financial Platform by ENICE Group",
+        content: "ePulse: Global Financial Platform by ENICE Group",
       },
       {
         name: "twitter:description",
@@ -96,32 +96,32 @@ const VISION = [
   {
     icon: Wallet,
     title: "Multi-currency accounts",
-    desc: "Hold and manage balances in the currencies that matter to you — NGN, USD, GBP, EUR and more from a single account.",
+    desc: "Hold and manage balances in the currencies that matter to you: NGN, USD, GBP, EUR and more, from a single account.",
   },
   {
     icon: Building2,
     title: "Dedicated receiving accounts",
-    desc: "Local account details for supported countries, including the US, UK, and Europe — get paid like a local from anywhere.",
+    desc: "Local account details for supported countries, including the US, UK, and Europe. Get paid like a local from anywhere.",
   },
   {
     icon: Send,
     title: "Fast international transfers",
-    desc: "Send money across borders with predictable timing, transparent fees, and clear pricing — no surprises.",
+    desc: "Send money across borders with predictable timing, transparent fees, and clear pricing. No surprises.",
   },
   {
     icon: Globe2,
     title: "Global payment solutions",
-    desc: "Pay and get paid anywhere your work takes you — from client invoices to vendor payments across continents.",
+    desc: "Pay and get paid anywhere your work takes you, from client invoices to vendor payments across continents.",
   },
   {
     icon: Gift,
     title: "Gift card marketplace",
-    desc: "Buy and redeem gift cards from trusted global and local brands — all within the ePulse platform.",
+    desc: "Buy and redeem gift cards from trusted global and local brands, all within the ePulse platform.",
   },
   {
     icon: Plane,
     title: "Lifestyle services",
-    desc: "Book hotels, plan travel, and access premium experiences — because great finance enables a great life.",
+    desc: "Book hotels, plan travel, and access premium experiences. Good finance should make life easier too.",
   },
 ];
 
@@ -306,7 +306,7 @@ function EPulsePage() {
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
               The ePulse platform includes everything you need to live your
-              financial life without borders — from day-to-day spending to
+              financial life without borders, from day-to-day spending to
               long-distance transfers to lifestyle services.
             </p>
           </div>

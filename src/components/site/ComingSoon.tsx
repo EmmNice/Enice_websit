@@ -202,17 +202,17 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
 
         {/* Headline */}
         <h1 className="mb-5 text-4xl font-bold leading-[1.1] tracking-[-0.03em] text-white sm:text-5xl md:text-6xl">
-          Building the
+          Building products
           <br />
           <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-            future of commerce.
+            for global commerce.
           </span>
         </h1>
 
         {/* Sub-copy */}
         <p className="mb-12 max-w-lg text-base leading-relaxed text-white/45 sm:mb-14 sm:text-lg">
-          A venture-grade technology ecosystem for the next era of global
-          commerce. Four platforms, three verticals, one infrastructure stack.
+          A technology group building payments, AI, and financial platforms for
+          Africa, with room to grow globally.
         </p>
 
         {/* ── Countdown ── */}
