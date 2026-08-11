@@ -72,52 +72,52 @@ const PRINCIPLES = [
   {
     index: "01",
     title: "Long-Term Thinking",
-    body: "Every architectural decision, every partnership, every product roadmap is evaluated against a horizon of decades — not quarters. We build companies that are meant to outlast trends, survive economic cycles, and compound in value over time. Short-term convenience that compromises long-term integrity is never an acceptable trade.",
+    body: "We evaluate decisions against decades, not quarters. We want companies that outlast trends and survive economic cycles. We won't trade long-term integrity for short-term convenience.",
   },
   {
     index: "02",
     title: "Engineering Excellence",
-    body: "We hold our engineering to the same standards expected of the most demanding regulated industries. Our codebases are rigorously documented, our APIs are versioned and backward-compatible, and our system designs prioritise resilience over novelty. Mediocre software cannot power institutional-grade infrastructure.",
+    body: "We hold our engineering to the standards of regulated industries. Our codebases are documented, our APIs are versioned and backward-compatible, and our system designs favour resilience over novelty.",
   },
   {
     index: "03",
     title: "Security by Design",
-    body: "Security is not a layer added after a product ships — it is the foundation on which every system is built. Zero-trust architecture, per-tenant data isolation, end-to-end encryption, and continuous threat modelling are standard practice across every venture in our ecosystem. We treat the protection of our partners' data as a fiduciary obligation.",
+    body: "Security isn't added after a product ships. It's built in from the start. Zero-trust architecture, per-tenant data isolation, end-to-end encryption, and continuous threat modelling are standard across every product we run. We treat our partners' data as our responsibility.",
   },
   {
     index: "04",
     title: "Customer Obsession",
-    body: "We measure ourselves against the outcomes of those we serve. Not feature counts, not uptime logs in isolation — actual, measurable improvement in the operational capability of our customers. Every product decision is traced back to a specific constraint facing a specific class of business, and our success is defined by how completely we remove it.",
+    body: "We measure ourselves by outcomes for the people we serve, not feature counts. Every product decision traces back to a real constraint facing a specific type of business, and our job is to remove it.",
   },
   {
     index: "05",
     title: "Institutional Quality",
-    body: "We build for the sophistication of enterprise, not the tolerance of the early adopter. Our documentation, onboarding, support posture, and SLA commitments are structured to satisfy the expectations of legal, compliance, and procurement teams at serious organisations. We do not compromise on presentation, precision, or professionalism.",
+    body: "We build for enterprise, not for early adopters willing to tolerate rough edges. Our documentation, onboarding, support, and SLA commitments are built to satisfy legal, compliance, and procurement teams at serious organisations.",
   },
   {
     index: "06",
     title: "Responsible AI",
-    body: "Artificial intelligence carries the potential for both extraordinary benefit and significant harm. At ENICE Group, AI systems are deployed with explicit guardrails, full auditability, and ongoing human oversight. We do not release AI-driven capabilities until they meet a threshold of reliability and interpretability we are prepared to defend publicly.",
+    body: "AI can help or cause real harm. Our AI systems ship with clear guardrails, full auditability, and ongoing human oversight. We don't release a capability until we're confident in its reliability and we can explain how it works.",
   },
   {
     index: "07",
     title: "Continuous Innovation",
-    body: "Staying relevant in technology requires disciplined, sustained investment in research and experimentation. Our innovation mandate is not delegated to a single team — it is embedded in the operating rhythm of every product. We allocate engineering cycles to exploratory work deliberately, because the products we build in five years do not yet have names.",
+    body: "Staying relevant takes sustained investment in research and experimentation. It isn't one team's job, it's built into how every product team works. We set aside engineering time for exploratory work because what we build in five years doesn't have a name yet.",
   },
   {
     index: "08",
     title: "Ownership Mentality",
-    body: "Everyone inside the ENICE ecosystem — from our engineers to our operations leads — is expected to think like an owner. This means proactive accountability, deep domain mastery, and a bias toward action. We do not build cultures of deference. We build cultures of excellence, where talent is trusted to lead and held to the standard that trust demands.",
+    body: "Everyone at ENICE, from engineers to operations leads, is expected to think like an owner: accountable, deeply knowledgeable in their domain, and biased toward action. We trust people to lead, and we hold them to that standard.",
   },
 ];
 
 const VERTICALS = [
   { label: "Financial Infrastructure", description: "Core transaction rails, digital banking architecture, and payment processing systems." },
-  { label: "Enterprise AI", description: "Autonomous communication, intelligent process automation, and adaptive enterprise intelligence." },
+  { label: "Enterprise AI", description: "Automated communication and process automation for enterprise teams." },
   { label: "Developer Infrastructure", description: "APIs, SDKs, and tooling that give builders a reliable foundation to scale on." },
-  { label: "Digital Commerce", description: "End-to-end commerce platforms engineered for high-volume, institutional-grade operations." },
-  { label: "Cloud Infrastructure", description: "Scalable, region-aware deployment systems with security and compliance baked in at the architecture layer." },
-  { label: "Future Technology", description: "Long-horizon research and build programmes in areas that will define the next generation of global technology." },
+  { label: "Digital Commerce", description: "Commerce platforms built for high transaction volume and institutional standards." },
+  { label: "Cloud Infrastructure", description: "Region-aware deployment systems with security and compliance built into the architecture." },
+  { label: "Future Technology", description: "Long-horizon research programmes exploring what comes after our current products." },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────

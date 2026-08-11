@@ -114,7 +114,7 @@ const VERTICALS = [
     index: "01",
     kicker: "Fintech",
     title: "Financial Infrastructure Systems",
-    desc: "High-throughput transaction networks, secure ledger databases, and virtual card infrastructure built for Nigeria's digital-first economy and positioned for regional expansion.",
+    desc: "Transaction networks, ledger databases, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
     bullets: ["Virtual Card Issuance", "Treasury and Ledger", "KYC and Compliance Tooling"],
   },
   {
@@ -122,7 +122,7 @@ const VERTICALS = [
     index: "02",
     kicker: "Artificial Intelligence",
     title: "Autonomous Enterprise AI",
-    desc: "Multi-tenant conversational AI that automates customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms at institutional scale.",
+    desc: "Conversational AI that handles customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms.",
     bullets: ["Autonomous Customer Support", "Policy-Bound AI Agents", "Workflow Automation"],
   },
   {
@@ -130,7 +130,7 @@ const VERTICALS = [
     index: "03",
     kicker: "Product Engineering",
     title: "Products built to operate",
-    desc: "We build, own, and operate full-stack technology products — taking each platform from a clear customer problem through engineering, launch, and continuous operation.",
+    desc: "We build, own, and operate full-stack products. Each platform starts from a real customer problem and goes through engineering, launch, and day-to-day operation.",
     bullets: ["Product Ownership", "Platform Engineering", "Continuous Operation"],
   },
 ];
@@ -140,25 +140,25 @@ const CORE_MODULES = [
     icon: Cpu,
     index: "01",
     title: "Unified AI and Automation Pipeline",
-    desc: "Centralized LLM orchestration and vector search routing that powers enterprise products like PulseAssist across every tenant.",
+    desc: "Centralized LLM orchestration and vector search routing that powers products like PulseAssist across every tenant.",
   },
   {
     icon: Database,
     index: "02",
     title: "High-Velocity Ledger and Payment Core",
-    desc: "A low-latency transaction engine and virtual account infrastructure that anchors PulsePay and future financial platforms.",
+    desc: "A fast transaction engine and virtual account infrastructure that anchors PulsePay and the financial products we build next.",
   },
   {
     icon: FileCheck2,
     index: "03",
     title: "Automated Compliance and KYC Layer",
-    desc: "Real-time identity verification, fraud detection, and regulatory screening shared across every product in the ecosystem.",
+    desc: "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
   },
   {
     icon: Globe,
     index: "04",
     title: "Global Cloud Grid",
-    desc: "Optimised database clustering and serverless edge delivery supporting 99.99% uptime and sub-20ms execution across platforms.",
+    desc: "Database clustering and serverless edge delivery that keep uptime at 99.99% and execution under 20ms across platforms.",
   },
 ];
 
@@ -166,7 +166,7 @@ const PORTFOLIO_PREVIEW = [
   {
     tag: "Venture · Fintech Infrastructure",
     name: "PulsePay",
-    desc: "A virtual payment platform for modern commerce — offering instant Naira card issuance, programmable wallets, embedded KYC, and peer-to-peer transfers built for Nigerian institutions.",
+    desc: "A virtual payment platform for modern commerce: instant Naira card issuance, programmable wallets, embedded KYC, and peer-to-peer transfers built for Nigerian institutions.",
     stat1: { label: "Card Issuance", value: "< 5s" },
     stat2: { label: "Uptime SLA", value: "99.99%" },
     to: "/portfolio/pulsepay" as const,
@@ -174,7 +174,7 @@ const PORTFOLIO_PREVIEW = [
   {
     tag: "Venture · Enterprise AI",
     name: "PulseAssist",
-    desc: "An AI operations platform for banking, fintech, and telecoms — with autonomous queue handling, real-time agent handoff, and policy-bound workflow automations at scale.",
+    desc: "An AI operations platform for banking, fintech, and telecoms, with automated queue handling, live agent handoff, and policy-bound workflow automation.",
     stat1: { label: "Response Latency", value: "< 80ms" },
     stat2: { label: "Concurrent Tenants", value: "∞" },
     to: "/portfolio/pulseassist" as const,
@@ -262,9 +262,9 @@ function Landing() {
                 >
                   We build the technology
                   <br />
-                  <span className="text-blue-400">powering the next</span>
+                  <span className="text-blue-400">behind Africa's next</span>
                   <br />
-                  generation of
+                  wave of
                   <br />
                   commerce.
                 </h1>
@@ -274,9 +274,9 @@ function Landing() {
                   className="animate-hero-up mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:mt-8 sm:text-lg"
                   style={{ animationDelay: "200ms" }}
                 >
-                  ENICE Group builds, owns, and operates technology products and
-                  platforms that make financial services, commerce, and business
-                  communication simpler and more accessible.
+                  ENICE Group builds, owns, and operates products that make financial
+                  services, commerce, and business communication simpler and
+                  more accessible.
                 </p>
 
                 {/* CTAs */}
@@ -476,12 +476,11 @@ function Landing() {
               <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-[3.25rem]">
                 Products and platforms.
                 <br />
-                One product standard.
+                Built to one standard.
               </h2>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                ENICE Group turns difficult problems in financial services and
-                business communication into products that people and businesses
-                can rely on.
+                ENICE Group takes hard problems in financial services and business
+                communication and turns them into products people can rely on.
               </p>
             </div>
           </Reveal>
@@ -563,9 +562,9 @@ function Landing() {
                 The ENICE Core.
               </h2>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/50">
-                Every product we operate runs on a shared high-performance
-                infrastructure core — so the software customers use inherits
-                scale, compliance, and reliability from the foundation up.
+                Every product we operate runs on a shared infrastructure core, so
+                the software customers use inherits scale, compliance, and
+                reliability from the ground up.
               </p>
             </div>
           </Reveal>
@@ -604,7 +603,7 @@ function Landing() {
             <div className="mb-16 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
               <div className="max-w-2xl">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.26em] text-primary">
-                   Products · Built and operated by ENICE
+                   Products, built and operated by ENICE
                 </div>
                 <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
                   Products built for
@@ -780,13 +779,13 @@ function Landing() {
                 <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">From the Founders</div>
                 <div className="mt-6 space-y-5 text-[16px] leading-[1.8] text-muted-foreground">
                   <p>
-                    Every great business depends on great infrastructure. That's the belief that inspired ENICE Group. We aren't here to build technology for its own sake — we're here to build products that solve meaningful problems, empower businesses to grow, and create the digital infrastructure that people and organizations can rely on for years to come.
+                    Every good business runs on good infrastructure. That's the idea behind ENICE Group. We don't build technology for its own sake. We build products that solve real problems and give people and businesses infrastructure they can depend on for years.
                   </p>
                   <p>
-                    That vision wasn't born in a boardroom. It came from lived experience. We experienced the frustrations of everyday life in Nigeria — reaching out to companies for help only to face long wait times, poor customer service, and unnecessary friction. We experienced financial platforms that failed when they mattered most, from declined international cards to everyday payment challenges that made simple tasks unnecessarily difficult.
+                    That idea didn't start in a boardroom. It came from everyday life in Nigeria: calling a company for help and waiting too long, dealing with poor service, hitting friction that shouldn't exist. It came from financial platforms that failed exactly when we needed them, from declined international cards to simple payments that turned into a headache.
                   </p>
                   <p>
-                    We refused to accept that these experiences should be normal. ENICE Group was founded on the belief that African businesses and consumers deserve technology that is reliable, secure, and built to global standards. Every venture we launch is another step toward making that belief a reality — not only for Africa, but for the world.
+                    We decided that shouldn't be normal. ENICE Group exists because African businesses and consumers deserve technology that is reliable, secure, and built to the same standard as anywhere else. Every product we launch is a step toward that, for Africa first, and for the world as we grow.
                   </p>
                 </div>
                 <div className="mt-8 flex items-center gap-4 border-t border-border pt-6">

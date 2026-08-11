@@ -44,7 +44,7 @@ export function NetworkMetrics() {
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
           </span>
           <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-muted-foreground">
-            Live Network Health
+            Live network health
           </span>
         </div>
 
