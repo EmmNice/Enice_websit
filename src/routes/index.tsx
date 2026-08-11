@@ -46,17 +46,17 @@ function IndexPage() {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ENICE Group | Infrastructure for Global Commerce" },
+      { title: "ENICE Group | Technology Products for Global Commerce" },
       {
         name: "description",
         content:
-          "ENICE Group is a technology venture studio and infrastructure holding firm building fintech platforms and enterprise AI systems — PulsePay, PulseAssist, ePulse, and PulseX.",
+          "ENICE Group is a technology company that builds, owns, and operates products and platforms for financial services, commerce, and business communication.",
       },
-      { property: "og:title", content: "ENICE Group — Infrastructure for Global Commerce" },
+      { property: "og:title", content: "ENICE Group — Technology Products for Global Commerce" },
       {
         property: "og:description",
         content:
-          "A venture ecosystem building fintech and enterprise AI infrastructure — PulsePay, PulseAssist, ePulse, and PulseX.",
+          "ENICE Group builds technology products and platforms for financial services, commerce, and business communication.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -64,15 +64,15 @@ export const Route = createFileRoute("/")({
       { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "ENICE Group — Infrastructure for Global Commerce" },
+      { property: "og:image:alt", content: "ENICE Group — Technology Products for Global Commerce" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
       { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      { name: "twitter:title", content: "ENICE Group — Infrastructure for Global Commerce" },
+      { name: "twitter:title", content: "ENICE Group — Technology Products for Global Commerce" },
       {
         name: "twitter:description",
         content:
-          "Venture studio building fintech and enterprise AI infrastructure for institutions. PulsePay · PulseAssist · ePulse · PulseX.",
+          "A product-driven technology company building fintech and AI platforms. PulsePay · PulseAssist · ePulse · PulseX.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -102,7 +102,7 @@ export const Route = createFileRoute("/")({
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
 const HERO_STATS = [
-  { value: "4", label: "Ventures Built" },
+  { value: "4", label: "Products in Ecosystem" },
   { value: "99.99%", label: "Infrastructure SLA" },
   { value: "< 14ms", label: "API Latency P50" },
   { value: "AES-256", label: "Encryption Standard" },
@@ -128,10 +128,10 @@ const VERTICALS = [
   {
     icon: Boxes,
     index: "03",
-    kicker: "Venture Studio",
-    title: "Product Studio and Incubation",
-    desc: "We design, fund, engineer, and operate full-stack SaaS platforms — taking each venture from concept through institutional deployment, market expansion, and long-term operation.",
-    bullets: ["Concept to Capitalization", "Product and Engineering", "Go-to-Market Execution"],
+    kicker: "Product Engineering",
+    title: "Products built to operate",
+    desc: "We build, own, and operate full-stack technology products — taking each platform from a clear customer problem through engineering, launch, and continuous operation.",
+    bullets: ["Product Ownership", "Platform Engineering", "Continuous Operation"],
   },
 ];
 
@@ -251,7 +251,7 @@ function Landing() {
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
                   </span>
                   <span className="whitespace-nowrap text-[11px] font-semibold tracking-[0.06em] text-white/60 sm:tracking-[0.12em]">
-                    Enterprise Venture Ecosystem · West Africa
+                    Product Company · Abuja, Nigeria
                   </span>
                 </div>
 
@@ -260,11 +260,11 @@ function Landing() {
                   className="animate-hero-up text-[2.1rem] font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem]"
                   style={{ animationDelay: "100ms" }}
                 >
-                  The infrastructure
+                  We build the technology
                   <br />
                   <span className="text-blue-400">powering the next</span>
                   <br />
-                  era of global
+                  generation of
                   <br />
                   commerce.
                 </h1>
@@ -274,9 +274,9 @@ function Landing() {
                   className="animate-hero-up mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:mt-8 sm:text-lg"
                   style={{ animationDelay: "200ms" }}
                 >
-                  ENICE Group designs, funds, and operates full-stack software
-                  ventures that deliver the financial and AI infrastructure
-                  modern institutions depend on.
+                  ENICE Group builds, owns, and operates technology products and
+                  platforms that make financial services, commerce, and business
+                  communication simpler and more accessible.
                 </p>
 
                 {/* CTAs */}
@@ -288,14 +288,14 @@ function Landing() {
                     to="/portfolio"
                     className="group inline-flex h-11 items-center gap-2 rounded-md bg-white px-6 text-[13px] font-semibold text-[#060912] transition-all hover:bg-white/90 sm:h-12 sm:px-7"
                   >
-                    Explore Portfolio
+                    Explore our products
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
                   <Link
                     to="/about"
                     className="inline-flex h-11 items-center gap-2 rounded-md border border-white/15 bg-white/5 px-6 text-[13px] font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white sm:h-12 sm:px-7"
                   >
-                    Corporate Overview
+                    How we build
                   </Link>
                 </div>
 
@@ -338,7 +338,7 @@ function Landing() {
                           <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
                         </div>
                         <span className="font-mono text-[10px] text-white/35">
-                          ENICE Core · Control Panel
+                           ENICE Product Systems · Control Panel
                         </span>
                       </div>
                       <span className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400">
@@ -355,7 +355,7 @@ function Landing() {
                       {[
                         {
                           name: "PulsePay",
-                          sub: "Fintech Infrastructure",
+                           sub: "Digital Financial Platform",
                           iconEl: CreditCard,
                           iconBg: "bg-blue-500/15",
                           iconColor: "text-blue-400",
@@ -363,7 +363,7 @@ function Landing() {
                         },
                         {
                           name: "PulseAssist",
-                          sub: "Enterprise AI Platform",
+                           sub: "AI Business Communication",
                           iconEl: BrainCircuit,
                           iconBg: "bg-violet-500/15",
                           iconColor: "text-violet-400",
@@ -419,7 +419,7 @@ function Landing() {
                           <span className="text-emerald-400">"operational"</span>,
                         </div>
                         <div className="pl-4 text-white/55">
-                          "ventures":{" "}
+                          "products":{" "}
                           <span className="text-blue-300">["PulsePay", "PulseAssist"]</span>,
                         </div>
                         <div className="pl-4 text-white/55">
@@ -464,24 +464,24 @@ function Landing() {
       <PartnersStrip />
 
       {/* ══════════════════════════════════════════════════════════════
-          CORE VERTICALS — Light, premium numbered cards
+          WHAT WE'RE BUILDING — Light, premium numbered cards
       ══════════════════════════════════════════════════════════════ */}
       <section id="verticals" className="bg-white py-28 sm:py-36">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <Reveal>
             <div className="mb-16 max-w-3xl">
               <div className="text-[11px] font-semibold uppercase tracking-[0.26em] text-primary">
-                Core Verticals
+                What we're building
               </div>
               <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-[3.25rem]">
-                Three pillars.
+                Products and platforms.
                 <br />
-                One operating standard.
+                One product standard.
               </h2>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                The ENICE Group portfolio is organised around three focused
-                competencies, each operated with institutional discipline and
-                built to compound over time.
+                ENICE Group turns difficult problems in financial services and
+                business communication into products that people and businesses
+                can rely on.
               </p>
             </div>
           </Reveal>
@@ -557,15 +557,15 @@ function Landing() {
           <Reveal>
             <div className="mb-16 max-w-3xl">
               <div className="text-[11px] font-semibold uppercase tracking-[0.26em] text-blue-400">
-                Shared Ecosystem Infrastructure
+                What powers our products
               </div>
               <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl md:text-[3.25rem]">
                 The ENICE Core.
               </h2>
               <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/50">
-                Every venture we operate runs on our shared high-performance
-                infrastructure core — so each product inherits enterprise-grade
-                scale, compliance, and reliability from day one.
+                Every product we operate runs on a shared high-performance
+                infrastructure core — so the software customers use inherits
+                scale, compliance, and reliability from the foundation up.
               </p>
             </div>
           </Reveal>
@@ -596,7 +596,7 @@ function Landing() {
       </section>
 
       {/* ══════════════════════════════════════════════════════════════
-          PORTFOLIO PREVIEW — Premium cards with product visuals
+          PRODUCTS — Premium cards with product visuals
       ══════════════════════════════════════════════════════════════ */}
       <section className="border-y border-border bg-secondary py-28 sm:py-36">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -604,10 +604,10 @@ function Landing() {
             <div className="mb-16 flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
               <div className="max-w-2xl">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.26em] text-primary">
-                  Portfolio · Active Ventures
+                   Products · Built and operated by ENICE
                 </div>
                 <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
-                  Platforms built for
+                  Products built for
                   <br />
                   institutional scale.
                 </h2>
@@ -616,7 +616,7 @@ function Landing() {
                 to="/portfolio"
                 className="group inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-white"
               >
-                View full portfolio
+                 Explore all products
                 <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
             </div>

@@ -193,7 +193,7 @@ function PulsePayPage() {
                 to="/portfolio"
                 className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
               >
-                All Ventures
+                All Products
               </Link>
             </div>
           </div>
@@ -405,7 +405,7 @@ function PulsePayPage() {
               to="/portfolio"
               className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-7 py-3.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
             >
-              View All Ventures
+              View All Products
             </Link>
           </div>
         </div>

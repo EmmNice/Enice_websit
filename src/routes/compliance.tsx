@@ -16,7 +16,7 @@ export const Route = createFileRoute("/compliance")({
     <LegalPage
       kicker="Compliance · Regulatory Posture"
       title="Regulatory Compliance"
-      intro="ENICE Group operates with transparency, integrity, and full adherence to global and local statutory frameworks. As a venture studio and commerce infrastructure holding firm, our compliance program covers three core areas."
+      intro="ENICE Group operates with transparency, integrity, and full adherence to global and local statutory frameworks. As a product-driven technology company, our compliance program covers the platforms we build and operate."
       sections={[
         {
           heading: "Corporate and Enterprise Registration",

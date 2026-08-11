@@ -309,7 +309,7 @@ function PulseXPage() {
                   to="/portfolio"
                   className="inline-flex items-center gap-2 rounded-md border border-white/12 bg-white/6 px-6 py-3 text-[13px] font-semibold text-white/70 transition-colors hover:bg-white/10 hover:text-white"
                 >
-                  Back to Portfolio
+                  Back to Products
                 </Link>
               </div>
             </div>
@@ -520,7 +520,7 @@ function PulseXPage() {
               to="/portfolio"
               className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-7 py-3.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
             >
-              View All Ventures
+              View All Products
             </Link>
           </div>
         </div>

@@ -7,7 +7,7 @@ type NavLink = { label: string; to?: string; hash?: string };
 
 const navLinks: NavLink[] = [
   { label: "Home", to: "/" },
-  { label: "Portfolio", to: "/portfolio" },
+  { label: "Products", to: "/portfolio" },
   { label: "About", to: "/about" },
   { label: "Contact", to: "/contact" },
 ];
@@ -92,7 +92,7 @@ export function SiteHeader() {
               to="/contact"
               className="group hidden items-center gap-1.5 rounded-md border border-primary bg-primary px-4 py-2 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 md:inline-flex"
             >
-              Get in Touch
+              Contact
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
             </Link>
 
@@ -160,7 +160,7 @@ export function SiteHeader() {
               onClick={() => setOpen(false)}
               className="group flex w-full items-center justify-center gap-2 rounded-md bg-primary px-5 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
             >
-              Get in Touch
+              Contact
               <ArrowUpRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -169,7 +169,7 @@ export function SiteHeader() {
               ENICE Group
             </div>
             <p className="mt-1 text-[12px] text-muted-foreground">
-              Building infrastructure for what's next.
+               Building products for what's next.
             </p>
           </div>
         </aside>

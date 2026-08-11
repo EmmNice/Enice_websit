@@ -6,17 +6,17 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About ENICE Group | Venture Studio & Infrastructure Firm" },
+      { title: "About ENICE Group | Product-Driven Technology Company" },
       {
         name: "description",
         content:
-          "ENICE Group is a technology venture studio and infrastructure holding firm. We design, engineer, and operate the software systems that power modern digital commerce, financial infrastructure, and enterprise AI.",
+          "ENICE Group is a product-driven technology company. We build, own, and operate software platforms for modern digital commerce, financial services, and enterprise AI.",
       },
-      { property: "og:title", content: "About ENICE Group — Venture Studio & Infrastructure Firm" },
+      { property: "og:title", content: "About ENICE Group — Product-Driven Technology Company" },
       {
         property: "og:description",
         content:
-          "ENICE Group's corporate thesis, operating standards, and ecosystem strategy. A venture studio building the next generation of financial and AI infrastructure.",
+          "ENICE Group's product thesis, operating standards, and technology ecosystem.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/about")({
       {
         name: "twitter:description",
         content:
-          "Corporate thesis, operating standards, and ecosystem strategy of ENICE Group — a technology venture studio building financial and AI infrastructure.",
+          "The product thesis, operating standards, and technology ecosystem of ENICE Group.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/about")({
           "@type": "AboutPage",
           name: "About ENICE Group",
           description:
-            "ENICE Group is a technology venture studio and infrastructure holding firm. We design, engineer, and operate software systems for financial infrastructure, enterprise AI, and digital commerce.",
+            "ENICE Group is a product-driven technology company building and operating software platforms for financial services, enterprise AI, and digital commerce.",
           url: `${SITE_URL}/about`,
           publisher: {
             "@type": "Organization",
@@ -102,7 +102,7 @@ const PRINCIPLES = [
   {
     index: "07",
     title: "Continuous Innovation",
-    body: "Staying relevant in technology requires disciplined, sustained investment in research and experimentation. Our innovation mandate is not delegated to a single team — it is embedded in the operating rhythm of every venture. We allocate engineering cycles to exploratory work deliberately, because the products we build in five years do not yet have names.",
+    body: "Staying relevant in technology requires disciplined, sustained investment in research and experimentation. Our innovation mandate is not delegated to a single team — it is embedded in the operating rhythm of every product. We allocate engineering cycles to exploratory work deliberately, because the products we build in five years do not yet have names.",
   },
   {
     index: "08",
@@ -135,11 +135,11 @@ function AboutPage() {
             About ENICE Group
           </div>
           <h1 className="mt-6 max-w-4xl text-[2rem] font-bold leading-[1.04] tracking-[-0.035em] text-white sm:text-6xl md:text-7xl">
-            We are not building a startup.{" "}
-            <span className="text-blue-400">We are building the infrastructure.</span>
+             We build technology products.{" "}
+             <span className="text-blue-400">Then we operate them.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/60 sm:mt-8 sm:text-xl">
-            ENICE Group is a technology venture studio and infrastructure holding company. We design, fund, engineer, and operate a compounding ecosystem of software platforms — each one purpose-built to close a critical gap in financial infrastructure, enterprise intelligence, or digital commerce.
+             ENICE Group is the parent technology company behind a growing ecosystem of software products. We identify meaningful problems in financial services, commerce, and business communication, then build and operate platforms that solve them.
           </p>
         </div>
       </section>
@@ -159,10 +159,10 @@ function AboutPage() {
                 ENICE Group was founded on a single, deliberate observation: the most consequential problems facing African businesses and institutions are not problems of ambition — they are problems of infrastructure. The software systems, financial rails, and enterprise tooling that global-scale organisations depend on have historically been inaccessible, prohibitively expensive, or simply absent for businesses operating in emerging markets.
               </p>
               <p>
-                We chose the venture studio model over a single-product company because the problem set is too broad, and the compounding effect too valuable, to address through any single lens. A studio allows us to apply the same rigorous engineering standards, the same institutional design philosophy, and the same infrastructure backbone across multiple purpose-built ventures — each one serving a distinct market, each one reinforcing the others.
+                 We are building a product company with more than one lens on the future. The same rigorous engineering standards and shared infrastructure backbone can support multiple purpose-built products — each serving a distinct need, each strengthening the technology system around it.
               </p>
               <p>
-                This is not diversification for its own sake. It is a deliberate structural decision: to build a holding company where the whole is engineered to be worth more than the sum of its parts. Where shared infrastructure compounds in value. Where one venture's excellence sets the standard every subsequent venture is held to.
+                 This is not a collection of disconnected experiments. It is a deliberate way to build products that improve together: shared infrastructure compounds in value, and the quality of one product raises the standard for everything we build next.
               </p>
             </div>
           </div>
@@ -231,16 +231,16 @@ function AboutPage() {
             </div>
             <div className="space-y-6 text-[16px] leading-relaxed text-white/60">
               <p>
-                Our model spans five stages: we identify a structural gap in a market, design a venture around the most rigorous interpretation of what solving that gap requires, fund and staff it with precision, engineer the product to institutional standards, launch it, and then operate it with the same discipline we applied in building it. We do not hand off. We do not outsource. We own the full lifecycle.
+                 We identify a structural gap, design a product around what solving it requires, engineer the platform to a high standard, launch it, and operate it with the same discipline we applied in building it. We do not hand off the product. We own the full lifecycle.
               </p>
               <p>
-                Across our portfolio, we operate in domains that sit at the intersection of high technical complexity and high real-world consequence: financial infrastructure and digital banking; AI-powered enterprise communication and operational automation; developer tools and API infrastructure; digital commerce systems; cloud and deployment infrastructure; and long-horizon emerging technology research.
+                Across our product ecosystem, we operate in domains that sit at the intersection of high technical complexity and high real-world consequence: financial infrastructure and digital banking; AI-powered enterprise communication and operational automation; developer tools and API infrastructure; digital commerce systems; cloud and deployment infrastructure; and long-horizon emerging technology research.
               </p>
               <p>
-                Our two current ventures represent the foundation of this ecosystem. <strong className="text-white font-semibold">PulsePay</strong> is our financial infrastructure platform — a Naira-native payment processing and digital banking system built for the operational demands of Nigerian businesses, from high-frequency transaction processing to institutional-grade compliance. <strong className="text-white font-semibold">PulseAssist</strong> is our enterprise AI platform — an intelligent communication and automation layer that augments the operational capacity of enterprise teams, replacing procedural overhead with adaptive, context-aware intelligence.
+                Our two current products represent the foundation of this ecosystem. <strong className="text-white font-semibold">PulsePay</strong> is our financial infrastructure platform — a Naira-native payment processing and digital banking system built for the operational demands of Nigerian businesses, from high-frequency transaction processing to institutional-grade compliance. <strong className="text-white font-semibold">PulseAssist</strong> is our enterprise AI platform — an intelligent communication and automation layer that augments the operational capacity of enterprise teams, replacing procedural overhead with adaptive, context-aware intelligence.
               </p>
               <p>
-                These are not the only ventures we will build. They are the first two in a portfolio we intend to expand with the same deliberate, standards-driven approach across every vertical we enter.
+                 These are the first two products in a technology ecosystem we intend to expand with the same deliberate, standards-driven approach.
               </p>
             </div>
           </div>
@@ -385,13 +385,13 @@ function AboutPage() {
                 The most important feature of the ENICE Group model is not any individual venture — it is the infrastructure they share. Every company we build operates on a common engineering foundation: the same security architecture, the same zero-trust access model, the same data isolation standards, the same deployment infrastructure, the same quality gates in the engineering pipeline.
               </p>
               <p>
-                This shared foundation creates compounding value in two directions. For each new venture, it significantly reduces the time and cost of reaching production-grade reliability — because the hard problems of infrastructure have already been solved at the group level and do not need to be re-solved in isolation. For every existing venture, the addition of a new platform strengthens the collective infrastructure through shared investment, shared learnings, and shared operational standards.
+                This shared foundation creates compounding value in two directions. For each new product, it significantly reduces the time and cost of reaching production-grade reliability — because the hard problems of infrastructure have already been solved at the group level and do not need to be re-solved in isolation. For every existing product, the addition of a new platform strengthens the collective infrastructure through shared investment, shared learnings, and shared operational standards.
               </p>
               <p>
-                The result is an ecosystem that becomes more valuable, more resilient, and more capable with every venture we add. Our companies are not simply co-located under a holding entity — they are architecturally integrated. Security improvements propagate across the portfolio. Infrastructure advances lift every platform. Compliance work done once serves every venture that operates in a regulated domain.
+                The result is an ecosystem that becomes more valuable, more resilient, and more capable with every product we add. Our platforms are not simply grouped under a parent company — they are architecturally integrated. Security improvements propagate across the ecosystem. Infrastructure advances lift every product. Compliance work done once serves every regulated platform.
               </p>
               <p>
-                This is why we describe what we are building as an ecosystem rather than a portfolio. A portfolio is a collection. An ecosystem compounds.
+                This is why we describe what we are building as an ecosystem rather than a collection. Our products are designed to compound.
               </p>
             </div>
           </div>
@@ -419,7 +419,7 @@ function AboutPage() {
                 We are equally clear about the global dimension of this work. The systems we build will not be confined to a single market. They will be engineered to scale across regions, to meet international compliance standards, and to compete with any equivalent platform in the world. We have no interest in building the best option available in Nigeria, or in Africa. We are building to be the best option available — full stop.
               </p>
               <p>
-                For the businesses that partner with us, the investors who back our ecosystem, and the engineers and operators who choose to build their careers with us: we offer something rarer than a product roadmap. We offer a structural commitment — to build something that matters, to the standard that matters, over the time horizon that it actually takes to build it properly.
+                 For the businesses that use our products and the engineers and operators who choose to build with us, we offer a clear commitment: to build technology that matters, to a standard that matters, over the time horizon it takes to build it properly.
               </p>
             </div>
           </div>

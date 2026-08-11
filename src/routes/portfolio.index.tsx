@@ -15,20 +15,20 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/portfolio/")({
   head: () => ({
     meta: [
-      { title: "Portfolio | ENICE Group Venture Ecosystem" },
+       { title: "Products | ENICE Group Technology Ecosystem" },
       {
         name: "description",
         content:
-          "Explore the ENICE Group venture portfolio: PulsePay, PulseAssist, ePulse, and PulseX — proprietary fintech and AI platforms built for modern global commerce.",
+           "Explore the products built, owned, and operated by ENICE Group: PulsePay, PulseAssist, ePulse, and PulseX.",
       },
       {
         property: "og:title",
-        content: "ENICE Group Portfolio — Venture Ecosystem",
+         content: "ENICE Group Products — Technology Ecosystem",
       },
       {
         property: "og:description",
         content:
-          "PulsePay, PulseAssist, ePulse, and PulseX — fintech and AI platforms built by ENICE Group for institutions, freelancers, and global businesses.",
+           "PulsePay, PulseAssist, ePulse, and PulseX — technology products built by ENICE Group.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -36,15 +36,15 @@ export const Route = createFileRoute("/portfolio/")({
       { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "ENICE Group Portfolio" },
+      { property: "og:image:alt", content: "ENICE Group Products" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
       { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      { name: "twitter:title", content: "ENICE Group Portfolio" },
+       { name: "twitter:title", content: "ENICE Group Products" },
       {
         name: "twitter:description",
         content:
-          "PulsePay, PulseAssist, ePulse, and PulseX — fintech and AI platforms by ENICE Group.",
+           "PulsePay, PulseAssist, ePulse, and PulseX — products built by ENICE Group.",
       },
     ],
     links: [
@@ -56,7 +56,7 @@ export const Route = createFileRoute("/portfolio/")({
         children: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "CollectionPage",
-          name: "ENICE Group Venture Portfolio",
+           name: "ENICE Group Products",
           description:
             "Proprietary software products and infrastructure networks built by ENICE Group.",
           url: `${SITE_URL}/portfolio`,
@@ -119,21 +119,20 @@ function PortfolioIndexPage() {
       <section className="border-b border-border bg-background py-12 sm:py-16">
         <div className="mx-auto max-w-5xl px-5 text-center sm:px-8">
           <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-            Ecosystem Portfolio
+             ENICE Products
           </div>
           <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
-            The ENICE Group Ecosystem
+             Products built by ENICE Group
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-            Four purpose-built platforms — payments infrastructure, enterprise
-            AI, digital banking, and asset exchange. Each venture shares the
-            same infrastructure backbone and operates to institutional
-            standards.
+             Technology products for payments, financial services, business
+             communication, and digital commerce. Each product shares the same
+             infrastructure backbone and is built to operate at scale.
           </p>
         </div>
       </section>
 
-      {/* ── Active Ventures ── */}
+       {/* ── Active Products ── */}
       <section className="bg-secondary py-12 sm:py-16">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="mb-12">
@@ -142,13 +141,13 @@ function PortfolioIndexPage() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
               </span>
-              Active Ventures
+               Active Products
             </span>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
               Operational platforms
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Live products serving real customers today.
+               Products currently being built and operated by ENICE Group.
             </p>
           </div>
 
@@ -337,7 +336,7 @@ function PortfolioIndexPage() {
         </div>
       </section>
 
-      {/* ── Coming Soon Ventures ── */}
+       {/* ── Products in development ── */}
       <section className="border-t border-border bg-background py-20 sm:py-28">
         <div className="mx-auto max-w-7xl px-5 sm:px-8">
           <div className="mb-12">
@@ -349,7 +348,7 @@ function PortfolioIndexPage() {
               Coming Soon
             </span>
             <h2 className="mt-4 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-              Next-generation ventures
+               Products in development
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
               Platforms in development and planning — expanding the ENICE

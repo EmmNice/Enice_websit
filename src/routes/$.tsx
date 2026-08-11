@@ -55,7 +55,7 @@ function NotFoundPage() {
             to="/portfolio"
             className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-6 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
           >
-            View Portfolio
+            Explore Products
           </Link>
         </div>
       </div>

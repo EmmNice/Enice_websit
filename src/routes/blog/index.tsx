@@ -127,7 +127,7 @@ function BlogPage() {
             Blog and Changelog
           </h1>
           <p className="max-w-xl text-base leading-relaxed text-zinc-400">
-            Updates on our ventures, infrastructure changes, product launches,
+            Updates on our products, infrastructure changes, and platform launches,
             and everything happening inside ENICE Group.
           </p>
         </div>

@@ -1,6 +1,6 @@
-# ENICE Group — Coming Soon Website
+# ENICE Group — Product Company Website
 
-A React + TanStack Router coming-soon page for ENICE Group with a countdown timer, watchlist sign-up form, and Sanity-powered blog/changelog.
+A React + TanStack Router website for ENICE Group, a product-driven technology company building, owning, and operating products and platforms for financial services, commerce, and business communication. The primary products are PulsePay and PulseAssist, with ePulse and PulseX represented in the product ecosystem and roadmap.
 
 ## Stack
 
@@ -16,6 +16,15 @@ A React + TanStack Router coming-soon page for ENICE Group with a countdown time
 bun install
 bun run dev   # starts on port 5000
 ```
+
+The homepage can be previewed before the launch gate with `/?preview=1`.
+
+## Positioning
+
+- ENICE Group is presented as a technology product company, not a consulting, outsourcing, investment, or professional services firm.
+- The primary homepage CTA is to explore products.
+- PulsePay and PulseAssist are the most prominent products; the Products page contains the wider ecosystem.
+- Keep future copy centered on products, platforms, product engineering, infrastructure, ownership, and operation. Avoid describing ENICE as a venture studio or using consultation-led messaging.
 
 ## Environment variables
 

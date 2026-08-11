@@ -50,7 +50,7 @@ export function AboutMatrix() {
         {/* Section header */}
         <div className="mb-14 max-w-3xl">
           <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">
-            About · Venture Matrix
+             About · Product System
           </div>
           <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
             Building the systems
@@ -58,10 +58,10 @@ export function AboutMatrix() {
             that power what's next.
           </h2>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-            ENICE Group is a technology venture studio and parent ecosystem. We
-            design our infrastructure from the ground up so every platform we
-            incubate inherits institutional-grade scale, compliance, and
-            reliability from day one.
+             ENICE Group is the parent technology company behind a growing
+             ecosystem of products. We build our software and infrastructure
+             from the ground up, then operate each platform to a consistent
+             standard of scale, compliance, and reliability.
           </p>
         </div>
 

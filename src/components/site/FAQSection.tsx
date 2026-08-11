@@ -11,12 +11,12 @@ import { Reveal } from "./Reveal";
 
 const FAQS = [
   {
-    q: "How does ENICE Group incubate ventures?",
-    a: "Every venture begins inside the studio with shared access to the ENICE Core, our AI, ledger, and compliance backbone. From concept and funding through engineering and go-to-market, a venture graduates from incubation only after meeting institutional thresholds for security, reliability, and unit economics.",
+    q: "What does ENICE Group build?",
+    a: "ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform, and PulseAssist is our AI-powered business communication and customer support platform.",
   },
   {
-    q: "Which industries does ENICE Group serve?",
-    a: "Our primary verticals are financial services, telecommunications, and enterprise operations. PulsePay targets payments infrastructure, PulseAssist serves regulated support operations, and EPulse and PulseX extend the ecosystem into digital banking and global digital asset trading.",
+    q: "Which problems are ENICE products built to solve?",
+    a: "Our products focus on financial services, telecommunications, and enterprise operations. PulsePay is our digital financial platform, PulseAssist serves business communication and customer support, and ePulse and PulseX extend the ecosystem into digital banking and digital assets.",
   },
   {
     q: "What does the ENICE Core provide?",
@@ -27,8 +27,8 @@ const FAQS = [
     a: "We operate a zero-trust architecture with per-tenant database isolation, row-level security, audit logging, and continuous controls monitoring. Every system is designed for regulatory readiness from day one and aligned with SOC 2 control objectives.",
   },
   {
-    q: "How can partners or institutions engage with ENICE Group?",
-    a: "Institutional partners, regulators, and enterprise customers can reach our partnerships desk through the Contact page. Qualified inquiries are reviewed by a partner and answered within two business days.",
+    q: "How can businesses access ENICE products?",
+    a: "Businesses and institutions can reach the ENICE team through the Contact page to ask about product access, enterprise licensing, or integration requirements.",
   },
 ];
 
@@ -48,7 +48,7 @@ export function FAQSection() {
               Questions, answered.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              A clear look at how ENICE Group operates, builds, and partners.
+              A clear look at the company, products, and technology behind ENICE Group.
             </p>
           </div>
         </Reveal>

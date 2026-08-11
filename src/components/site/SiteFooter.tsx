@@ -38,7 +38,7 @@ function LinkedInIcon({ className }: { className?: string }) {
 
 const FOOTER_COLS = [
   {
-    heading: "Ventures",
+    heading: "Products",
     links: [
       { label: "PulsePay", to: "/portfolio/pulsepay" },
       { label: "PulseAssist", to: "/portfolio/pulseassist" },
@@ -115,8 +115,8 @@ export function SiteFooter() {
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-              A technology venture studio and infrastructure holding company —
-              building the financial and AI platforms that power global
+              ENICE Group is a technology company building, owning, and
+              operating the financial and AI platforms that power global
               commerce.
             </p>
 

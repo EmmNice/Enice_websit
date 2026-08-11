@@ -41,7 +41,7 @@ export const Route = createFileRoute("/roadmap")({
           "@type": "WebPage",
           name: "ENICE Group Product Roadmap",
           description:
-            "Public product roadmap for ENICE Group — completed milestones, active ventures, and planned infrastructure for 2026-2027.",
+            "Public product roadmap for ENICE Group — completed milestones, active products, and the technology we are building next.",
           url: `${SITE_URL}/roadmap`,
           publisher: {
             "@type": "Organization",
@@ -70,7 +70,7 @@ function RoadmapPage() {
             Roadmap
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            Milestones completed, ventures in progress, and the infrastructure
+            Milestones completed, products in progress, and the infrastructure
             we are building next. Published openly so partners and the wider
             ecosystem can plan ahead with confidence.
           </p>

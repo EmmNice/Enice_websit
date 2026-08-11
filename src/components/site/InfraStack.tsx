@@ -41,7 +41,7 @@ export function InfraStack() {
               and technology stack.
             </h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Every ENICE Group venture runs on the same institutional-grade
+               Every ENICE Group product runs on the same institutional-grade
               backbone — chosen for reliability, compliance, and global scale,
               not convenience.
             </p>

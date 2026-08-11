@@ -132,7 +132,7 @@ function launchHtml(email: string) {
         </td></tr>
         <tr><td style="padding:40px 48px;">
           <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa;">The countdown is over. The ENICE Group platform is officially live.</p>
-          <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa;">You are among the first people on earth to receive this message. As a watchlist member, you have priority access to everything we have built — the full venture ecosystem, partner documentation, and our infrastructure roadmap.</p>
+          <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#a1a1aa;">You are among the first people on earth to receive this message. As a watchlist member, you have priority access to everything we have built — our products, product documentation, and our technology roadmap.</p>
           <table cellpadding="0" cellspacing="0" style="width:100%;margin:32px 0;"><tr><td align="center">
             <a href="https://enicehq.com" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;font-size:15px;font-weight:700;letter-spacing:0.02em;padding:16px 40px;border-radius:8px;">Enter the Platform →</a>
           </td></tr></table>

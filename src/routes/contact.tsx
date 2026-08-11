@@ -8,17 +8,17 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact ENICE Group | Enterprise Inquiries & Partnerships" },
+      { title: "Contact ENICE Group | Product Access & Partnerships" },
       {
         name: "description",
         content:
-          "Contact the ENICE Group executive and engineering office. Reach us about platform integration, enterprise licensing, venture partnerships, or general inquiries at corporate@enicehq.com.",
+          "Contact ENICE Group about product access, platform integration, enterprise licensing, partnerships, or general inquiries at corporate@enicehq.com.",
       },
-      { property: "og:title", content: "Contact ENICE Group — Enterprise Inquiries & Partnerships" },
+      { property: "og:title", content: "Contact ENICE Group — Product Access & Partnerships" },
       {
         property: "og:description",
         content:
-          "Enterprise integration, licensing, and partnership inquiries for ENICE Group. Contact us at corporate@enicehq.com.",
+          "Product access, enterprise integration, licensing, and partnership inquiries for ENICE Group.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -34,7 +34,7 @@ export const Route = createFileRoute("/contact")({
       {
         name: "twitter:description",
         content:
-          "Enterprise integration, licensing, and partnership inquiries. Contact us at corporate@enicehq.com.",
+          "Product access, enterprise integration, licensing, and partnership inquiries.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -47,7 +47,7 @@ export const Route = createFileRoute("/contact")({
           "@type": "ContactPage",
           name: "Contact ENICE Group",
           description:
-            "Enterprise engagement and corporate inquiries for ENICE Group — platform integration, licensing, and venture partnerships.",
+            "Product access, platform integration, licensing, and partnership inquiries for ENICE Group.",
           url: `${SITE_URL}/contact`,
           publisher: {
             "@type": "Organization",
@@ -74,7 +74,7 @@ const SHADOW_CARD = "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,
 const INQUIRY_OPTIONS = [
   "Fintech Infrastructure Integration (PulsePay)",
   "Telecom or Banking AI Deployment (PulseAssist)",
-  "Strategic Venture Partnership",
+  "Technology or Product Partnership",
   "General Corporate Inquiry",
 ];
 
@@ -147,7 +147,7 @@ function ContactPage() {
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">
             Reach the ENICE Group executive and engineering office about
-            integration, enterprise licensing, or venture partnerships.
+            product access, platform integration, enterprise licensing, or technology partnerships.
           </p>
         </div>
       </section>
@@ -208,7 +208,7 @@ function ContactPage() {
               </div>
               <ol className="mt-6 space-y-5">
                 {[
-                  { step: "01", title: "Review", body: "A partner reviews your inquiry within one business day." },
+                  { step: "01", title: "Review", body: "The ENICE team reviews your inquiry within one business day." },
                   { step: "02", title: "Routing", body: "Your message is routed to the most relevant team — engineering, commercial, or executive." },
                   { step: "03", title: "Response", body: "You receive a substantive reply within two business days — no auto-responses." },
                 ].map((s) => (
@@ -251,10 +251,10 @@ function ContactPage() {
                   Inquiry Received
                 </div>
                 <h3 className="mt-6 text-2xl font-semibold tracking-tight text-foreground">
-                  Thank you, {form.name.split(" ")[0] || "partner"}.
+                  Thank you, {form.name.split(" ")[0] || "there"}.
                 </h3>
                 <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                  Your message has been routed to the right team. A partner will
+                  Your message has been routed to the right team. Someone from ENICE will
                   respond within two business days.
                 </p>
               </div>
@@ -330,7 +330,7 @@ function ContactPage() {
                     }
                     rows={6}
                     required
-                    placeholder="Tell us about the integration, partnership, or project you'd like to discuss."
+                    placeholder="Tell us about the product, integration, partnership, or access request you'd like to discuss."
                     className="mt-2 block w-full resize-none rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
                   />
                 </div>

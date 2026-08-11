@@ -8,7 +8,7 @@ export const Route = createFileRoute("/privacy")({
       {
         name: "description",
         content:
-          "How ENICE Group collects, processes, and protects personal and corporate data across its venture ecosystem.",
+          "How ENICE Group collects, processes, and protects personal and corporate data across its product ecosystem.",
       },
     ],
   }),
@@ -16,7 +16,7 @@ export const Route = createFileRoute("/privacy")({
     <LegalPage
       kicker="Legal · Data Protection"
       title="Privacy Policy"
-      intro="ENICE Group is committed to the highest standards of data protection across our venture ecosystem. This policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our commerce platforms, or interact with our infrastructure services."
+      intro="ENICE Group is committed to the highest standards of data protection across our product ecosystem. This policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our commerce platforms, or interact with our infrastructure."
       sections={[
         {
           heading: "Information We Collect",
