@@ -31,22 +31,22 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
     meta: [
       {
         title:
-          "PulseAssist | Enterprise AI Operations Platform — ENICE Group",
+          "PulseAssist | Enterprise AI Operations Platform by ENICE Group",
       },
       {
         name: "description",
         content:
-          "PulseAssist by ENICE Group is a multi-tenant AI operations platform for banking, fintech, and telecom. Autonomous customer support, policy-bound agents, real-time live-agent handoff, and compliance-ready audit trails.",
+          "PulseAssist by ENICE Group is a multi-tenant AI operations platform for banking, fintech, and telecom. It handles customer support, runs policy-bound agents, hands off to live agents in real time, and keeps compliance-ready audit trails.",
       },
       {
         property: "og:title",
         content:
-          "PulseAssist — Enterprise AI Operations Platform by ENICE Group",
+          "PulseAssist: Enterprise AI Operations Platform by ENICE Group",
       },
       {
         property: "og:description",
         content:
-          "Multi-tenant AI operations for telecoms and financial networks. Autonomous support routing, policy-bound agents, real-time live-agent handoff. Built by ENICE Group.",
+          "Multi-tenant AI operations for telecoms and financial networks: support routing, policy-bound agents, real-time live-agent handoff. Built by ENICE Group.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -63,12 +63,12 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
       { name: "twitter:image", content: `${SITE_URL}/og.png` },
       {
         name: "twitter:title",
-        content: "PulseAssist — Enterprise AI by ENICE Group",
+        content: "PulseAssist: Enterprise AI by ENICE Group",
       },
       {
         name: "twitter:description",
         content:
-          "Multi-tenant AI operations platform for banking and telecom — autonomous support, policy agents, live handoff.",
+          "Multi-tenant AI operations platform for banking and telecom: automated support, policy agents, live handoff.",
       },
     ],
     links: [
@@ -85,7 +85,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
           "@type": "SoftwareApplication",
           name: "PulseAssist",
           description:
-            "ENICE Group's multi-tenant AI operations platform for banking, fintech, and telecom — autonomous customer support routing, policy-bound conversational agents, API-driven account management, and real-time handoff to live agents.",
+            "ENICE Group's multi-tenant AI operations platform for banking, fintech, and telecom: automated customer support routing, policy-bound conversational agents, API-driven account management, and real-time handoff to live agents.",
           url: `${SITE_URL}/portfolio/pulseassist`,
           applicationCategory: "BusinessApplication",
           operatingSystem: "Web",
@@ -139,7 +139,7 @@ const FEATURES = [
   {
     icon: Zap,
     title: "Real-time live-agent handoff",
-    desc: "Seamless escalation to human agents mid-conversation with full context preserved.",
+    desc: "Escalation to a human agent mid-conversation, with full context preserved.",
   },
   {
     icon: Globe,
@@ -398,8 +398,8 @@ function PulseAssistPage() {
               Operations that run themselves.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              PulseAssist handles the full customer operations lifecycle — from
-              first contact to resolution — without requiring a human for every
+              PulseAssist covers the full customer operations lifecycle, from first
+              contact to resolution, without needing a human for every
               interaction.
             </p>
           </div>
@@ -478,8 +478,8 @@ function PulseAssistPage() {
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
                 PulseAssist maintains comprehensive audit trails of every agent
                 interaction. Policy configurations are version-controlled,
-                every model decision is logged, and all data is tenant-isolated
-                — meeting the regulatory requirements of banking and telecom
+                every model decision is logged, and all data is tenant-isolated,
+                meeting the regulatory requirements of banking and telecom
                 in Africa and beyond.
               </p>
               <div className="mt-5 flex flex-wrap gap-2">

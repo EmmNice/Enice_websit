@@ -17,20 +17,20 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/portfolio/pulsex")({
   head: () => ({
     meta: [
-      { title: "PulseX | Digital Asset Platform — ENICE Group" },
+      { title: "PulseX | Digital Asset Platform by ENICE Group" },
       {
         name: "description",
         content:
-          "PulseX is ENICE Group's next-generation digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi — simple, secure, and integrated with the ENICE ecosystem.",
+          "PulseX is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem.",
       },
       {
         property: "og:title",
-        content: "PulseX — Digital Asset Platform by ENICE Group",
+        content: "PulseX: Digital Asset Platform by ENICE Group",
       },
       {
         property: "og:description",
         content:
-          "PulseX is ENICE Group's next-generation digital asset platform, making cryptocurrency simple, secure, and accessible. Launching Q3 2027.",
+          "PulseX is ENICE Group's digital asset platform, making cryptocurrency simple, secure, and accessible. Launching Q3 2027.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -42,12 +42,12 @@ export const Route = createFileRoute("/portfolio/pulsex")({
       { name: "twitter:site", content: "@ENICEHQ" },
       {
         name: "twitter:title",
-        content: "PulseX — Digital Asset Platform by ENICE Group",
+        content: "PulseX: Digital Asset Platform by ENICE Group",
       },
       {
         name: "twitter:description",
         content:
-          "Next-generation cryptocurrency and digital asset platform from ENICE Group. Launching Q3 2027.",
+          "Cryptocurrency and digital asset platform from ENICE Group. Launching Q3 2027.",
       },
     ],
     links: [
@@ -64,7 +64,7 @@ export const Route = createFileRoute("/portfolio/pulsex")({
           "@type": "SoftwareApplication",
           name: "PulseX",
           description:
-            "ENICE Group's next-generation digital asset platform for cryptocurrency trading, secure custody, and cross-ecosystem digital finance. Launching Q3 2027.",
+            "ENICE Group's digital asset platform for cryptocurrency trading, secure custody, and cross-ecosystem digital finance. Launching Q3 2027.",
           url: `${SITE_URL}/portfolio/pulsex`,
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, iOS, Android",
@@ -187,7 +187,7 @@ const HIGHLIGHTS = [
   {
     icon: BarChart3,
     title: "Multi-asset trading",
-    desc: "Trade major digital assets with deep liquidity and institutional-grade execution — Bitcoin, Ethereum, and beyond.",
+    desc: "Trade major digital assets with deep liquidity and institutional-grade execution: Bitcoin, Ethereum, and beyond.",
   },
   {
     icon: Lock,
@@ -197,12 +197,12 @@ const HIGHLIGHTS = [
   {
     icon: Layers,
     title: "Ecosystem-native",
-    desc: "Move seamlessly between PulseX, PulsePay, and ePulse without leaving the ENICE stack — one account, every service.",
+    desc: "Move between PulseX, PulsePay, and ePulse without leaving the ENICE stack: one account, every service.",
   },
   {
     icon: Globe,
     title: "Built for scale",
-    desc: "Global access with compliance and reporting designed for regulated markets from day one — Africa, Europe, and beyond.",
+    desc: "Global access with compliance and reporting designed for regulated markets from day one, in Africa, Europe, and beyond.",
   },
   {
     icon: Zap,
@@ -212,7 +212,7 @@ const HIGHLIGHTS = [
   {
     icon: ShieldCheck,
     title: "Regulatory-ready",
-    desc: "Compliance infrastructure built in from the ground up — KYC, AML, and transaction monitoring baked into the core.",
+    desc: "Compliance built in from the ground up: KYC, AML, and transaction monitoring at the core.",
   },
 ];
 
@@ -265,14 +265,13 @@ function PulseXPage() {
               </h1>
 
               <p className="mt-6 max-w-lg text-base leading-relaxed text-white/60 sm:text-lg">
-                PulseX is ENICE Group's next-generation digital asset platform,
-                designed to make cryptocurrency and digital finance{" "}
+                PulseX is ENICE Group's digital asset platform, designed to make
+                cryptocurrency and digital finance{" "}
                 <strong className="font-semibold text-white/80">
                   simple, secure, and accessible
                 </strong>
-                . The platform will enable users to manage digital assets with a
-                seamless experience while integrating with the broader ENICE
-                ecosystem.
+                . The platform will let users manage digital assets easily, while
+                staying connected to the broader ENICE ecosystem.
               </p>
 
               {/* Meta cards */}
@@ -422,9 +421,8 @@ function PulseXPage() {
               Digital assets, without the friction.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              PulseX will let users manage digital assets with a seamless
-              experience, fully integrated across the broader ENICE Group
-              ecosystem.
+              PulseX will let users manage digital assets easily, fully integrated
+              across the broader ENICE Group ecosystem.
             </p>
           </div>
 
@@ -462,9 +460,8 @@ function PulseXPage() {
             One ecosystem. Every financial need.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted-foreground">
-            PulseX is deeply integrated with PulsePay and ePulse — move between
-            crypto and traditional finance without friction, all from a single
-            account.
+            PulseX is deeply integrated with PulsePay and ePulse. Move between
+            crypto and traditional finance from a single account.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
             {[

@@ -18,20 +18,20 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/portfolio/pulsepay")({
   head: () => ({
     meta: [
-      { title: "PulsePay | Virtual Payment Platform — ENICE Group" },
+      { title: "PulsePay | Virtual Payment Platform by ENICE Group" },
       {
         name: "description",
         content:
-          "PulsePay by ENICE Group: instant virtual Naira and USD card issuance, built-in KYC, programmable wallets, peer-to-peer transfers, and enterprise-grade fraud monitoring for modern commerce.",
+          "PulsePay by ENICE Group: virtual Naira and USD card issuance, built-in KYC, programmable wallets, peer-to-peer transfers, and fraud monitoring for modern commerce.",
       },
       {
         property: "og:title",
-        content: "PulsePay — Virtual Payment Platform by ENICE Group",
+        content: "PulsePay: Virtual Payment Platform by ENICE Group",
       },
       {
         property: "og:description",
         content:
-          "Instant virtual card issuance, KYC verification, programmable wallets, and fast transfers. PulsePay is ENICE Group's fintech infrastructure platform for modern commerce.",
+          "Virtual card issuance, KYC verification, programmable wallets, and fast transfers. PulsePay is ENICE Group's fintech infrastructure platform for modern commerce.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -48,12 +48,12 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
       { name: "twitter:image", content: `${SITE_URL}/og.png` },
       {
         name: "twitter:title",
-        content: "PulsePay — Fintech Infrastructure Platform",
+        content: "PulsePay: Fintech Infrastructure Platform",
       },
       {
         name: "twitter:description",
         content:
-          "Instant virtual Naira & USD card issuance, KYC, wallets, and transfers. Built by ENICE Group.",
+          "Virtual Naira and USD card issuance, KYC, wallets, and transfers. Built by ENICE Group.",
       },
     ],
     links: [
@@ -70,7 +70,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
           "@type": "SoftwareApplication",
           name: "PulsePay",
           description:
-            "ENICE Group's virtual payment platform — instant Naira and USD card issuance, built-in KYC verification, peer-to-peer transfers, programmable spend controls, and enterprise-grade fraud monitoring.",
+            "ENICE Group's virtual payment platform: Naira and USD card issuance, built-in KYC verification, peer-to-peer transfers, programmable spend controls, and fraud monitoring.",
           url: `${SITE_URL}/portfolio/pulsepay`,
           applicationCategory: "FinanceApplication",
           operatingSystem: "Web, iOS, Android",
@@ -307,9 +307,8 @@ function PulsePayPage() {
               Everything a modern payments stack should be.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              PulsePay delivers the full payments infrastructure stack —
-              issuance, compliance, transfers, and spending controls — in one
-              integrated platform.
+              PulsePay covers the full payments stack: issuance, compliance,
+              transfers, and spending controls, in one integrated platform.
             </p>
           </div>
 

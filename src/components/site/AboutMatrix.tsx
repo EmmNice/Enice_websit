@@ -21,15 +21,15 @@ const TERMINAL_LINES = [
 const VENTURES = [
   {
     icon: Banknote,
-    tag: "Fintech and Digital Payment Infrastructure",
+    tag: "Fintech and Digital Payments",
     title: "PulsePay",
-    desc: "Virtual card issuance, programmable wallets, peer-to-peer transfers, and embedded treasury for modern Nigerian commerce.",
+    desc: "Virtual card issuance, programmable wallets, peer-to-peer transfers, and embedded treasury for Nigerian businesses.",
   },
   {
     icon: BrainCircuit,
-    tag: "Enterprise AI and Telecom",
+    tag: "AI and Business Communication",
     title: "PulseAssist",
-    desc: "Autonomous support agents, policy-bound automations, and AI-driven workflow orchestration for banks and telecoms.",
+    desc: "AI support agents, policy-bound automation, and workflow orchestration for banks and telecoms.",
   },
 ];
 
@@ -50,18 +50,18 @@ export function AboutMatrix() {
         {/* Section header */}
         <div className="mb-14 max-w-3xl">
           <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">
-             About · Product System
+             About: Product System
           </div>
           <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
             Building the systems
             <br />
-            that power what's next.
+            behind what we ship.
           </h2>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-             ENICE Group is the parent technology company behind a growing
-             ecosystem of products. We build our software and infrastructure
-             from the ground up, then operate each platform to a consistent
-             standard of scale, compliance, and reliability.
+             ENICE Group is the parent company behind a growing set of products.
+             We build our software and infrastructure ourselves, then run
+             each platform to the same standard of scale, compliance, and
+             reliability.
           </p>
         </div>
 
@@ -99,7 +99,7 @@ export function AboutMatrix() {
               className="group mt-2 inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
             >
               <BookOpen className="h-4 w-4 text-primary" />
-              Read API Docs
+              Read the API docs
               <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
             </button>
           </div>
@@ -154,15 +154,15 @@ export function AboutMatrix() {
               <X className="h-4 w-4" />
             </button>
             <div className="text-[10px] font-bold uppercase tracking-[0.26em] text-primary">
-              API Documentation
+              API documentation
             </div>
             <h3 className="mt-3 text-2xl font-bold tracking-tight text-foreground">
-              ENICE Core · Developer Reference
+              ENICE Core: developer reference
             </h3>
             <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
-              The full developer reference is being finalized. The ENICE Core
-              gateway exposes unified endpoints for ledger operations, AI
-              orchestration, KYC and compliance, and edge delivery — accessible
+              The full developer reference is still being finalized. The ENICE
+              Core gateway exposes endpoints for ledger operations, AI
+              orchestration, KYC and compliance, and edge delivery, accessible
               via REST and signed webhooks.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -179,7 +179,7 @@ export function AboutMatrix() {
               ))}
             </div>
             <p className="mt-6 text-[12px] text-muted-foreground">
-              Request developer access through the Corporate Inquiries form.
+              Request developer access through the corporate inquiries form.
             </p>
           </div>
         </div>

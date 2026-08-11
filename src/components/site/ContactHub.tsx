@@ -47,7 +47,7 @@ export function ContactHub() {
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
             For partnerships, enterprise integrations, and platform inquiries.
-            Our team responds within one business day.
+            We respond within one business day.
           </p>
         </div>
 
@@ -65,7 +65,7 @@ export function ContactHub() {
                 Inquiry received.
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                A member of the ENICE Group team will be in touch shortly.
+                Someone from the ENICE Group team will be in touch shortly.
               </p>
             </div>
           ) : (
@@ -121,7 +121,7 @@ export function ContactHub() {
                     onChange={(e) => setForm({ ...form, message: e.target.value })}
                     rows={5}
                     className="w-full resize-none rounded-md border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition-colors focus:border-primary"
-                    placeholder="Tell us about your team, project, and how we can collaborate."
+                    placeholder="Tell us about your team, your project, and how we can help."
                   />
                 }
               />

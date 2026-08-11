@@ -10,23 +10,23 @@ const POSTS = [
   {
     tag: "Announcement",
     date: "Jun 2026",
-    title: "ENICE Group establishes its Shared Ecosystem Infrastructure framework.",
+    title: "ENICE Group sets up a shared infrastructure framework across its products.",
     excerpt:
-      "A unified AI pipeline, high-velocity ledger, and automated compliance backbone now underpin every venture in the ENICE Group ecosystem.",
+      "A shared AI pipeline, ledger core, and compliance layer now sit under every product in the ENICE Group ecosystem.",
   },
   {
     tag: "Product",
     date: "May 2026",
-    title: "PulsePay enters extended pilot with regional treasury partners.",
+    title: "PulsePay expands its pilot with regional treasury partners.",
     excerpt:
-      "Programmable wallets, instant virtual card issuance, and embedded compliance controls have opened to a broader pilot cohort across West Africa.",
+      "Programmable wallets, instant virtual card issuance, and embedded compliance controls are now open to a wider pilot group across West Africa.",
   },
   {
     tag: "Engineering",
     date: "Apr 2026",
-    title: "PulseAssist: how policy-bound agents operate inside regulated institutions.",
+    title: "How PulseAssist's policy-bound agents work inside regulated institutions.",
     excerpt:
-      "An engineering overview of autonomous support workflows built with auditable, deterministic guardrails for banking and telecoms.",
+      "An engineering look at support workflows built with auditable, predictable guardrails for banking and telecoms.",
   },
 ];
 
@@ -40,7 +40,7 @@ export function PressSection() {
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <div className="max-w-2xl">
               <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Press and Announcements
+                Press and announcements
               </div>
               <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
                 Latest from ENICE Group.

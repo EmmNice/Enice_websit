@@ -4,8 +4,8 @@ const STACK = [
   {
     name: "Amazon Web Services",
     abbr: "AWS",
-    label: "Cloud Infrastructure and Security Architecture",
-    detail: "Primary cloud backbone powering compute, storage, and global edge delivery across ENICE Group platforms.",
+    label: "Cloud Infrastructure and Security",
+    detail: "Our main cloud backbone. It handles compute, storage, and edge delivery across every ENICE Group platform.",
     index: "01",
   },
   {
@@ -13,14 +13,14 @@ const STACK = [
     abbr: "GCP",
     provider: "and Gemini AI",
     label: "Core AI Engine and Computational Intelligence",
-    detail: "Powers PulseAssist's multi-tenant AI pipeline, LLM orchestration, and enterprise workflow automation.",
+    detail: "Runs PulseAssist's AI pipeline: LLM orchestration and workflow automation across tenants.",
     index: "02",
   },
   {
     name: "Supabase",
     abbr: "PG",
-    label: "Database Infrastructure and Auth Layer",
-    detail: "Row-level security, real-time data streams, and managed Postgres for PulsePay's transactional systems.",
+    label: "Database Infrastructure and Auth",
+    detail: "Row-level security, real-time data streams, and managed Postgres for PulsePay's transaction systems.",
     index: "03",
   },
 ] as const;
@@ -33,7 +33,7 @@ export function InfraStack() {
         <Reveal>
           <div className="mb-16 max-w-3xl">
             <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">
-              Technology Foundation
+              Technology foundation
             </div>
             <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
               Core infrastructure
@@ -41,9 +41,9 @@ export function InfraStack() {
               and technology stack.
             </h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-               Every ENICE Group product runs on the same institutional-grade
-              backbone — chosen for reliability, compliance, and global scale,
-              not convenience.
+               Every ENICE Group product runs on the same backbone. We chose it
+              for reliability, compliance, and scale, not because it was
+              the easy option.
             </p>
           </div>
         </Reveal>

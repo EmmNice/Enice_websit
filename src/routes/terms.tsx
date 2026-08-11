@@ -4,7 +4,7 @@ import { LegalPage } from "@/components/site/LegalPage";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service | ENICE Group" },
+      { title: "Terms of Service · ENICE Group" },
       {
         name: "description",
         content:

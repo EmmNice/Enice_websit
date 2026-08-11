@@ -7,11 +7,11 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/docs")({
   head: () => ({
     meta: [
-      { title: "API Documentation — ENICE Group" },
+      { title: "API Documentation · ENICE Group" },
       {
         name: "description",
         content:
-          "ENICE Core API reference — authentication, endpoints, rate limits, and webhooks for verified integrators.",
+          "ENICE Core API reference: authentication, endpoints, rate limits, and webhooks for verified integrators.",
       },
     ],
   }),
@@ -239,10 +239,7 @@ function DocsPage() {
           <DocSection id="introduction">
             <h2 className="text-2xl font-semibold tracking-tight text-foreground">Introduction</h2>
             <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-              The ENICE Core API gives verified partners programmatic access to the full
-              infrastructure stack — wallet issuance, ledger operations, AI agent routing,
-              KYC verification, and more. All endpoints communicate over HTTPS and return
-              JSON-encoded responses.
+              The ENICE Core API gives verified partners programmatic access to our infrastructure: wallet issuance, ledger operations, AI agent routing, KYC verification, and more. All endpoints use HTTPS and return JSON.
             </p>
 
             <SplitRow
@@ -295,7 +292,7 @@ https://api.enice.group/v1
             <h2 className="text-2xl font-semibold tracking-tight text-foreground">Authentication</h2>
             <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
               The API uses scoped Bearer tokens issued through the ENICE Partner Console.
-              Tokens are environment-specific — always use{" "}
+              Tokens are environment-specific. Always use{" "}
               <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[12px]">ek_test_</code>{" "}
               keys during development and{" "}
               <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[12px]">ek_live_</code>{" "}
@@ -341,13 +338,13 @@ https://api.enice.group/v1
 Content-Type: application/json`}
                   />
                   <CodeBlock
-                    title="EXAMPLE — cURL"
+                    title="EXAMPLE: cURL"
                     code={`<span class="text-slate-500"># Authenticated request to /v1/core</span>
 curl <span class="text-amber-300">https://api.enice.group/v1/core</span> \\
   -H <span class="text-emerald-400">"Authorization: Bearer ek_live_xxx"</span> \\
   -H <span class="text-emerald-400">"Content-Type: application/json"</span>
 
-<span class="text-slate-500"># 401 — missing or invalid token</span>
+<span class="text-slate-500"># 401: missing or invalid token</span>
 {
   <span class="text-sky-300">"error"</span>: {
     <span class="text-sky-300">"code"</span>:    <span class="text-amber-300">"unauthorized"</span>,
@@ -377,9 +374,9 @@ curl <span class="text-amber-300">https://api.enice.group/v1/core</span> \\
                       {[
                         ["200", "Success"],
                         ["201", "Resource created"],
-                        ["400", "Bad request — validation failed"],
-                        ["401", "Unauthorized — invalid or missing token"],
-                        ["403", "Forbidden — insufficient token scope"],
+                        ["400", "Bad request: validation failed"],
+                        ["401", "Unauthorized: invalid or missing token"],
+                        ["403", "Forbidden: insufficient token scope"],
                         ["404", "Resource not found"],
                         ["429", "Rate limit exceeded"],
                         ["500", "Internal server error"],
@@ -405,7 +402,7 @@ curl <span class="text-amber-300">https://api.enice.group/v1/core</span> \\
               right={
                 <CodeBlock
                   title="ERROR RESPONSE"
-                  code={`<span class="text-slate-500"># HTTP 429 — rate limit exceeded</span>
+                  code={`<span class="text-slate-500"># HTTP 429: rate limit exceeded</span>
 {
   <span class="text-sky-300">"error"</span>: {
     <span class="text-sky-300">"code"</span>:       <span class="text-amber-300">"rate_limit_exceeded"</span>,
@@ -452,14 +449,14 @@ X-RateLimit-Reset:     <span class="text-violet-400">1751500860</span>`}
                       <div className="mt-3 rounded-lg border border-border">
                         <ParamRow name="currency" type="string" desc="Filter by ISO 4217 currency code (e.g. NGN, USD)." />
                         <ParamRow name="limit" type="integer" desc="Number of results per page. Default: 20. Max: 100." />
-                        <ParamRow name="after" type="string" desc="Cursor for pagination — value of last result's id." />
+                        <ParamRow name="after" type="string" desc="Cursor for pagination. Use the last result's id." />
                       </div>
                     </div>
                   </div>
                 }
                 right={
                   <CodeBlock
-                    title="RESPONSE — 200 OK"
+                    title="RESPONSE: 200 OK"
                     code={`{
   <span class="text-sky-300">"data"</span>: [
     {
@@ -542,8 +539,7 @@ X-RateLimit-Reset:     <span class="text-violet-400">1751500860</span>`}
                 left={
                   <div>
                     <p className="text-[14px] leading-relaxed text-muted-foreground">
-                      Posts a debit/credit pair to the ledger. The operation is atomic — if
-                      either leg fails, the entire transaction is rolled back.
+                      Posts a debit/credit pair to the ledger. The operation is atomic: if either leg fails, the entire transaction is rolled back.
                     </p>
                     <div className="mt-6">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Body parameters</p>
@@ -663,7 +659,7 @@ X-RateLimit-Reset:     <span class="text-violet-400">1751500860</span>`}
                   <div>
                     <p className="text-[14px] leading-relaxed text-muted-foreground">
                       Initiates an identity verification workflow. Returns immediately with a
-                      pending status — subscribe to the <code className="rounded bg-secondary px-1 py-0.5 font-mono text-[11px]">kyc.verified</code> webhook for the final result.
+                      pending status. Subscribe to the <code className="rounded bg-secondary px-1 py-0.5 font-mono text-[11px]">kyc.verified</code> webhook for the final result.
                     </p>
                     <div className="mt-6">
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">Body parameters</p>

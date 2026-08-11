@@ -24,7 +24,7 @@ const MILESTONES = [
     quarter: "Q3 2027",
     product: "PulseX",
     headline: "Launching Q3 2027",
-    desc: "Next-generation multi-asset value processing and enterprise billing rails.",
+    desc: "Multi-asset value processing and enterprise billing rails.",
     index: "03",
   },
 ] as const;
@@ -48,8 +48,8 @@ export function EcosystemRoadmap() {
               The ENICE Group ecosystem roadmap.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              A phased rollout of the platforms we are building, each one
-              engineered for institutional scale from day one.
+              A phased rollout of the platforms we're building, each one
+              designed for institutional scale from day one.
             </p>
           </div>
         </Reveal>

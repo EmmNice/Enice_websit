@@ -54,7 +54,7 @@ async function hmacSHA256(
   const subtle = getSubtle();
   const cryptoKey = await subtle.importKey(
     "raw",
-    key,
+    key as BufferSource,
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign"],

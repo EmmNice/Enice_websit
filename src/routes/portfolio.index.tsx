@@ -15,20 +15,20 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/portfolio/")({
   head: () => ({
     meta: [
-       { title: "Products | ENICE Group Technology Ecosystem" },
+       { title: "Products | ENICE Group" },
       {
         name: "description",
         content:
-           "Explore the products built, owned, and operated by ENICE Group: PulsePay, PulseAssist, ePulse, and PulseX.",
+           "PulsePay, PulseAssist, ePulse, and PulseX: the products built and operated by ENICE Group.",
       },
       {
         property: "og:title",
-         content: "ENICE Group Products — Technology Ecosystem",
+         content: "ENICE Group Products",
       },
       {
         property: "og:description",
         content:
-           "PulsePay, PulseAssist, ePulse, and PulseX — technology products built by ENICE Group.",
+           "PulsePay, PulseAssist, ePulse, and PulseX: products built by ENICE Group.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -44,7 +44,7 @@ export const Route = createFileRoute("/portfolio/")({
       {
         name: "twitter:description",
         content:
-           "PulsePay, PulseAssist, ePulse, and PulseX — products built by ENICE Group.",
+           "PulsePay, PulseAssist, ePulse, and PulseX, products built by ENICE Group.",
       },
     ],
     links: [
@@ -125,9 +125,9 @@ function PortfolioIndexPage() {
              Products built by ENICE Group
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-             Technology products for payments, financial services, business
-             communication, and digital commerce. Each product shares the same
-             infrastructure backbone and is built to operate at scale.
+             Payments, financial services, business communication, and digital
+             commerce. Each product runs on the same infrastructure and is
+             built to operate at scale.
           </p>
         </div>
       </section>
@@ -351,8 +351,8 @@ function PortfolioIndexPage() {
                Products in development
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Platforms in development and planning — expanding the ENICE
-              ecosystem.
+              Platforms in development and planning, expanding what ENICE Group
+              builds.
             </p>
           </div>
 
@@ -416,7 +416,7 @@ function PortfolioIndexPage() {
                   ePulse
                 </h2>
                 <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                  ENICE Group's upcoming global financial platform — built for
+                  ENICE Group's upcoming global financial platform, built for
                   freelancers, remote workers, creators, and global businesses
                   who earn, send, and spend across borders.
                 </p>
@@ -516,9 +516,9 @@ function PortfolioIndexPage() {
                   PulseX
                 </h2>
                 <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                  ENICE Group's next-generation digital asset platform —
-                  designed to make cryptocurrency and digital finance simple,
-                  secure, and accessible within the ENICE ecosystem.
+                  ENICE Group's digital asset platform, designed to make
+                  cryptocurrency and digital finance simple, secure, and
+                  accessible within the ENICE ecosystem.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link

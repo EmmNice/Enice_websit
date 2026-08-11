@@ -4,10 +4,10 @@ import { ArrowLeft } from "lucide-react";
 export const Route = createFileRoute("/$")({
   head: () => ({
     meta: [
-      { title: "Lost in the grid — ENICE Group" },
+      { title: "Page not found — ENICE Group" },
       {
         name: "description",
-        content: "The page you requested could not be located in the ENICE Group grid.",
+        content: "The page you requested doesn't exist on the ENICE Group site.",
       },
     ],
   }),
@@ -37,11 +37,10 @@ function NotFoundPage() {
           404
         </h1>
         <h2 className="mt-6 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-          Lost in the grid.
+          Page not found.
         </h2>
         <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-muted-foreground">
-          The route you requested doesn't exist within the ENICE Group ecosystem.
-          Let's get you back to operational ground.
+          The page you're looking for doesn't exist. Let's get you back on track.
         </p>
         <div className="mt-10 flex flex-col gap-3 sm:flex-row">
           <Link

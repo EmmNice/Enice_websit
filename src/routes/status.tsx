@@ -10,7 +10,7 @@ export const Route = createFileRoute("/status")({
       {
         name: "description",
         content:
-          "Real-time operational status for ENICE Group platforms, including PulsePay and PulseAssist.",
+          "Live status for ENICE Group platforms, including PulsePay and PulseAssist.",
       },
     ],
   }),
@@ -19,9 +19,9 @@ export const Route = createFileRoute("/status")({
 
 const SERVICES = [
   { name: "PulsePay Network", status: "Operational", desc: "Card issuance, wallet, and transaction rails." },
-  { name: "PulseAssist Engine", status: "Operational", desc: "Autonomous support routing and API layer." },
+  { name: "PulseAssist Engine", status: "Operational", desc: "Support routing and API layer." },
   { name: "ENICE Core APIs", status: "Operational", desc: "Ledger, KYC, and identity infrastructure." },
-  { name: "Developer Sandbox", status: "Operational", desc: "Public beta sandbox for integration partners." },
+  { name: "Developer Sandbox", status: "Operational", desc: "Beta sandbox for integration partners." },
 ];
 
 function StatusPage() {
@@ -38,8 +38,8 @@ function StatusPage() {
             All systems operational.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            Live status for every ENICE Group platform. If you are experiencing
-            an issue that is not reflected here, please contact our team.
+            Live status for every ENICE Group platform. If you're having an
+            issue that isn't reflected here, please contact our team.
           </p>
           <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1.5 text-[12px] font-semibold text-emerald-700">
             <span className="relative flex h-2 w-2">

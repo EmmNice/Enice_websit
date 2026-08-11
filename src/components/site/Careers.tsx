@@ -15,9 +15,9 @@ export function Careers() {
            Build products that matter.
         </h2>
         <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-           We work with people who care about product quality, technical
-           excellence, and building technology that can operate at real scale.
-           If that sounds like you, we want to hear from you.
+           We work with people who care about product quality, solid
+           engineering, and technology that holds up at real scale. If
+           that sounds like you, we want to hear from you.
         </p>
         <Link
           to="/contact"
