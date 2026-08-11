@@ -139,7 +139,7 @@ function AboutPage() {
              <span className="text-blue-400">Then we operate them.</span>
           </h1>
           <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/60 sm:mt-8 sm:text-xl">
-             ENICE Group is the parent technology company behind a growing ecosystem of software products. We identify meaningful problems in financial services, commerce, and business communication, then build and operate platforms that solve them.
+             ENICE Group is the parent company behind a growing set of software products. We find real problems in financial services, commerce, and business communication, then build and run the platforms that solve them.
           </p>
         </div>
       </section>
@@ -156,13 +156,13 @@ function AboutPage() {
             </div>
             <div className="space-y-6 text-[16px] leading-relaxed text-muted-foreground">
               <p>
-                ENICE Group was founded on a single, deliberate observation: the most consequential problems facing African businesses and institutions are not problems of ambition — they are problems of infrastructure. The software systems, financial rails, and enterprise tooling that global-scale organisations depend on have historically been inaccessible, prohibitively expensive, or simply absent for businesses operating in emerging markets.
+                ENICE Group started from one observation: the biggest problems facing African businesses aren't problems of ambition, they're problems of infrastructure. The software systems and financial rails that large organisations rely on elsewhere have historically been too expensive, too inaccessible, or simply missing for businesses in emerging markets.
               </p>
               <p>
-                 We are building a product company with more than one lens on the future. The same rigorous engineering standards and shared infrastructure backbone can support multiple purpose-built products — each serving a distinct need, each strengthening the technology system around it.
+                 We're building more than one product on the same foundation. The same engineering standards and shared infrastructure can support multiple purpose-built platforms, each serving a distinct need and strengthening the system around it.
               </p>
               <p>
-                 This is not a collection of disconnected experiments. It is a deliberate way to build products that improve together: shared infrastructure compounds in value, and the quality of one product raises the standard for everything we build next.
+                 This isn't a collection of separate experiments. It's a deliberate approach: shared infrastructure compounds in value, and the quality of one product raises the bar for whatever we build next.
               </p>
             </div>
           </div>
@@ -181,13 +181,13 @@ function AboutPage() {
             </div>
             <div className="space-y-6 text-[16px] leading-relaxed text-muted-foreground">
               <p>
-                We exist to build the foundational technology layer that enables businesses, institutions, and developers across Africa — and eventually the world — to operate at genuine scale. Not software that works well enough, but software that works with the reliability, security, and performance that institutional operations demand.
+                We want to build the technology layer that lets businesses, institutions, and developers across Africa, and eventually beyond, operate at real scale. Not software that works well enough, but software built with the reliability, security, and performance that institutional operations require.
               </p>
               <p>
-                Our customers are not test users or beta participants. They are financial service providers, enterprise operations teams, and technology builders who need infrastructure they can stake their business on. We serve them by delivering platforms that are robust by default, secure by design, and built to perform under the weight of real commercial volume.
+                Our customers aren't test users. They're financial service providers, enterprise operations teams, and technology builders who need infrastructure they can stake their business on. We serve them with platforms that are secure by design and built to hold up under real commercial volume.
               </p>
               <p>
-                Our intended impact is structural. We are not interested in building features — we are interested in building the underlying systems that make entire categories of business possible. When payment infrastructure is reliable, commerce expands. When enterprise AI is accessible and trustworthy, operational capacity scales. When developer tools are professional-grade, the next generation of companies can be built faster and better. That is the impact we are here to create.
+                We're aiming for structural impact, not just features. When payment infrastructure is reliable, commerce expands. When enterprise AI is trustworthy, teams get more done. When developer tools are solid, the next generation of companies gets built faster. That's the impact we're here for.
               </p>
             </div>
           </div>
@@ -206,13 +206,13 @@ function AboutPage() {
             </div>
             <div className="space-y-6 text-[16px] leading-relaxed text-muted-foreground">
               <p>
-                Over the next ten to twenty years, we intend to build what Africa does not yet have: a home-grown, globally competitive technology infrastructure group. Not a company that processes technology trends, but one that defines them. An organisation capable of sitting at the same table as the world's most consequential technology companies — and holding its position there.
+                Over the next ten to twenty years, we want to build what Africa doesn't yet have: a home-grown technology infrastructure group that competes globally, not one that just follows trends.
               </p>
               <p>
-                We are building toward a future in which African-originated financial infrastructure is trusted by institutions across multiple continents. Where the enterprise AI systems powering African businesses set the regional standard for reliability and capability. Where the developer infrastructure coming out of our ecosystem is chosen by builders globally because it is, simply, the best available option.
+                We're building toward a future where African-originated financial infrastructure is trusted across multiple continents, where enterprise AI built here sets the regional standard for reliability, and where developer tools from our ecosystem are chosen by builders worldwide because they're simply good.
               </p>
               <p>
-                That is a ten-to-twenty year project. It requires a standard of discipline, patience, and engineering rigour that most organisations are not structured to sustain. ENICE Group is. Our model is designed for compounding — not for the short cycle of a venture-backed startup, but for the long arc of an institution building something that will last.
+                That's a ten-to-twenty-year project. It takes discipline and patience most organisations aren't built to sustain. We're structured for the long run, not the short cycle of a typical startup.
               </p>
             </div>
           </div>
@@ -231,16 +231,16 @@ function AboutPage() {
             </div>
             <div className="space-y-6 text-[16px] leading-relaxed text-white/60">
               <p>
-                 We identify a structural gap, design a product around what solving it requires, engineer the platform to a high standard, launch it, and operate it with the same discipline we applied in building it. We do not hand off the product. We own the full lifecycle.
+                 We find a real gap, design a product around what it takes to close it, build it to a high standard, launch it, and then operate it with the same discipline we used to build it. We don't hand products off. We own the full lifecycle.
               </p>
               <p>
-                Across our product ecosystem, we operate in domains that sit at the intersection of high technical complexity and high real-world consequence: financial infrastructure and digital banking; AI-powered enterprise communication and operational automation; developer tools and API infrastructure; digital commerce systems; cloud and deployment infrastructure; and long-horizon emerging technology research.
+                We work across areas where technical complexity meets real-world consequence: financial infrastructure and digital banking, AI-powered enterprise communication and automation, developer tools and API infrastructure, digital commerce systems, cloud infrastructure, and longer-horizon research.
               </p>
               <p>
-                Our two current products represent the foundation of this ecosystem. <strong className="text-white font-semibold">PulsePay</strong> is our financial infrastructure platform — a Naira-native payment processing and digital banking system built for the operational demands of Nigerian businesses, from high-frequency transaction processing to institutional-grade compliance. <strong className="text-white font-semibold">PulseAssist</strong> is our enterprise AI platform — an intelligent communication and automation layer that augments the operational capacity of enterprise teams, replacing procedural overhead with adaptive, context-aware intelligence.
+                Our two current products are the foundation of this. <strong className="text-white font-semibold">PulsePay</strong> is our financial infrastructure platform, a Naira-native payment processing and digital banking system built for Nigerian businesses, from high-frequency transactions to compliance. <strong className="text-white font-semibold">PulseAssist</strong> is our enterprise AI platform, a communication and automation layer that helps enterprise teams cut down on procedural overhead.
               </p>
               <p>
-                 These are the first two products in a technology ecosystem we intend to expand with the same deliberate, standards-driven approach.
+                 These are the first two products in a lineup we plan to grow the same way: deliberately, and to a high standard.
               </p>
             </div>
           </div>
