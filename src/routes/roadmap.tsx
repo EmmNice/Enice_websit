@@ -11,13 +11,13 @@ export const Route = createFileRoute("/roadmap")({
       {
         name: "description",
         content:
-          "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist in active operation, and the infrastructure we are building next — ePulse, PulseX, and the ENICE Core.",
+          "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist live, and what we are building next, including ePulse, PulseX, and the ENICE Core.",
       },
       { property: "og:title", content: "ENICE Group Product Roadmap" },
       {
         property: "og:description",
         content:
-          "From PulsePay and PulseAssist today to ePulse, PulseX, and global infrastructure expansion tomorrow — our public product roadmap.",
+          "From PulsePay and PulseAssist today to ePulse and PulseX next: our public product roadmap.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/roadmap")({
       {
         name: "twitter:description",
         content:
-          "Milestones completed and what we are building next — the public ENICE Group product roadmap.",
+          "Milestones completed and what we are building next, in our public product roadmap.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/roadmap")({
           "@type": "WebPage",
           name: "ENICE Group Product Roadmap",
           description:
-            "Public product roadmap for ENICE Group — completed milestones, active products, and the technology we are building next.",
+            "Public product roadmap for ENICE Group: completed milestones, active products, and what we are building next.",
           url: `${SITE_URL}/roadmap`,
           publisher: {
             "@type": "Organization",
@@ -70,9 +70,8 @@ function RoadmapPage() {
             Roadmap
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            Milestones completed, products in progress, and the infrastructure
-            we are building next. Published openly so partners and the wider
-            ecosystem can plan ahead with confidence.
+            Milestones completed, products in progress, and what we're building
+            next. We publish this openly so partners can plan ahead.
           </p>
         </div>
       </div>
