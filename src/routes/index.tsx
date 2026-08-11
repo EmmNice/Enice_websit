@@ -46,17 +46,17 @@ function IndexPage() {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ENICE Group | Technology Products for Global Commerce" },
+      { title: "ENICE Group | Technology Products for Africa" },
       {
         name: "description",
         content:
-          "ENICE Group is a technology company that builds, owns, and operates products and platforms for financial services, commerce, and business communication.",
+          "ENICE Group builds, owns, and operates products for financial services, commerce, and business communication.",
       },
-      { property: "og:title", content: "ENICE Group — Technology Products for Global Commerce" },
+      { property: "og:title", content: "ENICE Group: Technology Products for Africa" },
       {
         property: "og:description",
         content:
-          "ENICE Group builds technology products and platforms for financial services, commerce, and business communication.",
+          "ENICE Group builds products for financial services, commerce, and business communication.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -64,15 +64,15 @@ export const Route = createFileRoute("/")({
       { property: "og:image", content: `${SITE_URL}/og.png` },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "ENICE Group — Technology Products for Global Commerce" },
+      { property: "og:image:alt", content: "ENICE Group: Technology Products for Africa" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@ENICEHQ" },
       { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      { name: "twitter:title", content: "ENICE Group — Technology Products for Global Commerce" },
+      { name: "twitter:title", content: "ENICE Group: Technology Products for Africa" },
       {
         name: "twitter:description",
         content:
-          "A product-driven technology company building fintech and AI platforms. PulsePay · PulseAssist · ePulse · PulseX.",
+          "A technology group building fintech and AI products for Africa: PulsePay, PulseAssist, ePulse and PulseX.",
       },
       { name: "robots", content: "index, follow" },
     ],
