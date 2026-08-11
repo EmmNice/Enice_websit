@@ -6,17 +6,17 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About ENICE Group | Product-Driven Technology Company" },
+      { title: "About ENICE Group | A Technology Company Building African Infrastructure" },
       {
         name: "description",
         content:
-          "ENICE Group is a product-driven technology company. We build, own, and operate software platforms for modern digital commerce, financial services, and enterprise AI.",
+          "ENICE Group builds and operates software platforms for digital commerce, financial services, and enterprise AI. Here is our story, our mission, and how we work.",
       },
-      { property: "og:title", content: "About ENICE Group — Product-Driven Technology Company" },
+      { property: "og:title", content: "About ENICE Group" },
       {
         property: "og:description",
         content:
-          "ENICE Group's product thesis, operating standards, and technology ecosystem.",
+          "What ENICE Group builds, why we build it, and the standards we hold ourselves to.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -32,7 +32,7 @@ export const Route = createFileRoute("/about")({
       {
         name: "twitter:description",
         content:
-          "The product thesis, operating standards, and technology ecosystem of ENICE Group.",
+          "What ENICE Group builds, why we build it, and how our products fit together.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -45,7 +45,7 @@ export const Route = createFileRoute("/about")({
           "@type": "AboutPage",
           name: "About ENICE Group",
           description:
-            "ENICE Group is a product-driven technology company building and operating software platforms for financial services, enterprise AI, and digital commerce.",
+            "ENICE Group builds and operates software platforms for financial services, enterprise AI, and digital commerce.",
           url: `${SITE_URL}/about`,
           publisher: {
             "@type": "Organization",
