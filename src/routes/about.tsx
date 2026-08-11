@@ -270,8 +270,8 @@ function AboutPage() {
               The Founding Team
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-              ENICE Group was founded by operators, engineers, and strategists
-              who spent years inside the problems they now build solutions for.
+              ENICE Group was founded by operators and engineers who spent years
+              inside the problems they now build solutions for.
             </p>
           </div>
 
@@ -318,8 +318,8 @@ function AboutPage() {
 
           <div className="mt-8 rounded-xl border border-border bg-secondary/60 px-6 py-5">
             <p className="text-sm leading-relaxed text-muted-foreground">
-              Our founding team operates with a preference for substance over
-              visibility. Executive contact is available through{" "}
+              Our founding team prefers to let the work speak. Executive contact
+              is available through{" "}
               <a
                 href="mailto:corporate@enicehq.com"
                 className="font-medium text-foreground underline-offset-2 hover:underline"
@@ -341,7 +341,7 @@ function AboutPage() {
               Our Principles
             </h2>
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-              These are not aspirational values written for a careers page. They are operational constraints — the standards we hold every decision, every system, and every member of our team to.
+              These aren't aspirational values written for a careers page. They're the standards we hold every decision, every system, and every person on the team to.
             </p>
           </div>
 
@@ -382,16 +382,16 @@ function AboutPage() {
             </div>
             <div className="space-y-6 text-[16px] leading-relaxed text-muted-foreground">
               <p>
-                The most important feature of the ENICE Group model is not any individual venture — it is the infrastructure they share. Every company we build operates on a common engineering foundation: the same security architecture, the same zero-trust access model, the same data isolation standards, the same deployment infrastructure, the same quality gates in the engineering pipeline.
+                The most important part of the ENICE Group model isn't any single product, it's the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same zero-trust access model, the same data isolation standards, and the same deployment pipeline.
               </p>
               <p>
-                This shared foundation creates compounding value in two directions. For each new product, it significantly reduces the time and cost of reaching production-grade reliability — because the hard problems of infrastructure have already been solved at the group level and do not need to be re-solved in isolation. For every existing product, the addition of a new platform strengthens the collective infrastructure through shared investment, shared learnings, and shared operational standards.
+                That shared foundation pays off twice. Each new product reaches production-grade reliability faster, because the hard infrastructure problems are already solved at the group level. And each existing product gets stronger as we add new ones, through shared investment and shared operational standards.
               </p>
               <p>
-                The result is an ecosystem that becomes more valuable, more resilient, and more capable with every product we add. Our platforms are not simply grouped under a parent company — they are architecturally integrated. Security improvements propagate across the ecosystem. Infrastructure advances lift every product. Compliance work done once serves every regulated platform.
+                The result is a set of products that gets more capable with each addition. Security improvements spread across the ecosystem. Infrastructure work lifts every product. Compliance work done once serves every regulated platform.
               </p>
               <p>
-                This is why we describe what we are building as an ecosystem rather than a collection. Our products are designed to compound.
+                That's why we call it an ecosystem rather than a collection of products. They're built to compound.
               </p>
             </div>
           </div>
@@ -410,16 +410,16 @@ function AboutPage() {
             </div>
             <div className="space-y-6 text-[16px] leading-relaxed text-white/60">
               <p>
-                The infrastructure that African businesses depend on — financial, technological, operational — is still largely being built. That is not a criticism. It is an observation about where the opportunity sits, and a statement about the responsibility that comes with being positioned to address it.
+                The financial and technological infrastructure African businesses depend on is still largely being built. That's not a criticism, it's just where things stand, and it's the opportunity we're focused on.
               </p>
               <p>
-                ENICE Group intends to build the foundational systems that businesses on this continent will run on for the next generation. Not as an act of charity or corporate social responsibility, but as a hard commercial thesis: the demand for institutional-quality infrastructure is large, growing, and significantly underserved. We are building the supply side.
+                We want to build the systems businesses on this continent will run on for the next generation. This isn't charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it.
               </p>
               <p>
-                We are equally clear about the global dimension of this work. The systems we build will not be confined to a single market. They will be engineered to scale across regions, to meet international compliance standards, and to compete with any equivalent platform in the world. We have no interest in building the best option available in Nigeria, or in Africa. We are building to be the best option available — full stop.
+                We're also building for a global market. What we build will scale across regions, meet international compliance standards, and compete with any equivalent platform anywhere. We're not trying to be the best option in Nigeria or in Africa. We're trying to be the best option, period.
               </p>
               <p>
-                 For the businesses that use our products and the engineers and operators who choose to build with us, we offer a clear commitment: to build technology that matters, to a standard that matters, over the time horizon it takes to build it properly.
+                 To the businesses that use our products, and the engineers and operators who build with us: we're committed to building technology that matters, to a standard that matters, and taking the time it takes to do it properly.
               </p>
             </div>
           </div>
@@ -427,7 +427,7 @@ function AboutPage() {
           {/* Closing statement */}
           <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.03] p-7 sm:mt-20 sm:p-16 text-center">
             <p className="mx-auto max-w-3xl text-xl font-semibold leading-snug tracking-tight text-white sm:text-3xl">
-              "The infrastructure a society depends on is the most durable thing it can build. We are here to build it."
+              "The infrastructure a society depends on is the most durable thing it can build. That's what we're here to build."
             </p>
             <div className="mt-6 text-sm font-medium text-white/40">
               — The Founders, ENICE Group
