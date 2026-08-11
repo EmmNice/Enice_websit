@@ -251,7 +251,7 @@ function Landing() {
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
                   </span>
                   <span className="whitespace-nowrap text-[11px] font-semibold tracking-[0.06em] text-white/60 sm:tracking-[0.12em]">
-                    Product Company · Abuja, Nigeria
+                    Technology Group · Building for Africa
                   </span>
                 </div>
 
