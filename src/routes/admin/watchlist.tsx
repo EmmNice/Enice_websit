@@ -91,7 +91,7 @@ function AdminWatchlistPage() {
 
   if (!password || (error && !contacts)) {
     return (
-      <div className="flex min-h-dvh items-center justify-center bg-background px-4">
+      <main id="main" className="flex min-h-dvh items-center justify-center bg-background px-4">
         <form
           onSubmit={handleSubmit}
           className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-sm"
@@ -123,12 +123,12 @@ function AdminWatchlistPage() {
             {loading ? "Checking…" : "Enter"}
           </button>
         </form>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-dvh bg-background px-4 py-10 sm:px-8">
+    <main id="main" className="min-h-dvh bg-background px-4 py-10 sm:px-8">
       <div className="mx-auto max-w-4xl">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
@@ -209,6 +209,6 @@ function AdminWatchlistPage() {
           </table>
         </div>
       </div>
-    </div>
+    </main>
   );
 }
