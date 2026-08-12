@@ -74,6 +74,13 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Docs -->
+  <url>
+    <loc>https://enicehq.com/docs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
   <!-- System -->
   <url>
     <loc>https://enicehq.com/status</loc>
