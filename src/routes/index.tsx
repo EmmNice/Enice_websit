@@ -27,6 +27,7 @@ import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Careers } from "@/components/site/Careers";
 import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
+import { NewsletterSignup } from "@/components/site/NewsletterSignup";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
@@ -870,6 +871,7 @@ function Landing() {
       <InfraStack />
       <FAQSection />
       <Careers />
+      <NewsletterSignup />
 
       </main>
       <SiteFooter />
