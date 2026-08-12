@@ -294,7 +294,7 @@ function Landing() {
                     to="/about"
                     className="inline-flex h-11 items-center gap-2 rounded-md border border-white/15 bg-white/5 px-6 text-[13px] font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white sm:h-12 sm:px-7"
                   >
-                    How we build
+                    What we build
                   </Link>
                 </div>
 
