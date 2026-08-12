@@ -523,6 +523,34 @@ function Landing() {
               </Reveal>
             ))}
           </div>
+
+          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3">
+            {[
+              {
+                title: "Built around real problems",
+                desc: "We start with problems people and businesses actually face.",
+              },
+              {
+                title: "Built to grow",
+                desc: "Our products are designed to support users as their needs grow.",
+              },
+              {
+                title: "Built in Africa",
+                desc: "We understand the realities of African markets and build with those realities in mind.",
+              },
+            ].map((item, i) => (
+              <Reveal key={item.title} delay={i * 60}>
+                <div className="h-full bg-white p-8">
+                  <h3 className="text-[15px] font-bold tracking-tight text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
+                    {item.desc}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
         </div>
       </section>
 
