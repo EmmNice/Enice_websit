@@ -220,8 +220,9 @@ const HIGHLIGHTS = [
 
 function PulseXPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden border-b border-border bg-[#080810]">
@@ -523,6 +524,7 @@ function PulseXPage() {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

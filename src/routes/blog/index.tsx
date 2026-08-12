@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Rss } from "lucide-react";
@@ -185,5 +186,69 @@ function BlogPage() {
 }
 
 export const Route = createFileRoute("/blog/")({
+  head: () => ({
+    meta: [
+      { title: "Blog and Updates | ENICE Group" },
+      {
+        name: "description",
+        content:
+          "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PulseAssist, and the rest of our platform.",
+      },
+      { property: "og:title", content: "Blog and Updates | ENICE Group" },
+      {
+        property: "og:description",
+        content:
+          "Product updates, changelog entries, and announcements from ENICE Group.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "ENICE Group" },
+      { property: "og:url", content: `${SITE_URL}/blog` },
+      { property: "og:image", content: `${SITE_URL}/og.png` },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "ENICE Group Blog" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@ENICEHQ" },
+      { name: "twitter:image", content: `${SITE_URL}/og.png` },
+      { name: "twitter:title", content: "Blog and Updates | ENICE Group" },
+      {
+        name: "twitter:description",
+        content:
+          "Product updates, changelog entries, and announcements from ENICE Group.",
+      },
+      { name: "robots", content: "index, follow" },
+    ],
+    links: [{ rel: "canonical", href: `${SITE_URL}/blog` }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Blog",
+          name: "ENICE Group Blog",
+          description:
+            "Product updates, changelog entries, and announcements from ENICE Group.",
+          url: `${SITE_URL}/blog`,
+          publisher: {
+            "@type": "Organization",
+            name: "ENICE Group",
+            url: SITE_URL,
+            logo: `${SITE_URL}/favicon.svg`,
+          },
+        }),
+      },
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+            { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+          ],
+        }),
+      },
+    ],
+  }),
   component: BlogPage,
 });

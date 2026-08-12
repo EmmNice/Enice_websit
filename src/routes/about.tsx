@@ -124,8 +124,9 @@ const VERTICALS = [
 
 function AboutPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
 
       {/* ── 1. HERO ─────────────────────────────────────────────────────── */}
       <section className="border-b border-border bg-[#060912] pb-16 pt-16 sm:pb-36 sm:pt-32">
@@ -436,6 +437,7 @@ function AboutPage() {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

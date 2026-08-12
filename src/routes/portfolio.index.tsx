@@ -112,8 +112,9 @@ const QUEUE_ROWS = [
 
 function PortfolioIndexPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
 
       {/* ── Page header ── */}
       <section className="border-b border-border bg-background py-12 sm:py-16">
@@ -543,6 +544,7 @@ function PortfolioIndexPage() {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

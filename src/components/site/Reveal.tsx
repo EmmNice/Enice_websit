@@ -37,6 +37,16 @@ export function Reveal({
 }: RevealProps) {
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const onChange = () => setReducedMotion(mq.matches);
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
 
   useEffect(() => {
     const el = ref.current;
@@ -55,6 +65,14 @@ export function Reveal({
 
   const ease = "cubic-bezier(0.16, 1, 0.3, 1)";
   const Component = Tag as any;
+
+  if (reducedMotion) {
+    return (
+      <Component ref={ref as any} className={className}>
+        {children}
+      </Component>
+    );
+  }
 
   return (
     <Component

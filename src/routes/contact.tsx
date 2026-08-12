@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ArrowRight, Check, Mail, MapPin, AlertCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -96,6 +96,16 @@ function ContactPage() {
   });
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [website, setWebsite] = useState("");
+  const startedAtRef = useRef(Date.now());
+
+  function resetForm() {
+    setForm({ name: "", email: "", company: "", inquiry: "", message: "" });
+    setWebsite("");
+    setErrorMessage("");
+    startedAtRef.current = Date.now();
+    setStatus("idle");
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -115,6 +125,8 @@ function ContactPage() {
           company: form.company,
           inquiry: form.inquiry,
           message: form.message,
+          website,
+          startedAt: startedAtRef.current,
         }),
       });
 
@@ -245,18 +257,28 @@ function ContactPage() {
           >
             {status === "success" ? (
               /* Success state */
-              <div className="flex h-full flex-col items-start justify-center">
-                <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
-                  <Check className="h-3.5 w-3.5" />
-                  Inquiry Received
+              <div className="flex min-h-[420px] w-full max-w-full flex-col items-start justify-center overflow-hidden">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <Check className="h-6 w-6" strokeWidth={2.5} />
                 </div>
-                <h3 className="mt-6 text-2xl font-semibold tracking-tight text-foreground">
-                  Thank you, {form.name.split(" ")[0] || "there"}.
+                <h3 className="mt-6 break-words text-2xl font-semibold tracking-tight text-foreground">
+                  Message received
                 </h3>
-                <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">
-                  We've routed your message to the right team. Someone from ENICE
-                  will respond within two business days.
+                <p className="mt-3 max-w-md break-words text-sm leading-relaxed text-muted-foreground">
+                  Thanks, {form.name.split(" ")[0] || "there"}. Our team replies within one
+                  business day to{" "}
+                  <span className="break-all font-medium text-foreground">
+                    {form.email || "the email you entered"}
+                  </span>
+                  .
                 </p>
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="mt-8 inline-flex items-center justify-center gap-2 rounded-md border border-input bg-background px-5 py-2.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
+                >
+                  Send another message
+                </button>
               </div>
             ) : (
               <form className="space-y-6" onSubmit={handleSubmit}>
@@ -334,6 +356,18 @@ function ContactPage() {
                     className="mt-2 block w-full resize-none rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
                   />
                 </div>
+
+                <input
+                  type="text"
+                  name="website"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
+                  style={{ opacity: 0 }}
+                />
 
                 <button
                   type="submit"

@@ -27,6 +27,7 @@ import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Careers } from "@/components/site/Careers";
 import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
+import { NewsletterSignup } from "@/components/site/NewsletterSignup";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
@@ -192,9 +193,10 @@ const COMPLIANCE_BADGES = [
 
 function Landing() {
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-background text-foreground antialiased selection:bg-primary/15">
+    <div className="min-h-dvh w-full overflow-x-hidden bg-background text-foreground antialiased selection:bg-primary/15">
       <ScrollProgress />
       <SiteHeader />
+      <main id="main">
 
       {/* ══════════════════════════════════════════════════════════════
           HERO — Dark, full-screen, split layout
@@ -869,7 +871,9 @@ function Landing() {
       <InfraStack />
       <FAQSection />
       <Careers />
+      <NewsletterSignup />
 
+      </main>
       <SiteFooter />
       <AIChatbot />
     </div>

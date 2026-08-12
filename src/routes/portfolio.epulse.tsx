@@ -154,8 +154,9 @@ const FOR_WHO = [
 
 function EPulsePage() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
 
       {/* ── Hero ── */}
       <section className="relative overflow-hidden border-b border-border bg-background">
@@ -364,6 +365,7 @@ function EPulsePage() {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

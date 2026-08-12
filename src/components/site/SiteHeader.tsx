@@ -62,6 +62,12 @@ export function SiteHeader() {
 
   return (
     <>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-primary-foreground focus:shadow-lg"
+      >
+        Skip to content
+      </a>
       <header
         className={`sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur-md transition-shadow duration-200 ${scrolled ? "shadow-sm" : ""}`}
       >

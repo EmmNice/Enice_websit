@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Calendar, Tag } from "lucide-react";
 import { PortableText } from "@portabletext/react";
@@ -211,6 +212,73 @@ function ArticlePage() {
   );
 }
 
+function slugToTitle(slug: string) {
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(" ");
+}
+
 export const Route = createFileRoute("/blog/$slug")({
+  head: ({ params }) => {
+    const url = `${SITE_URL}/blog/${params.slug}`;
+    const fallbackTitle = `${slugToTitle(params.slug)} | ENICE Group Blog`;
+    const fallbackDescription = `Read "${slugToTitle(params.slug)}" on the ENICE Group blog: product updates, changelog entries, and announcements.`;
+
+    return {
+      meta: [
+        { title: fallbackTitle },
+        { name: "description", content: fallbackDescription },
+        { property: "og:title", content: fallbackTitle },
+        { property: "og:description", content: fallbackDescription },
+        { property: "og:type", content: "article" },
+        { property: "og:site_name", content: "ENICE Group" },
+        { property: "og:url", content: url },
+        { property: "og:image", content: `${SITE_URL}/og.png` },
+        { property: "og:image:width", content: "1200" },
+        { property: "og:image:height", content: "630" },
+        { property: "og:image:alt", content: fallbackTitle },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:site", content: "@ENICEHQ" },
+        { name: "twitter:image", content: `${SITE_URL}/og.png` },
+        { name: "twitter:title", content: fallbackTitle },
+        { name: "twitter:description", content: fallbackDescription },
+        { name: "robots", content: "index, follow" },
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline: fallbackTitle,
+            description: fallbackDescription,
+            url,
+            mainEntityOfPage: url,
+            publisher: {
+              "@type": "Organization",
+              name: "ENICE Group",
+              url: SITE_URL,
+              logo: `${SITE_URL}/favicon.svg`,
+            },
+          }),
+        },
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+              { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog` },
+              { "@type": "ListItem", position: 3, name: slugToTitle(params.slug), item: url },
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: ArticlePage,
 });

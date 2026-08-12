@@ -68,10 +68,17 @@
 
   <!-- Blog -->
   <url>
-    <loc>https://enicehq.com/blog/</loc>
+    <loc>https://enicehq.com/blog</loc>
     <lastmod>2026-07-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
+  </url>
+
+  <!-- Docs -->
+  <url>
+    <loc>https://enicehq.com/docs</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
   </url>
 
   <!-- System -->

@@ -208,7 +208,7 @@ export function AIChatbot() {
       {/* ── Floating trigger ───────────────────────────────────────────────── */}
       <button
         onClick={() => (open ? handleClose() : setOpen(true))}
-        aria-label="Open ENICE Group chat"
+        aria-label={open ? "Close chat" : "Open ENICE Group chat"}
         className="fixed bottom-5 right-5 z-40 grid place-items-center rounded-2xl text-white shadow-[0_12px_32px_-8px_rgba(30,58,138,0.65)] transition-all duration-200 hover:scale-105 hover:shadow-[0_16px_40px_-8px_rgba(30,58,138,0.80)] sm:bottom-6 sm:right-6"
         style={{
           width: 52,

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/$")({
 
 function NotFoundPage() {
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background text-foreground">
+    <main id="main" className="relative min-h-dvh overflow-hidden bg-background text-foreground">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-[0.5]"
@@ -28,7 +28,7 @@ function NotFoundPage() {
             "radial-gradient(ellipse 60% 50% at 50% 40%, black 30%, transparent 80%)",
         }}
       />
-      <div className="relative mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 text-center">
+      <div className="relative mx-auto flex min-h-dvh max-w-3xl flex-col items-center justify-center px-6 text-center">
         <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           <span className="h-1.5 w-1.5 rounded-full bg-primary" />
           Error · 404
@@ -58,6 +58,6 @@ function NotFoundPage() {
           </Link>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

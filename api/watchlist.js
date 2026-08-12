@@ -5840,6 +5840,16 @@ var Resend = class {
   }
 };
 
+// src/lib/launch.ts
+var LAUNCH_EMAILS = {
+  /** 3 days before launch: July 15 2026 09:00 UTC */
+  threeDayReminder: "2026-07-15T09:00:00.000Z",
+  /** 1 day before launch: July 17 2026 09:00 UTC */
+  oneDayReminder: "2026-07-17T09:00:00.000Z",
+  /** Exact launch moment: July 18 2026 00:00 UTC */
+  launchMoment: "2026-07-18T00:00:00.000Z"
+};
+
 // api-src/watchlist.ts
 function withErrorHandling(handler2) {
   return async (req, res) => {
@@ -5858,11 +5868,6 @@ function withErrorHandling(handler2) {
   };
 }
 var FROM = "ENICE Group <noreply@enicehq.com>";
-var LAUNCH = {
-  threeDayReminder: "2026-07-15T09:00:00.000Z",
-  oneDayReminder: "2026-07-17T09:00:00.000Z",
-  launchMoment: "2026-07-18T00:00:00.000Z"
-};
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 var rateLimitMap = /* @__PURE__ */ new Map();
 function isRateLimited(ip) {
@@ -5874,6 +5879,14 @@ function isRateLimited(ip) {
   }
   if (entry.count >= 3) return true;
   entry.count++;
+  return false;
+}
+var emailRateLimitMap = /* @__PURE__ */ new Map();
+function isEmailRateLimited(email) {
+  const now = Date.now();
+  const lastAt = emailRateLimitMap.get(email);
+  if (lastAt !== void 0 && now - lastAt < 36e5) return true;
+  emailRateLimitMap.set(email, now);
   return false;
 }
 function confirmationHtml(email) {
@@ -6006,6 +6019,10 @@ var watchlist_default = withErrorHandling(async function handler(req, res) {
     res.status(400).json({ ok: false, error: "Please enter a valid email address." });
     return;
   }
+  if (isEmailRateLimited(email)) {
+    res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
+    return;
+  }
   try {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
@@ -6063,21 +6080,21 @@ var watchlist_default = withErrorHandling(async function handler(req, res) {
         to: email,
         subject: "3 Days Until We Engineer the Future \u2014 ENICE Group",
         html: threeDayHtml(email),
-        scheduledAt: LAUNCH.threeDayReminder
+        scheduledAt: LAUNCH_EMAILS.threeDayReminder
       }),
       resend.emails.send({
         from: FROM,
         to: email,
         subject: "Tomorrow, Everything Changes \u2014 ENICE Group",
         html: oneDayHtml(email),
-        scheduledAt: LAUNCH.oneDayReminder
+        scheduledAt: LAUNCH_EMAILS.oneDayReminder
       }),
       resend.emails.send({
         from: FROM,
         to: email,
         subject: "ENICE Group Is Live \u2014 You Have Early Access",
         html: launchHtml(email),
-        scheduledAt: LAUNCH.launchMoment
+        scheduledAt: LAUNCH_EMAILS.launchMoment
       })
     ]);
     const scheduled = reminders.filter(

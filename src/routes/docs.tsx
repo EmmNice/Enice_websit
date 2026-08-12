@@ -160,8 +160,9 @@ function DocsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
 
       {/* Page header */}
       <div className="border-b border-border bg-secondary/40 py-14 sm:py-20">
@@ -761,6 +762,7 @@ X-ENICE-Signature: <span class="text-emerald-400">sha256=a1b2c3d4e5f6...</span>`
         </main>
       </div>
 
+      </main>
       <SiteFooter />
     </div>
   );
