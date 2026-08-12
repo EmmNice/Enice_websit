@@ -1,64 +1,63 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 
+export const Route = createFileRoute("/$")({
+  head: () => ({
+    meta: [
+      { title: "Page not found — ENICE Group" },
+      {
+        name: "description",
+        content: "The page you requested doesn't exist on the ENICE Group site.",
+      },
+    ],
+  }),
+  component: NotFoundPage,
+});
+
+function NotFoundPage() {
+  return (
+    <main id="main" className="relative min-h-dvh overflow-hidden bg-background text-foreground">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-[0.5]"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, rgba(17,24,39,0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(17,24,39,0.06) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+          maskImage:
+            "radial-gradient(ellipse 60% 50% at 50% 40%, black 30%, transparent 80%)",
+        }}
+      />
+      <div className="relative mx-auto flex min-h-dvh max-w-3xl flex-col items-center justify-center px-6 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary px-3.5 py-1.5 text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          Error · 404
+        </div>
+        <h1 className="mt-8 font-mono text-7xl font-semibold tracking-[-0.04em] text-foreground sm:text-8xl">
+          404
+        </h1>
+        <h2 className="mt-6 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+          Page not found.
+        </h2>
+        <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-muted-foreground">
+          The page you're looking for doesn't exist. Let's get you back on track.
+        </p>
+        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <Link
+            to="/"
+            className="group inline-flex h-11 items-center justify-center gap-2 rounded-md bg-primary px-6 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+            Return to Home
+          </Link>
+          <Link
+            to="/portfolio"
+            className="inline-flex h-11 items-center justify-center rounded-md border border-border bg-background px-6 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+          >
+            Explore Products
+          </Link>
+        </div>
+      </div>
+    </main>
+  );
 }
-;)  
->vid/<    
->vid/<      
->vid/<        
->kniL/<          
-stcudorP erolpxE            
->          
-"yradnoces-gb:revoh sroloc-noitisnart dnuorgerof-txet muidem-tnof ms-txet 6-xp dnuorgkcab-gb redrob-redrob redrob dm-dednuor retnec-yfitsuj retnec-smeti 11-h xelf-enilni"=emaNssalc            
-"oiloftrop/"=ot            
-kniL<          
->kniL/<          
-emoH ot nruteR            
->/ "5.0-x-etalsnart-:revoh-puorg mrofsnart-noitisnart 4-w 4-h"=emaNssalc tfeLworrA<            
->          
-"09/yramirp-gb:revoh lla-noitisnart dnuorgerof-yramirp-txet dlobimes-tnof ms-txet 6-xp yramirp-gb dm-dednuor 2-pag retnec-yfitsuj retnec-smeti 11-h xelf-enilni puorg"=emaNssalc            
-"/"=ot            
-kniL<          
->"wor-xelf:ms 3-pag loc-xelf xelf 01-tm"=emaNssalc vid<        
->p/<        
-.kcart no kcab uoy teg s'teL .tsixe t'nseod rof gnikool er'uoy egap ehT          
->"dnuorgerof-detum-txet dexaler-gnidael ]xp51[-txet dm-w-xam 4-tm otua-xm"=emaNssalc p<        
->2h/<        
-.dnuof ton egaP          
->"lx3-txet:ms dnuorgerof-txet thgit-gnikcart dlobimes-tnof lx2-txet 6-tm"=emaNssalc 2h<        
->1h/<        
-404          
->"lx8-txet:ms dnuorgerof-txet ]me40.0-[-gnikcart dlobimes-tnof lx7-txet onom-tnof 8-tm"=emaNssalc 1h<        
->vid/<        
-404 · rorrE          
->/ "yramirp-gb lluf-dednuor 5.1-w 5.1-h"=emaNssalc naps<          
->"dnuorgerof-detum-txet ]me2.0[-gnikcart esacreppu dlobimes-tnof ]xp11[-txet 5.1-yp 5.3-xp yradnoces-gb redrob-redrob redrob lluf-dednuor 2-pag retnec-smeti xelf-enilni"=emaNssalc vid<        
->"retnec-txet 6-xp retnec-yfitsuj retnec-smeti loc-xelf lx3-w-xam hvd-h-nim xelf otua-xm evitaler"=emaNssalc vid<      
->/      
-}}        
-,")%08 tnerapsnart ,%03 kcalb ,%04 %05 ta %05 %06 espille(tneidarg-laidar"            
-:egamIksam          
-,"xp65 xp65" :eziSdnuorgkcab          
-,")xp1 tnerapsnart ,xp1 )60.0,93,42,71(abgr ,mottob ot(tneidarg-raenil ,)xp1 tnerapsnart ,xp1 )60.0,93,42,71(abgr ,thgir ot(tneidarg-raenil"            
-:egamIdnuorgkcab          
-{{=elyts        
-"]5.0[-yticapo 0-tesni etulosba enon-stneve-retniop"=emaNssalc        
-neddih-aira        
-vid<      
->"dnuorgerof-txet dnuorgkcab-gb neddih-wolfrevo hvd-h-nim evitaler"=emaNssalc "niam"=di niam<    
-( nruter  
-{ )(egaPdnuoFtoN noitcnuf
-
-;)}
-,egaPdnuoFtoN :tnenopmoc  
-,)}  
-,]    
-,}      
-,".etis puorG ECINE eht no tsixe t'nseod detseuqer uoy egap ehT" :tnetnoc        
-,"noitpircsed" :eman        
-{      
-,} "puorG ECINE — dnuof ton egaP" :eltit {      
-[ :atem    
-{( >= )( :daeh  
-{()"$/"(etuoReliFetaerc = etuoR tsnoc tropxe
-
-;"tcaer-edicul" morf } tfeLworrA { tropmi
-;"retuor-tcaer/kcatsnat@" morf } kniL ,etuoReliFetaerc { tropmi
