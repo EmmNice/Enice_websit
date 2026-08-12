@@ -17,8 +17,9 @@ export function LegalPage({
   sections: { heading: string; body: ReactNode }[];
 }) {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
       <section className="border-b border-border py-20 sm:py-28">
         <div className="mx-auto max-w-4xl px-5 sm:px-8">
           <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
@@ -63,6 +64,7 @@ export function LegalPage({
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

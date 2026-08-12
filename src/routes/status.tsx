@@ -26,8 +26,9 @@ const SERVICES = [
 
 function StatusPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
 
       <section className="border-b border-border bg-secondary/40 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
@@ -82,6 +83,7 @@ function StatusPage() {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

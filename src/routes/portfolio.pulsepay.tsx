@@ -146,8 +146,9 @@ const STATS = [
 
 function PulsePayPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
 
       {/* ── Hero ── */}
       <section className="border-b border-border bg-secondary py-20 sm:py-28">
@@ -410,6 +411,7 @@ function PulsePayPage() {
         </div>
       </section>
 
+      </main>
       <SiteFooter />
     </div>
   );

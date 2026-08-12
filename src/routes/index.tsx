@@ -192,9 +192,10 @@ const COMPLIANCE_BADGES = [
 
 function Landing() {
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-background text-foreground antialiased selection:bg-primary/15">
+    <div className="min-h-dvh w-full overflow-x-hidden bg-background text-foreground antialiased selection:bg-primary/15">
       <ScrollProgress />
       <SiteHeader />
+      <main id="main">
 
       {/* ══════════════════════════════════════════════════════════════
           HERO — Dark, full-screen, split layout
@@ -870,6 +871,7 @@ function Landing() {
       <FAQSection />
       <Careers />
 
+      </main>
       <SiteFooter />
       <AIChatbot />
     </div>

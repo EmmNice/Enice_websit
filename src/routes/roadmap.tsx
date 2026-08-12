@@ -57,8 +57,9 @@ export const Route = createFileRoute("/roadmap")({
 
 function RoadmapPage() {
   return (
-    <div className="min-h-screen bg-background text-foreground antialiased">
+    <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
+      <main id="main">
 
       {/* Page header */}
       <div className="border-b border-border bg-secondary/40 py-14 sm:py-20">
@@ -78,6 +79,7 @@ function RoadmapPage() {
 
       <Roadmap />
 
+      </main>
       <SiteFooter />
     </div>
   );

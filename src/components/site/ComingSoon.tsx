@@ -152,7 +152,7 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
 
   return (
     <div
-      className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#080810] px-5"
+      className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-[#080810] px-5"
       aria-label="Coming soon"
     >
       {/* ── Background layer ── */}
