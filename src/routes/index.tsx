@@ -264,9 +264,9 @@ function Landing() {
                   <br />
                   <span className="text-blue-400">behind Africa's next</span>
                   <br />
-                  wave of
+                  generation of
                   <br />
-                  commerce.
+                  businesses.
                 </h1>
 
                 {/* Subheadline */}
@@ -274,9 +274,8 @@ function Landing() {
                   className="animate-hero-up mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:mt-8 sm:text-lg"
                   style={{ animationDelay: "200ms" }}
                 >
-                  ENICE Group builds, owns, and operates products that make financial
-                  services, commerce, and business communication simpler and
-                  more accessible.
+                  ENICE Group builds, owns, and operates technology products for
+                  financial services, commerce, and business communication.
                 </p>
 
                 {/* CTAs */}
