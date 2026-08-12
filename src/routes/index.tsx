@@ -264,9 +264,9 @@ function Landing() {
                   <br />
                   <span className="text-blue-400">behind Africa's next</span>
                   <br />
-                  wave of
+                  generation of
                   <br />
-                  commerce.
+                  businesses.
                 </h1>
 
                 {/* Subheadline */}
@@ -274,9 +274,8 @@ function Landing() {
                   className="animate-hero-up mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:mt-8 sm:text-lg"
                   style={{ animationDelay: "200ms" }}
                 >
-                  ENICE Group builds, owns, and operates products that make financial
-                  services, commerce, and business communication simpler and
-                  more accessible.
+                  ENICE Group builds, owns, and operates technology products for
+                  financial services, commerce, and business communication.
                 </p>
 
                 {/* CTAs */}
@@ -295,7 +294,7 @@ function Landing() {
                     to="/about"
                     className="inline-flex h-11 items-center gap-2 rounded-md border border-white/15 bg-white/5 px-6 text-[13px] font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white sm:h-12 sm:px-7"
                   >
-                    How we build
+                    What we build
                   </Link>
                 </div>
 
@@ -521,6 +520,34 @@ function Landing() {
                     ))}
                   </ul>
                 </article>
+              </Reveal>
+            ))}
+          </div>
+
+          <div className="mt-14 grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-3">
+            {[
+              {
+                title: "Built around real problems",
+                desc: "We start with problems people and businesses actually face.",
+              },
+              {
+                title: "Built to grow",
+                desc: "Our products are designed to support users as their needs grow.",
+              },
+              {
+                title: "Built in Africa",
+                desc: "We understand the realities of African markets and build with those realities in mind.",
+              },
+            ].map((item, i) => (
+              <Reveal key={item.title} delay={i * 60}>
+                <div className="h-full bg-white p-8">
+                  <h3 className="text-[15px] font-bold tracking-tight text-foreground">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
+                    {item.desc}
+                  </p>
+                </div>
               </Reveal>
             ))}
           </div>
