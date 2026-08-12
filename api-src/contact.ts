@@ -56,6 +56,31 @@ function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
+function buildAutoReplyHtml(data: { name: string }) {
+  const firstName = escapeHtml(data.name.trim().split(/\s+/)[0] || "there");
+  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#ffffff;font-family:Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
+    <table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
+      <tr><td style="padding:0 0 24px;">
+        <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#3b82f6;font-weight:700;">ENICE Group</p>
+        <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#0f172a;">We received your message, ${firstName}.</h1>
+      </td></tr>
+      <tr><td>
+        <p style="margin:0;font-size:14px;line-height:1.6;color:#0f172a;">
+          Thanks for reaching out to ENICE Group. Your inquiry has been routed to the right team and
+          you can expect a response within one business day.
+        </p>
+      </td></tr>
+      <tr><td style="padding:24px 0 0;">
+        <p style="margin:0;font-size:12px;line-height:1.6;color:#64748b;">
+          This is an automated confirmation. If you need to add anything, reply directly to this email
+          or reach us at corporate@enicehq.com.
+        </p>
+      </td></tr>
+    </table>
+  </td></tr></table></body></html>`;
+}
+
 function buildHtml(data: {
   name: string;
   email: string;
@@ -119,6 +144,20 @@ export default async function handler(req: AnyReq, res: AnyRes) {
 
     const body =
       typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+
+    // Honeypot: bots that fill hidden fields get a silent success.
+    if (String(body.website || "").trim().length > 0) {
+      res.status(200).json({ ok: true });
+      return;
+    }
+
+    // Timing check: reject submissions filled out in under 2 seconds.
+    const startedAt = Number(body.startedAt);
+    if (Number.isFinite(startedAt) && Date.now() - startedAt < 2_000) {
+      res.status(200).json({ ok: true });
+      return;
+    }
+
     const name = String(body.name || "").trim().slice(0, 200);
     const email = String(body.email || "").trim().slice(0, 200);
     const company = String(body.company || "").trim().slice(0, 200);
@@ -159,6 +198,20 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       console.error("[api/contact] Resend error:", result.error);
       res.status(502).json({ ok: false, error: "Failed to deliver message." });
       return;
+    }
+
+    try {
+      const autoReply = await resend.emails.send({
+        from: "ENICE Group <noreply@enicehq.com>",
+        to: email,
+        subject: "We received your message",
+        html: buildAutoReplyHtml({ name }),
+      });
+      if (autoReply.error) {
+        console.error("[api/contact] Auto-reply error:", autoReply.error);
+      }
+    } catch (err) {
+      console.error("[api/contact] Auto-reply unhandled error:", err);
     }
 
     res.status(200).json({ ok: true });
