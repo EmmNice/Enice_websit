@@ -86,7 +86,7 @@ export const Route = createFileRoute("/")({
           "@type": "Organization",
           name: "ENICE Group",
           url: SITE_URL,
-          logo: `${SITE_URL}/favicon.svg`,
+          logo: `${SITE_URL}/favicon.png`,
           subOrganization: [
             { "@type": "FinancialProduct", name: "PulsePay", description: "Virtual card issuance, programmable wallets, and embedded treasury." },
             { "@type": "Organization", name: "PulseAssist", description: "Multi-tenant AI conversational SaaS for banking and telecom." },

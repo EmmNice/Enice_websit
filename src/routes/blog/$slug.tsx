@@ -261,7 +261,7 @@ export const Route = createFileRoute("/blog/$slug")({
               "@type": "Organization",
               name: "ENICE Group",
               url: SITE_URL,
-              logo: `${SITE_URL}/favicon.svg`,
+              logo: `${SITE_URL}/favicon.png`,
             },
           }),
         },

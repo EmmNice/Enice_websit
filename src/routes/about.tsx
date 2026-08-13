@@ -51,7 +51,7 @@ export const Route = createFileRoute("/about")({
             "@type": "Organization",
             name: "ENICE Group",
             url: SITE_URL,
-            logo: `${SITE_URL}/favicon.svg`,
+            logo: `${SITE_URL}/favicon.png`,
             foundingDate: "2026",
             address: {
               "@type": "PostalAddress",
