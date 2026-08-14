@@ -29,6 +29,7 @@ import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pul
 import { Route as PortfolioEpulseRouteImport } from './routes/portfolio.epulse'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as AdminWatchlistRouteImport } from './routes/admin/watchlist'
+import { Route as AdminEarlyAccessRouteImport } from './routes/admin/early-access'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -133,6 +134,11 @@ const AdminWatchlistRoute = AdminWatchlistRouteImport.update({
   path: '/admin/watchlist',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminEarlyAccessRoute = AdminEarlyAccessRouteImport.update({
+  id: '/admin/early-access',
+  path: '/admin/early-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -167,6 +173,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin/early-access': typeof AdminEarlyAccessRoute
   '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
@@ -191,6 +198,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin/early-access': typeof AdminEarlyAccessRoute
   '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
@@ -217,6 +225,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/admin/early-access': typeof AdminEarlyAccessRoute
   '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
@@ -244,6 +253,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/admin/early-access'
     | '/admin/watchlist'
     | '/blog/$slug'
     | '/portfolio/epulse'
@@ -268,6 +278,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/admin/early-access'
     | '/admin/watchlist'
     | '/blog/$slug'
     | '/portfolio/epulse'
@@ -293,6 +304,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/admin/early-access'
     | '/admin/watchlist'
     | '/blog/$slug'
     | '/portfolio/epulse'
@@ -319,6 +331,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  AdminEarlyAccessRoute: typeof AdminEarlyAccessRoute
   AdminWatchlistRoute: typeof AdminWatchlistRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -467,6 +480,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWatchlistRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/early-access': {
+      id: '/admin/early-access'
+      path: '/admin/early-access'
+      fullPath: '/admin/early-access'
+      preLoaderRoute: typeof AdminEarlyAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -527,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  AdminEarlyAccessRoute: AdminEarlyAccessRoute,
   AdminWatchlistRoute: AdminWatchlistRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
