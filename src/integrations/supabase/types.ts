@@ -14,7 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      early_access_registrations: {
+        Row: {
+          business_name: string
+          business_need: string | null
+          business_type: string
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          product: string
+          source: string
+          status: Database["public"]["Enums"]["early_access_status"]
+          updated_at: string
+        }
+        Insert: {
+          business_name: string
+          business_need?: string | null
+          business_type: string
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          product?: string
+          source?: string
+          status?: Database["public"]["Enums"]["early_access_status"]
+          updated_at?: string
+        }
+        Update: {
+          business_name?: string
+          business_need?: string | null
+          business_type?: string
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          product?: string
+          source?: string
+          status?: Database["public"]["Enums"]["early_access_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +64,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      early_access_status:
+        | "EARLY_ACCESS"
+        | "UNDER_REVIEW"
+        | "SELECTED_FOR_BETA"
+        | "INVITATION_SENT"
+        | "BETA_USER"
+        | "REJECTED"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +197,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      early_access_status: [
+        "EARLY_ACCESS",
+        "UNDER_REVIEW",
+        "SELECTED_FOR_BETA",
+        "INVITATION_SENT",
+        "BETA_USER",
+        "REJECTED",
+      ],
+    },
   },
 } as const
