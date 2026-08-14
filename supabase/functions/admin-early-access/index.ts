@@ -16,17 +16,21 @@ const STATUSES = [
   "REJECTED",
 ] as const;
 
-const headers = { ...corsHeaders, "x-admin-password": "x-admin-password" };
+const cors = {
+  ...corsHeaders,
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-admin-password",
+};
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...cors, "Content-Type": "application/json" },
   });
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers });
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
   try {
     const adminPassword = Deno.env.get("ADMIN_PASSWORD");
