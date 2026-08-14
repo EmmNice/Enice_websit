@@ -24,6 +24,7 @@ import {
   Ticket,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 export const Route = createFileRoute("/portfolio/pulseassist")({
@@ -219,15 +220,7 @@ function PulseAssistPage() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
-                href="https://www.getpulseassist.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-              >
-                Visit PulseAssist
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-              </a>
+              <PulseAssistEarlyAccessButton className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90" />
               <a
                 href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
                 className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
@@ -521,15 +514,7 @@ function PulseAssistPage() {
             multi-tenant configuration, and SLA options.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <a
-              href="https://www.getpulseassist.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-            >
-              Visit PulseAssist
-              <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-            </a>
+            <PulseAssistEarlyAccessButton className="group inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90" />
             <a
               href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
               className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-7 py-3.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"

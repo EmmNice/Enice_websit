@@ -10,6 +10,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { SiteFooter } from "@/components/site/SiteFooter";
 
 export const Route = createFileRoute("/portfolio/")({
@@ -312,16 +313,7 @@ function PortfolioIndexPage() {
                   live agents in real time when needed.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
-                  <a
-                    href="https://www.getpulseassist.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-                    aria-label="Visit PulseAssist platform"
-                  >
-                    Visit Platform
-                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-                  </a>
+                  <PulseAssistEarlyAccessButton className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90" />
                   <Link
                     to="/portfolio/pulseassist"
                     className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-[12px] font-semibold text-foreground transition-colors hover:bg-secondary"
