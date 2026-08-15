@@ -28,6 +28,7 @@ import { FAQSection } from "@/components/site/FAQSection";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
+import { ContactSection } from "@/components/site/ContactSection";
 
 // The chatbot is a floating widget that is never part of first paint, so it is split out
 // of the homepage's critical path and fetched after hydration.
@@ -928,6 +929,7 @@ function Landing() {
         <InfraStack />
         <FAQSection />
         <Careers />
+        <ContactSection />
       </main>
       <SiteFooter />
       <Suspense fallback={null}>

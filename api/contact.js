@@ -5948,146 +5948,192 @@ function createRateLimiter(max, windowMs) {
 function escapeHtml2(value) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
+function errorRef(prefix) {
+  return `${prefix}${Date.now().toString(36).toUpperCase()}`;
+}
+
+// src/lib/contact.ts
+var FIELD_LIMITS = {
+  name: 200,
+  email: 200,
+  company: 200,
+  inquiry: 200,
+  message: 2e3
+};
+var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // api-src/contact.ts
 var FROM = "ENICE Contact <noreply@enicehq.com>";
+var REPLY_FROM = "ENICE Group <noreply@enicehq.com>";
 var TO = "corporate@enicehq.com";
-var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-var isRateLimited = createRateLimiter(5, 10 * 60 * 1e3);
-var isEmailRateLimited = createRateLimiter(3, 60 * 60 * 1e3);
-function buildAutoReplyHtml(data) {
-  const firstName = escapeHtml2(data.name.trim().split(/\s+/)[0] || "there");
-  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#ffffff;font-family:Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
-    <table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
-      <tr><td style="padding:0 0 24px;">
-        <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#3b82f6;font-weight:700;">ENICE Group</p>
-        <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#0f172a;">We received your message, ${firstName}.</h1>
-      </td></tr>
-      <tr><td>
-        <p style="margin:0;font-size:14px;line-height:1.6;color:#0f172a;">
-          Thanks for reaching out to ENICE Group. Your inquiry has been routed to the right team and
-          you can expect a response within one business day.
-        </p>
-      </td></tr>
-      <tr><td style="padding:24px 0 0;">
-        <p style="margin:0;font-size:12px;line-height:1.6;color:#64748b;">
-          This is an automated confirmation. If you need to add anything, reply directly to this email
-          or reach us at corporate@enicehq.com.
-        </p>
-      </td></tr>
-    </table>
-  </td></tr></table></body></html>`;
+var tooManyRequests = createRateLimiter(30, 10 * 60 * 1e3);
+var tooManySends = createRateLimiter(5, 10 * 60 * 1e3);
+var tooManyForEmail = createRateLimiter(3, 60 * 60 * 1e3);
+function readField(value, max) {
+  return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
-function buildHtml(data) {
-  const rows = [
-    ["Full Name", data.name],
-    ["Corporate Email", data.email],
-    ["Company / Institution", data.company],
-    ["Nature of Inquiry", data.inquiry || "\u2013"]
-  ].map(
-    ([k, v]) => `<tr><td style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#64748b;font-weight:600;width:180px;">${escapeHtml2(
-      k
-    )}</td><td style="padding:10px 14px;border:1px solid #e2e8f0;font-size:14px;color:#0f172a;">${escapeHtml2(
-      v
-    )}</td></tr>`
-  ).join("");
-  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#ffffff;font-family:Helvetica,Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
-    <table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
-      <tr><td style="padding:0 0 24px;">
-        <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#3b82f6;font-weight:700;">ENICE Group \xB7 Corporate Inquiry</p>
-        <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#0f172a;">New inquiry from ${escapeHtml2(
-    data.name
-  )}</h1>
-      </td></tr>
-      <tr><td>
-        <table cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">${rows}</table>
-      </td></tr>
-      <tr><td style="padding:24px 0 0;">
-        <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#64748b;font-weight:600;">Message</p>
-        <div style="padding:16px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:14px;line-height:1.6;color:#0f172a;white-space:pre-wrap;">${escapeHtml2(
-    data.message
-  )}</div>
-      </td></tr>
-    </table>
-  </td></tr></table></body></html>`;
+function validate(fields) {
+  const errors = {};
+  if (fields.name.length < 2) errors.name = ["Please enter your name."];
+  if (!fields.email || !EMAIL_RE.test(fields.email) || fields.email.length > FIELD_LIMITS.email) {
+    errors.email = ["Please enter a valid email address."];
+  }
+  if (!fields.message) errors.message = ["Please write a message."];
+  else if (fields.message.length < 10) errors.message = ["Please add a little more detail."];
+  return errors;
+}
+function acknowledgementHtml(name) {
+  const firstName = escapeHtml2(name.split(/\s+/)[0] || "there");
+  return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
+  <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
+    <tr><td style="padding:0 0 24px;">
+      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#1e3a8a;font-weight:700;">ENICE Group</p>
+      <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#111827;">We received your message, ${firstName}.</h1>
+    </td></tr>
+    <tr><td>
+      <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#111827;">
+        Thanks for reaching out to ENICE Group. Your message has been routed to the right team and
+        you can expect a reply within one business day.
+      </p>
+      <p style="margin:0;font-size:14px;line-height:1.7;color:#374151;">
+        If you need to add anything, reply directly to this email.
+      </p>
+    </td></tr>
+    <tr><td style="padding:24px 0 0;border-top:1px solid #e5e7eb;">
+      <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7280;">
+        ENICE Group &middot; Abuja &amp; Kaduna, Nigeria &middot; corporate@enicehq.com
+      </p>
+    </td></tr>
+  </table>
+</td></tr></table></body></html>`;
+}
+function notificationHtml(fields) {
+  const row = (label, value) => `<tr>
+       <td style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#64748b;font-weight:600;width:170px;vertical-align:top;">${escapeHtml2(label)}</td>
+       <td style="padding:10px 14px;border:1px solid #e2e8f0;font-size:14px;color:#0f172a;">${escapeHtml2(value || "\u2014")}</td>
+     </tr>`;
+  return `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#ffffff;font-family:Helvetica,Arial,sans-serif;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
+  <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
+    <tr><td style="padding:0 0 24px;">
+      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#1e3a8a;font-weight:700;">ENICE Group &middot; Contact</p>
+      <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#111827;">New message from ${escapeHtml2(fields.name)}</h1>
+      <p style="margin:10px 0 0;font-size:13px;color:#6b7280;">Reply to this email to respond directly to the sender.</p>
+    </td></tr>
+    <tr><td>
+      <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-collapse:collapse;">
+        ${row("Name", fields.name)}
+        ${row("Email", fields.email)}
+        ${row("Company", fields.company)}
+        ${row("Inquiry", fields.inquiry || "General")}
+        ${row("Wants updates", fields.updates ? "Yes" : "No")}
+        ${row("Submitted from", fields.source)}
+      </table>
+    </td></tr>
+    <tr><td style="padding:24px 0 0;">
+      <p style="margin:0 0 8px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#64748b;font-weight:600;">Message</p>
+      <div style="padding:16px;border:1px solid #e2e8f0;border-radius:8px;background:#f8fafc;font-size:14px;line-height:1.7;color:#0f172a;white-space:pre-wrap;">${escapeHtml2(fields.message)}</div>
+    </td></tr>
+  </table>
+</td></tr></table></body></html>`;
 }
 async function handler(req, res) {
+  const ref = errorRef("CT");
   try {
     if (req.method !== "POST") {
-      res.status(405).json({ ok: false, error: "Method not allowed" });
+      res.status(405).json({ ok: false, error: "Method not allowed." });
       return;
     }
-    if (isRateLimited(clientIp(req))) {
+    const ip = clientIp(req);
+    if (tooManyRequests(ip)) {
       res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
       return;
     }
     const body = parseJsonBody(req.body);
-    if (String(body.website || "").trim().length > 0) {
+    if (readField(body.website, 200).length > 0) {
+      console.warn(`[api/contact:${ref}] honeypot triggered \u2014 discarding submission.`);
       res.status(200).json({ ok: true });
       return;
     }
     const startedAt = Number(body.startedAt);
     if (Number.isFinite(startedAt) && Date.now() - startedAt < 2e3) {
+      console.warn(`[api/contact:${ref}] submitted too fast \u2014 discarding submission.`);
       res.status(200).json({ ok: true });
       return;
     }
-    const name = String(body.name || "").trim().slice(0, 200);
-    const email = String(body.email || "").trim().slice(0, 200);
-    const company = String(body.company || "").trim().slice(0, 200);
-    const inquiry = String(body.inquiry || "").trim().slice(0, 200);
-    const message = String(body.message || "").trim().slice(0, 2e3);
-    if (!name || !company || !message) {
-      res.status(400).json({ ok: false, error: "Missing required fields." });
+    const fields = {
+      name: readField(body.name, FIELD_LIMITS.name),
+      email: readField(body.email, FIELD_LIMITS.email).toLowerCase(),
+      company: readField(body.company, FIELD_LIMITS.company),
+      inquiry: readField(body.inquiry, FIELD_LIMITS.inquiry),
+      message: readField(body.message, FIELD_LIMITS.message),
+      updates: body.updates === true,
+      source: readField(body.source, 40) || "website"
+    };
+    const fieldErrors = validate(fields);
+    if (Object.keys(fieldErrors).length > 0) {
+      res.status(400).json({ ok: false, error: "Please correct the highlighted fields.", fieldErrors });
       return;
     }
-    if (!EMAIL_RE.test(email)) {
-      res.status(400).json({ ok: false, error: "Invalid email address." });
-      return;
-    }
-    if (isEmailRateLimited(email)) {
+    if (tooManySends(ip) || tooManyForEmail(fields.email)) {
       res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
       return;
     }
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      console.error("[api/contact] Missing RESEND_API_KEY");
-      res.status(500).json({ ok: false, error: "Email service not configured." });
+      console.error(`[api/contact:${ref}] RESEND_API_KEY is not configured.`);
+      res.status(503).json({
+        ok: false,
+        error: "Our contact form is temporarily unavailable. Please email corporate@enicehq.com.",
+        ref
+      });
       return;
     }
     const resend = new Resend(apiKey);
-    const result = await resend.emails.send({
+    const subject = fields.company ? `Contact: ${fields.inquiry || "General"} \u2014 ${fields.name} (${fields.company})` : `Contact: ${fields.inquiry || "General"} \u2014 ${fields.name}`;
+    const notification = await resend.emails.send({
       from: FROM,
       to: TO,
-      replyTo: email,
-      subject: `Inquiry: ${inquiry || "General"} \u2014 ${name} (${company})`,
-      html: buildHtml({ name, email, company, inquiry, message })
+      replyTo: fields.email,
+      subject,
+      html: notificationHtml(fields)
     });
-    if (result.error) {
-      console.error("[api/contact] Resend error:", result.error);
-      res.status(502).json({ ok: false, error: "Failed to deliver message." });
+    if (notification.error) {
+      console.error(`[api/contact:${ref}] Resend rejected the notification:`, notification.error);
+      res.status(502).json({
+        ok: false,
+        error: "We could not deliver your message. Please email corporate@enicehq.com directly.",
+        ref
+      });
       return;
     }
     try {
-      const autoReply = await resend.emails.send({
-        from: "ENICE Group <noreply@enicehq.com>",
-        to: email,
+      const ack = await resend.emails.send({
+        from: REPLY_FROM,
+        to: fields.email,
         subject: "We received your message",
-        html: buildAutoReplyHtml({ name })
+        html: acknowledgementHtml(fields.name)
       });
-      if (autoReply.error) {
-        console.error("[api/contact] Auto-reply error:", autoReply.error);
+      if (ack.error) {
+        console.error(`[api/contact:${ref}] acknowledgement rejected:`, ack.error);
       }
     } catch (err) {
-      console.error("[api/contact] Auto-reply unhandled error:", err);
+      console.error(`[api/contact:${ref}] acknowledgement failed:`, err);
     }
     res.status(200).json({ ok: true });
   } catch (err) {
-    const ref = `E${Date.now().toString(36).toUpperCase()}`;
-    console.error(`[api/contact:unhandled:${ref}]`, err);
+    console.error(`[api/contact:${ref}]`, err);
     if (!res.headersSent) {
-      res.status(500).json({ ok: false, error: "Unexpected error.", ref });
+      res.status(500).json({
+        ok: false,
+        error: "Unexpected error. Please email corporate@enicehq.com directly.",
+        ref
+      });
     }
   }
 }
