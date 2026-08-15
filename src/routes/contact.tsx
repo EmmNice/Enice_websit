@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { ArrowRight, Check, Mail, MapPin, AlertCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { SHADOW_CARD } from "@/lib/design";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -64,8 +65,6 @@ export const Route = createFileRoute("/contact")({
   }),
   component: ContactPage,
 });
-
-const SHADOW_CARD = "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)";
 
 // ─── Inquiry options ──────────────────────────────────────────────────────────
 

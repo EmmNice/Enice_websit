@@ -5,43 +5,28 @@
 
 import { createAIProvider, SYSTEM_PROMPT } from "../src/lib/ai/index";
 import type { AIMessage } from "../src/lib/ai/types";
+import {
+  clientIp,
+  createRateLimiter,
+  errorRef,
+  parseJsonBody,
+  type ApiRequest,
+  type ApiResponse,
+} from "./lib/http";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyReq = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRes = any;
+const isRateLimited = createRateLimiter(10, 5 * 60 * 1000);
 
-// ── Rate limiter (10 requests / 5 min per IP) ─────────────────────────────────
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 300_000 });
-    return false;
-  }
-  if (entry.count >= 10) return true;
-  entry.count++;
-  return false;
-}
-
-// ── Handler ───────────────────────────────────────────────────────────────────
-export default async function handler(req: AnyReq, res: AnyRes) {
+export default async function handler(req: ApiRequest, res: ApiResponse) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ ok: false, error: "Method not allowed" });
     }
 
-    const ip =
-      (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ||
-      req.socket?.remoteAddress ||
-      "unknown";
-
-    if (isRateLimited(ip)) {
+    if (isRateLimited(clientIp(req))) {
       return res.status(429).json({ ok: false, error: "Too many requests. Please slow down." });
     }
 
-    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    const body = parseJsonBody(req.body);
 
     if (!Array.isArray(body.messages) || body.messages.length === 0) {
       return res.status(400).json({ ok: false, error: "messages array is required." });
@@ -74,7 +59,7 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       .status(200)
       .json({ ok: true, text: result.text, model: result.model, provider: result.provider });
   } catch (err) {
-    const ref = `C${Date.now().toString(36).toUpperCase()}`;
+    const ref = errorRef("C");
     // Provider adapters embed the upstream HTTP body in their thrown messages, so the
     // detail stays in the server log. The client only ever gets a generic message plus
     // the correlation ref.

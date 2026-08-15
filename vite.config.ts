@@ -4,7 +4,6 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
 /**
  * ─── Dev-mode /api/* bridge ──────────────────────────────────────────────────
@@ -34,8 +33,6 @@ type ApiHandler = (req: any, res: any) => unknown;
 
 /** Endpoint path → module that default-exports the handler. */
 const API_ROUTES: Record<string, string> = {
-  "/api/watchlist": "/api-src/watchlist.ts",
-  "/api/admin/watchlist": "/api-src/admin/watchlist.ts",
   "/api/early-access": "/api-src/early-access.ts",
   "/api/admin/early-access": "/api-src/admin/early-access.ts",
   "/api/contact": "/api-src/contact.ts",
@@ -136,22 +133,8 @@ function apiBridgePlugin(): Plugin {
 export default defineConfig({
   plugins: [
     tsconfigPaths({ ignoreConfigErrors: true }),
-    mcpPlugin(),
     apiBridgePlugin(),
-    TanStackRouterVite({
-      autoCodeSplitting: true,
-      // The Lovable MCP plugin generates `mcp.ts`, `[.mcp]/*` and `[.well-known]/*` routes
-      // that expose their behaviour exclusively through `server.handlers`. Those handlers
-      // require a TanStack Start server, and this project ships a static SPA (see
-      // vercel.json's rewrite) — so they are inert in production: /mcp returns index.html
-      // and /.mcp/list-tools 404s.
-      //
-      // Including them in the route tree still pulled @lovable.dev/mcp-js, zod and ajv into
-      // the entry chunk: ~300 kB of JavaScript downloaded by every visitor that can never
-      // run. Excluding them keeps the generated files on disk, ready to work the moment a
-      // `tanstackStart()` server plugin is added — remove this option at that point.
-      routeFileIgnorePattern: "\\[\\.mcp\\]|\\[\\.well-known\\]|mcp\\.ts",
-    }),
+    TanStackRouterVite({ autoCodeSplitting: true }),
     react(),
     tailwindcss(),
   ],
@@ -197,8 +180,6 @@ export default defineConfig({
       "react/jsx-runtime",
       "react/jsx-dev-runtime",
       "@tanstack/react-router",
-      "@tanstack/react-query",
     ],
-    force: true,
   },
 });

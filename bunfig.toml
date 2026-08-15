@@ -1,7 +1,0 @@
-[install]
-# NOTE: the previous 24h "minimumReleaseAge" supply-chain guard was removed.
-# It caused `bun install` to fail on Vercel (fresh installs against the public
-# npm registry can hit a locked dependency version published <24h ago and the
-# guard hard-fails instead of skipping it). Supply-chain risk from resolving
-# fresh version ranges is not a concern here since bun.lock pins exact,
-# already-vetted versions — CI installs just replay the lockfile.

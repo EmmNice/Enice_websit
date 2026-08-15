@@ -16,11 +16,15 @@ import {
   listRegistrations,
   updateRegistrationStatus,
 } from "../../src/lib/early-access-store.server";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyReq = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRes = any;
+import {
+  clientIp,
+  createAttemptLimiter,
+  errorRef,
+  header,
+  parseJsonBody,
+  type ApiRequest,
+  type ApiResponse,
+} from "../lib/http";
 
 /**
  * Constant-time credential comparison. A plain `!==` leaks the shared password one
@@ -38,47 +42,12 @@ function secretsMatch(supplied: unknown, expected: string): boolean {
   return timingSafeEqual(a, b);
 }
 
-// Brute-force guard. Module-scoped, so per-instance and reset on cold start.
-const attempts = new Map<string, { count: number; resetAt: number }>();
-const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
-const MAX_ATTEMPTS = 10;
+// Only failed attempts count, so normal admin use never trips this. Module-scoped, so
+// per-instance and reset on cold start.
+const loginAttempts = createAttemptLimiter(10, 15 * 60 * 1000);
 
-function clientIp(req: AnyReq): string {
-  const fwd = req.headers["x-forwarded-for"];
-  const raw = Array.isArray(fwd) ? fwd[0] : fwd;
-  return (typeof raw === "string" ? raw.split(",")[0]?.trim() : "") || "unknown";
-}
-
-function tooManyAttempts(ip: string): boolean {
-  const entry = attempts.get(ip);
-  if (!entry || Date.now() > entry.resetAt) return false;
-  return entry.count >= MAX_ATTEMPTS;
-}
-
-function recordFailure(ip: string): void {
-  const now = Date.now();
-  const entry = attempts.get(ip);
-  if (!entry || now > entry.resetAt) {
-    attempts.set(ip, { count: 1, resetAt: now + ATTEMPT_WINDOW_MS });
-    return;
-  }
-  entry.count++;
-}
-
-function parseBody(raw: unknown): Record<string, unknown> {
-  if (typeof raw === "string") {
-    try {
-      return JSON.parse(raw) as Record<string, unknown>;
-    } catch {
-      return {};
-    }
-  }
-  if (raw && typeof raw === "object") return raw as Record<string, unknown>;
-  return {};
-}
-
-export default async function handler(req: AnyReq, res: AnyRes) {
-  const ref = `AD${Date.now().toString(36).toUpperCase()}`;
+export default async function handler(req: ApiRequest, res: ApiResponse) {
+  const ref = errorRef("AD");
 
   try {
     const adminPassword = process.env.ADMIN_PASSWORD;
@@ -92,13 +61,13 @@ export default async function handler(req: AnyReq, res: AnyRes) {
     }
 
     const ip = clientIp(req);
-    if (tooManyAttempts(ip)) {
+    if (loginAttempts.isLocked(ip)) {
       res.status(429).json({ ok: false, error: "Too many attempts. Try again later." });
       return;
     }
 
-    if (!secretsMatch(req.headers["x-admin-password"], adminPassword)) {
-      recordFailure(ip);
+    if (!secretsMatch(header(req, "x-admin-password"), adminPassword)) {
+      loginAttempts.recordFailure(ip);
       res.status(401).json({ ok: false, error: "Invalid password." });
       return;
     }
@@ -117,7 +86,7 @@ export default async function handler(req: AnyReq, res: AnyRes) {
     }
 
     if (req.method === "POST") {
-      const body = parseBody(req.body);
+      const body = parseJsonBody(req.body);
       const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
       const status = typeof body.status === "string" ? body.status : "";
 

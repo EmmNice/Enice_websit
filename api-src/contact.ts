@@ -4,57 +4,26 @@
  * via Resend.
  */
 import { Resend } from "resend";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyReq = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRes = any;
+import {
+  clientIp,
+  createRateLimiter,
+  escapeHtml,
+  parseJsonBody,
+  type ApiRequest,
+  type ApiResponse,
+} from "./lib/http";
 
 const FROM = "ENICE Contact <noreply@enicehq.com>";
 const TO = "corporate@enicehq.com";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-// IP-based rate limiter (5 submissions / 10 min per IP).
-// Note: in-memory — resets on cold start and is not shared across Vercel
-// instances. For production-grade distributed rate limiting, replace this
-// with an Upstash/Redis-backed solution. The email-based limiter below
-// provides a complementary per-address guard within each warm instance.
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 600_000 });
-    return false;
-  }
-  if (entry.count >= 5) return true;
-  entry.count++;
-  return false;
-}
+// In-memory and therefore per-instance: resets on cold start and is not shared across
+// Vercel instances. Upstash/Redis is the upgrade if a hard guarantee is ever needed.
+const isRateLimited = createRateLimiter(5, 10 * 60 * 1000);
 
 // Email-based rate limiter (3 submissions per address per 60 min per instance).
 // Guards against the same sender submitting the contact form repeatedly.
-const emailRateLimitMap = new Map<string, { count: number; resetAt: number }>();
-function isEmailRateLimited(email: string): boolean {
-  const now = Date.now();
-  const entry = emailRateLimitMap.get(email);
-  if (!entry || now > entry.resetAt) {
-    emailRateLimitMap.set(email, { count: 1, resetAt: now + 3_600_000 });
-    return false;
-  }
-  if (entry.count >= 3) return true;
-  entry.count++;
-  return false;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
+const isEmailRateLimited = createRateLimiter(3, 60 * 60 * 1000);
 
 function buildAutoReplyHtml(data: { name: string }) {
   const firstName = escapeHtml(data.name.trim().split(/\s+/)[0] || "there");
@@ -126,23 +95,19 @@ function buildHtml(data: {
   </td></tr></table></body></html>`;
 }
 
-export default async function handler(req: AnyReq, res: AnyRes) {
+export default async function handler(req: ApiRequest, res: ApiResponse) {
   try {
     if (req.method !== "POST") {
       res.status(405).json({ ok: false, error: "Method not allowed" });
       return;
     }
 
-    const ip =
-      (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0]?.trim() ||
-      req.socket?.remoteAddress ||
-      "unknown";
-    if (isRateLimited(ip)) {
+    if (isRateLimited(clientIp(req))) {
       res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
       return;
     }
 
-    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    const body = parseJsonBody(req.body);
 
     // Honeypot: bots that fill hidden fields get a silent success.
     if (String(body.website || "").trim().length > 0) {

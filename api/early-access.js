@@ -4,11 +4,20 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __esm = (fn, res) => function __init() {
-  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+var __esm = (fn, res, err) => function __init() {
+  if (err) throw err[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err = [e], e;
+  }
 };
 var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
 };
 var __export = (target, all) => {
   for (var name in all)
@@ -60,7 +69,8 @@ function decodeBase64(base64) {
   return arrayBuffer;
 }
 function getDecoder(charset) {
-  charset = charset || "utf8";
+  charset = (charset || "utf8").trim().toLowerCase();
+  charset = charsetAliases.get(charset) || charset;
   let decoder;
   try {
     decoder = new TextDecoder(charset);
@@ -223,7 +233,7 @@ function decodeParameterValueContinuations(header) {
     );
   });
 }
-var textEncoder, base64Chars, base64Lookup;
+var textEncoder, base64Chars, base64Lookup, charsetAliases;
 var init_decode_strings = __esm({
   "node_modules/postal-mime/src/decode-strings.js"() {
     textEncoder = new TextEncoder();
@@ -232,6 +242,10 @@ var init_decode_strings = __esm({
     for (let i = 0; i < base64Chars.length; i++) {
       base64Lookup[base64Chars.charCodeAt(i)] = i;
     }
+    charsetAliases = /* @__PURE__ */ new Map([
+      ["iso-8859-8-i", "iso-8859-8"],
+      ["iso-8859-8-e", "iso-8859-8"]
+    ]);
   }
 });
 
@@ -4704,6 +4718,10 @@ var dist_exports = {};
 __export(dist_exports, {
   Resend: () => Resend
 });
+function buildPaginationUrl(base, options) {
+  const queryString = buildPaginationQuery(options);
+  return queryString ? `${base}?${queryString}` : base;
+}
 function buildPaginationQuery(options) {
   const searchParams = new URLSearchParams();
   if (options.limit !== void 0) searchParams.set("limit", options.limit.toString());
@@ -4868,6 +4886,12 @@ function parseDomainToApiOptions(domain) {
     tracking_subdomain: domain.trackingSubdomain
   };
 }
+function buildSuppressionsQuery(options) {
+  const { origin, ...pagination } = options;
+  const searchParams = new URLSearchParams(buildPaginationQuery(pagination));
+  if (origin) searchParams.set("origin", origin);
+  return searchParams.toString();
+}
 function getPaginationQueryProperties(options = {}) {
   const query = new URLSearchParams();
   if (options.before) query.set("before", options.before);
@@ -4900,12 +4924,12 @@ function getDefaultBaseUrl() {
 function getDefaultUserAgent() {
   return typeof process !== "undefined" && process.env ? process.env.RESEND_USER_AGENT || defaultUserAgent : defaultUserAgent;
 }
-var import_standardwebhooks, version, ApiKeys, AutomationRuns, Automations, Batch, Broadcasts, ContactProperties, ContactImports, ContactSegments, ContactTopics, Contacts, DomainClaims, Domains, Attachments$1, Attachments, Receiving, Emails, Events, Logs, OAuthGrants, Segments, ChainableTemplateResult, Templates, Topics, Webhooks, defaultBaseUrl, defaultUserAgent, Resend;
+var import_standardwebhooks, version, ApiKeys, AutomationRuns, Automations, Batch$1, Broadcasts, ContactProperties, ContactImports, ContactSegments, ContactTopics, Contacts, DomainClaims, Domains, Attachments$1, Attachments, Receiving, Emails, Events, Logs, OAuthGrants, Segments, Batch, missingIdentifierError, Suppressions, ChainableTemplateResult, Templates, Topics, Webhooks, defaultBaseUrl, defaultUserAgent, Resend;
 var init_dist = __esm({
   "node_modules/resend/dist/index.mjs"() {
     init_postal_mime();
     import_standardwebhooks = __toESM(require_dist(), 1);
-    version = "6.17.1";
+    version = "6.20.0";
     ApiKeys = class {
       constructor(resend) {
         this.resend = resend;
@@ -4914,8 +4938,7 @@ var init_dist = __esm({
         return await this.resend.post("/api-keys", payload, options);
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/api-keys?${queryString}` : "/api-keys";
+        const url = buildPaginationUrl("/api-keys", options);
         return await this.resend.get(url);
       }
       async remove(id) {
@@ -4970,11 +4993,14 @@ var init_dist = __esm({
         if (payload.connections !== void 0) apiPayload.connections = payload.connections.map(parseConnection);
         return await this.resend.patch(`/automations/${id}`, apiPayload);
       }
+      async duplicate(id) {
+        return await this.resend.post(`/automations/${id}/duplicate`);
+      }
       async stop(id) {
         return await this.resend.post(`/automations/${id}/stop`);
       }
     };
-    Batch = class {
+    Batch$1 = class {
       constructor(resend) {
         this.resend = resend;
       }
@@ -5024,8 +5050,7 @@ var init_dist = __esm({
         return await this.resend.post(`/broadcasts/${id}/send`, { scheduled_at: payload?.scheduledAt });
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/broadcasts?${queryString}` : "/broadcasts";
+        const url = buildPaginationUrl("/broadcasts", options);
         return await this.resend.get(url);
       }
       async get(id) {
@@ -5033,6 +5058,9 @@ var init_dist = __esm({
       }
       async remove(id) {
         return await this.resend.delete(`/broadcasts/${id}`);
+      }
+      async cancel(id) {
+        return await this.resend.post(`/broadcasts/${id}/cancel`);
       }
       async update(id, payload) {
         const html = payload.react ? await render(payload.react) : payload.html;
@@ -5059,8 +5087,7 @@ var init_dist = __esm({
         return await this.resend.post("/contact-properties", apiOptions);
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/contact-properties?${queryString}` : "/contact-properties";
+        const url = buildPaginationUrl("/contact-properties", options);
         const response = await this.resend.get(url);
         if (response.data) return {
           data: {
@@ -5175,9 +5202,7 @@ var init_dist = __esm({
             name: "missing_required_field"
           }
         };
-        const identifier = options.email ? options.email : options.contactId;
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/contacts/${identifier}/segments?${queryString}` : `/contacts/${identifier}/segments`;
+        const url = buildPaginationUrl(`/contacts/${options.email ? options.email : options.contactId}/segments`, options);
         return await this.resend.get(url);
       }
       async add(options) {
@@ -5234,9 +5259,7 @@ var init_dist = __esm({
             name: "missing_required_field"
           }
         };
-        const identifier = options.email ? options.email : options.id;
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/contacts/${identifier}/topics?${queryString}` : `/contacts/${identifier}/topics`;
+        const url = buildPaginationUrl(`/contacts/${options.email ? options.email : options.id}/topics`, options);
         return this.resend.get(url);
       }
     };
@@ -5279,12 +5302,10 @@ var init_dist = __esm({
       async list(options = {}) {
         const segmentId = options.segmentId ?? options.audienceId;
         if (!segmentId) {
-          const queryString2 = buildPaginationQuery(options);
-          const url2 = queryString2 ? `/contacts?${queryString2}` : "/contacts";
+          const url2 = buildPaginationUrl("/contacts", options);
           return await this.resend.get(url2);
         }
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/segments/${segmentId}/contacts?${queryString}` : `/segments/${segmentId}/contacts`;
+        const url = buildPaginationUrl(`/segments/${segmentId}/contacts`, options);
         return await this.resend.get(url);
       }
       async get(options) {
@@ -5369,8 +5390,7 @@ var init_dist = __esm({
         return await this.resend.post("/domains", parseDomainToApiOptions(payload), options);
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/domains?${queryString}` : "/domains";
+        const url = buildPaginationUrl("/domains", options);
         return await this.resend.get(url);
       }
       async get(id) {
@@ -5402,8 +5422,7 @@ var init_dist = __esm({
       }
       async list(options) {
         const { emailId } = options;
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/emails/${emailId}/attachments?${queryString}` : `/emails/${emailId}/attachments`;
+        const url = buildPaginationUrl(`/emails/${emailId}/attachments`, options);
         return await this.resend.get(url);
       }
     };
@@ -5417,8 +5436,7 @@ var init_dist = __esm({
       }
       async list(options) {
         const { emailId } = options;
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/emails/receiving/${emailId}/attachments?${queryString}` : `/emails/receiving/${emailId}/attachments`;
+        const url = buildPaginationUrl(`/emails/receiving/${emailId}/attachments`, options);
         return await this.resend.get(url);
       }
     };
@@ -5435,8 +5453,7 @@ var init_dist = __esm({
         return await this.resend.get(path);
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/emails/receiving?${queryString}` : "/emails/receiving";
+        const url = buildPaginationUrl("/emails/receiving", options);
         return await this.resend.get(url);
       }
       async forward(options, requestOptions = {}) {
@@ -5559,8 +5576,7 @@ var init_dist = __esm({
         return await this.resend.get(`/emails/${id}`);
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/emails?${queryString}` : "/emails";
+        const url = buildPaginationUrl("/emails", options);
         return await this.resend.get(url);
       }
       async update(payload) {
@@ -5584,8 +5600,7 @@ var init_dist = __esm({
         return await this.resend.get(`/events/${encodeURIComponent(identifier)}`);
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/events?${queryString}` : "/events";
+        const url = buildPaginationUrl("/events", options);
         return await this.resend.get(url);
       }
       async update(identifier, payload) {
@@ -5600,8 +5615,7 @@ var init_dist = __esm({
         this.resend = resend;
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/logs?${queryString}` : "/logs";
+        const url = buildPaginationUrl("/logs", options);
         return await this.resend.get(url);
       }
       async get(id) {
@@ -5613,8 +5627,7 @@ var init_dist = __esm({
         this.resend = resend;
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/oauth/grants?${queryString}` : "/oauth/grants";
+        const url = buildPaginationUrl("/oauth/grants", options);
         return await this.resend.get(url);
       }
       async revoke(id) {
@@ -5629,8 +5642,7 @@ var init_dist = __esm({
         return await this.resend.post("/segments", payload, options);
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/segments?${queryString}` : "/segments";
+        const url = buildPaginationUrl("/segments", options);
         return await this.resend.get(url);
       }
       async get(id) {
@@ -5638,6 +5650,48 @@ var init_dist = __esm({
       }
       async remove(id) {
         return await this.resend.delete(`/segments/${id}`);
+      }
+    };
+    Batch = class {
+      constructor(resend) {
+        this.resend = resend;
+      }
+      async add(options) {
+        return this.resend.post("/suppressions/batch/add", options);
+      }
+      async remove(options) {
+        return this.resend.post("/suppressions/batch/remove", options);
+      }
+    };
+    missingIdentifierError = () => ({
+      data: null,
+      headers: null,
+      error: {
+        message: "Missing `id` field.",
+        statusCode: null,
+        name: "missing_required_field"
+      }
+    });
+    Suppressions = class {
+      constructor(resend) {
+        this.resend = resend;
+        this.batch = new Batch(resend);
+      }
+      async add(options) {
+        return this.resend.post("/suppressions", options);
+      }
+      async list(options = {}) {
+        const queryString = buildSuppressionsQuery(options);
+        const url = queryString ? `/suppressions?${queryString}` : "/suppressions";
+        return this.resend.get(url);
+      }
+      async get(idOrEmail) {
+        if (!idOrEmail) return missingIdentifierError();
+        return this.resend.get(`/suppressions/${encodeURIComponent(idOrEmail)}`);
+      }
+      async remove(idOrEmail) {
+        if (!idOrEmail) return missingIdentifierError();
+        return this.resend.delete(`/suppressions/${encodeURIComponent(idOrEmail)}`);
       }
     };
     ChainableTemplateResult = class {
@@ -5751,8 +5805,7 @@ var init_dist = __esm({
         return await this.resend.get(`/webhooks/${id}`);
       }
       async list(options = {}) {
-        const queryString = buildPaginationQuery(options);
-        const url = queryString ? `/webhooks?${queryString}` : "/webhooks";
+        const url = buildPaginationUrl("/webhooks", options);
         return await this.resend.get(url);
       }
       async update(id, payload) {
@@ -5778,7 +5831,7 @@ var init_dist = __esm({
         this.apiKeys = new ApiKeys(this);
         this.audiences = this.segments;
         this.automations = new Automations(this);
-        this.batch = new Batch(this);
+        this.batch = new Batch$1(this);
         this.broadcasts = new Broadcasts(this);
         this.contactProperties = new ContactProperties(this);
         this.contacts = new Contacts(this);
@@ -5787,6 +5840,7 @@ var init_dist = __esm({
         this.events = new Events(this);
         this.logs = new Logs(this);
         this.oauthGrants = new OAuthGrants(this);
+        this.suppressions = new Suppressions(this);
         this.templates = new Templates(this);
         this.topics = new Topics(this);
         this.webhooks = new Webhooks(this);
@@ -5802,39 +5856,57 @@ var init_dist = __esm({
           "Content-Type": "application/json"
         });
       }
+      logError(error, path, status) {
+        if (typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production") console.error("[Resend API Error]:", {
+          ...status !== void 0 && { status },
+          error,
+          path
+        });
+      }
       async fetchRequest(path, options = {}) {
         try {
           const response = await fetch(`${this.baseUrl}${path}`, options);
           if (!response.ok) try {
             const rawError = await response.text();
+            const parsedError = JSON.parse(rawError);
+            this.logError(parsedError, path, response.status);
             return {
               data: null,
-              error: JSON.parse(rawError),
+              error: parsedError,
               headers: Object.fromEntries(response.headers.entries())
             };
           } catch (err) {
-            if (err instanceof SyntaxError) return {
-              data: null,
-              error: {
+            if (err instanceof SyntaxError) {
+              const error2 = {
                 name: "application_error",
                 statusCode: response.status,
                 message: "Internal server error. We are unable to process your request right now, please try again later."
-              },
-              headers: Object.fromEntries(response.headers.entries())
-            };
+              };
+              this.logError(error2, path, response.status);
+              return {
+                data: null,
+                error: error2,
+                headers: Object.fromEntries(response.headers.entries())
+              };
+            }
             const error = {
               message: response.statusText,
               statusCode: response.status,
               name: "application_error"
             };
-            if (err instanceof Error) return {
-              data: null,
-              error: {
+            if (err instanceof Error) {
+              const errorWithMessage = {
                 ...error,
                 message: err.message
-              },
-              headers: Object.fromEntries(response.headers.entries())
-            };
+              };
+              this.logError(errorWithMessage, path, response.status);
+              return {
+                data: null,
+                error: errorWithMessage,
+                headers: Object.fromEntries(response.headers.entries())
+              };
+            }
+            this.logError(error, path, response.status);
             return {
               data: null,
               error,
@@ -5847,13 +5919,15 @@ var init_dist = __esm({
             headers: Object.fromEntries(response.headers.entries())
           };
         } catch {
+          const error = {
+            name: "application_error",
+            statusCode: null,
+            message: "Unable to fetch data. The request could not be resolved."
+          };
+          this.logError(error, path);
           return {
             data: null,
-            error: {
-              name: "application_error",
-              statusCode: null,
-              message: "Unable to fetch data. The request could not be resolved."
-            },
+            error,
             headers: null
           };
         }
@@ -6116,45 +6190,55 @@ async function registerEarlyAccess(input) {
   return { outcome: "created" };
 }
 
-// api-src/early-access.ts
-var FROM = "ENICE Group <noreply@enicehq.com>";
-var INTERNAL_RECIPIENT = "corporate@enicehq.com";
-var requestHits = /* @__PURE__ */ new Map();
-var writeHits = /* @__PURE__ */ new Map();
-var emailHits = /* @__PURE__ */ new Map();
-function limited(map, key, max, windowMs) {
-  const now = Date.now();
-  if (map.size > 5e3) {
-    for (const [k, v] of map) if (now > v.resetAt) map.delete(k);
-  }
-  const entry = map.get(key);
-  if (!entry || now > entry.resetAt) {
-    map.set(key, { count: 1, resetAt: now + windowMs });
-    return false;
-  }
-  if (entry.count >= max) return true;
-  entry.count++;
-  return false;
-}
+// api-src/lib/http.ts
 function clientIp(req) {
-  const fwd = req.headers["x-forwarded-for"];
-  const raw = Array.isArray(fwd) ? fwd[0] : fwd;
-  return (typeof raw === "string" ? raw.split(",")[0]?.trim() : "") || "unknown";
+  const forwarded = req.headers["x-forwarded-for"];
+  const first = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  const fromHeader = typeof first === "string" ? first.split(",")[0]?.trim() : void 0;
+  return fromHeader || req.socket?.remoteAddress || "unknown";
 }
-function escapeHtml2(value) {
-  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
-}
-function parseBody(raw) {
-  if (typeof raw === "string") {
+function parseJsonBody(body) {
+  if (typeof body === "string") {
     try {
-      return JSON.parse(raw);
+      const parsed = JSON.parse(body);
+      return parsed && typeof parsed === "object" ? parsed : {};
     } catch {
       return {};
     }
   }
-  if (raw && typeof raw === "object") return raw;
+  if (body && typeof body === "object") return body;
   return {};
 }
+function createRateLimiter(max, windowMs) {
+  const hits = /* @__PURE__ */ new Map();
+  return function isLimited(key) {
+    const now = Date.now();
+    if (hits.size > 5e3) {
+      for (const [k, entry2] of hits) if (now > entry2.resetAt) hits.delete(k);
+    }
+    const entry = hits.get(key);
+    if (!entry || now > entry.resetAt) {
+      hits.set(key, { count: 1, resetAt: now + windowMs });
+      return false;
+    }
+    if (entry.count >= max) return true;
+    entry.count++;
+    return false;
+  };
+}
+function escapeHtml2(value) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+function errorRef(prefix) {
+  return `${prefix}${Date.now().toString(36).toUpperCase()}`;
+}
+
+// api-src/early-access.ts
+var FROM = "ENICE Group <noreply@enicehq.com>";
+var INTERNAL_RECIPIENT = "corporate@enicehq.com";
+var tooManyRequests = createRateLimiter(30, 10 * 60 * 1e3);
+var tooManyWrites = createRateLimiter(5, 10 * 60 * 1e3);
+var tooManyForEmail = createRateLimiter(3, 60 * 60 * 1e3);
 function str(value, max) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
@@ -6243,14 +6327,14 @@ async function handler(req, res) {
     res.status(405).json({ ok: false, error: "Method not allowed." });
     return;
   }
-  const ref = `EA${Date.now().toString(36).toUpperCase()}`;
+  const ref = errorRef("EA");
   try {
     const ip = clientIp(req);
-    if (limited(requestHits, ip, 30, 10 * 60 * 1e3)) {
+    if (tooManyRequests(ip)) {
       res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
       return;
     }
-    const body = parseBody(req.body);
+    const body = parseJsonBody(req.body);
     if (typeof body.website === "string" && body.website.trim() !== "") {
       console.warn(`[api/early-access:${ref}] honeypot triggered \u2014 discarding submission.`);
       res.status(200).json({ ok: true });
@@ -6272,11 +6356,11 @@ async function handler(req, res) {
       res.status(400).json({ ok: false, error: "Please correct the highlighted fields.", fieldErrors });
       return;
     }
-    if (limited(writeHits, ip, 5, 10 * 60 * 1e3)) {
+    if (tooManyWrites(ip)) {
       res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
       return;
     }
-    if (limited(emailHits, fields.email, 3, 60 * 60 * 1e3)) {
+    if (tooManyForEmail(fields.email)) {
       res.status(429).json({
         ok: false,
         error: "We already received a request for this email. Please check back."

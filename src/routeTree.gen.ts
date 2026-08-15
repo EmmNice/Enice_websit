@@ -9,70 +9,29 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as StatusRouteImport } from './routes/status'
-import { Route as RoadmapRouteImport } from './routes/roadmap'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PortfolioRouteImport } from './routes/portfolio'
-import { Route as DocsRouteImport } from './routes/docs'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as ComplianceRouteImport } from './routes/compliance'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
-import { Route as BlogIndexRouteImport } from './routes/blog/index'
-import { Route as PortfolioPulsexRouteImport } from './routes/portfolio.pulsex'
-import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
-import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pulseassist'
-import { Route as PortfolioEpulseRouteImport } from './routes/portfolio.epulse'
-import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
-import { Route as AdminWatchlistRouteImport } from './routes/admin/watchlist'
+import { Route as SplatRouteImport } from './routes/$'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as ComplianceRouteImport } from './routes/compliance'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DocsRouteImport } from './routes/docs'
+import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
+import { Route as StatusRouteImport } from './routes/status'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminEarlyAccessRouteImport } from './routes/admin/early-access'
+import { Route as BlogIndexRouteImport } from './routes/blog/index'
+import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
+import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
+import { Route as PortfolioEpulseRouteImport } from './routes/portfolio.epulse'
+import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pulseassist'
+import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
+import { Route as PortfolioPulsexRouteImport } from './routes/portfolio.pulsex'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StatusRoute = StatusRouteImport.update({
-  id: '/status',
-  path: '/status',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RoadmapRoute = RoadmapRouteImport.update({
-  id: '/roadmap',
-  path: '/roadmap',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortfolioRoute = PortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DocsRoute = DocsRouteImport.update({
-  id: '/docs',
-  path: '/docs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ComplianceRoute = ComplianceRouteImport.update({
-  id: '/compliance',
-  path: '/compliance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SplatRoute = SplatRouteImport.update({
@@ -80,9 +39,64 @@ const SplatRoute = SplatRouteImport.update({
   path: '/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComplianceRoute = ComplianceRouteImport.update({
+  id: '/compliance',
+  path: '/compliance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsRoute = DocsRouteImport.update({
+  id: '/docs',
+  path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortfolioRoute = PortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StatusRoute = StatusRouteImport.update({
+  id: '/status',
+  path: '/status',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEarlyAccessRoute = AdminEarlyAccessRouteImport.update({
+  id: '/admin/early-access',
+  path: '/admin/early-access',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogSlugRoute = BlogSlugRouteImport.update({
+  id: '/blog/$slug',
+  path: '/blog/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioIndexRoute = PortfolioIndexRouteImport.update({
@@ -90,19 +104,9 @@ const PortfolioIndexRoute = PortfolioIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PortfolioRoute,
 } as any)
-const BlogIndexRoute = BlogIndexRouteImport.update({
-  id: '/blog/',
-  path: '/blog/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortfolioPulsexRoute = PortfolioPulsexRouteImport.update({
-  id: '/pulsex',
-  path: '/pulsex',
-  getParentRoute: () => PortfolioRoute,
-} as any)
-const PortfolioPulsepayRoute = PortfolioPulsepayRouteImport.update({
-  id: '/pulsepay',
-  path: '/pulsepay',
+const PortfolioEpulseRoute = PortfolioEpulseRouteImport.update({
+  id: '/epulse',
+  path: '/epulse',
   getParentRoute: () => PortfolioRoute,
 } as any)
 const PortfolioPulseassistRoute = PortfolioPulseassistRouteImport.update({
@@ -110,25 +114,15 @@ const PortfolioPulseassistRoute = PortfolioPulseassistRouteImport.update({
   path: '/pulseassist',
   getParentRoute: () => PortfolioRoute,
 } as any)
-const PortfolioEpulseRoute = PortfolioEpulseRouteImport.update({
-  id: '/epulse',
-  path: '/epulse',
+const PortfolioPulsepayRoute = PortfolioPulsepayRouteImport.update({
+  id: '/pulsepay',
+  path: '/pulsepay',
   getParentRoute: () => PortfolioRoute,
 } as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminWatchlistRoute = AdminWatchlistRouteImport.update({
-  id: '/admin/watchlist',
-  path: '/admin/watchlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminEarlyAccessRoute = AdminEarlyAccessRouteImport.update({
-  id: '/admin/early-access',
-  path: '/admin/early-access',
-  getParentRoute: () => rootRouteImport,
+const PortfolioPulsexRoute = PortfolioPulsexRouteImport.update({
+  id: '/pulsex',
+  path: '/pulsex',
+  getParentRoute: () => PortfolioRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -144,7 +138,6 @@ export interface FileRoutesByFullPath {
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/admin/early-access': typeof AdminEarlyAccessRoute
-  '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
@@ -165,7 +158,6 @@ export interface FileRoutesByTo {
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/admin/early-access': typeof AdminEarlyAccessRoute
-  '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
@@ -188,7 +180,6 @@ export interface FileRoutesById {
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/admin/early-access': typeof AdminEarlyAccessRoute
-  '/admin/watchlist': typeof AdminWatchlistRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
@@ -212,7 +203,6 @@ export interface FileRouteTypes {
     | '/status'
     | '/terms'
     | '/admin/early-access'
-    | '/admin/watchlist'
     | '/blog/$slug'
     | '/portfolio/epulse'
     | '/portfolio/pulseassist'
@@ -233,7 +223,6 @@ export interface FileRouteTypes {
     | '/status'
     | '/terms'
     | '/admin/early-access'
-    | '/admin/watchlist'
     | '/blog/$slug'
     | '/portfolio/epulse'
     | '/portfolio/pulseassist'
@@ -255,7 +244,6 @@ export interface FileRouteTypes {
     | '/status'
     | '/terms'
     | '/admin/early-access'
-    | '/admin/watchlist'
     | '/blog/$slug'
     | '/portfolio/epulse'
     | '/portfolio/pulseassist'
@@ -278,74 +266,17 @@ export interface RootRouteChildren {
   StatusRoute: typeof StatusRoute
   TermsRoute: typeof TermsRoute
   AdminEarlyAccessRoute: typeof AdminEarlyAccessRoute
-  AdminWatchlistRoute: typeof AdminWatchlistRoute
   BlogSlugRoute: typeof BlogSlugRoute
   BlogIndexRoute: typeof BlogIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/status': {
-      id: '/status'
-      path: '/status'
-      fullPath: '/status'
-      preLoaderRoute: typeof StatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/roadmap': {
-      id: '/roadmap'
-      path: '/roadmap'
-      fullPath: '/roadmap'
-      preLoaderRoute: typeof RoadmapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portfolio': {
-      id: '/portfolio'
-      path: '/portfolio'
-      fullPath: '/portfolio'
-      preLoaderRoute: typeof PortfolioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/docs': {
-      id: '/docs'
-      path: '/docs'
-      fullPath: '/docs'
-      preLoaderRoute: typeof DocsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/compliance': {
-      id: '/compliance'
-      path: '/compliance'
-      fullPath: '/compliance'
-      preLoaderRoute: typeof ComplianceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$': {
@@ -355,11 +286,88 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SplatRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/compliance': {
+      id: '/compliance'
+      path: '/compliance'
+      fullPath: '/compliance'
+      preLoaderRoute: typeof ComplianceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs': {
+      id: '/docs'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portfolio': {
+      id: '/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof PortfolioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/status': {
+      id: '/status'
+      path: '/status'
+      fullPath: '/status'
+      preLoaderRoute: typeof StatusRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/early-access': {
+      id: '/admin/early-access'
+      path: '/admin/early-access'
+      fullPath: '/admin/early-access'
+      preLoaderRoute: typeof AdminEarlyAccessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/$slug': {
+      id: '/blog/$slug'
+      path: '/blog/$slug'
+      fullPath: '/blog/$slug'
+      preLoaderRoute: typeof BlogSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio/': {
@@ -369,25 +377,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioIndexRouteImport
       parentRoute: typeof PortfolioRoute
     }
-    '/blog/': {
-      id: '/blog/'
-      path: '/blog'
-      fullPath: '/blog/'
-      preLoaderRoute: typeof BlogIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portfolio/pulsex': {
-      id: '/portfolio/pulsex'
-      path: '/pulsex'
-      fullPath: '/portfolio/pulsex'
-      preLoaderRoute: typeof PortfolioPulsexRouteImport
-      parentRoute: typeof PortfolioRoute
-    }
-    '/portfolio/pulsepay': {
-      id: '/portfolio/pulsepay'
-      path: '/pulsepay'
-      fullPath: '/portfolio/pulsepay'
-      preLoaderRoute: typeof PortfolioPulsepayRouteImport
+    '/portfolio/epulse': {
+      id: '/portfolio/epulse'
+      path: '/epulse'
+      fullPath: '/portfolio/epulse'
+      preLoaderRoute: typeof PortfolioEpulseRouteImport
       parentRoute: typeof PortfolioRoute
     }
     '/portfolio/pulseassist': {
@@ -397,33 +391,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioPulseassistRouteImport
       parentRoute: typeof PortfolioRoute
     }
-    '/portfolio/epulse': {
-      id: '/portfolio/epulse'
-      path: '/epulse'
-      fullPath: '/portfolio/epulse'
-      preLoaderRoute: typeof PortfolioEpulseRouteImport
+    '/portfolio/pulsepay': {
+      id: '/portfolio/pulsepay'
+      path: '/pulsepay'
+      fullPath: '/portfolio/pulsepay'
+      preLoaderRoute: typeof PortfolioPulsepayRouteImport
       parentRoute: typeof PortfolioRoute
     }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/watchlist': {
-      id: '/admin/watchlist'
-      path: '/admin/watchlist'
-      fullPath: '/admin/watchlist'
-      preLoaderRoute: typeof AdminWatchlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/early-access': {
-      id: '/admin/early-access'
-      path: '/admin/early-access'
-      fullPath: '/admin/early-access'
-      preLoaderRoute: typeof AdminEarlyAccessRouteImport
-      parentRoute: typeof rootRouteImport
+    '/portfolio/pulsex': {
+      id: '/portfolio/pulsex'
+      path: '/pulsex'
+      fullPath: '/portfolio/pulsex'
+      preLoaderRoute: typeof PortfolioPulsexRouteImport
+      parentRoute: typeof PortfolioRoute
     }
   }
 }
@@ -461,7 +441,6 @@ const rootRouteChildren: RootRouteChildren = {
   StatusRoute: StatusRoute,
   TermsRoute: TermsRoute,
   AdminEarlyAccessRoute: AdminEarlyAccessRoute,
-  AdminWatchlistRoute: AdminWatchlistRoute,
   BlogSlugRoute: BlogSlugRoute,
   BlogIndexRoute: BlogIndexRoute,
 }

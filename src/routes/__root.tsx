@@ -1,5 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Outlet, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
+import { Outlet, createRootRoute, useRouter } from "@tanstack/react-router";
 import { RefreshCw, ArrowLeft } from "lucide-react";
 import { NotFound } from "@/components/site/NotFound";
 
@@ -99,20 +98,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
-export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
-  component: RootComponent,
+export const Route = createRootRoute({
+  component: Outlet,
   // Rendered when a route throws `notFound()` (e.g. a blog slug with no Sanity document).
   // Shares the designed 404 with the `/$` splat route so both paths look identical.
   notFoundComponent: NotFound,
   errorComponent: ErrorComponent,
 });
-
-function RootComponent() {
-  const { queryClient } = Route.useRouteContext();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
-  );
-}

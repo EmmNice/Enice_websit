@@ -569,29 +569,57 @@ When the email is required, introduce it with corporate polish:
 8. If someone is frustrated, acknowledge it with professional composure and offer to connect them with the team.
 9. No hollow filler phrases at the start of replies \u2014 no "Great question!", "Absolutely!", "Certainly!", "Of course!".`;
 
-// api-src/chat.ts
-var rateLimitMap = /* @__PURE__ */ new Map();
-function isRateLimited(ip) {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + 3e5 });
-    return false;
-  }
-  if (entry.count >= 10) return true;
-  entry.count++;
-  return false;
+// api-src/lib/http.ts
+function clientIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  const first = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  const fromHeader = typeof first === "string" ? first.split(",")[0]?.trim() : void 0;
+  return fromHeader || req.socket?.remoteAddress || "unknown";
 }
+function parseJsonBody(body) {
+  if (typeof body === "string") {
+    try {
+      const parsed = JSON.parse(body);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+  if (body && typeof body === "object") return body;
+  return {};
+}
+function createRateLimiter(max, windowMs) {
+  const hits = /* @__PURE__ */ new Map();
+  return function isLimited(key) {
+    const now = Date.now();
+    if (hits.size > 5e3) {
+      for (const [k, entry2] of hits) if (now > entry2.resetAt) hits.delete(k);
+    }
+    const entry = hits.get(key);
+    if (!entry || now > entry.resetAt) {
+      hits.set(key, { count: 1, resetAt: now + windowMs });
+      return false;
+    }
+    if (entry.count >= max) return true;
+    entry.count++;
+    return false;
+  };
+}
+function errorRef(prefix) {
+  return `${prefix}${Date.now().toString(36).toUpperCase()}`;
+}
+
+// api-src/chat.ts
+var isRateLimited = createRateLimiter(10, 5 * 60 * 1e3);
 async function handler(req, res) {
   try {
     if (req.method !== "POST") {
       return res.status(405).json({ ok: false, error: "Method not allowed" });
     }
-    const ip = req.headers["x-forwarded-for"]?.split(",")[0]?.trim() || req.socket?.remoteAddress || "unknown";
-    if (isRateLimited(ip)) {
+    if (isRateLimited(clientIp(req))) {
       return res.status(429).json({ ok: false, error: "Too many requests. Please slow down." });
     }
-    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    const body = parseJsonBody(req.body);
     if (!Array.isArray(body.messages) || body.messages.length === 0) {
       return res.status(400).json({ ok: false, error: "messages array is required." });
     }
@@ -609,7 +637,7 @@ async function handler(req, res) {
     const result = await provider.complete(messages);
     return res.status(200).json({ ok: true, text: result.text, model: result.model, provider: result.provider });
   } catch (err) {
-    const ref = `C${Date.now().toString(36).toUpperCase()}`;
+    const ref = errorRef("C");
     console.error(`[api/chat:${ref}]`, err);
     return res.status(500).json({
       ok: false,
