@@ -1,10 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
-import { useState, useRef } from "react";
-import { ArrowRight, Check, Mail, MapPin, AlertCircle } from "lucide-react";
+import { useId, useRef, useState } from "react";
+import { AlertCircle, ArrowRight, Check, Loader2, Mail, MapPin } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
+import {
+  EMPTY_CONTACT,
+  FIELD_LIMITS,
+  INQUIRY_OPTIONS,
+  submitContact,
+  validateContact,
+  type ContactFieldErrors,
+  type ContactFields,
+} from "@/lib/contact";
 
 export const Route = createFileRoute("/contact")({
   head: () => ({
@@ -66,78 +75,75 @@ export const Route = createFileRoute("/contact")({
   component: ContactPage,
 });
 
-// ─── Inquiry options ──────────────────────────────────────────────────────────
-
-const INQUIRY_OPTIONS = [
-  "Fintech Infrastructure Integration (PulsePay)",
-  "Telecom or Banking AI Deployment (PulseAssist)",
-  "Technology or Product Partnership",
-  "General Corporate Inquiry",
-];
-
-// ─── Contact endpoint ─────────────────────────────────────────────────────────
-// Server-side Vercel function that forwards submissions to corporate@enicehq.com
-// via Resend. See api/contact.ts.
-
-const CONTACT_ENDPOINT = "/api/contact";
-
-// ─── Component ────────────────────────────────────────────────────────────────
-
 function ContactPage() {
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    company: "",
-    inquiry: "",
-    message: "",
-  });
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [website, setWebsite] = useState("");
+  const id = useId();
+  const formRef = useRef<HTMLFormElement>(null);
+  // Captured on first render so the server can reject submissions completed impossibly fast.
   const startedAtRef = useRef(Date.now());
 
+  const [form, setForm] = useState<ContactFields>(EMPTY_CONTACT);
+  const [errors, setErrors] = useState<ContactFieldErrors>({});
+  const [formError, setFormError] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"form" | "submitting" | "done">("form");
+  const [honeypot, setHoneypot] = useState("");
+
+  const submitting = phase === "submitting";
+
+  function set<K extends keyof ContactFields>(key: K, value: ContactFields[K]) {
+    setForm((v) => ({ ...v, [key]: value }));
+    setErrors((e) => (e[key] ? { ...e, [key]: undefined } : e));
+  }
+
+  function focusFirstError(nextErrors: ContactFieldErrors) {
+    const order: (keyof ContactFields)[] = ["name", "email", "company", "inquiry", "message"];
+    const first = order.find((key) => nextErrors[key]);
+    if (!first) return;
+    formRef.current?.querySelector<HTMLElement>(`[data-field="${first}"]`)?.focus();
+  }
+
   function resetForm() {
-    setForm({ name: "", email: "", company: "", inquiry: "", message: "" });
-    setWebsite("");
-    setErrorMessage("");
+    setForm(EMPTY_CONTACT);
+    setErrors({});
+    setFormError(null);
+    setHoneypot("");
     startedAtRef.current = Date.now();
-    setStatus("idle");
+    setPhase("form");
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim() || !form.company.trim() || !form.message.trim())
+    if (submitting) return;
+
+    // The `full` variant additionally requires company and the inquiry category.
+    const nextErrors = validateContact(form, "full");
+    setFormError(null);
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      focusFirstError(nextErrors);
       return;
-
-    setStatus("submitting");
-    setErrorMessage("");
-
-    try {
-      const res = await fetch(CONTACT_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          company: form.company,
-          inquiry: form.inquiry,
-          message: form.message,
-          website,
-          startedAt: startedAtRef.current,
-        }),
-      });
-
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data?.ok) {
-        setStatus("success");
-      } else {
-        setErrorMessage(data?.error || "Something went wrong. Please try again.");
-        setStatus("error");
-      }
-    } catch {
-      setErrorMessage("Network error. Please check your connection and try again.");
-      setStatus("error");
     }
+    setErrors({});
+    setPhase("submitting");
+
+    const outcome = await submitContact(form, {
+      honeypot,
+      startedAt: startedAtRef.current,
+      source: "contact-page",
+    });
+
+    if (outcome.status === "ok") {
+      setPhase("done");
+      return;
+    }
+
+    setPhase("form");
+    if (outcome.status === "invalid") {
+      setErrors(outcome.fieldErrors);
+      setFormError(outcome.message);
+      focusFirstError(outcome.fieldErrors);
+      return;
+    }
+    setFormError(outcome.message);
   }
 
   return (
@@ -264,7 +270,7 @@ function ContactPage() {
             className="rounded-xl border border-border bg-background p-8 sm:p-10"
             style={{ boxShadow: SHADOW_CARD }}
           >
-            {status === "success" ? (
+            {phase === "done" ? (
               /* Success state */
               <div className="flex min-h-[420px] w-full max-w-full flex-col items-start justify-center overflow-hidden">
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -274,8 +280,8 @@ function ContactPage() {
                   Message received
                 </h3>
                 <p className="mt-3 max-w-md break-words text-sm leading-relaxed text-muted-foreground">
-                  Thanks, {form.name.split(" ")[0] || "there"}. Our team replies within one business
-                  day to{" "}
+                  Thanks, {form.name.trim().split(/\s+/)[0] || "there"}. Our team replies within one
+                  business day to{" "}
                   <span className="break-all font-medium text-foreground">
                     {form.email || "the email you entered"}
                   </span>
@@ -290,13 +296,19 @@ function ContactPage() {
                 </button>
               </div>
             ) : (
-              <form className="space-y-6" onSubmit={handleSubmit}>
+              <form
+                ref={formRef}
+                className="space-y-6"
+                onSubmit={handleSubmit}
+                noValidate
+                aria-busy={submitting}
+              >
                 {/* Error banner */}
-                {status === "error" && (
+                {formError && (
                   <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                     <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
                     <p className="min-w-0 flex-1 break-words">
-                      {errorMessage || "Something went wrong."} You can also email us directly at{" "}
+                      {formError} You can also email us directly at{" "}
                       <a href="mailto:corporate@enicehq.com" className="break-all underline">
                         corporate@enicehq.com
                       </a>
@@ -307,39 +319,63 @@ function ContactPage() {
 
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field
+                    id={`${id}-name`}
+                    name="name"
                     label="Full Name"
                     value={form.name}
-                    onChange={(v) => setForm({ ...form, name: v })}
+                    onChange={(v) => set("name", v)}
                     placeholder="Your full name"
+                    maxLength={FIELD_LIMITS.name}
+                    disabled={submitting}
+                    error={errors.name}
                     required
                   />
                   <Field
+                    id={`${id}-email`}
+                    name="email"
                     label="Corporate Email"
                     type="email"
                     value={form.email}
-                    onChange={(v) => setForm({ ...form, email: v })}
+                    onChange={(v) => set("email", v)}
                     placeholder="jane@company.com"
+                    maxLength={FIELD_LIMITS.email}
+                    disabled={submitting}
+                    error={errors.email}
                     required
                   />
                 </div>
 
                 <Field
+                  id={`${id}-company`}
+                  name="company"
                   label="Company / Institution"
                   value={form.company}
-                  onChange={(v) => setForm({ ...form, company: v })}
+                  onChange={(v) => set("company", v)}
                   placeholder="Your company or institution"
+                  maxLength={FIELD_LIMITS.company}
+                  disabled={submitting}
+                  error={errors.company}
                   required
                 />
 
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  <label
+                    className="block text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    htmlFor={`${id}-inquiry`}
+                  >
                     Nature of Inquiry
                   </label>
                   <select
+                    id={`${id}-inquiry`}
+                    data-field="inquiry"
                     value={form.inquiry}
-                    onChange={(e) => setForm({ ...form, inquiry: e.target.value })}
+                    onChange={(e) => set("inquiry", e.target.value)}
                     required
-                    className="mt-2 block w-full rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+                    aria-required="true"
+                    disabled={submitting}
+                    aria-invalid={!!errors.inquiry}
+                    aria-describedby={errors.inquiry ? `${id}-inquiry-err` : undefined}
+                    className="mt-2 block w-full rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/15 focus:outline-none disabled:opacity-60 aria-[invalid=true]:border-destructive"
                   >
                     <option value="" disabled>
                       Select nature of inquiry…
@@ -350,42 +386,87 @@ function ContactPage() {
                       </option>
                     ))}
                   </select>
+                  {errors.inquiry && (
+                    <p id={`${id}-inquiry-err`} className="mt-1.5 text-[12px] text-destructive">
+                      {errors.inquiry}
+                    </p>
+                  )}
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  <label
+                    className="block text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+                    htmlFor={`${id}-message`}
+                  >
                     Message
                   </label>
                   <textarea
+                    id={`${id}-message`}
+                    data-field="message"
                     value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value.slice(0, 2000) })}
+                    onChange={(e) => set("message", e.target.value)}
                     rows={6}
                     required
+                    aria-required="true"
+                    maxLength={FIELD_LIMITS.message}
+                    disabled={submitting}
+                    aria-invalid={!!errors.message}
+                    aria-describedby={errors.message ? `${id}-message-err` : undefined}
                     placeholder="Tell us about the product, integration, partnership, or access request."
-                    className="mt-2 block w-full resize-none rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+                    className="mt-2 block w-full resize-none rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-primary/15 focus:outline-none disabled:opacity-60 aria-[invalid=true]:border-destructive"
+                  />
+                  {errors.message && (
+                    <p id={`${id}-message-err`} className="mt-1.5 text-[12px] text-destructive">
+                      {errors.message}
+                    </p>
+                  )}
+                </div>
+
+                <label className="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={form.updates}
+                    onChange={(e) => set("updates", e.target.checked)}
+                    disabled={submitting}
+                    className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-input accent-primary"
+                  />
+                  <span className="text-[13px] leading-relaxed text-muted-foreground">
+                    Also keep me updated on ENICE Group products and launches.
+                  </span>
+                </label>
+
+                {/* Honeypot: hidden from users and assistive tech, irresistible to bots. */}
+                <div aria-hidden="true" className="pointer-events-none absolute -left-[9999px]">
+                  <label htmlFor={`${id}-website`}>Website</label>
+                  <input
+                    id={`${id}-website`}
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={honeypot}
+                    onChange={(e) => setHoneypot(e.target.value)}
                   />
                 </div>
 
-                <input
-                  type="text"
-                  name="website"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  tabIndex={-1}
-                  autoComplete="off"
-                  aria-hidden="true"
-                  className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
-                  style={{ opacity: 0 }}
-                />
-
                 <button
                   type="submit"
-                  disabled={status === "submitting"}
+                  disabled={submitting}
                   className="group inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {status === "submitting" ? "Submitting…" : "Submit Inquiry"}
-                  {status !== "submitting" && (
-                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                      Submitting
+                    </>
+                  ) : (
+                    <>
+                      Submit Inquiry
+                      <ArrowRight
+                        className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+                        aria-hidden="true"
+                      />
+                    </>
                   )}
                 </button>
               </form>
@@ -402,34 +483,58 @@ function ContactPage() {
 // ─── Reusable field ───────────────────────────────────────────────────────────
 
 function Field({
+  id,
+  name,
   label,
   value,
   onChange,
   placeholder,
   type = "text",
   required,
+  disabled,
+  maxLength,
+  error,
 }: {
+  id: string;
+  name: string;
   label: string;
   value: string;
   onChange: (v: string) => void;
   placeholder?: string;
   type?: string;
   required?: boolean;
+  disabled?: boolean;
+  maxLength?: number;
+  error?: string;
 }) {
   return (
     <div>
-      <label className="block text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+      <label
+        className="block text-[11px] font-semibold tracking-[0.18em] text-muted-foreground uppercase"
+        htmlFor={id}
+      >
         {label}
       </label>
       <input
+        id={id}
+        data-field={name}
         type={type}
         value={value}
         required={required}
-        maxLength={200}
+        aria-required={required}
+        disabled={disabled}
+        maxLength={maxLength}
+        aria-invalid={!!error}
+        aria-describedby={error ? `${id}-err` : undefined}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="mt-2 block w-full rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
+        className="mt-2 block w-full rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-primary/15 focus:outline-none disabled:opacity-60 aria-[invalid=true]:border-destructive"
       />
+      {error && (
+        <p id={`${id}-err`} className="mt-1.5 text-[12px] text-destructive">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
