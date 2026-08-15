@@ -22,15 +22,13 @@ const DETAILS: Record<
   epulse: {
     name: "EPulse",
     category: "Digital banking",
-    description:
-      "Digital banking layer extending the ENICE Core into consumer and SME banking.",
+    description: "Digital banking layer extending the ENICE Core into consumer and SME banking.",
     status: "In incubation",
   },
   pulsex: {
     name: "PulseX",
     category: "Global digital asset trading",
-    description:
-      "Institutional-grade global cryptocurrency and digital asset trading exchange.",
+    description: "Institutional-grade global cryptocurrency and digital asset trading exchange.",
     status: "In incubation",
   },
 };
@@ -41,9 +39,7 @@ export default defineTool({
   description:
     "Return details for a single ENICE venture by its slug (pulsepay, pulseassist, epulse, pulsex).",
   inputSchema: {
-    slug: z
-      .enum(["pulsepay", "pulseassist", "epulse", "pulsex"])
-      .describe("Venture slug."),
+    slug: z.enum(["pulsepay", "pulseassist", "epulse", "pulsex"]).describe("Venture slug."),
   },
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: ({ slug }) => {

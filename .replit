@@ -34,13 +34,18 @@ waitForPort = 5000
 localPort = 5000
 externalPort = 80
 
+# `vite build` emits a static SPA to `dist/` — there is no Nitro/TanStack Start server
+# entry, so the previous `run = [".output/server/index.mjs"]` could never start.
+# Production hosting is Vercel (see vercel.json); this target is preview only and the
+# /api/* functions are not served here.
 [deployment]
-deploymentTarget = "autoscale"
-run = ["bun", "run", ".output/server/index.mjs"]
+deploymentTarget = "static"
+publicDir = "dist"
 build = ["bun", "run", "build"]
 
 [userenv]
 
+# Non-secret defaults only. Secrets (RESEND_API_KEY, ADMIN_PASSWORD, AI_API_KEY,
+# AI_API_SECRET, SUPABASE_SERVICE_ROLE_KEY) belong in Replit Secrets, never in this file.
 [userenv.shared]
-RESEND_AUDIENCE_ID = "58c2ec8b-ad13-4582-8779-ea6500def2dd"
 AI_PROVIDER = "bedrock"

@@ -803,6 +803,19 @@ var require_dist = __commonJS({
   }
 });
 
+// api-src/admin/early-access.ts
+import { timingSafeEqual } from "node:crypto";
+
+// src/lib/early-access.ts
+var EARLY_ACCESS_STATUSES = [
+  "EARLY_ACCESS",
+  "UNDER_REVIEW",
+  "SELECTED_FOR_BETA",
+  "INVITATION_SENT",
+  "BETA_USER",
+  "REJECTED"
+];
+
 // node_modules/postal-mime/src/decode-strings.js
 var textEncoder = new TextEncoder();
 var base64Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
@@ -5840,8 +5853,151 @@ var Resend = class {
   }
 };
 
-// api-src/admin/watchlist.ts
-import { timingSafeEqual } from "node:crypto";
+// src/lib/early-access-store.server.ts
+var SEGMENT_NAME = "PulseAssist Early Access";
+var PRODUCT = "PulseAssist";
+var SOURCE = "enice_website";
+var INITIAL_STATUS = "EARLY_ACCESS";
+var PROPERTY_KEYS = {
+  status: "pulseassist_status",
+  businessName: "pulseassist_business_name",
+  businessType: "pulseassist_business_type",
+  businessNeed: "pulseassist_business_need",
+  source: "pulseassist_source",
+  registeredAt: "pulseassist_registered_at",
+  updatedAt: "pulseassist_updated_at"
+};
+var ALL_PROPERTY_KEYS = Object.values(PROPERTY_KEYS);
+var EarlyAccessConfigError = class extends Error {
+};
+function client() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new EarlyAccessConfigError("RESEND_API_KEY is not configured.");
+  }
+  return new Resend(apiKey);
+}
+var propertiesReady = null;
+async function ensureProperties(resend) {
+  if (propertiesReady) return propertiesReady;
+  propertiesReady = (async () => {
+    const existing = await resend.contactProperties.list({ limit: 100 });
+    if (existing.error) {
+      throw new Error(`Could not list contact properties: ${existing.error.message}`);
+    }
+    const have = new Set((existing.data?.data ?? []).map((p) => p.key));
+    for (const key of ALL_PROPERTY_KEYS) {
+      if (have.has(key)) continue;
+      const created = await resend.contactProperties.create({
+        key,
+        type: "string",
+        fallbackValue: null
+      });
+      if (created.error && !/exist/i.test(created.error.message)) {
+        throw new Error(`Could not create contact property "${key}": ${created.error.message}`);
+      }
+    }
+  })().catch((err) => {
+    propertiesReady = null;
+    throw err;
+  });
+  return propertiesReady;
+}
+var segmentIdCache = null;
+async function resolveSegmentId(resend) {
+  if (segmentIdCache) return segmentIdCache;
+  const configured = process.env.RESEND_EARLY_ACCESS_SEGMENT_ID;
+  if (configured) {
+    segmentIdCache = configured;
+    return configured;
+  }
+  const list = await resend.segments.list({ limit: 100 });
+  if (list.error) throw new Error(`Could not list segments: ${list.error.message}`);
+  const found = (list.data?.data ?? []).find((s) => s.name === SEGMENT_NAME);
+  if (found) {
+    segmentIdCache = found.id;
+    return found.id;
+  }
+  const created = await resend.segments.create({ name: SEGMENT_NAME });
+  if (created.error || !created.data?.id) {
+    throw new Error(`Could not create the "${SEGMENT_NAME}" segment: ${created.error?.message}`);
+  }
+  segmentIdCache = created.data.id;
+  return created.data.id;
+}
+function joinName(firstName, lastName) {
+  return [firstName, lastName].filter(Boolean).join(" ").trim();
+}
+function readProperty(properties, key) {
+  const entry = properties?.[key];
+  if (!entry) return "";
+  return typeof entry.value === "string" ? entry.value : String(entry.value);
+}
+function toStatus(raw) {
+  return EARLY_ACCESS_STATUSES.includes(raw) ? raw : INITIAL_STATUS;
+}
+async function findContact(resend, email) {
+  try {
+    const res = await resend.contacts.get({ email });
+    if (res.error || !res.data) return null;
+    return res.data;
+  } catch {
+    return null;
+  }
+}
+async function listRegistrations(limit = 100) {
+  const resend = client();
+  const segmentId = await resolveSegmentId(resend);
+  const capped = Math.min(Math.max(limit, 1), 100);
+  const list = await resend.contacts.list({ segmentId, limit: capped });
+  if (list.error) throw new Error(`Could not list contacts: ${list.error.message}`);
+  const contacts = list.data?.data ?? [];
+  const registrations = [];
+  const CONCURRENCY = 6;
+  for (let i = 0; i < contacts.length; i += CONCURRENCY) {
+    const batch = contacts.slice(i, i + CONCURRENCY);
+    const details = await Promise.all(
+      batch.map(async (c) => {
+        const full = await findContact(resend, c.email);
+        const properties = full?.properties ?? {};
+        const registeredAt = readProperty(properties, PROPERTY_KEYS.registeredAt);
+        return {
+          id: c.id,
+          email: c.email,
+          fullName: joinName(c.first_name, c.last_name) || c.email,
+          product: PRODUCT,
+          businessName: readProperty(properties, PROPERTY_KEYS.businessName),
+          businessType: readProperty(properties, PROPERTY_KEYS.businessType),
+          businessNeed: readProperty(properties, PROPERTY_KEYS.businessNeed),
+          source: readProperty(properties, PROPERTY_KEYS.source) || SOURCE,
+          status: toStatus(readProperty(properties, PROPERTY_KEYS.status)),
+          createdAt: registeredAt || c.created_at,
+          updatedAt: readProperty(properties, PROPERTY_KEYS.updatedAt) || registeredAt
+        };
+      })
+    );
+    registrations.push(...details);
+  }
+  registrations.sort((a, b) => a.createdAt < b.createdAt ? 1 : -1);
+  return { registrations, truncated: Boolean(list.data?.has_more) };
+}
+async function updateRegistrationStatus(email, status) {
+  const resend = client();
+  await ensureProperties(resend);
+  const existing = await findContact(resend, email);
+  if (!existing) return { outcome: "not_found" };
+  const res = await resend.contacts.update({
+    email,
+    properties: {
+      [PROPERTY_KEYS.status]: status,
+      [PROPERTY_KEYS.updatedAt]: (/* @__PURE__ */ new Date()).toISOString()
+    }
+  });
+  if (res.error) throw new Error(`Could not update status: ${res.error.message}`);
+  return { outcome: "updated" };
+}
+
+// api-src/admin/early-access.ts
 function secretsMatch(supplied, expected) {
   if (typeof supplied !== "string") return false;
   const a = Buffer.from(supplied, "utf8");
@@ -5861,9 +6017,8 @@ function clientIp(req) {
   return (typeof raw === "string" ? raw.split(",")[0]?.trim() : "") || "unknown";
 }
 function tooManyAttempts(ip) {
-  const now = Date.now();
   const entry = attempts.get(ip);
-  if (!entry || now > entry.resetAt) return false;
+  if (!entry || Date.now() > entry.resetAt) return false;
   return entry.count >= MAX_ATTEMPTS;
 }
 function recordFailure(ip) {
@@ -5875,15 +6030,27 @@ function recordFailure(ip) {
   }
   entry.count++;
 }
-async function handler(req, res) {
-  try {
-    if (req.method !== "GET") {
-      res.status(405).json({ ok: false, error: "Method not allowed" });
-      return;
+function parseBody(raw) {
+  if (typeof raw === "string") {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return {};
     }
+  }
+  if (raw && typeof raw === "object") return raw;
+  return {};
+}
+async function handler(req, res) {
+  const ref = `AD${Date.now().toString(36).toUpperCase()}`;
+  try {
     const adminPassword = process.env.ADMIN_PASSWORD;
     if (!adminPassword) {
-      res.status(500).json({ ok: false, error: "Admin access is not configured." });
+      console.error("[api/admin/early-access] ADMIN_PASSWORD is not set.");
+      res.status(500).json({
+        ok: false,
+        error: "Admin access is not configured. The ADMIN_PASSWORD variable is missing."
+      });
       return;
     }
     const ip = clientIp(req);
@@ -5896,33 +6063,50 @@ async function handler(req, res) {
       res.status(401).json({ ok: false, error: "Invalid password." });
       return;
     }
-    const apiKey = process.env.RESEND_API_KEY;
-    const audienceId = process.env.RESEND_AUDIENCE_ID;
-    if (!apiKey || !audienceId) {
-      res.status(500).json({ ok: false, error: "Watchlist storage is not configured." });
-      return;
-    }
-    const resend = new Resend(apiKey);
-    const contacts = [];
-    const result = await resend.contacts.list({ audienceId });
-    if (result.error) {
-      console.error("[admin/watchlist] contacts.list error:", JSON.stringify(result.error));
-      res.status(502).json({ ok: false, error: "Could not fetch watchlist from provider." });
-      return;
-    }
-    for (const c of result.data?.data ?? []) {
-      contacts.push({
-        id: c.id,
-        email: c.email,
-        created_at: c.created_at,
-        unsubscribed: c.unsubscribed
+    if (req.method === "GET") {
+      const { registrations, truncated } = await listRegistrations(100);
+      res.status(200).json({
+        ok: true,
+        registrations,
+        total: registrations.length,
+        // Resend's contacts API exposes `limit` only (max 100) with no cursor, so a larger
+        // list cannot be paged through here. Surfaced so the UI can say so plainly.
+        truncated
       });
+      return;
     }
-    contacts.sort((a, b) => a.created_at < b.created_at ? 1 : -1);
-    res.status(200).json({ ok: true, contacts, total: contacts.length });
+    if (req.method === "POST") {
+      const body = parseBody(req.body);
+      const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+      const status = typeof body.status === "string" ? body.status : "";
+      if (!email) {
+        res.status(400).json({ ok: false, error: "A registration email is required." });
+        return;
+      }
+      if (!EARLY_ACCESS_STATUSES.includes(status)) {
+        res.status(400).json({
+          ok: false,
+          error: `Invalid status. Expected one of: ${EARLY_ACCESS_STATUSES.join(", ")}.`
+        });
+        return;
+      }
+      const result = await updateRegistrationStatus(email, status);
+      if (result.outcome === "not_found") {
+        res.status(404).json({ ok: false, error: "Registration not found." });
+        return;
+      }
+      res.status(200).json({ ok: true, email, status });
+      return;
+    }
+    res.status(405).json({ ok: false, error: "Method not allowed." });
   } catch (err) {
-    console.error("[admin/watchlist] Unexpected error:", err);
-    res.status(500).json({ ok: false, error: "An unexpected error occurred." });
+    if (err instanceof EarlyAccessConfigError) {
+      console.error(`[api/admin/early-access:${ref}] not configured:`, err.message);
+      res.status(503).json({ ok: false, error: "Storage is not configured.", ref });
+      return;
+    }
+    console.error(`[api/admin/early-access:${ref}]`, err);
+    res.status(500).json({ ok: false, error: "An unexpected error occurred.", ref });
   }
 }
 export {

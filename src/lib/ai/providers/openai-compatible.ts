@@ -57,6 +57,10 @@ export class OpenAICompatibleProvider implements AIProvider {
     const text = data.choices?.[0]?.message?.content?.trim();
     if (!text) throw new Error(`[${this.providerLabel}] Empty response from API`);
 
-    return { text, model: data.model || this.model || this.defaultModel, provider: this.providerLabel };
+    return {
+      text,
+      model: data.model || this.model || this.defaultModel,
+      provider: this.providerLabel,
+    };
   }
 }

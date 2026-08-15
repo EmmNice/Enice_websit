@@ -6,9 +6,11 @@ export const API_VERSION = "2025-01-01";
 
 // Use CDN in production for fast reads; disable in dev so localhost isn't
 // blocked by Sanity's CDN CORS policy (dev API calls use the direct API).
-const isProduction = typeof window !== "undefined"
-  ? !window.location.hostname.includes("localhost") && !window.location.hostname.includes("127.0.0.1")
-  : true;
+const isProduction =
+  typeof window !== "undefined"
+    ? !window.location.hostname.includes("localhost") &&
+      !window.location.hostname.includes("127.0.0.1")
+    : true;
 
 export const sanityClient = createClient({
   projectId: PROJECT_ID,

@@ -1,5 +1,4 @@
 import { defineTool } from "@lovable.dev/mcp-js";
-import { z } from "zod";
 
 const VENTURES = [
   {
@@ -20,15 +19,13 @@ const VENTURES = [
     slug: "epulse",
     name: "EPulse",
     category: "Digital banking",
-    description:
-      "Digital banking layer extending the ENICE Core into consumer and SME banking.",
+    description: "Digital banking layer extending the ENICE Core into consumer and SME banking.",
   },
   {
     slug: "pulsex",
     name: "PulseX",
     category: "Global digital asset trading",
-    description:
-      "Institutional-grade global cryptocurrency and digital asset trading exchange.",
+    description: "Institutional-grade global cryptocurrency and digital asset trading exchange.",
   },
 ];
 

@@ -2,7 +2,14 @@ node_modules
 dist
 .output
 .vinxi
+.vercel
 pnpm-lock.yaml
 package-lock.json
 bun.lock
+
+# Generated output — `api/` is the esbuild bundle of `api-src/`.
+api
 routeTree.gen.ts
+
+# Separate package with its own toolchain.
+studio-enice-group

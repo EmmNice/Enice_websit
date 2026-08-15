@@ -37,7 +37,6 @@ export function NetworkMetrics() {
   return (
     <section className="border-y border-border bg-secondary/50 py-16">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-
         <div className="mb-10 flex items-center gap-3">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />

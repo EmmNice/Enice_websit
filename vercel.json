@@ -12,7 +12,5 @@
       "headers": [{ "key": "Content-Type", "value": "text/plain; charset=utf-8" }]
     }
   ],
-  "rewrites": [
-    { "source": "/((?!api/)[^.]*)", "destination": "/index.html" }
-  ]
+  "rewrites": [{ "source": "/((?!api/)[^.]*)", "destination": "/index.html" }]
 }

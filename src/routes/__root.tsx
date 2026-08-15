@@ -1,34 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import {
-  Outlet,
-  Link,
-  createRootRouteWithContext,
-  useRouter,
-} from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { Outlet, createRootRouteWithContext, useRouter } from "@tanstack/react-router";
 import { RefreshCw, ArrowLeft } from "lucide-react";
-
-function NotFoundComponent() {
-  return (
-    <main id="main" className="flex min-h-dvh items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          The page you're looking for doesn't exist or has been moved.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
-      </div>
-    </main>
-  );
-}
+import { NotFound } from "@/components/site/NotFound";
 
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   // Log privately — never surfaced to the user
@@ -90,8 +63,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
         {/* Copy — exact text requested */}
         <p className="mb-10 max-w-sm text-[15px] leading-relaxed text-white/45">
-          We are fixing it right now — please refresh the page or try again
-          shortly.
+          We are fixing it right now — please refresh the page or try again shortly.
         </p>
 
         {/* Actions */}
@@ -104,7 +76,10 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
             Refresh page
           </button>
           <button
-            onClick={() => { router.invalidate(); reset(); }}
+            onClick={() => {
+              router.invalidate();
+              reset();
+            }}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/5 px-6 text-sm font-medium text-white/70 transition-colors hover:bg-white/10 hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -115,10 +90,7 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
         {/* Footer */}
         <p className="mt-12 text-[11px] text-white/20">
           If this keeps happening, contact us at{" "}
-          <a
-            href="mailto:corporate@enicehq.com"
-            className="transition-colors hover:text-white/50"
-          >
+          <a href="mailto:corporate@enicehq.com" className="transition-colors hover:text-white/50">
             corporate@enicehq.com
           </a>
         </p>
@@ -129,7 +101,9 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
   component: RootComponent,
-  notFoundComponent: NotFoundComponent,
+  // Rendered when a route throws `notFound()` (e.g. a blog slug with no Sanity document).
+  // Shares the designed 404 with the `/$` splat route so both paths look identical.
+  notFoundComponent: NotFound,
   errorComponent: ErrorComponent,
 });
 

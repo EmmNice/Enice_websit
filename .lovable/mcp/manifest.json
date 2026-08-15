@@ -43,18 +43,11 @@
           "properties": {
             "slug": {
               "type": "string",
-              "enum": [
-                "pulsepay",
-                "pulseassist",
-                "epulse",
-                "pulsex"
-              ],
+              "enum": ["pulsepay", "pulseassist", "epulse", "pulsex"],
               "description": "Venture slug."
             }
           },
-          "required": [
-            "slug"
-          ]
+          "required": ["slug"]
         },
         "outputSchema": null
       },

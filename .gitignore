@@ -18,6 +18,11 @@ node_modules
 .nitro
 *.local
 
+# Environment — never commit real values. See .env.example for the required names.
+.env
+.env.*
+!.env.example
+
 # Wrangler / Cloudflare
 .wrangler/
 .dev.vars

@@ -65,21 +65,23 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       return res.status(400).json({ ok: false, error: "No valid messages provided." });
     }
 
-    const messages: AIMessage[] = [
-      { role: "system", content: SYSTEM_PROMPT },
-      ...history,
-    ];
+    const messages: AIMessage[] = [{ role: "system", content: SYSTEM_PROMPT }, ...history];
 
     const provider = createAIProvider();
     const result = await provider.complete(messages);
 
-    return res.status(200).json({ ok: true, text: result.text, model: result.model, provider: result.provider });
+    return res
+      .status(200)
+      .json({ ok: true, text: result.text, model: result.model, provider: result.provider });
   } catch (err) {
     const ref = `C${Date.now().toString(36).toUpperCase()}`;
+    // Provider adapters embed the upstream HTTP body in their thrown messages, so the
+    // detail stays in the server log. The client only ever gets a generic message plus
+    // the correlation ref.
     console.error(`[api/chat:${ref}]`, err);
     return res.status(500).json({
       ok: false,
-      error: err instanceof Error ? err.message : String(err),
+      error: "The assistant is temporarily unavailable. Please try again shortly.",
       ref,
     });
   }

@@ -37,7 +37,6 @@ export function EcosystemRoadmap() {
   return (
     <section className="border-b border-border bg-secondary py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-
         {/* Header */}
         <Reveal>
           <div className="mx-auto max-w-2xl text-center">
@@ -48,8 +47,8 @@ export function EcosystemRoadmap() {
               The ENICE Group ecosystem roadmap.
             </h2>
             <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              A phased rollout of the platforms we're building, each one
-              designed for institutional scale from day one.
+              A phased rollout of the platforms we're building, each one designed for institutional
+              scale from day one.
             </p>
           </div>
         </Reveal>
@@ -71,7 +70,6 @@ export function EcosystemRoadmap() {
 
               return (
                 <div key={m.product} className="relative flex flex-col items-center">
-
                   {/* Left half-connector (suppressed on first node) */}
                   {!isFirst && (
                     <div className="absolute left-0 right-1/2 top-[0.9375rem] h-px -translate-y-1/2 bg-border" />
@@ -85,9 +83,7 @@ export function EcosystemRoadmap() {
                   {/* Node ring */}
                   <div
                     className={`relative z-10 flex ${NODE_SIZE} items-center justify-center rounded-full border-2 ${
-                      isLive
-                        ? "border-emerald-500 bg-emerald-500/10"
-                        : "border-border bg-secondary"
+                      isLive ? "border-emerald-500 bg-emerald-500/10" : "border-border bg-secondary"
                     }`}
                   >
                     <span
@@ -156,7 +152,6 @@ export function EcosystemRoadmap() {
             );
           })}
         </div>
-
       </div>
     </section>
   );
@@ -164,17 +159,12 @@ export function EcosystemRoadmap() {
 
 // ─── Shared card ──────────────────────────────────────────────────────────────
 
-function MilestoneCard({
-  m,
-}: {
-  m: (typeof MILESTONES)[number];
-}) {
+function MilestoneCard({ m }: { m: (typeof MILESTONES)[number] }) {
   return (
     <div
       className="flex h-full flex-col rounded-xl border border-border bg-background p-8"
       style={{
-        boxShadow:
-          "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)",
+        boxShadow: "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)",
       }}
     >
       {/* Index + quarter */}
@@ -188,9 +178,7 @@ function MilestoneCard({
       </div>
 
       {/* Product name */}
-      <h3 className="mt-6 text-2xl font-semibold tracking-tight text-foreground">
-        {m.product}
-      </h3>
+      <h3 className="mt-6 text-2xl font-semibold tracking-tight text-foreground">{m.product}</h3>
 
       {/* Headline */}
       <p className="mt-1 text-[13px] font-medium uppercase tracking-[0.16em] text-primary">
@@ -198,9 +186,7 @@ function MilestoneCard({
       </p>
 
       {/* Description */}
-      <p className="mt-5 text-[13.5px] leading-relaxed text-muted-foreground">
-        {m.desc}
-      </p>
+      <p className="mt-5 text-[13.5px] leading-relaxed text-muted-foreground">{m.desc}</p>
     </div>
   );
 }

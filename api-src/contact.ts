@@ -142,8 +142,7 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       return;
     }
 
-    const body =
-      typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
+    const body = typeof req.body === "string" ? JSON.parse(req.body || "{}") : req.body || {};
 
     // Honeypot: bots that fill hidden fields get a silent success.
     if (String(body.website || "").trim().length > 0) {
@@ -158,11 +157,21 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       return;
     }
 
-    const name = String(body.name || "").trim().slice(0, 200);
-    const email = String(body.email || "").trim().slice(0, 200);
-    const company = String(body.company || "").trim().slice(0, 200);
-    const inquiry = String(body.inquiry || "").trim().slice(0, 200);
-    const message = String(body.message || "").trim().slice(0, 2000);
+    const name = String(body.name || "")
+      .trim()
+      .slice(0, 200);
+    const email = String(body.email || "")
+      .trim()
+      .slice(0, 200);
+    const company = String(body.company || "")
+      .trim()
+      .slice(0, 200);
+    const inquiry = String(body.inquiry || "")
+      .trim()
+      .slice(0, 200);
+    const message = String(body.message || "")
+      .trim()
+      .slice(0, 2000);
 
     if (!name || !company || !message) {
       res.status(400).json({ ok: false, error: "Missing required fields." });

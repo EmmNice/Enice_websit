@@ -55,12 +55,8 @@ const ptComponents: PortableTextComponents = {
     ),
   },
   marks: {
-    strong: ({ children }) => (
-      <strong className="font-bold text-white">{children}</strong>
-    ),
-    em: ({ children }) => (
-      <em className="italic text-zinc-300">{children}</em>
-    ),
+    strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
+    em: ({ children }) => <em className="italic text-zinc-300">{children}</em>,
     code: ({ children }) => (
       <code className="rounded bg-white/[0.07] px-1.5 py-0.5 font-mono text-[0.85em] text-blue-300">
         {children}
@@ -69,9 +65,7 @@ const ptComponents: PortableTextComponents = {
   },
   list: {
     bullet: ({ children }) => (
-      <ul className="mb-6 space-y-2 pl-6 text-[17px] leading-8 text-zinc-300">
-        {children}
-      </ul>
+      <ul className="mb-6 space-y-2 pl-6 text-[17px] leading-8 text-zinc-300">{children}</ul>
     ),
     number: ({ children }) => (
       <ol className="mb-6 list-decimal space-y-2 pl-6 text-[17px] leading-8 text-zinc-300">
@@ -139,7 +133,6 @@ function ArticlePage() {
 
       <main className="px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-2xl">
-
           {/* Back link */}
           <Link
             to="/blog/"
@@ -194,11 +187,18 @@ function ArticlePage() {
               {/* Body */}
               <div className="prose-enice">
                 {post.body?.length > 0 ? (
-                  <PortableText value={post.body as Parameters<typeof PortableText>[0]["value"]} components={ptComponents} />
+                  <PortableText
+                    value={post.body as Parameters<typeof PortableText>[0]["value"]}
+                    components={ptComponents}
+                  />
                 ) : (
                   <div className="rounded-xl border border-white/10 bg-white/[0.03] px-8 py-10 text-center">
-                    <p className="text-base font-semibold text-white/80">This article is being prepared.</p>
-                    <p className="mt-2 text-sm text-zinc-500">The full piece will be published here shortly. Check back soon.</p>
+                    <p className="text-base font-semibold text-white/80">
+                      This article is being prepared.
+                    </p>
+                    <p className="mt-2 text-sm text-zinc-500">
+                      The full piece will be published here shortly. Check back soon.
+                    </p>
                   </div>
                 )}
               </div>

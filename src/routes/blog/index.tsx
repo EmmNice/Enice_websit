@@ -71,9 +71,7 @@ function PostCard({ post }: { post: Post }) {
       </p>
 
       {/* Excerpt — 2 lines */}
-      <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">
-        {post.excerpt}
-      </p>
+      <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{post.excerpt}</p>
 
       {/* Read more */}
       <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-blue-400 opacity-0 transition-opacity group-hover:opacity-100">
@@ -128,8 +126,8 @@ function BlogPage() {
             Blog and Changelog
           </h1>
           <p className="max-w-xl text-base leading-relaxed text-zinc-400">
-            Updates on our products, infrastructure changes, and platform launches,
-            and everything happening inside ENICE Group.
+            Updates on our products, infrastructure changes, and platform launches, and everything
+            happening inside ENICE Group.
           </p>
         </div>
       </section>
@@ -197,8 +195,7 @@ export const Route = createFileRoute("/blog/")({
       { property: "og:title", content: "Blog and Updates | ENICE Group" },
       {
         property: "og:description",
-        content:
-          "Product updates, changelog entries, and announcements from ENICE Group.",
+        content: "Product updates, changelog entries, and announcements from ENICE Group.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -213,8 +210,7 @@ export const Route = createFileRoute("/blog/")({
       { name: "twitter:title", content: "Blog and Updates | ENICE Group" },
       {
         name: "twitter:description",
-        content:
-          "Product updates, changelog entries, and announcements from ENICE Group.",
+        content: "Product updates, changelog entries, and announcements from ENICE Group.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -226,8 +222,7 @@ export const Route = createFileRoute("/blog/")({
           "@context": "https://schema.org",
           "@type": "Blog",
           name: "ENICE Group Blog",
-          description:
-            "Product updates, changelog entries, and announcements from ENICE Group.",
+          description: "Product updates, changelog entries, and announcements from ENICE Group.",
           url: `${SITE_URL}/blog`,
           publisher: {
             "@type": "Organization",

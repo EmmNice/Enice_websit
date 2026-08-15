@@ -1,11 +1,34 @@
 {
-  "include": ["src/**/*.ts", "src/**/*.tsx", "vite.config.ts", "eslint.config.js"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    // `api-src/` holds the Vercel serverless handlers. It was previously excluded, so
+    // nothing type-checked the code that talks to Resend and the AI providers.
+    "api-src/**/*.ts",
+    "vite.config.ts",
+    "eslint.config.js"
+  ],
+  // Auto-generated MCP routes. They are excluded from the router's route tree in
+  // vite.config.ts (see routeFileIgnorePattern) because their `server.handlers` need a
+  // TanStack Start server this project does not deploy. Excluding them here as well keeps
+  // the Lovable plugin free to regenerate the files without failing typecheck on route
+  // paths that are deliberately absent from FileRoutesByPath.
+  //
+  // NOTE: these patterns deliberately avoid literal square brackets. `vite-tsconfig-paths`
+  // compiles tsconfig globs with `globrex`, which reads `[.well-known]` as a regex
+  // character class and throws "Range out of order in character class", crashing `vite dev`.
+  "exclude": [
+    "src/routes/mcp.ts",
+    "src/routes/*/list-tools.ts",
+    "src/routes/*/invoke-tool/*.ts",
+    "src/routes/*/oauth-protected-resource.ts"
+  ],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",
     "module": "ESNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vite/client"],
+    "types": ["vite/client", "node"],
 
     /* Bundler mode */
     "moduleResolution": "Bundler",

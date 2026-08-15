@@ -7,8 +7,7 @@ export const Route = createFileRoute("/compliance")({
       { title: "Regulatory Compliance · ENICE Group" },
       {
         name: "description",
-        content:
-          "Regulatory posture, registrations, and compliance program of ENICE Group.",
+        content: "Regulatory posture, registrations, and compliance program of ENICE Group.",
       },
     ],
   }),
@@ -22,10 +21,9 @@ export const Route = createFileRoute("/compliance")({
           heading: "Corporate and Enterprise Registration",
           body: (
             <p>
-              ENICE Group is fully registered with the Small and Medium
-              Enterprises Development Agency of Nigeria (SMEDAN) as a certified
-              Nano Enterprise, and meets all local operational, reporting, and
-              statutory requirements for enterprise businesses.
+              ENICE Group is fully registered with the Small and Medium Enterprises Development
+              Agency of Nigeria (SMEDAN) as a certified Nano Enterprise, and meets all local
+              operational, reporting, and statutory requirements for enterprise businesses.
             </p>
           ),
         },
@@ -37,15 +35,15 @@ export const Route = createFileRoute("/compliance")({
                 <span className="font-medium text-foreground">
                   Anti-Money Laundering (AML) and KYC.
                 </span>{" "}
-                Our platforms rely on rigorous Know Your Customer and
-                Anti-Money Laundering verification frameworks to prevent illicit
-                financial flows, identity theft, and commercial fraud.
+                Our platforms rely on rigorous Know Your Customer and Anti-Money Laundering
+                verification frameworks to prevent illicit financial flows, identity theft, and
+                commercial fraud.
               </p>
               <p>
-                <span className="font-medium text-foreground">Data security standards.</span>{" "}
-                Any financial processing that runs in our environments uses
-                industry-standard security architectures, including PCI-DSS
-                compliant gateways, so data pipelines stay secure end to end.
+                <span className="font-medium text-foreground">Data security standards.</span> Any
+                financial processing that runs in our environments uses industry-standard security
+                architectures, including PCI-DSS compliant gateways, so data pipelines stay secure
+                end to end.
               </p>
             </div>
           ),
@@ -55,21 +53,20 @@ export const Route = createFileRoute("/compliance")({
           body: (
             <div className="space-y-4">
               <p>
-                We map our application data models to comply with leading
-                privacy regulations based on user demographics:
+                We map our application data models to comply with leading privacy regulations based
+                on user demographics:
               </p>
               <ul className="list-disc space-y-2 pl-5">
                 <li>
-                  <span className="font-medium text-foreground">NDPA and NDPR.</span>{" "}
-                  Compliant with the Nigerian Data Protection Act and Regulation
-                  on consumer data privacy.
+                  <span className="font-medium text-foreground">NDPA and NDPR.</span> Compliant with
+                  the Nigerian Data Protection Act and Regulation on consumer data privacy.
                 </li>
                 <li>
                   <span className="font-medium text-foreground">
                     GDPR and international standards.
                   </span>{" "}
-                  Adhering to strict data-controllership rules for cross-border
-                  data transfers and user consent in global commerce.
+                  Adhering to strict data-controllership rules for cross-border data transfers and
+                  user consent in global commerce.
                 </li>
               </ul>
             </div>
@@ -79,9 +76,8 @@ export const Route = createFileRoute("/compliance")({
           heading: "Security Architecture",
           body: (
             <p>
-              Our systems apply SOC 2 aligned controls, row-level security on
-              every multi-tenant database, encryption at rest, zero-trust
-              access, and active-active disaster recovery.
+              Our systems apply SOC 2 aligned controls, row-level security on every multi-tenant
+              database, encryption at rest, zero-trust access, and active-active disaster recovery.
             </p>
           ),
         },
@@ -89,8 +85,7 @@ export const Route = createFileRoute("/compliance")({
           heading: "Contact for Regulatory Matters",
           body: (
             <p>
-              Regulators, auditors, and compliance partners can reach our office
-              at{" "}
+              Regulators, auditors, and compliance partners can reach our office at{" "}
               <a
                 href="mailto:compliance@enicehq.com"
                 className="font-medium text-primary hover:underline"

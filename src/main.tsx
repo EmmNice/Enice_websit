@@ -48,5 +48,5 @@ createRoot(rootElement).render(
     <GlobalErrorBoundary>
       <RouterProvider router={router} />
     </GlobalErrorBoundary>
-  </StrictMode>
+  </StrictMode>,
 );

@@ -5,7 +5,8 @@ const STACK = [
     name: "Amazon Web Services",
     abbr: "AWS",
     label: "Cloud Infrastructure and Security",
-    detail: "Our main cloud backbone. It handles compute, storage, and edge delivery across every ENICE Group platform.",
+    detail:
+      "Our main cloud backbone. It handles compute, storage, and edge delivery across every ENICE Group platform.",
     index: "01",
   },
   {
@@ -13,14 +14,16 @@ const STACK = [
     abbr: "GCP",
     provider: "and Gemini AI",
     label: "Core AI Engine and Computational Intelligence",
-    detail: "Runs PulseAssist's AI pipeline: LLM orchestration and workflow automation across tenants.",
+    detail:
+      "Runs PulseAssist's AI pipeline: LLM orchestration and workflow automation across tenants.",
     index: "02",
   },
   {
     name: "Supabase",
     abbr: "PG",
     label: "Database Infrastructure and Auth",
-    detail: "Row-level security, real-time data streams, and managed Postgres for PulsePay's transaction systems.",
+    detail:
+      "Row-level security, real-time data streams, and managed Postgres for PulsePay's transaction systems.",
     index: "03",
   },
 ] as const;
@@ -29,7 +32,6 @@ export function InfraStack() {
   return (
     <section className="border-t border-border bg-background py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-
         <Reveal>
           <div className="mb-16 max-w-3xl">
             <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">
@@ -41,9 +43,8 @@ export function InfraStack() {
               and technology stack.
             </h2>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-               Every ENICE Group product runs on the same backbone. We chose it
-              for reliability, compliance, and scale, not because it was
-              the easy option.
+              Every ENICE Group product runs on the same backbone. We chose it for reliability,
+              compliance, and scale, not because it was the easy option.
             </p>
           </div>
         </Reveal>
@@ -52,7 +53,6 @@ export function InfraStack() {
           {STACK.map((s, i) => (
             <Reveal key={s.name} delay={i * 70}>
               <div className="group flex h-full flex-col bg-background p-8 transition-colors hover:bg-secondary/50 xl:p-10">
-
                 <span className="font-mono text-[10px] font-bold tracking-[0.22em] text-muted-foreground/40">
                   /{s.index}
                 </span>
@@ -81,12 +81,10 @@ export function InfraStack() {
                     {s.detail}
                   </p>
                 </div>
-
               </div>
             </Reveal>
           ))}
         </div>
-
       </div>
     </section>
   );

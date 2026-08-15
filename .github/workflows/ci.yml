@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  web:
+    name: Web app (lint · typecheck · build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Check formatting
+        run: bun run format:check
+
+      - name: Lint
+        run: bun run lint
+
+      - name: Typecheck (src + api-src)
+        run: bun run typecheck
+
+      - name: Build client
+        run: bun run build
+
+      - name: Build serverless functions
+        run: bun run build:api
+
+      # `api/` is committed so the deployed functions always match the reviewed source.
+      # If rebuilding changes it, the committed bundle is stale.
+      - name: Fail if committed api/ bundle is out of date
+        run: |
+          if ! git diff --quiet -- api; then
+            echo "::error::api/ is out of sync with api-src/. Run 'bun run build:api' and commit the result."
+            git diff --stat -- api
+            exit 1
+          fi

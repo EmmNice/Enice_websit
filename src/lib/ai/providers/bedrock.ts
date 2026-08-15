@@ -24,7 +24,7 @@ function getSubtle(): SubtleCrypto {
   }
   throw new Error(
     "[BedrockProvider] Web Crypto API (globalThis.crypto.subtle) is not available " +
-    "in this runtime. Ensure Node.js >= 18 is being used.",
+      "in this runtime. Ensure Node.js >= 18 is being used.",
   );
 }
 
@@ -37,17 +37,11 @@ function toHex(buf: ArrayBuffer): string {
 }
 
 async function sha256Hex(data: string): Promise<string> {
-  const hash = await getSubtle().digest(
-    "SHA-256",
-    new TextEncoder().encode(data),
-  );
+  const hash = await getSubtle().digest("SHA-256", new TextEncoder().encode(data));
   return toHex(hash);
 }
 
-async function hmacSHA256(
-  key: ArrayBuffer | Uint8Array,
-  data: string,
-): Promise<ArrayBuffer> {
+async function hmacSHA256(key: ArrayBuffer | Uint8Array, data: string): Promise<ArrayBuffer> {
   // Pass key directly — both Uint8Array and ArrayBuffer are valid BufferSource.
   // Using key.buffer on a Uint8Array can reference a larger shared buffer in some
   // Node.js builds (e.g. Vercel's runtime), corrupting the HMAC with extra bytes.
@@ -69,8 +63,8 @@ async function deriveSigningKey(
   service: string,
 ): Promise<ArrayBuffer> {
   const kSecret = new TextEncoder().encode("AWS4" + secretKey);
-  const kDate    = await hmacSHA256(kSecret, dateStamp);
-  const kRegion  = await hmacSHA256(kDate, region);
+  const kDate = await hmacSHA256(kSecret, dateStamp);
+  const kRegion = await hmacSHA256(kDate, region);
   const kService = await hmacSHA256(kRegion, service);
   return hmacSHA256(kService, "aws4_request");
 }
@@ -88,16 +82,18 @@ async function signRequest(opts: {
   body: string;
 }): Promise<Record<string, string>> {
   const now = new Date();
-  const amzDate  = now.toISOString().replace(/[:-]|\.\d{3}/g, "").slice(0, 15) + "Z";
+  const amzDate =
+    now
+      .toISOString()
+      .replace(/[:-]|\.\d{3}/g, "")
+      .slice(0, 15) + "Z";
   const dateStamp = amzDate.slice(0, 8);
 
   const payloadHash = await sha256Hex(opts.body);
 
   // Canonical headers (must be sorted, lower-cased)
   const canonicalHeaders =
-    `content-type:application/json\n` +
-    `host:${opts.host}\n` +
-    `x-amz-date:${amzDate}\n`;
+    `content-type:application/json\n` + `host:${opts.host}\n` + `x-amz-date:${amzDate}\n`;
 
   const signedHeaders = "content-type;host;x-amz-date";
 
@@ -112,7 +108,7 @@ async function signRequest(opts: {
   const canonicalRequest = [
     opts.method,
     canonicalUri,
-    "",                  // no query string
+    "", // no query string
     canonicalHeaders,
     signedHeaders,
     payloadHash,
@@ -139,17 +135,22 @@ async function signRequest(opts: {
     `SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
   return {
-    "Content-Type":  "application/json",
-    "x-amz-date":    amzDate,
-    "Authorization": authHeader,
+    "Content-Type": "application/json",
+    "x-amz-date": amzDate,
+    Authorization: authHeader,
   };
 }
 
 // ── Bedrock Converse API types ────────────────────────────────────────────────
 
-interface BedrockContentBlock  { text: string }
-interface BedrockMessage       { role: "user" | "assistant"; content: BedrockContentBlock[] }
-interface BedrockConverseBody  {
+interface BedrockContentBlock {
+  text: string;
+}
+interface BedrockMessage {
+  role: "user" | "assistant";
+  content: BedrockContentBlock[];
+}
+interface BedrockConverseBody {
   messages: BedrockMessage[];
   system?: { text: string }[];
   inferenceConfig?: { maxTokens?: number; temperature?: number };
@@ -163,39 +164,37 @@ interface BedrockConverseResponse {
 // ── Provider class ────────────────────────────────────────────────────────────
 
 export class BedrockProvider implements AIProvider {
-  private readonly accessKeyId:     string;
+  private readonly accessKeyId: string;
   private readonly secretAccessKey: string;
-  private readonly region:          string;
-  private readonly modelId:         string;
+  private readonly region: string;
+  private readonly modelId: string;
 
   constructor(
     accessKeyId: string,
     secretAccessKey: string,
-    region  = "us-east-1",
+    region = "us-east-1",
     modelId = "amazon.nova-lite-v1:0",
   ) {
-    this.accessKeyId     = accessKeyId;
+    this.accessKeyId = accessKeyId;
     this.secretAccessKey = secretAccessKey;
-    this.region          = region;
-    this.modelId         = modelId;
+    this.region = region;
+    this.modelId = modelId;
   }
 
   async complete(messages: AIMessage[]): Promise<AIResponse> {
     // Separate system messages from conversation turns
     const systemMessages = messages.filter((m) => m.role === "system");
-    const turns          = messages.filter((m) => m.role !== "system");
+    const turns = messages.filter((m) => m.role !== "system");
 
     // Bedrock Converse requires the conversation to start with a "user" message.
     // Drop any leading assistant turns (e.g. a synthetic greeting prepended by
     // the frontend) so we never violate this constraint.
-    const userFirstTurns = turns.slice(
-      turns.findIndex((m) => m.role === "user"),
-    );
+    const userFirstTurns = turns.slice(turns.findIndex((m) => m.role === "user"));
 
     const bedrockMessages: BedrockMessage[] = (
       userFirstTurns.length > 0 ? userFirstTurns : turns
     ).map((m) => ({
-      role:    m.role as "user" | "assistant",
+      role: m.role as "user" | "assistant",
       content: [{ text: m.content }],
     }));
 
@@ -209,21 +208,21 @@ export class BedrockProvider implements AIProvider {
     }
 
     const bodyStr = JSON.stringify(body);
-    const host    = `bedrock-runtime.${this.region}.amazonaws.com`;
+    const host = `bedrock-runtime.${this.region}.amazonaws.com`;
     // Do NOT use encodeURIComponent — Bedrock model IDs contain colons and dots
     // that AWS expects unencoded in the URL path (e.g. amazon.nova-lite-v1:0)
-    const path    = `/model/${this.modelId}/converse`;
-    const url     = `https://${host}${path}`;
+    const path = `/model/${this.modelId}/converse`;
+    const url = `https://${host}${path}`;
 
     const headers = await signRequest({
-      method:          "POST",
+      method: "POST",
       host,
       path,
-      region:          this.region,
-      service:         "bedrock",
-      accessKeyId:     this.accessKeyId,
+      region: this.region,
+      service: "bedrock",
+      accessKeyId: this.accessKeyId,
       secretAccessKey: this.secretAccessKey,
-      body:            bodyStr,
+      body: bodyStr,
     });
 
     const res = await fetch(url, { method: "POST", headers, body: bodyStr });

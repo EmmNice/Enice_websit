@@ -28,45 +28,40 @@
  */
 
 import type { AIProvider } from "./types";
-import { BedrockProvider }          from "./providers/bedrock";
-import { OpenAIProvider }           from "./providers/openai";
-import { AnthropicProvider }        from "./providers/anthropic";
-import { GeminiProvider }           from "./providers/gemini";
+import { BedrockProvider } from "./providers/bedrock";
+import { OpenAIProvider } from "./providers/openai";
+import { AnthropicProvider } from "./providers/anthropic";
+import { GeminiProvider } from "./providers/gemini";
 import { OpenAICompatibleProvider } from "./providers/openai-compatible";
-import { FallbackProvider }         from "./providers/fallback";
+import { FallbackProvider } from "./providers/fallback";
 
 export function createAIProvider(): AIProvider {
-  const provider  = (process.env.AI_PROVIDER ?? "bedrock").toLowerCase().trim();
+  const provider = (process.env.AI_PROVIDER ?? "bedrock").toLowerCase().trim();
   // Accept both AI_API_KEY and AWS_API_KEY (legacy alias)
-  const apiKey    = process.env.AI_API_KEY    || process.env.AWS_API_KEY    || "";
+  const apiKey = process.env.AI_API_KEY || process.env.AWS_API_KEY || "";
   // Accept both AI_API_SECRET and AWS_API_SECRET (legacy alias)
   const apiSecret = process.env.AI_API_SECRET || process.env.AWS_API_SECRET || "";
-  const region    = process.env.AI_REGION     ?? "us-east-1";
-  const model     = process.env.AI_MODEL      || undefined;
-  const baseUrl   = process.env.AI_BASE_URL   || undefined;
+  const region = process.env.AI_REGION ?? "us-east-1";
+  const model = process.env.AI_MODEL || undefined;
+  const baseUrl = process.env.AI_BASE_URL || undefined;
 
   // ── Amazon Bedrock (needs Access Key ID + Secret Access Key) ───────────────
   if (provider === "bedrock" || provider === "aws") {
     if (!apiKey || !apiSecret) {
       console.warn(
         "[AI] Bedrock requires AI_API_KEY (Access Key ID) and AI_API_SECRET (Secret Access Key). " +
-        "Using FallbackProvider until credentials are set.",
+          "Using FallbackProvider until credentials are set.",
       );
       return new FallbackProvider();
     }
-    return new BedrockProvider(
-      apiKey,
-      apiSecret,
-      region,
-      model ?? "amazon.nova-lite-v1:0",
-    );
+    return new BedrockProvider(apiKey, apiSecret, region, model ?? "amazon.nova-lite-v1:0");
   }
 
   // ── All other providers — gate on single API key ───────────────────────────
   if (!apiKey) {
     console.warn(
       `[AI] No AI_API_KEY set — using FallbackProvider. ` +
-      `Set AI_PROVIDER and AI_API_KEY to enable live responses.`,
+        `Set AI_PROVIDER and AI_API_KEY to enable live responses.`,
     );
     return new FallbackProvider();
   }
@@ -116,7 +111,7 @@ export function createAIProvider(): AIProvider {
         // OpenRouter recommends these headers for usage tracking
         {
           "HTTP-Referer": "https://enicehq.com",
-          "X-Title":      "ENICE Group",
+          "X-Title": "ENICE Group",
         },
       );
 
@@ -132,7 +127,7 @@ export function createAIProvider(): AIProvider {
     default:
       console.error(
         `[AI] Unknown AI_PROVIDER="${provider}". ` +
-        `Valid values: bedrock, openai, anthropic, gemini, deepseek, grok, openrouter, custom.`,
+          `Valid values: bedrock, openai, anthropic, gemini, deepseek, grok, openrouter, custom.`,
       );
       return new FallbackProvider();
   }

@@ -46,11 +46,10 @@ export function AboutMatrix() {
   return (
     <section id="about" className="border-t border-border bg-background py-28 sm:py-36">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-
         {/* Section header */}
         <div className="mb-14 max-w-3xl">
           <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">
-             About: Product System
+            About: Product System
           </div>
           <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
             Building the systems
@@ -58,22 +57,22 @@ export function AboutMatrix() {
             behind what we ship.
           </h2>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-             ENICE Group is the parent company behind a growing set of products.
-             We build our software and infrastructure ourselves, then run
-             each platform to the same standard of scale, compliance, and
-             reliability.
+            ENICE Group is the parent company behind a growing set of products. We build our
+            software and infrastructure ourselves, then run each platform to the same standard of
+            scale, compliance, and reliability.
           </p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2 lg:gap-12">
-
           {/* Left: venture cards + docs link */}
           <div className="space-y-4">
             {VENTURES.map((v) => (
               <article
                 key={v.title}
                 className="rounded-xl border border-border bg-background p-7 transition-all hover:-translate-y-0.5 hover:shadow-md"
-                style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 6px rgba(17,24,39,0.05)" }}
+                style={{
+                  boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 6px rgba(17,24,39,0.05)",
+                }}
               >
                 <div className="flex items-start gap-4">
                   <div className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/15">
@@ -131,7 +130,6 @@ export function AboutMatrix() {
               )}
             </pre>
           </div>
-
         </div>
       </div>
 
@@ -160,10 +158,9 @@ export function AboutMatrix() {
               ENICE Core: developer reference
             </h3>
             <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground">
-              The full developer reference is still being finalized. The ENICE
-              Core gateway exposes endpoints for ledger operations, AI
-              orchestration, KYC and compliance, and edge delivery, accessible
-              via REST and signed webhooks.
+              The full developer reference is still being finalized. The ENICE Core gateway exposes
+              endpoints for ledger operations, AI orchestration, KYC and compliance, and edge
+              delivery, accessible via REST and signed webhooks.
             </p>
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               {[

@@ -6,12 +6,12 @@
 import { Cpu, Cloud, Database, Zap, Globe, Building2 } from "lucide-react";
 
 const PARTNERS = [
-  { icon: Cloud,    label: "Amazon Web Services", sub: "Cloud Infrastructure" },
-  { icon: Cpu,      label: "Google Cloud",         sub: "AI & Compute"        },
-  { icon: Database, label: "Supabase",              sub: "Database & Auth"     },
-  { icon: Globe,    label: "Vercel",                sub: "Edge Delivery"       },
-  { icon: Building2,label: "AWS Activate",          sub: "Startup Program"     },
-  { icon: Zap,      label: "Resend",                sub: "Transactional Email" },
+  { icon: Cloud, label: "Amazon Web Services", sub: "Cloud Infrastructure" },
+  { icon: Cpu, label: "Google Cloud", sub: "AI & Compute" },
+  { icon: Database, label: "Supabase", sub: "Database & Auth" },
+  { icon: Globe, label: "Vercel", sub: "Edge Delivery" },
+  { icon: Building2, label: "AWS Activate", sub: "Startup Program" },
+  { icon: Zap, label: "Resend", sub: "Transactional Email" },
 ] as const;
 
 // Duplicate for seamless loop
@@ -48,9 +48,7 @@ export function PartnersStrip() {
                 <p className="text-[12px] font-semibold leading-none tracking-tight text-foreground">
                   {p.label}
                 </p>
-                <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">
-                  {p.sub}
-                </p>
+                <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">{p.sub}</p>
               </div>
             </div>
           ))}
