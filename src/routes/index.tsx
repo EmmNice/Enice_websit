@@ -1,5 +1,4 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SITE_URL } from "@/lib/site";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -28,41 +27,10 @@ import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { ContactSection } from "@/components/site/ContactSection";
-import { pageHead } from "@/lib/seo";
+import { organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
-  head: () =>
-    pageHead("/", [
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        name: "ENICE Group",
-        url: SITE_URL,
-        logo: `${SITE_URL}/favicon.png`,
-        subOrganization: [
-          {
-            "@type": "FinancialProduct",
-            name: "PulsePay",
-            description: "Virtual card issuance, programmable wallets, and embedded treasury.",
-          },
-          {
-            "@type": "Organization",
-            name: "PulseAssist",
-            description: "Multi-tenant AI conversational SaaS for banking and telecom.",
-          },
-          {
-            "@type": "FinancialProduct",
-            name: "EPulse",
-            description: "Digital banking infrastructure.",
-          },
-          {
-            "@type": "FinancialProduct",
-            name: "PulseX",
-            description: "Global digital asset trading exchange.",
-          },
-        ],
-      },
-    ]),
+  head: () => pageHead("/", [organizationJsonLd(), webSiteJsonLd()]),
   component: Landing,
 });
 

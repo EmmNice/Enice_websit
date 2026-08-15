@@ -70,7 +70,7 @@ async function loadSeoModule() {
  * two of each tag — the values are identical, but duplicate title and description elements are
  * exactly what an SEO audit flags.
  */
-function renderHead(meta, canonical) {
+function renderHead(meta, canonical, jsonLd = []) {
   const lines = [];
   const mark = "data-prerendered";
   for (const tag of meta) {
@@ -85,6 +85,12 @@ function renderHead(meta, canonical) {
     }
   }
   lines.push(`    <link ${mark} rel="canonical" href="${attr(canonical)}" />`);
+  for (const data of jsonLd) {
+    // `</script>` inside a JSON string would close the tag early; escaping the slash is the
+    // standard defence and stays valid JSON.
+    const json = JSON.stringify(data).replace(/<\//g, "<\\/");
+    lines.push(`    <script ${mark} type="application/ld+json">${json}</script>`);
+  }
   return lines.join("\n");
 }
 
@@ -145,15 +151,16 @@ async function main() {
     process.exit(1);
   }
 
-  const { PAGE_SEO, buildMeta, canonicalUrl, DEFAULT_OG_IMAGE, SITE_NAME } = await loadSeoModule();
+  const { PAGE_SEO, buildMeta, canonicalUrl, DEFAULT_OG_IMAGE, prerenderJsonLd } =
+    await loadSeoModule();
   const shell = await readFile(join(DIST, "index.html"), "utf8");
-  void SITE_NAME;
 
   let written = 0;
 
   for (const [pathname, seo] of Object.entries(PAGE_SEO)) {
     const url = canonicalUrl(pathname);
-    const file = await writePage(pathname, renderHead(buildMeta(seo, url), url), shell);
+    const head = renderHead(buildMeta(seo, url), url, prerenderJsonLd(pathname));
+    const file = await writePage(pathname, head, shell);
     console.log(`[prerender] ${pathname.padEnd(26)} -> ${file}`);
     written++;
   }
