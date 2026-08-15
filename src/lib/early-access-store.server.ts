@@ -74,6 +74,49 @@ function client(): Resend {
   return new Resend(apiKey);
 }
 
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Resend's default limit is around 2 requests/second. */
+const THROTTLE_MS = 260;
+
+type ResendResult<T> = {
+  data: T | null;
+  error: { message: string; statusCode: number | null } | null;
+};
+
+function isTransient(error: { message: string; statusCode: number | null } | null): boolean {
+  if (!error) return false;
+  const status = error.statusCode ?? 0;
+  return status === 429 || status >= 500 || /rate.?limit|too many/i.test(error.message);
+}
+
+/**
+ * Retries a Resend call on rate limiting and server errors.
+ *
+ * Provisioning issues nine calls in quick succession, which tripped Resend's per-second
+ * limit and made the first request after a cold start fail outright — observed in
+ * production on the very first live submission. Callers are retried with backoff instead.
+ */
+async function withRetry<T>(
+  label: string,
+  call: () => Promise<ResendResult<T>>,
+  attempts = 3,
+): Promise<ResendResult<T>> {
+  let last: ResendResult<T> = { data: null, error: null };
+  for (let i = 0; i < attempts; i++) {
+    last = await call();
+    if (!isTransient(last.error)) return last;
+    if (i < attempts - 1) {
+      const backoff = 400 * 2 ** i;
+      console.warn(
+        `[early-access] ${label} hit a transient error (${last.error?.statusCode}); retrying in ${backoff}ms`,
+      );
+      await sleep(backoff);
+    }
+  }
+  return last;
+}
+
 // ── Provisioning (cached per warm instance) ──────────────────────────────────
 
 let propertiesReady: Promise<void> | null = null;
@@ -82,19 +125,22 @@ async function ensureProperties(resend: Resend): Promise<void> {
   if (propertiesReady) return propertiesReady;
 
   propertiesReady = (async () => {
-    const existing = await resend.contactProperties.list({ limit: 100 });
+    const existing = await withRetry("contactProperties.list", () =>
+      resend.contactProperties.list({ limit: 100 }),
+    );
     if (existing.error) {
       throw new Error(`Could not list contact properties: ${existing.error.message}`);
     }
     const have = new Set((existing.data?.data ?? []).map((p) => p.key));
+    const missing = ALL_PROPERTY_KEYS.filter((k) => !have.has(k));
 
-    for (const key of ALL_PROPERTY_KEYS) {
-      if (have.has(key)) continue;
-      const created = await resend.contactProperties.create({
-        key,
-        type: "string",
-        fallbackValue: null,
-      });
+    // Spaced out to stay under Resend's per-second limit. This only runs until every key
+    // exists, so the steady-state cost is the single list call above.
+    for (const [index, key] of missing.entries()) {
+      if (index > 0) await sleep(THROTTLE_MS);
+      const created = await withRetry(`contactProperties.create(${key})`, () =>
+        resend.contactProperties.create({ key, type: "string", fallbackValue: null }),
+      );
       // A concurrent cold start may have created it first; that is not an error.
       if (created.error && !/exist/i.test(created.error.message)) {
         throw new Error(`Could not create contact property "${key}": ${created.error.message}`);
@@ -121,7 +167,7 @@ async function resolveSegmentId(resend: Resend): Promise<string> {
   }
 
   // Self-provision by name so deploying does not require creating the segment by hand.
-  const list = await resend.segments.list({ limit: 100 });
+  const list = await withRetry("segments.list", () => resend.segments.list({ limit: 100 }));
   if (list.error) throw new Error(`Could not list segments: ${list.error.message}`);
 
   const found = (list.data?.data ?? []).find((s) => s.name === SEGMENT_NAME);
@@ -130,7 +176,9 @@ async function resolveSegmentId(resend: Resend): Promise<string> {
     return found.id;
   }
 
-  const created = await resend.segments.create({ name: SEGMENT_NAME });
+  const created = await withRetry("segments.create", () =>
+    resend.segments.create({ name: SEGMENT_NAME }),
+  );
   if (created.error || !created.data?.id) {
     throw new Error(`Could not create the "${SEGMENT_NAME}" segment: ${created.error?.message}`);
   }
@@ -173,7 +221,7 @@ function toStatus(raw: string): EarlyAccessStatus {
 /** `contacts.get` errors when the address is unknown; treat that as "not found". */
 async function findContact(resend: Resend, email: string) {
   try {
-    const res = await resend.contacts.get({ email });
+    const res = await withRetry("contacts.get", () => resend.contacts.get({ email }));
     if (res.error || !res.data) return null;
     return res.data;
   } catch {
@@ -218,16 +266,15 @@ export async function registerEarlyAccess(input: {
   };
 
   if (existing) {
-    const updated = await resend.contacts.update({
-      email: input.email,
-      firstName,
-      lastName,
-      properties,
-    });
+    const updated = await withRetry("contacts.update", () =>
+      resend.contacts.update({ email: input.email, firstName, lastName, properties }),
+    );
     if (updated.error) {
       throw new Error(`Could not update contact: ${updated.error.message}`);
     }
-    const added = await resend.contacts.segments.add({ email: input.email, segmentId });
+    const added = await withRetry("contacts.segments.add", () =>
+      resend.contacts.segments.add({ email: input.email, segmentId }),
+    );
     // Already-a-member is a success for our purposes.
     if (added.error && !/exist|already/i.test(added.error.message)) {
       throw new Error(`Could not add contact to the segment: ${added.error.message}`);
@@ -235,14 +282,16 @@ export async function registerEarlyAccess(input: {
     return { outcome: "created" };
   }
 
-  const created = await resend.contacts.create({
-    email: input.email,
-    firstName,
-    // `create` accepts `string | undefined` while `update` accepts `string | null`.
-    lastName: lastName ?? undefined,
-    properties,
-    segments: [{ id: segmentId }],
-  });
+  const created = await withRetry("contacts.create", () =>
+    resend.contacts.create({
+      email: input.email,
+      firstName,
+      // `create` accepts `string | undefined` while `update` accepts `string | null`.
+      lastName: lastName ?? undefined,
+      properties,
+      segments: [{ id: segmentId }],
+    }),
+  );
   if (created.error) {
     throw new Error(`Could not create contact: ${created.error.message}`);
   }
@@ -264,13 +313,16 @@ export async function listRegistrations(limit = 100): Promise<{
   const segmentId = await resolveSegmentId(resend);
 
   const capped = Math.min(Math.max(limit, 1), 100);
-  const list = await resend.contacts.list({ segmentId, limit: capped });
+  const list = await withRetry("contacts.list", () =>
+    resend.contacts.list({ segmentId, limit: capped }),
+  );
   if (list.error) throw new Error(`Could not list contacts: ${list.error.message}`);
 
   const contacts = list.data?.data ?? [];
   const registrations: Registration[] = [];
 
-  const CONCURRENCY = 6;
+  // Kept low so a page of reads cannot trip Resend's per-second limit.
+  const CONCURRENCY = 3;
   for (let i = 0; i < contacts.length; i += CONCURRENCY) {
     const batch = contacts.slice(i, i + CONCURRENCY);
     const details = await Promise.all(
@@ -316,13 +368,15 @@ export async function updateRegistrationStatus(
   const existing = await findContact(resend, email);
   if (!existing) return { outcome: "not_found" };
 
-  const res = await resend.contacts.update({
-    email,
-    properties: {
-      [PROPERTY_KEYS.status]: status,
-      [PROPERTY_KEYS.updatedAt]: new Date().toISOString(),
-    },
-  });
+  const res = await withRetry("contacts.update(status)", () =>
+    resend.contacts.update({
+      email,
+      properties: {
+        [PROPERTY_KEYS.status]: status,
+        [PROPERTY_KEYS.updatedAt]: new Date().toISOString(),
+      },
+    }),
+  );
   if (res.error) throw new Error(`Could not update status: ${res.error.message}`);
   return { outcome: "updated" };
 }

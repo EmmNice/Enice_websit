@@ -5877,22 +5877,47 @@ function client() {
   }
   return new Resend(apiKey);
 }
+var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+var THROTTLE_MS = 260;
+function isTransient(error) {
+  if (!error) return false;
+  const status = error.statusCode ?? 0;
+  return status === 429 || status >= 500 || /rate.?limit|too many/i.test(error.message);
+}
+async function withRetry(label, call, attempts2 = 3) {
+  let last = { data: null, error: null };
+  for (let i = 0; i < attempts2; i++) {
+    last = await call();
+    if (!isTransient(last.error)) return last;
+    if (i < attempts2 - 1) {
+      const backoff = 400 * 2 ** i;
+      console.warn(
+        `[early-access] ${label} hit a transient error (${last.error?.statusCode}); retrying in ${backoff}ms`
+      );
+      await sleep(backoff);
+    }
+  }
+  return last;
+}
 var propertiesReady = null;
 async function ensureProperties(resend) {
   if (propertiesReady) return propertiesReady;
   propertiesReady = (async () => {
-    const existing = await resend.contactProperties.list({ limit: 100 });
+    const existing = await withRetry(
+      "contactProperties.list",
+      () => resend.contactProperties.list({ limit: 100 })
+    );
     if (existing.error) {
       throw new Error(`Could not list contact properties: ${existing.error.message}`);
     }
     const have = new Set((existing.data?.data ?? []).map((p) => p.key));
-    for (const key of ALL_PROPERTY_KEYS) {
-      if (have.has(key)) continue;
-      const created = await resend.contactProperties.create({
-        key,
-        type: "string",
-        fallbackValue: null
-      });
+    const missing = ALL_PROPERTY_KEYS.filter((k) => !have.has(k));
+    for (const [index, key] of missing.entries()) {
+      if (index > 0) await sleep(THROTTLE_MS);
+      const created = await withRetry(
+        `contactProperties.create(${key})`,
+        () => resend.contactProperties.create({ key, type: "string", fallbackValue: null })
+      );
       if (created.error && !/exist/i.test(created.error.message)) {
         throw new Error(`Could not create contact property "${key}": ${created.error.message}`);
       }
@@ -5911,14 +5936,17 @@ async function resolveSegmentId(resend) {
     segmentIdCache = configured;
     return configured;
   }
-  const list = await resend.segments.list({ limit: 100 });
+  const list = await withRetry("segments.list", () => resend.segments.list({ limit: 100 }));
   if (list.error) throw new Error(`Could not list segments: ${list.error.message}`);
   const found = (list.data?.data ?? []).find((s) => s.name === SEGMENT_NAME);
   if (found) {
     segmentIdCache = found.id;
     return found.id;
   }
-  const created = await resend.segments.create({ name: SEGMENT_NAME });
+  const created = await withRetry(
+    "segments.create",
+    () => resend.segments.create({ name: SEGMENT_NAME })
+  );
   if (created.error || !created.data?.id) {
     throw new Error(`Could not create the "${SEGMENT_NAME}" segment: ${created.error?.message}`);
   }
@@ -5938,7 +5966,7 @@ function toStatus(raw) {
 }
 async function findContact(resend, email) {
   try {
-    const res = await resend.contacts.get({ email });
+    const res = await withRetry("contacts.get", () => resend.contacts.get({ email }));
     if (res.error || !res.data) return null;
     return res.data;
   } catch {
@@ -5949,11 +5977,14 @@ async function listRegistrations(limit = 100) {
   const resend = client();
   const segmentId = await resolveSegmentId(resend);
   const capped = Math.min(Math.max(limit, 1), 100);
-  const list = await resend.contacts.list({ segmentId, limit: capped });
+  const list = await withRetry(
+    "contacts.list",
+    () => resend.contacts.list({ segmentId, limit: capped })
+  );
   if (list.error) throw new Error(`Could not list contacts: ${list.error.message}`);
   const contacts = list.data?.data ?? [];
   const registrations = [];
-  const CONCURRENCY = 6;
+  const CONCURRENCY = 3;
   for (let i = 0; i < contacts.length; i += CONCURRENCY) {
     const batch = contacts.slice(i, i + CONCURRENCY);
     const details = await Promise.all(
@@ -5986,13 +6017,16 @@ async function updateRegistrationStatus(email, status) {
   await ensureProperties(resend);
   const existing = await findContact(resend, email);
   if (!existing) return { outcome: "not_found" };
-  const res = await resend.contacts.update({
-    email,
-    properties: {
-      [PROPERTY_KEYS.status]: status,
-      [PROPERTY_KEYS.updatedAt]: (/* @__PURE__ */ new Date()).toISOString()
-    }
-  });
+  const res = await withRetry(
+    "contacts.update(status)",
+    () => resend.contacts.update({
+      email,
+      properties: {
+        [PROPERTY_KEYS.status]: status,
+        [PROPERTY_KEYS.updatedAt]: (/* @__PURE__ */ new Date()).toISOString()
+      }
+    })
+  );
   if (res.error) throw new Error(`Could not update status: ${res.error.message}`);
   return { outcome: "updated" };
 }
