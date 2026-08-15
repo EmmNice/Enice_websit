@@ -48,18 +48,3 @@ jobs:
             git diff --stat -- api
             exit 1
           fi
-
-  edge-functions:
-    name: Supabase Edge Functions (typecheck)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: denoland/setup-deno@v2
-        with:
-          deno-version: v2.x
-
-      # ESLint cannot resolve Deno's `npm:` specifiers, so these files are excluded there
-      # and checked here instead.
-      - name: Typecheck Edge Functions
-        run: deno check --no-lock supabase/functions/*/index.ts

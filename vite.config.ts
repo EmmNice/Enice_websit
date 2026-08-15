@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv, type Plugin, type ViteDevServer } from "vite";
+import { defineConfig, type Plugin, type ViteDevServer } from "vite";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
@@ -36,6 +36,8 @@ type ApiHandler = (req: any, res: any) => unknown;
 const API_ROUTES: Record<string, string> = {
   "/api/watchlist": "/api-src/watchlist.ts",
   "/api/admin/watchlist": "/api-src/admin/watchlist.ts",
+  "/api/early-access": "/api-src/early-access.ts",
+  "/api/admin/early-access": "/api-src/admin/early-access.ts",
   "/api/contact": "/api-src/contact.ts",
   "/api/chat": "/api-src/chat.ts",
   "/api/ping": "/api-src/ping.ts",
@@ -131,38 +133,8 @@ function apiBridgePlugin(): Plugin {
   };
 }
 
-/**
- * Fails the production build when the public Supabase variables are missing.
- *
- * `.env` used to be committed, so these values reached the Vercel build implicitly. Now
- * that it is git-ignored they must be configured as Vercel environment variables. Without
- * this guard the build would still succeed and only the PulseAssist early-access form
- * would break at runtime; failing the build instead keeps the last good deployment live
- * and names exactly what is missing.
- */
-function requirePublicEnvPlugin(): Plugin {
-  const REQUIRED = ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"];
-  return {
-    name: "enice-require-public-env",
-    apply: "build",
-    config(_config, { mode }) {
-      const env = loadEnv(mode, process.cwd(), "");
-      const missing = REQUIRED.filter((key) => !env[key] && !process.env[key]);
-      if (missing.length > 0) {
-        throw new Error(
-          `\n\nMissing required build-time environment variables: ${missing.join(", ")}.\n` +
-            `These are public (VITE_-prefixed) values needed by the PulseAssist early-access ` +
-            `form.\nSet them in your hosting provider's environment settings, or in a local ` +
-            `.env file (see .env.example).\n`,
-        );
-      }
-    },
-  };
-}
-
 export default defineConfig({
   plugins: [
-    requirePublicEnvPlugin(),
     tsconfigPaths({ ignoreConfigErrors: true }),
     mcpPlugin(),
     apiBridgePlugin(),

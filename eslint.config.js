@@ -18,10 +18,6 @@ export default tseslint.config(
       "src/routeTree.gen.ts",
       // Sanity Studio is a separate package with its own React version and toolchain.
       "studio-enice-group/**",
-      // Supabase Edge Functions run on Deno with `npm:`/`jsr:` specifiers that this
-      // browser/Node-oriented config cannot resolve. They are checked by `deno check`
-      // in CI instead — see .github/workflows/ci.yml.
-      "supabase/functions/**",
     ],
   },
   {

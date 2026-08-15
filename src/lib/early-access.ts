@@ -1,13 +1,31 @@
 /**
  * PulseAssist early-access registration — shared field contract and client submission.
  *
- * The limits and messages here intentionally mirror the Zod schema in
- * `supabase/functions/pulseassist-early-access/index.ts`. Client validation exists for
- * fast feedback only; the Edge Function re-validates everything and is the authority.
+ * This module is safe on both client and server: no secrets, no server-only imports. The
+ * limits and messages here are mirrored by the server-side validation in
+ * `api-src/early-access.ts`; client validation exists for fast feedback only, and the
+ * handler re-validates everything.
  */
-import { invokeFunction } from "./supabase-functions";
 
-export const EARLY_ACCESS_FUNCTION = "pulseassist-early-access";
+/** POST target. Same-origin Vercel function — no cross-origin call, no public API key. */
+export const EARLY_ACCESS_ENDPOINT = "/api/early-access";
+export const ADMIN_EARLY_ACCESS_ENDPOINT = "/api/admin/early-access";
+
+/**
+ * Review workflow. The server enforces this exact list, so an operator can only move a
+ * registration between these states and a public visitor cannot set a status at all.
+ * Submitting the form never grants product access — it records a request to be reviewed.
+ */
+export const EARLY_ACCESS_STATUSES = [
+  "EARLY_ACCESS",
+  "UNDER_REVIEW",
+  "SELECTED_FOR_BETA",
+  "INVITATION_SENT",
+  "BETA_USER",
+  "REJECTED",
+] as const;
+
+export type EarlyAccessStatus = (typeof EARLY_ACCESS_STATUSES)[number];
 
 /** Kept in sync with the server. Anything not listed is rejected server-side. */
 export const BUSINESS_TYPES = [
@@ -53,14 +71,13 @@ export const EMPTY_FIELDS: EarlyAccessFields = {
  * Deliberately permissive: it rejects clear typos without excluding valid-but-unusual
  * addresses. Deliverability is proven by the confirmation email, not by a regex.
  */
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export function validateEarlyAccess(values: EarlyAccessFields): FieldErrors {
   const errors: FieldErrors = {};
 
   const fullName = values.fullName.trim();
-  if (!fullName) errors.fullName = "Please enter your full name.";
-  else if (fullName.length < 2) errors.fullName = "Please enter your full name.";
+  if (!fullName || fullName.length < 2) errors.fullName = "Please enter your full name.";
   else if (fullName.length > FIELD_LIMITS.fullName)
     errors.fullName = `Please keep this under ${FIELD_LIMITS.fullName} characters.`;
 
@@ -93,14 +110,16 @@ export type SubmitOutcome =
 const GENERIC_FAILURE = "We could not submit your request right now. Please try again in a moment.";
 const UNREACHABLE = "We could not reach our servers. Check your connection and try again.";
 
-type ServerErrorBody = {
+const REQUEST_TIMEOUT_MS = 15_000;
+
+type ServerBody = {
   ok?: boolean;
   code?: string;
   error?: string;
   fieldErrors?: Record<string, string[] | undefined>;
 };
 
-function mapFieldErrors(raw: ServerErrorBody["fieldErrors"]): FieldErrors {
+function mapFieldErrors(raw: ServerBody["fieldErrors"]): FieldErrors {
   const out: FieldErrors = {};
   if (!raw) return out;
   const allowed: (keyof EarlyAccessFields)[] = [
@@ -121,32 +140,53 @@ function mapFieldErrors(raw: ServerErrorBody["fieldErrors"]): FieldErrors {
  * Submits a registration. Never throws — every failure mode is returned so the UI can
  * render a specific, useful message.
  *
- * `honeypot` carries the value of a hidden field that humans never see. It is forwarded
- * so the server can silently absorb bot traffic.
+ * `honeypot` carries a hidden field that humans never see; it is forwarded so the server
+ * can silently absorb bot traffic.
  */
 export async function submitEarlyAccess(
   values: EarlyAccessFields,
   honeypot = "",
 ): Promise<SubmitOutcome> {
-  const result = await invokeFunction<{ ok?: boolean }>(EARLY_ACCESS_FUNCTION, {
-    method: "POST",
-    body: {
-      fullName: values.fullName.trim(),
-      email: values.email.trim().toLowerCase(),
-      businessName: values.businessName.trim(),
-      businessType: values.businessType,
-      businessNeed: values.businessNeed.trim(),
-      website: honeypot,
-    },
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
-  if (result.kind === "unreachable") return { status: "failed", message: UNREACHABLE };
+  let res: Response;
+  let body: ServerBody = {};
+  try {
+    res = await fetch(EARLY_ACCESS_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        fullName: values.fullName.trim(),
+        email: values.email.trim().toLowerCase(),
+        businessName: values.businessName.trim(),
+        businessType: values.businessType,
+        businessNeed: values.businessNeed.trim(),
+        website: honeypot,
+      }),
+      signal: controller.signal,
+    });
 
-  const body = (result.data ?? {}) as ServerErrorBody;
+    // A platform-level failure can return an HTML error page; parse defensively so raw
+    // markup never reaches the UI.
+    const text = await res.text();
+    if (text) {
+      try {
+        body = JSON.parse(text) as ServerBody;
+      } catch {
+        body = {};
+      }
+    }
+  } catch {
+    // Includes AbortError from the timeout above.
+    return { status: "failed", message: UNREACHABLE };
+  } finally {
+    clearTimeout(timer);
+  }
 
-  if (result.kind === "ok" && body.ok !== false) return { status: "ok" };
+  if (res.ok && body.ok !== false) return { status: "ok" };
 
-  if (result.status === 409 || body.code === "DUPLICATE") {
+  if (res.status === 409 || body.code === "DUPLICATE") {
     return {
       status: "duplicate",
       message:
@@ -155,23 +195,18 @@ export async function submitEarlyAccess(
     };
   }
 
-  if (result.status === 429) {
+  if (res.status === 429) {
     return {
       status: "failed",
       message: "Too many attempts. Please wait a few minutes and try again.",
     };
   }
 
-  if (result.status === 400) {
+  if (res.status === 400) {
     const fieldErrors = mapFieldErrors(body.fieldErrors);
     if (Object.keys(fieldErrors).length > 0) {
-      return {
-        status: "invalid",
-        fieldErrors,
-        message: "Please correct the highlighted fields.",
-      };
+      return { status: "invalid", fieldErrors, message: "Please correct the highlighted fields." };
     }
-    return { status: "failed", message: body.error ?? GENERIC_FAILURE };
   }
 
   return { status: "failed", message: body.error ?? GENERIC_FAILURE };
