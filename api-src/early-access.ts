@@ -156,16 +156,36 @@ function confirmationHtml(fullName: string): string {
   );
 }
 
-function notificationHtml(fields: EarlyAccessFields): string {
+/**
+ * Internal notification. When `storageFailure` is non-null the write to Resend did not
+ * succeed, so this email is the only record of the application and says so prominently.
+ */
+function notificationHtml(fields: EarlyAccessFields, storageFailure: unknown): string {
   const row = (label: string, value: string) =>
     `<tr>
        <td style="padding:6px 12px 6px 0;font-size:12px;color:#6b7280;white-space:nowrap;vertical-align:top;">${label}</td>
        <td style="padding:6px 0;font-size:13px;color:#111827;">${escapeHtml(value || "—")}</td>
      </tr>`;
+
+  const warning =
+    storageFailure === null
+      ? ""
+      : `<div style="margin:0 0 20px;padding:12px 14px;border:1px solid #fca5a5;background:#fef2f2;border-radius:6px;">
+           <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#991b1b;">
+             This registration was NOT saved to Resend.
+           </p>
+           <p style="margin:0;font-size:12px;line-height:1.6;color:#7f1d1d;">
+             It will not appear in the admin list, so keep this email as the record. Most
+             likely the RESEND_API_KEY lacks contacts/segments access. Reason:
+             ${escapeHtml(storageFailure instanceof Error ? storageFailure.message : String(storageFailure))}
+           </p>
+         </div>`;
+
   return layout(
     "PulseAssist &middot; Early Access",
     "New early-access registration",
-    `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;">
+    `${warning}
+     <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;">
        ${row("Name", fields.fullName)}
        ${row("Email", fields.email)}
        ${row("Business", fields.businessName)}
@@ -173,7 +193,7 @@ function notificationHtml(fields: EarlyAccessFields): string {
        ${row("Need", fields.businessNeed)}
        ${row("Product", PRODUCT)}
        ${row("Source", SOURCE)}
-       ${row("Status", "EARLY_ACCESS")}
+       ${row("Status", storageFailure === null ? "EARLY_ACCESS" : "not stored")}
      </table>`,
   );
 }
@@ -237,21 +257,40 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       return;
     }
 
-    const result = await registerEarlyAccess(fields);
+    // Storage is attempted first, but a failure here must not cost us the lead.
+    //
+    // Writing a registration needs contacts/segments/contact-properties access, whereas
+    // sending needs only sending access — so a narrowly-scoped RESEND_API_KEY can send mail
+    // while being unable to store anything. Rather than turning that into a dead end for
+    // the applicant, the internal notification email doubles as the durable record: it is
+    // always sent, and it is clearly flagged when the write failed so the team knows the
+    // application is not in the admin list.
+    let stored = false;
+    let storageFailure: unknown = null;
 
-    if (result.outcome === "duplicate") {
-      res.status(409).json({
-        ok: false,
-        code: "DUPLICATE",
-        error: "This email is already on the PulseAssist early-access list.",
-      });
-      return;
+    try {
+      const result = await registerEarlyAccess(fields);
+      if (result.outcome === "duplicate") {
+        res.status(409).json({
+          ok: false,
+          code: "DUPLICATE",
+          error: "This email is already on the PulseAssist early-access list.",
+        });
+        return;
+      }
+      stored = true;
+    } catch (err) {
+      storageFailure = err;
+      console.error(`[api/early-access:${ref}] storage failed, falling back to email:`, err);
     }
 
-    // Email is best-effort: the registration is already stored, so a delivery failure must
-    // not surface to the applicant as an error.
     const { Resend } = await import("resend");
     const resend = new Resend(process.env.RESEND_API_KEY);
+
+    const internalSubject = stored
+      ? `PulseAssist Early Access — ${fields.businessName}`
+      : `[ACTION REQUIRED — not saved] PulseAssist Early Access — ${fields.businessName}`;
+
     const sends = await Promise.allSettled([
       resend.emails.send({
         from: FROM,
@@ -263,10 +302,16 @@ export default async function handler(req: AnyReq, res: AnyRes) {
         from: FROM,
         to: INTERNAL_RECIPIENT,
         replyTo: fields.email,
-        subject: `PulseAssist Early Access — ${fields.businessName}`,
-        html: notificationHtml(fields),
+        subject: internalSubject,
+        html: notificationHtml(fields, stored ? null : storageFailure),
       }),
     ]);
+
+    // The internal notification is the one that must land if storage did not.
+    const internal = sends[1];
+    const internalDelivered =
+      internal.status === "fulfilled" && !(internal.value as { error?: unknown }).error;
+
     for (const outcome of sends) {
       if (outcome.status === "rejected") {
         console.error(`[api/early-access:${ref}] email send failed:`, outcome.reason);
@@ -276,6 +321,17 @@ export default async function handler(req: AnyReq, res: AnyRes) {
           JSON.stringify((outcome.value as { error?: unknown }).error),
         );
       }
+    }
+
+    // Only a total loss — neither stored nor emailed — is reported as a failure, because
+    // only then is the application actually gone.
+    if (!stored && !internalDelivered) {
+      res.status(500).json({
+        ok: false,
+        error: "We could not save your request. Please try again.",
+        ref,
+      });
+      return;
     }
 
     res.status(200).json({ ok: true });

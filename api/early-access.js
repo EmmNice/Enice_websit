@@ -6175,15 +6175,26 @@ function confirmationHtml(fullName) {
      </p>`
   );
 }
-function notificationHtml(fields) {
+function notificationHtml(fields, storageFailure) {
   const row = (label, value) => `<tr>
        <td style="padding:6px 12px 6px 0;font-size:12px;color:#6b7280;white-space:nowrap;vertical-align:top;">${label}</td>
        <td style="padding:6px 0;font-size:13px;color:#111827;">${escapeHtml2(value || "\u2014")}</td>
      </tr>`;
+  const warning = storageFailure === null ? "" : `<div style="margin:0 0 20px;padding:12px 14px;border:1px solid #fca5a5;background:#fef2f2;border-radius:6px;">
+           <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#991b1b;">
+             This registration was NOT saved to Resend.
+           </p>
+           <p style="margin:0;font-size:12px;line-height:1.6;color:#7f1d1d;">
+             It will not appear in the admin list, so keep this email as the record. Most
+             likely the RESEND_API_KEY lacks contacts/segments access. Reason:
+             ${escapeHtml2(storageFailure instanceof Error ? storageFailure.message : String(storageFailure))}
+           </p>
+         </div>`;
   return layout(
     "PulseAssist &middot; Early Access",
     "New early-access registration",
-    `<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;">
+    `${warning}
+     <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;">
        ${row("Name", fields.fullName)}
        ${row("Email", fields.email)}
        ${row("Business", fields.businessName)}
@@ -6191,7 +6202,7 @@ function notificationHtml(fields) {
        ${row("Need", fields.businessNeed)}
        ${row("Product", PRODUCT)}
        ${row("Source", SOURCE)}
-       ${row("Status", "EARLY_ACCESS")}
+       ${row("Status", storageFailure === null ? "EARLY_ACCESS" : "not stored")}
      </table>`
   );
 }
@@ -6240,17 +6251,26 @@ async function handler(req, res) {
       });
       return;
     }
-    const result = await registerEarlyAccess(fields);
-    if (result.outcome === "duplicate") {
-      res.status(409).json({
-        ok: false,
-        code: "DUPLICATE",
-        error: "This email is already on the PulseAssist early-access list."
-      });
-      return;
+    let stored = false;
+    let storageFailure = null;
+    try {
+      const result = await registerEarlyAccess(fields);
+      if (result.outcome === "duplicate") {
+        res.status(409).json({
+          ok: false,
+          code: "DUPLICATE",
+          error: "This email is already on the PulseAssist early-access list."
+        });
+        return;
+      }
+      stored = true;
+    } catch (err) {
+      storageFailure = err;
+      console.error(`[api/early-access:${ref}] storage failed, falling back to email:`, err);
     }
     const { Resend: Resend2 } = await Promise.resolve().then(() => (init_dist(), dist_exports));
     const resend = new Resend2(process.env.RESEND_API_KEY);
+    const internalSubject = stored ? `PulseAssist Early Access \u2014 ${fields.businessName}` : `[ACTION REQUIRED \u2014 not saved] PulseAssist Early Access \u2014 ${fields.businessName}`;
     const sends = await Promise.allSettled([
       resend.emails.send({
         from: FROM,
@@ -6262,10 +6282,12 @@ async function handler(req, res) {
         from: FROM,
         to: INTERNAL_RECIPIENT,
         replyTo: fields.email,
-        subject: `PulseAssist Early Access \u2014 ${fields.businessName}`,
-        html: notificationHtml(fields)
+        subject: internalSubject,
+        html: notificationHtml(fields, stored ? null : storageFailure)
       })
     ]);
+    const internal = sends[1];
+    const internalDelivered = internal.status === "fulfilled" && !internal.value.error;
     for (const outcome of sends) {
       if (outcome.status === "rejected") {
         console.error(`[api/early-access:${ref}] email send failed:`, outcome.reason);
@@ -6275,6 +6297,14 @@ async function handler(req, res) {
           JSON.stringify(outcome.value.error)
         );
       }
+    }
+    if (!stored && !internalDelivered) {
+      res.status(500).json({
+        ok: false,
+        error: "We could not save your request. Please try again.",
+        ref
+      });
+      return;
     }
     res.status(200).json({ ok: true });
   } catch (err) {
