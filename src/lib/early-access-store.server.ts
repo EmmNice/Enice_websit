@@ -6,17 +6,15 @@
  *
  * ## Why Resend rather than a database
  *
- * The rest of this site already stores form data in Resend (the watchlist audience), and
- * `replit.md` records that as the project's preference. Keeping registrations there means
- * one vendor, one API key, no migrations, and no separate Edge Function deploy step — the
- * handlers ship with the site through `api-src/`.
+ * Resend is the project's single backend for both transactional email and stored form
+ * data. Keeping registrations there means one vendor, one API key, no migrations, and no
+ * separate deploy step — the handlers ship with the site through `api-src/`.
  *
  * ## How a registration is represented
  *
  * One Resend contact, added to a dedicated segment, with the application stored in custom
  * Contact Properties. Contacts are global per email address, so property keys are
- * namespaced with `pulseassist_` to avoid colliding with the watchlist or anything added
- * later.
+ * namespaced with `pulseassist_` so they cannot collide with anything added later.
  *
  * ## Constraints this design inherits from the Resend API
  *
@@ -247,8 +245,8 @@ export async function registerEarlyAccess(input: {
   const existing = await findContact(resend, input.email);
 
   // An existing contact is only a duplicate *registration* if it already carries a
-  // PulseAssist status. Someone who merely joined the launch watchlist must still be able
-  // to apply.
+  // PulseAssist status. A contact that already exists for some other reason — an earlier
+  // mailing list, a different product — must still be able to apply.
   if (existing && readProperty(existing.properties as RawProperties, PROPERTY_KEYS.status)) {
     return { outcome: "duplicate" };
   }

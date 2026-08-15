@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -25,25 +25,15 @@ import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Careers } from "@/components/site/Careers";
 import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
-import { NewsletterSignup } from "@/components/site/NewsletterSignup";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
+
 // The chatbot is a floating widget that is never part of first paint, so it is split out
 // of the homepage's critical path and fetched after hydration.
 const AIChatbot = lazy(() =>
   import("@/components/site/AIChatbot").then((m) => ({ default: m.AIChatbot })),
 );
-import { ComingSoon } from "@/components/site/ComingSoon";
-import { isPreLaunch } from "@/lib/launch";
-
-function IndexPage() {
-  const isPreview =
-    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("preview");
-  const [launched, setLaunched] = useState(() => isPreview || !isPreLaunch());
-  if (!launched) return <ComingSoon onLaunched={() => setLaunched(true)} />;
-  return <Landing />;
-}
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -114,7 +104,7 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
-  component: IndexPage,
+  component: Landing,
 });
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -938,7 +928,6 @@ function Landing() {
         <InfraStack />
         <FAQSection />
         <Careers />
-        <NewsletterSignup />
       </main>
       <SiteFooter />
       <Suspense fallback={null}>

@@ -5,7 +5,11 @@ var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
 };
 var __copyProps = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
@@ -850,8 +854,13 @@ function decodeBase64(base64) {
   }
   return arrayBuffer;
 }
+var charsetAliases = /* @__PURE__ */ new Map([
+  ["iso-8859-8-i", "iso-8859-8"],
+  ["iso-8859-8-e", "iso-8859-8"]
+]);
 function getDecoder(charset) {
-  charset = charset || "utf8";
+  charset = (charset || "utf8").trim().toLowerCase();
+  charset = charsetAliases.get(charset) || charset;
   let decoder;
   try {
     decoder = new TextDecoder(charset);
@@ -980,9 +989,9 @@ function decodeURIComponentWithCharset(encodedStr, charset) {
   }
   return getDecoder(charset).decode(byteStr);
 }
-function decodeParameterValueContinuations(header) {
+function decodeParameterValueContinuations(header2) {
   let paramKeys = /* @__PURE__ */ new Map();
-  Object.keys(header.params).forEach((key) => {
+  Object.keys(header2.params).forEach((key) => {
     let match = key.match(/\*((\d+)\*?)?$/);
     if (!match) {
       return;
@@ -999,16 +1008,16 @@ function decodeParameterValueContinuations(header) {
     } else {
       paramVal = paramKeys.get(actualKey);
     }
-    let value = header.params[key];
+    let value = header2.params[key];
     if (nr === 0 && match[0].charAt(match[0].length - 1) === "*" && (match = value.match(/^([^']*)'[^']*'(.*)$/))) {
       paramVal.charset = match[1] || "utf-8";
       value = match[2];
     }
     paramVal.values.push({ nr, value });
-    delete header.params[key];
+    delete header2.params[key];
   });
   paramKeys.forEach((paramVal, key) => {
-    header.params[key] = decodeURIComponentWithCharset(
+    header2.params[key] = decodeURIComponentWithCharset(
       paramVal.values.sort((a, b) => a.nr - b.nr).map((a) => a.value).join(""),
       paramVal.charset
     );
@@ -4592,10 +4601,10 @@ var PostalMime = class _PostalMime {
       }
     }
     for (const key of ["subject", "message-id", "in-reply-to", "references"]) {
-      const header = this.root.headers.find((line) => line.key === key);
-      if (header && header.value) {
+      const header2 = this.root.headers.find((line) => line.key === key);
+      if (header2 && header2.value) {
         const camelKey = toCamelCase(key);
-        message[camelKey] = decodeWords(header.value);
+        message[camelKey] = decodeWords(header2.value);
       }
     }
     let dateHeader = this.root.headers.find((line) => line.key === "date");
@@ -4645,7 +4654,11 @@ var PostalMime = class _PostalMime {
 
 // node_modules/resend/dist/index.mjs
 var import_standardwebhooks = __toESM(require_dist(), 1);
-var version = "6.17.1";
+var version = "6.20.0";
+function buildPaginationUrl(base, options) {
+  const queryString = buildPaginationQuery(options);
+  return queryString ? `${base}?${queryString}` : base;
+}
 function buildPaginationQuery(options) {
   const searchParams = new URLSearchParams();
   if (options.limit !== void 0) searchParams.set("limit", options.limit.toString());
@@ -4661,8 +4674,7 @@ var ApiKeys = class {
     return await this.resend.post("/api-keys", payload, options);
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/api-keys?${queryString}` : "/api-keys";
+    const url = buildPaginationUrl("/api-keys", options);
     return await this.resend.get(url);
   }
   async remove(id) {
@@ -4806,6 +4818,9 @@ var Automations = class {
     if (payload.connections !== void 0) apiPayload.connections = payload.connections.map(parseConnection);
     return await this.resend.patch(`/automations/${id}`, apiPayload);
   }
+  async duplicate(id) {
+    return await this.resend.post(`/automations/${id}/duplicate`);
+  }
   async stop(id) {
     return await this.resend.post(`/automations/${id}/stop`);
   }
@@ -4849,7 +4864,7 @@ async function render(node) {
   }
   return render2(node);
 }
-var Batch = class {
+var Batch$1 = class {
   constructor(resend) {
     this.resend = resend;
   }
@@ -4899,8 +4914,7 @@ var Broadcasts = class {
     return await this.resend.post(`/broadcasts/${id}/send`, { scheduled_at: payload?.scheduledAt });
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/broadcasts?${queryString}` : "/broadcasts";
+    const url = buildPaginationUrl("/broadcasts", options);
     return await this.resend.get(url);
   }
   async get(id) {
@@ -4908,6 +4922,9 @@ var Broadcasts = class {
   }
   async remove(id) {
     return await this.resend.delete(`/broadcasts/${id}`);
+  }
+  async cancel(id) {
+    return await this.resend.post(`/broadcasts/${id}/cancel`);
   }
   async update(id, payload) {
     const html = payload.react ? await render(payload.react) : payload.html;
@@ -4951,8 +4968,7 @@ var ContactProperties = class {
     return await this.resend.post("/contact-properties", apiOptions);
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/contact-properties?${queryString}` : "/contact-properties";
+    const url = buildPaginationUrl("/contact-properties", options);
     const response = await this.resend.get(url);
     if (response.data) return {
       data: {
@@ -5067,9 +5083,7 @@ var ContactSegments = class {
         name: "missing_required_field"
       }
     };
-    const identifier = options.email ? options.email : options.contactId;
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/contacts/${identifier}/segments?${queryString}` : `/contacts/${identifier}/segments`;
+    const url = buildPaginationUrl(`/contacts/${options.email ? options.email : options.contactId}/segments`, options);
     return await this.resend.get(url);
   }
   async add(options) {
@@ -5126,9 +5140,7 @@ var ContactTopics = class {
         name: "missing_required_field"
       }
     };
-    const identifier = options.email ? options.email : options.id;
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/contacts/${identifier}/topics?${queryString}` : `/contacts/${identifier}/topics`;
+    const url = buildPaginationUrl(`/contacts/${options.email ? options.email : options.id}/topics`, options);
     return this.resend.get(url);
   }
 };
@@ -5171,12 +5183,10 @@ var Contacts = class {
   async list(options = {}) {
     const segmentId = options.segmentId ?? options.audienceId;
     if (!segmentId) {
-      const queryString2 = buildPaginationQuery(options);
-      const url2 = queryString2 ? `/contacts?${queryString2}` : "/contacts";
+      const url2 = buildPaginationUrl("/contacts", options);
       return await this.resend.get(url2);
     }
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/segments/${segmentId}/contacts?${queryString}` : `/segments/${segmentId}/contacts`;
+    const url = buildPaginationUrl(`/segments/${segmentId}/contacts`, options);
     return await this.resend.get(url);
   }
   async get(options) {
@@ -5273,8 +5283,7 @@ var Domains = class {
     return await this.resend.post("/domains", parseDomainToApiOptions(payload), options);
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/domains?${queryString}` : "/domains";
+    const url = buildPaginationUrl("/domains", options);
     return await this.resend.get(url);
   }
   async get(id) {
@@ -5306,8 +5315,7 @@ var Attachments$1 = class {
   }
   async list(options) {
     const { emailId } = options;
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/emails/${emailId}/attachments?${queryString}` : `/emails/${emailId}/attachments`;
+    const url = buildPaginationUrl(`/emails/${emailId}/attachments`, options);
     return await this.resend.get(url);
   }
 };
@@ -5321,8 +5329,7 @@ var Attachments = class {
   }
   async list(options) {
     const { emailId } = options;
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/emails/receiving/${emailId}/attachments?${queryString}` : `/emails/receiving/${emailId}/attachments`;
+    const url = buildPaginationUrl(`/emails/receiving/${emailId}/attachments`, options);
     return await this.resend.get(url);
   }
 };
@@ -5339,8 +5346,7 @@ var Receiving = class {
     return await this.resend.get(path);
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/emails/receiving?${queryString}` : "/emails/receiving";
+    const url = buildPaginationUrl("/emails/receiving", options);
     return await this.resend.get(url);
   }
   async forward(options, requestOptions = {}) {
@@ -5463,8 +5469,7 @@ var Emails = class {
     return await this.resend.get(`/emails/${id}`);
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/emails?${queryString}` : "/emails";
+    const url = buildPaginationUrl("/emails", options);
     return await this.resend.get(url);
   }
   async update(payload) {
@@ -5488,8 +5493,7 @@ var Events = class {
     return await this.resend.get(`/events/${encodeURIComponent(identifier)}`);
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/events?${queryString}` : "/events";
+    const url = buildPaginationUrl("/events", options);
     return await this.resend.get(url);
   }
   async update(identifier, payload) {
@@ -5504,8 +5508,7 @@ var Logs = class {
     this.resend = resend;
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/logs?${queryString}` : "/logs";
+    const url = buildPaginationUrl("/logs", options);
     return await this.resend.get(url);
   }
   async get(id) {
@@ -5517,8 +5520,7 @@ var OAuthGrants = class {
     this.resend = resend;
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/oauth/grants?${queryString}` : "/oauth/grants";
+    const url = buildPaginationUrl("/oauth/grants", options);
     return await this.resend.get(url);
   }
   async revoke(id) {
@@ -5533,8 +5535,7 @@ var Segments = class {
     return await this.resend.post("/segments", payload, options);
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/segments?${queryString}` : "/segments";
+    const url = buildPaginationUrl("/segments", options);
     return await this.resend.get(url);
   }
   async get(id) {
@@ -5544,6 +5545,54 @@ var Segments = class {
     return await this.resend.delete(`/segments/${id}`);
   }
 };
+var Batch = class {
+  constructor(resend) {
+    this.resend = resend;
+  }
+  async add(options) {
+    return this.resend.post("/suppressions/batch/add", options);
+  }
+  async remove(options) {
+    return this.resend.post("/suppressions/batch/remove", options);
+  }
+};
+var missingIdentifierError = () => ({
+  data: null,
+  headers: null,
+  error: {
+    message: "Missing `id` field.",
+    statusCode: null,
+    name: "missing_required_field"
+  }
+});
+var Suppressions = class {
+  constructor(resend) {
+    this.resend = resend;
+    this.batch = new Batch(resend);
+  }
+  async add(options) {
+    return this.resend.post("/suppressions", options);
+  }
+  async list(options = {}) {
+    const queryString = buildSuppressionsQuery(options);
+    const url = queryString ? `/suppressions?${queryString}` : "/suppressions";
+    return this.resend.get(url);
+  }
+  async get(idOrEmail) {
+    if (!idOrEmail) return missingIdentifierError();
+    return this.resend.get(`/suppressions/${encodeURIComponent(idOrEmail)}`);
+  }
+  async remove(idOrEmail) {
+    if (!idOrEmail) return missingIdentifierError();
+    return this.resend.delete(`/suppressions/${encodeURIComponent(idOrEmail)}`);
+  }
+};
+function buildSuppressionsQuery(options) {
+  const { origin, ...pagination } = options;
+  const searchParams = new URLSearchParams(buildPaginationQuery(pagination));
+  if (origin) searchParams.set("origin", origin);
+  return searchParams.toString();
+}
 function getPaginationQueryProperties(options = {}) {
   const query = new URLSearchParams();
   if (options.before) query.set("before", options.before);
@@ -5681,8 +5730,7 @@ var Webhooks = class {
     return await this.resend.get(`/webhooks/${id}`);
   }
   async list(options = {}) {
-    const queryString = buildPaginationQuery(options);
-    const url = queryString ? `/webhooks?${queryString}` : "/webhooks";
+    const url = buildPaginationUrl("/webhooks", options);
     return await this.resend.get(url);
   }
   async update(id, payload) {
@@ -5714,7 +5762,7 @@ var Resend = class {
     this.apiKeys = new ApiKeys(this);
     this.audiences = this.segments;
     this.automations = new Automations(this);
-    this.batch = new Batch(this);
+    this.batch = new Batch$1(this);
     this.broadcasts = new Broadcasts(this);
     this.contactProperties = new ContactProperties(this);
     this.contacts = new Contacts(this);
@@ -5723,6 +5771,7 @@ var Resend = class {
     this.events = new Events(this);
     this.logs = new Logs(this);
     this.oauthGrants = new OAuthGrants(this);
+    this.suppressions = new Suppressions(this);
     this.templates = new Templates(this);
     this.topics = new Topics(this);
     this.webhooks = new Webhooks(this);
@@ -5738,39 +5787,57 @@ var Resend = class {
       "Content-Type": "application/json"
     });
   }
+  logError(error, path, status) {
+    if (typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production") console.error("[Resend API Error]:", {
+      ...status !== void 0 && { status },
+      error,
+      path
+    });
+  }
   async fetchRequest(path, options = {}) {
     try {
       const response = await fetch(`${this.baseUrl}${path}`, options);
       if (!response.ok) try {
         const rawError = await response.text();
+        const parsedError = JSON.parse(rawError);
+        this.logError(parsedError, path, response.status);
         return {
           data: null,
-          error: JSON.parse(rawError),
+          error: parsedError,
           headers: Object.fromEntries(response.headers.entries())
         };
       } catch (err) {
-        if (err instanceof SyntaxError) return {
-          data: null,
-          error: {
+        if (err instanceof SyntaxError) {
+          const error2 = {
             name: "application_error",
             statusCode: response.status,
             message: "Internal server error. We are unable to process your request right now, please try again later."
-          },
-          headers: Object.fromEntries(response.headers.entries())
-        };
+          };
+          this.logError(error2, path, response.status);
+          return {
+            data: null,
+            error: error2,
+            headers: Object.fromEntries(response.headers.entries())
+          };
+        }
         const error = {
           message: response.statusText,
           statusCode: response.status,
           name: "application_error"
         };
-        if (err instanceof Error) return {
-          data: null,
-          error: {
+        if (err instanceof Error) {
+          const errorWithMessage = {
             ...error,
             message: err.message
-          },
-          headers: Object.fromEntries(response.headers.entries())
-        };
+          };
+          this.logError(errorWithMessage, path, response.status);
+          return {
+            data: null,
+            error: errorWithMessage,
+            headers: Object.fromEntries(response.headers.entries())
+          };
+        }
+        this.logError(error, path, response.status);
         return {
           data: null,
           error,
@@ -5783,13 +5850,15 @@ var Resend = class {
         headers: Object.fromEntries(response.headers.entries())
       };
     } catch {
+      const error = {
+        name: "application_error",
+        statusCode: null,
+        message: "Unable to fetch data. The request could not be resolved."
+      };
+      this.logError(error, path);
       return {
         data: null,
-        error: {
-          name: "application_error",
-          statusCode: null,
-          message: "Unable to fetch data. The request could not be resolved."
-        },
+        error,
         headers: null
       };
     }
@@ -5884,12 +5953,12 @@ function isTransient(error) {
   const status = error.statusCode ?? 0;
   return status === 429 || status >= 500 || /rate.?limit|too many/i.test(error.message);
 }
-async function withRetry(label, call, attempts2 = 3) {
+async function withRetry(label, call, attempts = 3) {
   let last = { data: null, error: null };
-  for (let i = 0; i < attempts2; i++) {
+  for (let i = 0; i < attempts; i++) {
     last = await call();
     if (!isTransient(last.error)) return last;
-    if (i < attempts2 - 1) {
+    if (i < attempts - 1) {
       const backoff = 400 * 2 ** i;
       console.warn(
         `[early-access] ${label} hit a transient error (${last.error?.statusCode}); retrying in ${backoff}ms`
@@ -6031,6 +6100,52 @@ async function updateRegistrationStatus(email, status) {
   return { outcome: "updated" };
 }
 
+// api-src/lib/http.ts
+function clientIp(req) {
+  const forwarded = req.headers["x-forwarded-for"];
+  const first = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+  const fromHeader = typeof first === "string" ? first.split(",")[0]?.trim() : void 0;
+  return fromHeader || req.socket?.remoteAddress || "unknown";
+}
+function header(req, name) {
+  const value = req.headers[name.toLowerCase()];
+  return Array.isArray(value) ? value[0] : value;
+}
+function parseJsonBody(body) {
+  if (typeof body === "string") {
+    try {
+      const parsed = JSON.parse(body);
+      return parsed && typeof parsed === "object" ? parsed : {};
+    } catch {
+      return {};
+    }
+  }
+  if (body && typeof body === "object") return body;
+  return {};
+}
+function createAttemptLimiter(max, windowMs) {
+  const attempts = /* @__PURE__ */ new Map();
+  return {
+    isLocked(key) {
+      const entry = attempts.get(key);
+      if (!entry || Date.now() > entry.resetAt) return false;
+      return entry.count >= max;
+    },
+    recordFailure(key) {
+      const now = Date.now();
+      const entry = attempts.get(key);
+      if (!entry || now > entry.resetAt) {
+        attempts.set(key, { count: 1, resetAt: now + windowMs });
+        return;
+      }
+      entry.count++;
+    }
+  };
+}
+function errorRef(prefix) {
+  return `${prefix}${Date.now().toString(36).toUpperCase()}`;
+}
+
 // api-src/admin/early-access.ts
 function secretsMatch(supplied, expected) {
   if (typeof supplied !== "string") return false;
@@ -6042,41 +6157,9 @@ function secretsMatch(supplied, expected) {
   }
   return timingSafeEqual(a, b);
 }
-var attempts = /* @__PURE__ */ new Map();
-var ATTEMPT_WINDOW_MS = 15 * 60 * 1e3;
-var MAX_ATTEMPTS = 10;
-function clientIp(req) {
-  const fwd = req.headers["x-forwarded-for"];
-  const raw = Array.isArray(fwd) ? fwd[0] : fwd;
-  return (typeof raw === "string" ? raw.split(",")[0]?.trim() : "") || "unknown";
-}
-function tooManyAttempts(ip) {
-  const entry = attempts.get(ip);
-  if (!entry || Date.now() > entry.resetAt) return false;
-  return entry.count >= MAX_ATTEMPTS;
-}
-function recordFailure(ip) {
-  const now = Date.now();
-  const entry = attempts.get(ip);
-  if (!entry || now > entry.resetAt) {
-    attempts.set(ip, { count: 1, resetAt: now + ATTEMPT_WINDOW_MS });
-    return;
-  }
-  entry.count++;
-}
-function parseBody(raw) {
-  if (typeof raw === "string") {
-    try {
-      return JSON.parse(raw);
-    } catch {
-      return {};
-    }
-  }
-  if (raw && typeof raw === "object") return raw;
-  return {};
-}
+var loginAttempts = createAttemptLimiter(10, 15 * 60 * 1e3);
 async function handler(req, res) {
-  const ref = `AD${Date.now().toString(36).toUpperCase()}`;
+  const ref = errorRef("AD");
   try {
     const adminPassword = process.env.ADMIN_PASSWORD;
     if (!adminPassword) {
@@ -6088,12 +6171,12 @@ async function handler(req, res) {
       return;
     }
     const ip = clientIp(req);
-    if (tooManyAttempts(ip)) {
+    if (loginAttempts.isLocked(ip)) {
       res.status(429).json({ ok: false, error: "Too many attempts. Try again later." });
       return;
     }
-    if (!secretsMatch(req.headers["x-admin-password"], adminPassword)) {
-      recordFailure(ip);
+    if (!secretsMatch(header(req, "x-admin-password"), adminPassword)) {
+      loginAttempts.recordFailure(ip);
       res.status(401).json({ ok: false, error: "Invalid password." });
       return;
     }
@@ -6110,7 +6193,7 @@ async function handler(req, res) {
       return;
     }
     if (req.method === "POST") {
-      const body = parseBody(req.body);
+      const body = parseJsonBody(req.body);
       const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
       const status = typeof body.status === "string" ? body.status : "";
       if (!email) {

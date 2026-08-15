@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { SHADOW_CARD } from "@/lib/design";
 
 export const Route = createFileRoute("/portfolio/epulse")({
   head: () => ({
@@ -85,8 +86,6 @@ export const Route = createFileRoute("/portfolio/epulse")({
   }),
   component: EPulsePage,
 });
-
-const SHADOW_CARD = "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)";
 
 // ─── Vision feature list ───────────────────────────────────────────────────────
 

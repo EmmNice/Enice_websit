@@ -25,11 +25,15 @@ import {
   SOURCE,
   registerEarlyAccess,
 } from "../src/lib/early-access-store.server";
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyReq = any;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyRes = any;
+import {
+  clientIp,
+  createRateLimiter,
+  errorRef,
+  escapeHtml,
+  parseJsonBody,
+  type ApiRequest,
+  type ApiResponse,
+} from "./lib/http";
 
 const FROM = "ENICE Group <noreply@enicehq.com>";
 const INTERNAL_RECIPIENT = "corporate@enicehq.com";
@@ -44,56 +48,9 @@ const INTERNAL_RECIPIENT = "corporate@enicehq.com";
 //
 // All are module-scoped: per-instance and reset on cold start. Enough to blunt casual
 // abuse, not a distributed guarantee — Upstash/Redis is the upgrade if that is needed.
-const requestHits = new Map<string, { count: number; resetAt: number }>();
-const writeHits = new Map<string, { count: number; resetAt: number }>();
-const emailHits = new Map<string, { count: number; resetAt: number }>();
-
-function limited(
-  map: Map<string, { count: number; resetAt: number }>,
-  key: string,
-  max: number,
-  windowMs: number,
-) {
-  const now = Date.now();
-  if (map.size > 5_000) {
-    for (const [k, v] of map) if (now > v.resetAt) map.delete(k);
-  }
-  const entry = map.get(key);
-  if (!entry || now > entry.resetAt) {
-    map.set(key, { count: 1, resetAt: now + windowMs });
-    return false;
-  }
-  if (entry.count >= max) return true;
-  entry.count++;
-  return false;
-}
-
-function clientIp(req: AnyReq): string {
-  const fwd = req.headers["x-forwarded-for"];
-  const raw = Array.isArray(fwd) ? fwd[0] : fwd;
-  return (typeof raw === "string" ? raw.split(",")[0]?.trim() : "") || "unknown";
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function parseBody(raw: unknown): Record<string, unknown> {
-  if (typeof raw === "string") {
-    try {
-      return JSON.parse(raw) as Record<string, unknown>;
-    } catch {
-      return {};
-    }
-  }
-  if (raw && typeof raw === "object") return raw as Record<string, unknown>;
-  return {};
-}
+const tooManyRequests = createRateLimiter(30, 10 * 60 * 1000);
+const tooManyWrites = createRateLimiter(5, 10 * 60 * 1000);
+const tooManyForEmail = createRateLimiter(3, 60 * 60 * 1000);
 
 function str(value: unknown, max: number): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -198,22 +155,22 @@ function notificationHtml(fields: EarlyAccessFields, storageFailure: unknown): s
   );
 }
 
-export default async function handler(req: AnyReq, res: AnyRes) {
+export default async function handler(req: ApiRequest, res: ApiResponse) {
   if (req.method !== "POST") {
     res.status(405).json({ ok: false, error: "Method not allowed." });
     return;
   }
 
-  const ref = `EA${Date.now().toString(36).toUpperCase()}`;
+  const ref = errorRef("EA");
 
   try {
     const ip = clientIp(req);
-    if (limited(requestHits, ip, 30, 10 * 60 * 1000)) {
+    if (tooManyRequests(ip)) {
       res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
       return;
     }
 
-    const body = parseBody(req.body);
+    const body = parseJsonBody(req.body);
 
     // The honeypot is checked before validation. Validating it first would return a 400
     // naming the hidden field, telling a bot exactly which trap it fell into. A plain 200
@@ -245,11 +202,11 @@ export default async function handler(req: AnyReq, res: AnyRes) {
     }
 
     // Only now, with a well-formed submission in hand, spend the strict budget.
-    if (limited(writeHits, ip, 5, 10 * 60 * 1000)) {
+    if (tooManyWrites(ip)) {
       res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
       return;
     }
-    if (limited(emailHits, fields.email, 3, 60 * 60 * 1000)) {
+    if (tooManyForEmail(fields.email)) {
       res.status(429).json({
         ok: false,
         error: "We already received a request for this email. Please check back.",
