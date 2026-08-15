@@ -13,86 +13,51 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/")({
-  head: () => ({
-    meta: [
-      { title: "Products | ENICE Group" },
+  head: () =>
+    pageHead("/portfolio", [
       {
-        name: "description",
-        content:
-          "PulsePay, PulseAssist, ePulse, and PulseX: the products built and operated by ENICE Group.",
-      },
-      {
-        property: "og:title",
-        content: "ENICE Group Products",
-      },
-      {
-        property: "og:description",
-        content: "PulsePay, PulseAssist, ePulse, and PulseX: products built by ENICE Group.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: `${SITE_URL}/portfolio` },
-      { property: "og:image", content: `${SITE_URL}/og.png` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "ENICE Group Products" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      { name: "twitter:title", content: "ENICE Group Products" },
-      {
-        name: "twitter:description",
-        content: "PulsePay, PulseAssist, ePulse, and PulseX, products built by ENICE Group.",
-      },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/portfolio` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: "ENICE Group Products",
-          description:
-            "Proprietary software products and infrastructure networks built by ENICE Group.",
-          url: `${SITE_URL}/portfolio`,
-          publisher: {
-            "@type": "Organization",
-            name: "ENICE Group",
-            url: SITE_URL,
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "ENICE Group Products",
+        description:
+          "Proprietary software products and infrastructure networks built by ENICE Group.",
+        url: `${SITE_URL}/portfolio`,
+        publisher: {
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: SITE_URL,
+        },
+        hasPart: [
+          {
+            "@type": "SoftwareApplication",
+            name: "PulsePay",
+            url: `${SITE_URL}/portfolio/pulsepay`,
+            applicationCategory: "FinanceApplication",
           },
-          hasPart: [
-            {
-              "@type": "SoftwareApplication",
-              name: "PulsePay",
-              url: `${SITE_URL}/portfolio/pulsepay`,
-              applicationCategory: "FinanceApplication",
-            },
-            {
-              "@type": "SoftwareApplication",
-              name: "PulseAssist",
-              url: `${SITE_URL}/portfolio/pulseassist`,
-              applicationCategory: "BusinessApplication",
-            },
-            {
-              "@type": "SoftwareApplication",
-              name: "ePulse",
-              url: `${SITE_URL}/portfolio/epulse`,
-              applicationCategory: "FinanceApplication",
-            },
-            {
-              "@type": "SoftwareApplication",
-              name: "PulseX",
-              url: `${SITE_URL}/portfolio/pulsex`,
-              applicationCategory: "FinanceApplication",
-            },
-          ],
-        }),
+          {
+            "@type": "SoftwareApplication",
+            name: "PulseAssist",
+            url: `${SITE_URL}/portfolio/pulseassist`,
+            applicationCategory: "BusinessApplication",
+          },
+          {
+            "@type": "SoftwareApplication",
+            name: "ePulse",
+            url: `${SITE_URL}/portfolio/epulse`,
+            applicationCategory: "FinanceApplication",
+          },
+          {
+            "@type": "SoftwareApplication",
+            name: "PulseX",
+            url: `${SITE_URL}/portfolio/pulsex`,
+            applicationCategory: "FinanceApplication",
+          },
+        ],
       },
-    ],
-  }),
+    ]),
   component: PortfolioIndexPage,
 });
 

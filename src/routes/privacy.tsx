@@ -1,34 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE_URL } from "@/lib/site";
 import { LegalPage } from "@/components/site/LegalPage";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
-  head: () => ({
-    meta: [
-      { title: "Privacy Policy · ENICE Group" },
-      {
-        name: "description",
-        content:
-          "How ENICE Group collects, processes, and protects personal and corporate data across its product ecosystem.",
-      },
-      { property: "og:title", content: "Privacy Policy · ENICE Group" },
-      {
-        property: "og:description",
-        content:
-          "How ENICE Group collects, processes, and protects personal and corporate data across its product ecosystem.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE_URL}/privacy` },
-      { name: "twitter:title", content: "Privacy Policy · ENICE Group" },
-      {
-        name: "twitter:description",
-        content:
-          "How ENICE Group collects, processes, and protects personal and corporate data across its product ecosystem.",
-      },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/privacy` }],
-  }),
+  head: () => pageHead("/privacy"),
   component: () => (
     <LegalPage
       lastUpdated="July 16, 2026"

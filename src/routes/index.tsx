@@ -28,76 +28,41 @@ import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { ContactSection } from "@/components/site/ContactSection";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
-  head: () => ({
-    meta: [
-      { title: "ENICE Group | Technology Products for Africa" },
+  head: () =>
+    pageHead("/", [
       {
-        name: "description",
-        content:
-          "ENICE Group builds, owns, and operates products for financial services, commerce, and business communication.",
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "ENICE Group",
+        url: SITE_URL,
+        logo: `${SITE_URL}/favicon.png`,
+        subOrganization: [
+          {
+            "@type": "FinancialProduct",
+            name: "PulsePay",
+            description: "Virtual card issuance, programmable wallets, and embedded treasury.",
+          },
+          {
+            "@type": "Organization",
+            name: "PulseAssist",
+            description: "Multi-tenant AI conversational SaaS for banking and telecom.",
+          },
+          {
+            "@type": "FinancialProduct",
+            name: "EPulse",
+            description: "Digital banking infrastructure.",
+          },
+          {
+            "@type": "FinancialProduct",
+            name: "PulseX",
+            description: "Global digital asset trading exchange.",
+          },
+        ],
       },
-      { property: "og:title", content: "ENICE Group: Technology Products for Africa" },
-      {
-        property: "og:description",
-        content:
-          "ENICE Group builds products for financial services, commerce, and business communication.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: `${SITE_URL}/` },
-      { property: "og:image", content: `${SITE_URL}/og.png` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "ENICE Group: Technology Products for Africa" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      { name: "twitter:title", content: "ENICE Group: Technology Products for Africa" },
-      {
-        name: "twitter:description",
-        content:
-          "A technology group building fintech and AI products for Africa: PulsePay, PulseAssist, ePulse and PulseX.",
-      },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-          logo: `${SITE_URL}/favicon.png`,
-          subOrganization: [
-            {
-              "@type": "FinancialProduct",
-              name: "PulsePay",
-              description: "Virtual card issuance, programmable wallets, and embedded treasury.",
-            },
-            {
-              "@type": "Organization",
-              name: "PulseAssist",
-              description: "Multi-tenant AI conversational SaaS for banking and telecom.",
-            },
-            {
-              "@type": "FinancialProduct",
-              name: "EPulse",
-              description: "Digital banking infrastructure.",
-            },
-            {
-              "@type": "FinancialProduct",
-              name: "PulseX",
-              description: "Global digital asset trading exchange.",
-            },
-          ],
-        }),
-      },
-    ],
-  }),
+    ]),
   component: Landing,
 });
 

@@ -14,75 +14,33 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/pulsex")({
-  head: () => ({
-    meta: [
-      { title: "PulseX | Digital Asset Platform by ENICE Group" },
+  head: () =>
+    pageHead("/portfolio/pulsex", [
       {
-        name: "description",
-        content:
-          "PulseX is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem.",
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "PulseX",
+        description:
+          "ENICE Group's digital asset platform for cryptocurrency trading, secure custody, and cross-ecosystem digital finance. Launching Q3 2027.",
+        url: `${SITE_URL}/portfolio/pulsex`,
+        applicationCategory: "FinanceApplication",
+        operatingSystem: "Web, iOS, Android",
+        releaseNotes: "Expected Q3 2027",
+        author: {
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: SITE_URL,
+        },
+        offers: {
+          "@type": "Offer",
+          availability: "https://schema.org/PreOrder",
+          description: "Waitlist available. Platform launching Q3 2027.",
+        },
       },
-      {
-        property: "og:title",
-        content: "PulseX: Digital Asset Platform by ENICE Group",
-      },
-      {
-        property: "og:description",
-        content:
-          "PulseX is ENICE Group's digital asset platform, making cryptocurrency simple, secure, and accessible. Launching Q3 2027.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      {
-        property: "og:url",
-        content: `${SITE_URL}/portfolio/pulsex`,
-      },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      {
-        name: "twitter:title",
-        content: "PulseX: Digital Asset Platform by ENICE Group",
-      },
-      {
-        name: "twitter:description",
-        content: "Cryptocurrency and digital asset platform from ENICE Group. Launching Q3 2027.",
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `${SITE_URL}/portfolio/pulsex`,
-      },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "PulseX",
-          description:
-            "ENICE Group's digital asset platform for cryptocurrency trading, secure custody, and cross-ecosystem digital finance. Launching Q3 2027.",
-          url: `${SITE_URL}/portfolio/pulsex`,
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web, iOS, Android",
-          releaseNotes: "Expected Q3 2027",
-          author: {
-            "@type": "Organization",
-            name: "ENICE Group",
-            url: SITE_URL,
-          },
-          offers: {
-            "@type": "Offer",
-            availability: "https://schema.org/PreOrder",
-            description: "Waitlist available. Platform launching Q3 2027.",
-          },
-        }),
-      },
-    ],
-  }),
+    ]),
   component: PulseXPage,
 });
 

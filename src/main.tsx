@@ -3,6 +3,17 @@ import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";
 import "./styles.css";
 import { getRouter } from "./router";
+
+/**
+ * Removes the head tags baked in by `scripts/prerender.mjs`.
+ *
+ * They exist so crawlers that do not run JavaScript see page-specific previews. Once the app
+ * boots, the router's <HeadContent /> owns the head, so leaving the static copies in place
+ * would mean two of every title and description in the DOM.
+ */
+function dropPrerenderedHead() {
+  for (const el of document.querySelectorAll("[data-prerendered]")) el.remove();
+}
 import { GlobalErrorBoundary } from "./components/GlobalErrorBoundary";
 
 // Bootstrap the router outside of React. If this throws (e.g. a config or
@@ -41,6 +52,8 @@ try {
   // Stop further execution — nothing left to mount
   throw err;
 }
+
+dropPrerenderedHead();
 
 const rootElement = document.getElementById("root")!;
 createRoot(rootElement).render(

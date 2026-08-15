@@ -3,24 +3,11 @@ import { useCallback, useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, XCircle } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { SITE_URL } from "@/lib/site";
 import { SHADOW_CARD } from "@/lib/design";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/status")({
-  head: () => ({
-    meta: [
-      { title: "System Status | ENICE Group" },
-      {
-        name: "description",
-        content:
-          "Live availability of the ENICE Group public API and website, checked from your browser.",
-      },
-      { property: "og:title", content: "System Status | ENICE Group" },
-      { property: "og:url", content: `${SITE_URL}/status` },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/status` }],
-  }),
+  head: () => pageHead("/status"),
   component: StatusPage,
 });
 

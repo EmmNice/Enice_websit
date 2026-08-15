@@ -3,55 +3,25 @@ import { SITE_URL } from "@/lib/site";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap } from "@/components/site/Roadmap";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/roadmap")({
-  head: () => ({
-    meta: [
-      { title: "Product Roadmap | ENICE Group" },
+  head: () =>
+    pageHead("/roadmap", [
       {
-        name: "description",
-        content:
-          "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist live, and what we are building next, including ePulse, PulseX, and the ENICE Core.",
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: "ENICE Group Product Roadmap",
+        description:
+          "Public product roadmap for ENICE Group: completed milestones, active products, and what we are building next.",
+        url: `${SITE_URL}/roadmap`,
+        publisher: {
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: SITE_URL,
+        },
       },
-      { property: "og:title", content: "ENICE Group Product Roadmap" },
-      {
-        property: "og:description",
-        content:
-          "From PulsePay and PulseAssist today to ePulse and PulseX next: our public product roadmap.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: `${SITE_URL}/roadmap` },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:title", content: "ENICE Group Product Roadmap" },
-      {
-        name: "twitter:description",
-        content:
-          "Milestones completed and what we are building next, in our public product roadmap.",
-      },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/roadmap` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebPage",
-          name: "ENICE Group Product Roadmap",
-          description:
-            "Public product roadmap for ENICE Group: completed milestones, active products, and what we are building next.",
-          url: `${SITE_URL}/roadmap`,
-          publisher: {
-            "@type": "Organization",
-            name: "ENICE Group",
-            url: SITE_URL,
-          },
-        }),
-      },
-    ],
-  }),
+    ]),
   component: RoadmapPage,
 });
 

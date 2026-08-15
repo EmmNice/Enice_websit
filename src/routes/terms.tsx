@@ -1,34 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE_URL } from "@/lib/site";
 import { LegalPage } from "@/components/site/LegalPage";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
-  head: () => ({
-    meta: [
-      { title: "Terms of Service · ENICE Group" },
-      {
-        name: "description",
-        content:
-          "Terms governing access to and use of ENICE Group platforms, APIs, and infrastructure services.",
-      },
-      { property: "og:title", content: "Terms of Service · ENICE Group" },
-      {
-        property: "og:description",
-        content:
-          "Terms governing access to and use of ENICE Group platforms, APIs, and infrastructure services.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE_URL}/terms` },
-      { name: "twitter:title", content: "Terms of Service · ENICE Group" },
-      {
-        name: "twitter:description",
-        content:
-          "Terms governing access to and use of ENICE Group platforms, APIs, and infrastructure services.",
-      },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/terms` }],
-  }),
+  head: () => pageHead("/terms"),
   component: () => (
     <LegalPage
       lastUpdated="July 16, 2026"

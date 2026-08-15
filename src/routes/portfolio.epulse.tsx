@@ -15,75 +15,32 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/epulse")({
-  head: () => ({
-    meta: [
-      { title: "ePulse | Global Financial Platform by ENICE Group" },
+  head: () =>
+    pageHead("/portfolio/epulse", [
       {
-        name: "description",
-        content:
-          "ePulse is ENICE Group's upcoming global financial platform built for freelancers, remote workers, creators, and global businesses. Multi-currency accounts, international transfers, gift cards, and lifestyle services.",
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "ePulse",
+        description:
+          "ENICE Group's upcoming global financial platform for people who earn, send, and spend money across borders. Multi-currency accounts, dedicated US/UK/EU receiving accounts, international transfers, gift cards, and lifestyle services.",
+        url: `${SITE_URL}/portfolio/epulse`,
+        applicationCategory: "FinanceApplication",
+        operatingSystem: "Web, iOS, Android",
+        author: {
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: SITE_URL,
+        },
+        offers: {
+          "@type": "Offer",
+          availability: "https://schema.org/PreOrder",
+          description: "Waitlist available. Platform in active development.",
+        },
       },
-      {
-        property: "og:title",
-        content: "ePulse: Global Financial Platform by ENICE Group",
-      },
-      {
-        property: "og:description",
-        content:
-          "ePulse makes international finance simple. Multi-currency accounts, dedicated receiving accounts (US, UK, Europe), fast transfers, gift cards, and lifestyle services.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      {
-        property: "og:url",
-        content: `${SITE_URL}/portfolio/epulse`,
-      },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      {
-        name: "twitter:title",
-        content: "ePulse: Global Financial Platform by ENICE Group",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "ePulse: global finance for freelancers, remote workers, and creators. Multi-currency, international transfers, lifestyle services. Coming soon.",
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `${SITE_URL}/portfolio/epulse`,
-      },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "ePulse",
-          description:
-            "ENICE Group's upcoming global financial platform for people who earn, send, and spend money across borders. Multi-currency accounts, dedicated US/UK/EU receiving accounts, international transfers, gift cards, and lifestyle services.",
-          url: `${SITE_URL}/portfolio/epulse`,
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web, iOS, Android",
-          author: {
-            "@type": "Organization",
-            name: "ENICE Group",
-            url: SITE_URL,
-          },
-          offers: {
-            "@type": "Offer",
-            availability: "https://schema.org/PreOrder",
-            description: "Waitlist available. Platform in active development.",
-          },
-        }),
-      },
-    ],
-  }),
+    ]),
   component: EPulsePage,
 });
 

@@ -1,31 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SITE_URL } from "@/lib/site";
 import { LegalPage } from "@/components/site/LegalPage";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/compliance")({
-  head: () => ({
-    meta: [
-      { title: "Regulatory Compliance · ENICE Group" },
-      {
-        name: "description",
-        content: "Regulatory posture, registrations, and compliance program of ENICE Group.",
-      },
-      { property: "og:title", content: "Regulatory Compliance · ENICE Group" },
-      {
-        property: "og:description",
-        content: "Regulatory posture, registrations, and compliance program of ENICE Group.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE_URL}/compliance` },
-      { name: "twitter:title", content: "Regulatory Compliance · ENICE Group" },
-      {
-        name: "twitter:description",
-        content: "Regulatory posture, registrations, and compliance program of ENICE Group.",
-      },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/compliance` }],
-  }),
+  head: () => pageHead("/compliance"),
   component: () => (
     <LegalPage
       lastUpdated="July 16, 2026"
