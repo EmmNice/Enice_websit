@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build",
+    "build": "vite build && npm run prerender",
     "build:dev": "vite build --mode development",
     "preview": "vite preview",
     "lint": "eslint .",
@@ -14,7 +14,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "build:api": "esbuild api-src/*.ts api-src/admin/*.ts --bundle --platform=node --format=esm --outbase=api-src --outdir=api",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm run build && npm run build:api",
-    "vercel-build": "npm run build && npm run build:api"
+    "vercel-build": "npm run build && npm run build:api",
+    "prerender": "node scripts/prerender.mjs"
   },
   "dependencies": {
     "@portabletext/react": "^6.2.0",

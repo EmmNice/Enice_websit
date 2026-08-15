@@ -5,6 +5,7 @@ import { AlertCircle, ArrowRight, Check, Loader2, Mail, MapPin } from "lucide-re
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
+import { pageHead } from "@/lib/seo";
 import {
   EMPTY_CONTACT,
   FIELD_LIMITS,
@@ -16,62 +17,28 @@ import {
 } from "@/lib/contact";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact ENICE Group" },
+  head: () =>
+    pageHead("/contact", [
       {
-        name: "description",
-        content:
-          "Reach ENICE Group about product access, platform integration, enterprise licensing, partnerships, or general inquiries at corporate@enicehq.com.",
-      },
-      { property: "og:title", content: "Contact ENICE Group" },
-      {
-        property: "og:description",
-        content: "Get in touch about product access, integration, licensing, or partnerships.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: `${SITE_URL}/contact` },
-      { property: "og:image", content: `${SITE_URL}/og.png` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "Contact ENICE Group" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      { name: "twitter:title", content: "Contact ENICE Group" },
-      {
-        name: "twitter:description",
-        content: "Get in touch about product access, integration, licensing, or partnerships.",
-      },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/contact` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "ContactPage",
-          name: "Contact ENICE Group",
-          description:
-            "Reach ENICE Group about product access, platform integration, licensing, and partnerships.",
-          url: `${SITE_URL}/contact`,
-          publisher: {
-            "@type": "Organization",
-            name: "ENICE Group",
-            url: SITE_URL,
-            email: "corporate@enicehq.com",
-            address: {
-              "@type": "PostalAddress",
-              addressLocality: "Abuja",
-              addressCountry: "NG",
-            },
+        "@context": "https://schema.org",
+        "@type": "ContactPage",
+        name: "Contact ENICE Group",
+        description:
+          "Reach ENICE Group about product access, platform integration, licensing, and partnerships.",
+        url: `${SITE_URL}/contact`,
+        publisher: {
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: SITE_URL,
+          email: "corporate@enicehq.com",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Abuja",
+            addressCountry: "NG",
           },
-        }),
+        },
       },
-    ],
-  }),
+    ]),
   component: ContactPage,
 });
 

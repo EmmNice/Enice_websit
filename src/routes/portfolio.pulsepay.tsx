@@ -15,88 +15,40 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/pulsepay")({
-  head: () => ({
-    meta: [
-      { title: "PulsePay | Virtual Payment Platform by ENICE Group" },
+  head: () =>
+    pageHead("/portfolio/pulsepay", [
       {
-        name: "description",
-        content:
-          "PulsePay by ENICE Group: virtual Naira and USD card issuance, built-in KYC, programmable wallets, peer-to-peer transfers, and fraud monitoring for modern commerce.",
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "PulsePay",
+        description:
+          "ENICE Group's virtual payment platform: Naira and USD card issuance, built-in KYC verification, peer-to-peer transfers, programmable spend controls, and fraud monitoring.",
+        url: `${SITE_URL}/portfolio/pulsepay`,
+        applicationCategory: "FinanceApplication",
+        operatingSystem: "Web, iOS, Android",
+        offers: {
+          "@type": "Offer",
+          availability: "https://schema.org/InStock",
+          description: "Request access via corporate@enicehq.com",
+        },
+        author: {
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: SITE_URL,
+        },
+        featureList: [
+          "Instant virtual Naira and USD card issuance",
+          "Built-in KYC and identity verification",
+          "Peer-to-peer transfers and wallet funding",
+          "Programmable spend controls for teams",
+          "Value-added services and bill payments",
+          "Enterprise-grade fraud monitoring",
+        ],
       },
-      {
-        property: "og:title",
-        content: "PulsePay: Virtual Payment Platform by ENICE Group",
-      },
-      {
-        property: "og:description",
-        content:
-          "Virtual card issuance, KYC verification, programmable wallets, and fast transfers. PulsePay is ENICE Group's fintech infrastructure platform for modern commerce.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:image", content: `${SITE_URL}/og.png` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "PulsePay by ENICE Group" },
-      {
-        property: "og:url",
-        content: `${SITE_URL}/portfolio/pulsepay`,
-      },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      {
-        name: "twitter:title",
-        content: "PulsePay: Fintech Infrastructure Platform",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Virtual Naira and USD card issuance, KYC, wallets, and transfers. Built by ENICE Group.",
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `${SITE_URL}/portfolio/pulsepay`,
-      },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "PulsePay",
-          description:
-            "ENICE Group's virtual payment platform: Naira and USD card issuance, built-in KYC verification, peer-to-peer transfers, programmable spend controls, and fraud monitoring.",
-          url: `${SITE_URL}/portfolio/pulsepay`,
-          applicationCategory: "FinanceApplication",
-          operatingSystem: "Web, iOS, Android",
-          offers: {
-            "@type": "Offer",
-            availability: "https://schema.org/InStock",
-            description: "Request access via corporate@enicehq.com",
-          },
-          author: {
-            "@type": "Organization",
-            name: "ENICE Group",
-            url: SITE_URL,
-          },
-          featureList: [
-            "Instant virtual Naira and USD card issuance",
-            "Built-in KYC and identity verification",
-            "Peer-to-peer transfers and wallet funding",
-            "Programmable spend controls for teams",
-            "Value-added services and bill payments",
-            "Enterprise-grade fraud monitoring",
-          ],
-        }),
-      },
-    ],
-  }),
+    ]),
   component: PulsePayPage,
 });
 

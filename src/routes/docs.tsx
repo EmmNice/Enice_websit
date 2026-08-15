@@ -3,35 +3,10 @@ import { useState } from "react";
 import { ArrowUpRight, ChevronRight, Copy, Check } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { SITE_URL } from "@/lib/site";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/docs")({
-  head: () => ({
-    meta: [
-      { title: "API Documentation · ENICE Group" },
-      {
-        name: "description",
-        content:
-          "ENICE Core API reference: authentication, endpoints, rate limits, and webhooks for verified integrators.",
-      },
-      { property: "og:title", content: "API Documentation · ENICE Group" },
-      {
-        property: "og:description",
-        content:
-          "ENICE Core API reference: authentication, endpoints, rate limits, and webhooks for verified integrators.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:url", content: `${SITE_URL}/docs` },
-      { name: "twitter:title", content: "API Documentation · ENICE Group" },
-      {
-        name: "twitter:description",
-        content:
-          "ENICE Core API reference: authentication, endpoints, rate limits, and webhooks for verified integrators.",
-      },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/docs` }],
-  }),
+  head: () => pageHead("/docs"),
   component: DocsPage,
 });
 

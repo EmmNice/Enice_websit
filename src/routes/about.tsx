@@ -2,66 +2,32 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About ENICE Group | A Technology Company Building African Infrastructure" },
+  head: () =>
+    pageHead("/about", [
       {
-        name: "description",
-        content:
-          "ENICE Group builds and operates software platforms for digital commerce, financial services, and enterprise AI. Here is our story, our mission, and how we work.",
-      },
-      { property: "og:title", content: "About ENICE Group" },
-      {
-        property: "og:description",
-        content:
-          "What ENICE Group builds, why we build it, and the standards we hold ourselves to.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:url", content: `${SITE_URL}/about` },
-      { property: "og:image", content: `${SITE_URL}/og.png` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "About ENICE Group" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      { name: "twitter:title", content: "About ENICE Group" },
-      {
-        name: "twitter:description",
-        content: "What ENICE Group builds, why we build it, and how our products fit together.",
-      },
-      { name: "robots", content: "index, follow" },
-    ],
-    links: [{ rel: "canonical", href: `${SITE_URL}/about` }],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "AboutPage",
-          name: "About ENICE Group",
-          description:
-            "ENICE Group builds and operates software platforms for financial services, enterprise AI, and digital commerce.",
-          url: `${SITE_URL}/about`,
-          publisher: {
-            "@type": "Organization",
-            name: "ENICE Group",
-            url: SITE_URL,
-            logo: `${SITE_URL}/favicon.png`,
-            foundingDate: "2026",
-            address: {
-              "@type": "PostalAddress",
-              addressLocality: "Abuja",
-              addressCountry: "NG",
-            },
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        name: "About ENICE Group",
+        description:
+          "ENICE Group builds and operates software platforms for financial services, enterprise AI, and digital commerce.",
+        url: `${SITE_URL}/about`,
+        publisher: {
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: SITE_URL,
+          logo: `${SITE_URL}/favicon.png`,
+          foundingDate: "2026",
+          address: {
+            "@type": "PostalAddress",
+            addressLocality: "Abuja",
+            addressCountry: "NG",
           },
-        }),
+        },
       },
-    ],
-  }),
+    ]),
   component: AboutPage,
 });
 

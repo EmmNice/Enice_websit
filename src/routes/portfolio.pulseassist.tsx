@@ -26,90 +26,40 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
+import { pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/pulseassist")({
-  head: () => ({
-    meta: [
+  head: () =>
+    pageHead("/portfolio/pulseassist", [
       {
-        title: "PulseAssist | Enterprise AI Operations Platform by ENICE Group",
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        name: "PulseAssist",
+        description:
+          "ENICE Group's multi-tenant AI operations platform for banking, fintech, and telecom: automated customer support routing, policy-bound conversational agents, API-driven account management, and real-time handoff to live agents.",
+        url: `${SITE_URL}/portfolio/pulseassist`,
+        applicationCategory: "BusinessApplication",
+        operatingSystem: "Web",
+        offers: {
+          "@type": "Offer",
+          availability: "https://schema.org/InStock",
+          description: "Request enterprise integration access via corporate@enicehq.com",
+        },
+        author: {
+          "@type": "Organization",
+          name: "ENICE Group",
+          url: SITE_URL,
+        },
+        featureList: [
+          "Autonomous customer support routing",
+          "Policy-bound conversational agents",
+          "Real-time handoff to live agents",
+          "API-driven account management",
+          "Multi-tenant architecture for enterprises",
+          "Compliance-ready audit trails",
+        ],
       },
-      {
-        name: "description",
-        content:
-          "PulseAssist by ENICE Group is a multi-tenant AI operations platform for banking, fintech, and telecom. It handles customer support, runs policy-bound agents, hands off to live agents in real time, and keeps compliance-ready audit trails.",
-      },
-      {
-        property: "og:title",
-        content: "PulseAssist: Enterprise AI Operations Platform by ENICE Group",
-      },
-      {
-        property: "og:description",
-        content:
-          "Multi-tenant AI operations for telecoms and financial networks: support routing, policy-bound agents, real-time live-agent handoff. Built by ENICE Group.",
-      },
-      { property: "og:type", content: "website" },
-      { property: "og:site_name", content: "ENICE Group" },
-      { property: "og:image", content: `${SITE_URL}/og.png` },
-      { property: "og:image:width", content: "1200" },
-      { property: "og:image:height", content: "630" },
-      { property: "og:image:alt", content: "PulseAssist by ENICE Group" },
-      {
-        property: "og:url",
-        content: `${SITE_URL}/portfolio/pulseassist`,
-      },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@ENICEHQ" },
-      { name: "twitter:image", content: `${SITE_URL}/og.png` },
-      {
-        name: "twitter:title",
-        content: "PulseAssist: Enterprise AI by ENICE Group",
-      },
-      {
-        name: "twitter:description",
-        content:
-          "Multi-tenant AI operations platform for banking and telecom: automated support, policy agents, live handoff.",
-      },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `${SITE_URL}/portfolio/pulseassist`,
-      },
-    ],
-    scripts: [
-      {
-        type: "application/ld+json",
-        children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
-          name: "PulseAssist",
-          description:
-            "ENICE Group's multi-tenant AI operations platform for banking, fintech, and telecom: automated customer support routing, policy-bound conversational agents, API-driven account management, and real-time handoff to live agents.",
-          url: `${SITE_URL}/portfolio/pulseassist`,
-          applicationCategory: "BusinessApplication",
-          operatingSystem: "Web",
-          offers: {
-            "@type": "Offer",
-            availability: "https://schema.org/InStock",
-            description: "Request enterprise integration access via corporate@enicehq.com",
-          },
-          author: {
-            "@type": "Organization",
-            name: "ENICE Group",
-            url: SITE_URL,
-          },
-          featureList: [
-            "Autonomous customer support routing",
-            "Policy-bound conversational agents",
-            "Real-time handoff to live agents",
-            "API-driven account management",
-            "Multi-tenant architecture for enterprises",
-            "Compliance-ready audit trails",
-          ],
-        }),
-      },
-    ],
-  }),
+    ]),
   component: PulseAssistPage,
 });
 
