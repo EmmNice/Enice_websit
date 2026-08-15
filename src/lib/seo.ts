@@ -31,7 +31,6 @@ export const SOCIAL_PROFILES = [
   { label: "X (Twitter)", href: "https://x.com/ENICEHQ" },
   { label: "Instagram", href: "https://www.instagram.com/enicehq" },
   { label: "Facebook", href: "https://www.facebook.com/share/18CwCS1iYf/" },
-  { label: "LinkedIn", href: "https://www.linkedin.com/company/enicehq" },
 ] as const;
 
 /**
