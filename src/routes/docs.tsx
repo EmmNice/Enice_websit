@@ -3,10 +3,10 @@ import { useState } from "react";
 import { ArrowUpRight, ChevronRight, Copy, Check } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { pageHead } from "@/lib/seo";
+import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/docs")({
-  head: () => pageHead("/docs"),
+  head: () => pageHead("/docs", [breadcrumbJsonLd([{ name: "API Documentation", path: "/docs" }])]),
   component: DocsPage,
 });
 

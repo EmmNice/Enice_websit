@@ -13,11 +13,12 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
-import { pageHead } from "@/lib/seo";
+import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/")({
   head: () =>
     pageHead("/portfolio", [
+      breadcrumbJsonLd([{ name: "Products", path: "/portfolio" }]),
       {
         "@context": "https://schema.org",
         "@type": "CollectionPage",
@@ -25,11 +26,7 @@ export const Route = createFileRoute("/portfolio/")({
         description:
           "Proprietary software products and infrastructure networks built by ENICE Group.",
         url: `${SITE_URL}/portfolio`,
-        publisher: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-        },
+        publisher: ORGANIZATION_REF,
         hasPart: [
           {
             "@type": "SoftwareApplication",

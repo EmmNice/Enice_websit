@@ -23,14 +23,15 @@ import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Careers } from "@/components/site/Careers";
 import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
+import { FAQS } from "@/lib/faqs";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { ContactSection } from "@/components/site/ContactSection";
-import { organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
+import { faqJsonLd, organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
-  head: () => pageHead("/", [organizationJsonLd(), webSiteJsonLd()]),
+  head: () => pageHead("/", [organizationJsonLd(), webSiteJsonLd(), faqJsonLd(FAQS)]),
   component: Landing,
 });
 

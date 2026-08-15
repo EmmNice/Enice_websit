@@ -26,11 +26,15 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
-import { pageHead } from "@/lib/seo";
+import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/pulseassist")({
   head: () =>
     pageHead("/portfolio/pulseassist", [
+      breadcrumbJsonLd([
+        { name: "Products", path: "/portfolio" },
+        { name: "PulseAssist", path: "/portfolio/pulseassist" },
+      ]),
       {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
@@ -45,11 +49,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
           availability: "https://schema.org/InStock",
           description: "Request enterprise integration access via corporate@enicehq.com",
         },
-        author: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-        },
+        author: ORGANIZATION_REF,
         featureList: [
           "Autonomous customer support routing",
           "Policy-bound conversational agents",

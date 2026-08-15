@@ -2,11 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { pageHead } from "@/lib/seo";
+import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
   head: () =>
     pageHead("/about", [
+      breadcrumbJsonLd([{ name: "About", path: "/about" }]),
       {
         "@context": "https://schema.org",
         "@type": "AboutPage",
