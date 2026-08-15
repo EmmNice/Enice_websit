@@ -9,7 +9,6 @@ const FALLBACK_TEXT =
   "Thanks for reaching out. A member of our team will follow up shortly. For urgent matters, write to corporate@enicehq.com.";
 
 export class FallbackProvider implements AIProvider {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async complete(_messages: AIMessage[]): Promise<AIResponse> {
     return { text: FALLBACK_TEXT, model: "fallback", provider: "fallback" };
   }

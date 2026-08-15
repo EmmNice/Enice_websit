@@ -1,4 +1,24 @@
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ElementType,
+  type ReactNode,
+  type Ref,
+} from "react";
+
+/**
+ * Minimal prop surface we actually pass to the polymorphic tag. Casting `Tag` to this
+ * instead of `any` keeps the render call type-checked while still allowing `as="section"`,
+ * `as="li"`, etc.
+ */
+type PolymorphicProps = {
+  ref?: Ref<HTMLElement>;
+  className?: string;
+  style?: CSSProperties;
+  children?: ReactNode;
+};
 
 type Direction = "up" | "down" | "left" | "right" | "scale" | "none";
 
@@ -17,12 +37,18 @@ interface RevealProps {
 
 function getInitialTransform(direction: Direction, distance: number): string {
   switch (direction) {
-    case "up":    return `translateY(${distance}px)`;
-    case "down":  return `translateY(-${distance}px)`;
-    case "left":  return `translateX(${distance}px)`;
-    case "right": return `translateX(-${distance}px)`;
-    case "scale": return `scale(0.93)`;
-    case "none":  return "none";
+    case "up":
+      return `translateY(${distance}px)`;
+    case "down":
+      return `translateY(-${distance}px)`;
+    case "left":
+      return `translateX(${distance}px)`;
+    case "right":
+      return `translateX(-${distance}px)`;
+    case "scale":
+      return `scale(0.93)`;
+    case "none":
+      return "none";
   }
 }
 
@@ -51,7 +77,10 @@ export function Reveal({
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    if (typeof IntersectionObserver === "undefined") { setVisible(true); return; }
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
 
     const io = new IntersectionObserver(
       ([entry]) => {
@@ -64,11 +93,11 @@ export function Reveal({
   }, []);
 
   const ease = "cubic-bezier(0.16, 1, 0.3, 1)";
-  const Component = Tag as any;
+  const Component = Tag as React.ComponentType<PolymorphicProps>;
 
   if (reducedMotion) {
     return (
-      <Component ref={ref as any} className={className}>
+      <Component ref={ref} className={className}>
         {children}
       </Component>
     );
@@ -76,7 +105,7 @@ export function Reveal({
 
   return (
     <Component
-      ref={ref as any}
+      ref={ref}
       style={{
         transition: `opacity ${duration}ms ${ease}, transform ${duration}ms ${ease}, filter ${duration}ms ${ease}`,
         transitionDelay: `${delay}ms`,

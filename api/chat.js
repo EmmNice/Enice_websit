@@ -11,10 +11,7 @@ function toHex(buf) {
   return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 async function sha256Hex(data) {
-  const hash = await getSubtle().digest(
-    "SHA-256",
-    new TextEncoder().encode(data)
-  );
+  const hash = await getSubtle().digest("SHA-256", new TextEncoder().encode(data));
   return toHex(hash);
 }
 async function hmacSHA256(key, data) {
@@ -73,7 +70,7 @@ x-amz-date:${amzDate}
   return {
     "Content-Type": "application/json",
     "x-amz-date": amzDate,
-    "Authorization": authHeader
+    Authorization: authHeader
   };
 }
 var BedrockProvider = class {
@@ -90,9 +87,7 @@ var BedrockProvider = class {
   async complete(messages) {
     const systemMessages = messages.filter((m) => m.role === "system");
     const turns = messages.filter((m) => m.role !== "system");
-    const userFirstTurns = turns.slice(
-      turns.findIndex((m) => m.role === "user")
-    );
+    const userFirstTurns = turns.slice(turns.findIndex((m) => m.role === "user"));
     const bedrockMessages = (userFirstTurns.length > 0 ? userFirstTurns : turns).map((m) => ({
       role: m.role,
       content: [{ text: m.content }]
@@ -293,14 +288,17 @@ var OpenAICompatibleProvider = class {
     }
     const text = data.choices?.[0]?.message?.content?.trim();
     if (!text) throw new Error(`[${this.providerLabel}] Empty response from API`);
-    return { text, model: data.model || this.model || this.defaultModel, provider: this.providerLabel };
+    return {
+      text,
+      model: data.model || this.model || this.defaultModel,
+      provider: this.providerLabel
+    };
   }
 };
 
 // src/lib/ai/providers/fallback.ts
 var FALLBACK_TEXT = "Thanks for reaching out. A member of our team will follow up shortly. For urgent matters, write to corporate@enicehq.com.";
 var FallbackProvider = class {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async complete(_messages) {
     return { text: FALLBACK_TEXT, model: "fallback", provider: "fallback" };
   }
@@ -321,12 +319,7 @@ function createAIProvider() {
       );
       return new FallbackProvider();
     }
-    return new BedrockProvider(
-      apiKey,
-      apiSecret,
-      region,
-      model ?? "amazon.nova-lite-v1:0"
-    );
+    return new BedrockProvider(apiKey, apiSecret, region, model ?? "amazon.nova-lite-v1:0");
   }
   if (!apiKey) {
     console.warn(
@@ -611,10 +604,7 @@ async function handler(req, res) {
     if (history.length === 0) {
       return res.status(400).json({ ok: false, error: "No valid messages provided." });
     }
-    const messages = [
-      { role: "system", content: SYSTEM_PROMPT },
-      ...history
-    ];
+    const messages = [{ role: "system", content: SYSTEM_PROMPT }, ...history];
     const provider = createAIProvider();
     const result = await provider.complete(messages);
     return res.status(200).json({ ok: true, text: result.text, model: result.model, provider: result.provider });
@@ -623,7 +613,7 @@ async function handler(req, res) {
     console.error(`[api/chat:${ref}]`, err);
     return res.status(500).json({
       ok: false,
-      error: err instanceof Error ? err.message : String(err),
+      error: "The assistant is temporarily unavailable. Please try again shortly.",
       ref
     });
   }

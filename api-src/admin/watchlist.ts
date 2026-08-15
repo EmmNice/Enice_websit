@@ -4,6 +4,7 @@
  * Protected by a shared password sent via the `x-admin-password` header.
  */
 import { Resend } from "resend";
+import { timingSafeEqual } from "node:crypto";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyReq = any;
@@ -16,6 +17,53 @@ type Contact = {
   created_at: string;
   unsubscribed: boolean;
 };
+
+/**
+ * Constant-time credential comparison. A plain `!==` leaks the shared password one
+ * character at a time through response timing.
+ */
+function secretsMatch(supplied: unknown, expected: string): boolean {
+  if (typeof supplied !== "string") return false;
+  const a = Buffer.from(supplied, "utf8");
+  const b = Buffer.from(expected, "utf8");
+  // timingSafeEqual throws on length mismatch, so compare digests of equal width.
+  if (a.length !== b.length) {
+    // Still perform a comparison so a wrong-length guess costs the same as a wrong value.
+    timingSafeEqual(b, b);
+    return false;
+  }
+  return timingSafeEqual(a, b);
+}
+
+// Brute-force guard for the admin password. Module-scoped, so it is per-instance and
+// resets on cold start — enough to blunt online guessing, not a substitute for real
+// auth. Upgrade to Upstash/Redis if the admin surface grows.
+const attempts = new Map<string, { count: number; resetAt: number }>();
+const ATTEMPT_WINDOW_MS = 15 * 60 * 1000;
+const MAX_ATTEMPTS = 10;
+
+function clientIp(req: AnyReq): string {
+  const fwd = req.headers["x-forwarded-for"];
+  const raw = Array.isArray(fwd) ? fwd[0] : fwd;
+  return (typeof raw === "string" ? raw.split(",")[0]?.trim() : "") || "unknown";
+}
+
+function tooManyAttempts(ip: string): boolean {
+  const now = Date.now();
+  const entry = attempts.get(ip);
+  if (!entry || now > entry.resetAt) return false;
+  return entry.count >= MAX_ATTEMPTS;
+}
+
+function recordFailure(ip: string): void {
+  const now = Date.now();
+  const entry = attempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    attempts.set(ip, { count: 1, resetAt: now + ATTEMPT_WINDOW_MS });
+    return;
+  }
+  entry.count++;
+}
 
 export default async function handler(req: AnyReq, res: AnyRes) {
   try {
@@ -30,8 +78,14 @@ export default async function handler(req: AnyReq, res: AnyRes) {
       return;
     }
 
-    const supplied = req.headers["x-admin-password"];
-    if (supplied !== adminPassword) {
+    const ip = clientIp(req);
+    if (tooManyAttempts(ip)) {
+      res.status(429).json({ ok: false, error: "Too many attempts. Try again later." });
+      return;
+    }
+
+    if (!secretsMatch(req.headers["x-admin-password"], adminPassword)) {
+      recordFailure(ip);
       res.status(401).json({ ok: false, error: "Invalid password." });
       return;
     }

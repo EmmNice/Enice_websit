@@ -1,255 +1,185 @@
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig, loadEnv, type Plugin, type ViteDevServer } from "vite";
+import type { IncomingMessage, ServerResponse } from "node:http";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
-const devWatchlistEmails = new Set<string>();
+/**
+ * ─── Dev-mode /api/* bridge ──────────────────────────────────────────────────
+ *
+ * In production these routes are Vercel serverless functions built from `api-src/`
+ * by `npm run build:api`. `vite dev` doesn't run them, so this bridge loads the
+ * *same* handler modules through Vite's SSR pipeline and adapts Node's
+ * (IncomingMessage, ServerResponse) to the Vercel handler signature.
+ *
+ * This previously existed as three hand-written middlewares that re-implemented the
+ * validation, rate limiting and email logic. They drifted from the real handlers and
+ * left `/api/contact` and `/api/ping` returning 404 locally. Delegating instead means
+ * dev and production execute identical code, and new endpoints only need a line in
+ * API_ROUTES below.
+ */
 
-function watchlistDevPlugin(): Plugin {
-  return {
-    name: "watchlist-dev-api",
-    configureServer(server) {
-      server.middlewares.use("/api/watchlist", async (req, res, next) => {
-        if (req.method !== "POST") return next();
+type VercelLikeResponse = ServerResponse & {
+  status: (code: number) => VercelLikeResponse;
+  json: (payload: unknown) => void;
+  send: (payload: unknown) => void;
+};
 
-        // Rate limit (3 per IP per 10 min)
-        const ip =
-          (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
-          "unknown";
-        const now = Date.now();
-        const entry = rateLimitMap.get(ip);
-        if (!entry || now > entry.resetAt) {
-          rateLimitMap.set(ip, { count: 1, resetAt: now + 600_000 });
-        } else if (entry.count >= 3) {
-          res.writeHead(429, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "Too many requests. Please try again later." }));
-          return;
-        } else {
-          entry.count++;
-        }
+type VercelLikeRequest = IncomingMessage & { body?: unknown; query: Record<string, string> };
 
-        // Parse body
-        let raw = "";
-        for await (const chunk of req) raw += chunk;
-        let email = "";
-        try {
-          const body = JSON.parse(raw);
-          email =
-            typeof body.email === "string"
-              ? body.email.trim().toLowerCase()
-              : "";
-        } catch {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "Invalid request body." }));
-          return;
-        }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ApiHandler = (req: any, res: any) => unknown;
 
-        if (!email || !EMAIL_RE.test(email) || email.length > 320) {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "Please enter a valid email address." }));
-          return;
-        }
+/** Endpoint path → module that default-exports the handler. */
+const API_ROUTES: Record<string, string> = {
+  "/api/watchlist": "/api-src/watchlist.ts",
+  "/api/admin/watchlist": "/api-src/admin/watchlist.ts",
+  "/api/contact": "/api-src/contact.ts",
+  "/api/chat": "/api-src/chat.ts",
+  "/api/ping": "/api-src/ping.ts",
+};
 
-        // Duplicate check (in-memory for dev)
-        if (devWatchlistEmails.has(email)) {
-          res.writeHead(409, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, code: "DUPLICATE" }));
-          return;
-        }
+const MAX_BODY_BYTES = 100 * 1024;
 
-        const apiKey = process.env.RESEND_API_KEY;
-        if (!apiKey) {
-          // No key in dev — return success so the form can be tested
-          devWatchlistEmails.add(email);
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: true, scheduledReminders: 0, dev: true }));
-          return;
-        }
-
-        try {
-          // Dynamically load the shared email module (Node/Bun context, no bundling)
-          const { sendWatchlistEmails } = await import(
-            "./src/lib/api/email.server.js"
-          );
-          const result = await sendWatchlistEmails(email);
-          devWatchlistEmails.add(email);
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify(result));
-        } catch (err) {
-          console.error("[watchlist-dev] error:", err);
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(
-            JSON.stringify({
-              ok: false,
-              error: "We could not process your request. Please try again.",
-            })
-          );
-        }
-      });
-    },
-  };
+async function readBody(req: IncomingMessage): Promise<string | undefined> {
+  if (req.method === "GET" || req.method === "HEAD") return undefined;
+  const chunks: Buffer[] = [];
+  let size = 0;
+  for await (const chunk of req) {
+    const buf = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    size += buf.length;
+    if (size > MAX_BODY_BYTES) throw new Error("PAYLOAD_TOO_LARGE");
+    chunks.push(buf);
+  }
+  return Buffer.concat(chunks).toString("utf8");
 }
 
-function adminWatchlistDevPlugin(): Plugin {
+function decorateResponse(res: ServerResponse): VercelLikeResponse {
+  const out = res as VercelLikeResponse;
+  out.status = (code: number) => {
+    out.statusCode = code;
+    return out;
+  };
+  out.json = (payload: unknown) => {
+    if (!out.headersSent) out.setHeader("Content-Type", "application/json; charset=utf-8");
+    out.end(JSON.stringify(payload));
+  };
+  out.send = (payload: unknown) => {
+    if (typeof payload === "object" && payload !== null) return out.json(payload);
+    out.end(String(payload));
+  };
+  return out;
+}
+
+function apiBridgePlugin(): Plugin {
   return {
-    name: "admin-watchlist-dev-api",
-    configureServer(server) {
-      server.middlewares.use("/api/admin/watchlist", async (req, res, next) => {
-        if (req.method !== "GET") return next();
+    name: "enice-dev-api-bridge",
+    configureServer(server: ViteDevServer) {
+      for (const [route, modulePath] of Object.entries(API_ROUTES)) {
+        server.middlewares.use(route, async (req, res, next) => {
+          // Only handle an exact match; anything deeper falls through to the SPA.
+          const path = (req.url ?? "/").split("?")[0];
+          if (path !== "/" && path !== "") return next();
 
-        const adminPassword = process.env.ADMIN_PASSWORD;
-        if (!adminPassword) {
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "Admin access is not configured." }));
-          return;
-        }
+          const response = decorateResponse(res);
 
-        if (req.headers["x-admin-password"] !== adminPassword) {
-          res.writeHead(401, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "Invalid password." }));
-          return;
-        }
-
-        const apiKey = process.env.RESEND_API_KEY;
-        const audienceId = process.env.RESEND_AUDIENCE_ID;
-        if (!apiKey || !audienceId) {
-          // No Resend key in dev — return the in-memory dev sign-ups instead
-          const contacts = Array.from(devWatchlistEmails).map((email, i) => ({
-            id: `dev-${i}`,
-            email,
-            created_at: new Date().toISOString(),
-            unsubscribed: false,
-          }));
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: true, contacts, total: contacts.length, dev: true }));
-          return;
-        }
-
-        try {
-          const { Resend } = await import("resend");
-          const resend = new Resend(apiKey);
-          const result = await resend.contacts.list({ audienceId });
-          if (result.error) {
-            res.writeHead(502, { "Content-Type": "application/json" });
-            res.end(JSON.stringify({ ok: false, error: "Could not fetch watchlist from provider." }));
+          let rawBody: string | undefined;
+          try {
+            rawBody = await readBody(req);
+          } catch {
+            response.status(413).json({ ok: false, error: "Request body too large." });
             return;
           }
-          const contacts = (result.data?.data ?? [])
-            .map((c) => ({
-              id: c.id,
-              email: c.email,
-              created_at: c.created_at,
-              unsubscribed: c.unsubscribed,
-            }))
-            .sort((a, b) => (a.created_at < b.created_at ? 1 : -1));
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: true, contacts, total: contacts.length }));
-        } catch (err) {
-          console.error("[admin-watchlist-dev] error:", err);
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "An unexpected error occurred." }));
-        }
-      });
+
+          const request = req as VercelLikeRequest;
+          request.query = Object.fromEntries(
+            new URL(req.url ?? "/", "http://localhost").searchParams,
+          );
+          if (rawBody) {
+            // Vercel pre-parses JSON bodies; mirror that so handlers behave identically.
+            try {
+              request.body = JSON.parse(rawBody);
+            } catch {
+              request.body = rawBody;
+            }
+          }
+
+          try {
+            // `ssrLoadModule` compiles the TypeScript source on demand. The previous
+            // implementation used `await import("./src/.../x.js")`, which only resolved
+            // under Bun and threw ERR_MODULE_NOT_FOUND under Node.
+            const mod = await server.ssrLoadModule(modulePath);
+            const handler = (mod.default ?? mod.handler) as ApiHandler | undefined;
+            if (typeof handler !== "function") {
+              throw new Error(`${modulePath} does not default-export a handler`);
+            }
+            await handler(request, response);
+          } catch (err) {
+            const ref = `DEV${Date.now().toString(36).toUpperCase()}`;
+            server.config.logger.error(`[dev-api ${route}:${ref}] ${String(err)}`);
+            if (!res.writableEnded) {
+              response
+                .status(500)
+                .json({ ok: false, error: "Local API handler failed. See server logs.", ref });
+            }
+          }
+        });
+      }
     },
   };
 }
 
-// ── /api/chat dev middleware ──────────────────────────────────────────────────
-
-const chatRateLimitMap = new Map<string, { count: number; resetAt: number }>();
-
-function chatDevPlugin(): Plugin {
+/**
+ * Fails the production build when the public Supabase variables are missing.
+ *
+ * `.env` used to be committed, so these values reached the Vercel build implicitly. Now
+ * that it is git-ignored they must be configured as Vercel environment variables. Without
+ * this guard the build would still succeed and only the PulseAssist early-access form
+ * would break at runtime; failing the build instead keeps the last good deployment live
+ * and names exactly what is missing.
+ */
+function requirePublicEnvPlugin(): Plugin {
+  const REQUIRED = ["VITE_SUPABASE_URL", "VITE_SUPABASE_PUBLISHABLE_KEY"];
   return {
-    name: "chat-dev-api",
-    configureServer(server) {
-      server.middlewares.use("/api/chat", async (req, res, next) => {
-        if (req.method !== "POST") return next();
-
-        // Rate limit (10 req / 5 min per IP)
-        const ip =
-          (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
-          "unknown";
-        const now = Date.now();
-        const entry = chatRateLimitMap.get(ip);
-        if (!entry || now > entry.resetAt) {
-          chatRateLimitMap.set(ip, { count: 1, resetAt: now + 300_000 });
-        } else if (entry.count >= 10) {
-          res.writeHead(429, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "Too many requests. Please slow down." }));
-          return;
-        } else {
-          entry.count++;
-        }
-
-        // Parse body
-        let raw = "";
-        for await (const chunk of req) raw += chunk;
-        let body: Record<string, unknown> = {};
-        try {
-          body = JSON.parse(raw || "{}");
-        } catch {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "Invalid request body." }));
-          return;
-        }
-
-        // Validate messages
-        if (!Array.isArray(body.messages) || body.messages.length === 0) {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "messages array is required." }));
-          return;
-        }
-
-        const history = (body.messages as unknown[])
-          .filter(
-            (m): m is { role: string; content: string } =>
-              typeof m === "object" &&
-              m !== null &&
-              typeof (m as Record<string, unknown>).role === "string" &&
-              typeof (m as Record<string, unknown>).content === "string",
-          )
-          .slice(-20)
-          .map((m) => ({
-            role: (["user", "assistant"].includes(m.role) ? m.role : "user") as "user" | "assistant" | "system",
-            content: String(m.content).slice(0, 2000),
-          }));
-
-        if (history.length === 0) {
-          res.writeHead(400, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "No valid messages provided." }));
-          return;
-        }
-
-        try {
-          const { createAIProvider, SYSTEM_PROMPT } = await import("./src/lib/ai/index.js");
-          const provider = createAIProvider();
-          const messages = [{ role: "system" as const, content: SYSTEM_PROMPT }, ...history];
-          const result = await provider.complete(messages);
-          res.writeHead(200, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: true, text: result.text, model: result.model, provider: result.provider }));
-        } catch (err) {
-          const ref = `C${Date.now().toString(36).toUpperCase()}`;
-          console.error(`[chat-dev:${ref}]`, err);
-          res.writeHead(500, { "Content-Type": "application/json" });
-          res.end(JSON.stringify({ ok: false, error: "Unexpected error.", ref }));
-        }
-      });
+    name: "enice-require-public-env",
+    apply: "build",
+    config(_config, { mode }) {
+      const env = loadEnv(mode, process.cwd(), "");
+      const missing = REQUIRED.filter((key) => !env[key] && !process.env[key]);
+      if (missing.length > 0) {
+        throw new Error(
+          `\n\nMissing required build-time environment variables: ${missing.join(", ")}.\n` +
+            `These are public (VITE_-prefixed) values needed by the PulseAssist early-access ` +
+            `form.\nSet them in your hosting provider's environment settings, or in a local ` +
+            `.env file (see .env.example).\n`,
+        );
+      }
     },
   };
 }
 
 export default defineConfig({
   plugins: [
+    requirePublicEnvPlugin(),
     tsconfigPaths({ ignoreConfigErrors: true }),
     mcpPlugin(),
-    watchlistDevPlugin(),
-    adminWatchlistDevPlugin(),
-    chatDevPlugin(),
-    TanStackRouterVite({ autoCodeSplitting: true }),
+    apiBridgePlugin(),
+    TanStackRouterVite({
+      autoCodeSplitting: true,
+      // The Lovable MCP plugin generates `mcp.ts`, `[.mcp]/*` and `[.well-known]/*` routes
+      // that expose their behaviour exclusively through `server.handlers`. Those handlers
+      // require a TanStack Start server, and this project ships a static SPA (see
+      // vercel.json's rewrite) — so they are inert in production: /mcp returns index.html
+      // and /.mcp/list-tools 404s.
+      //
+      // Including them in the route tree still pulled @lovable.dev/mcp-js, zod and ajv into
+      // the entry chunk: ~300 kB of JavaScript downloaded by every visitor that can never
+      // run. Excluding them keeps the generated files on disk, ready to work the moment a
+      // `tanstackStart()` server plugin is added — remove this option at that point.
+      routeFileIgnorePattern: "\\[\\.mcp\\]|\\[\\.well-known\\]|mcp\\.ts",
+    }),
     react(),
     tailwindcss(),
   ],
@@ -262,6 +192,30 @@ export default defineConfig({
       // Exclude the Sanity studio directory from Vite file-watching
       // to avoid ENOSPC (too many file watchers) errors.
       ignored: ["**/studio-enice-group/**", "**/.cache/**"],
+    },
+  },
+  build: {
+    // The default 500 kB warning was firing on a single ~854 kB entry chunk. Splitting the
+    // stable third-party layers out means a copy change no longer invalidates the vendor
+    // bundles in visitors' caches.
+    //
+    // A function is used rather than the object form because the object form matches only
+    // a package's main entry — listing "react-dom" missed `react-dom/client` and produced
+    // an empty chunk while React stayed in the entry bundle.
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes("node_modules")) return;
+          if (/node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return "vendor-react";
+          if (/node_modules[\\/]@tanstack[\\/]/.test(id)) return "vendor-tanstack";
+          if (/node_modules[\\/](@sanity|@portabletext|groq|get-it)[\\/]/.test(id)) {
+            return "vendor-sanity";
+          }
+          if (/node_modules[\\/]lucide-react[\\/]/.test(id)) return "vendor-icons";
+          if (/node_modules[\\/]@radix-ui[\\/]/.test(id)) return "vendor-radix";
+          return undefined;
+        },
+      },
     },
   },
   optimizeDeps: {

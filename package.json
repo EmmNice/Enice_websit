@@ -10,7 +10,11 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "build:api": "esbuild api-src/chat.ts api-src/contact.ts api-src/ping.ts api-src/watchlist.ts api-src/admin/watchlist.ts --bundle --platform=node --format=esm --outdir=api",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "check:functions": "deno check --no-lock supabase/functions/*/index.ts",
+    "build:api": "esbuild api-src/*.ts api-src/admin/*.ts --bundle --platform=node --format=esm --outbase=api-src --outdir=api",
+    "verify": "npm run format:check && npm run lint && npm run typecheck && npm run build && npm run build:api",
     "vercel-build": "npm run build && npm run build:api"
   },
   "dependencies": {

@@ -7,7 +7,7 @@
  *   4. Launch moment (scheduled)
  */
 import { Resend } from "resend";
-import { LAUNCH_EMAILS as LAUNCH } from "../src/lib/launch";
+import { LAUNCH_EMAILS as LAUNCH, isFutureSchedule } from "../src/lib/launch";
 
 // Inlined from api/lib/handler.ts — Vercel treats every file under api/ as its
 // own serverless function and does not reliably bundle sibling imports, so an
@@ -198,9 +198,7 @@ export default withErrorHandling(async function handler(req: any, res: any) {
     return;
   }
 
-  const ip =
-    (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ??
-    "unknown";
+  const ip = (req.headers["x-forwarded-for"] as string)?.split(",")[0]?.trim() ?? "unknown";
   if (isRateLimited(ip)) {
     res.status(429).json({ ok: false, error: "Too many requests. Please try again later." });
     return;
@@ -209,14 +207,14 @@ export default withErrorHandling(async function handler(req: any, res: any) {
   let body: { email?: unknown };
   try {
     // body-parser may already have parsed it (Vercel injects it)
-    body = typeof req.body === "object" && req.body !== null ? req.body : JSON.parse(req.body ?? "{}");
+    body =
+      typeof req.body === "object" && req.body !== null ? req.body : JSON.parse(req.body ?? "{}");
   } catch {
     res.status(400).json({ ok: false, error: "Invalid request body." });
     return;
   }
 
-  const email =
-    typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+  const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   if (!email || !EMAIL_RE.test(email) || email.length > 320) {
     res.status(400).json({ ok: false, error: "Please enter a valid email address." });
     return;
@@ -231,7 +229,9 @@ export default withErrorHandling(async function handler(req: any, res: any) {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
       console.error("[watchlist] RESEND_API_KEY is not configured");
-      res.status(500).json({ ok: false, error: "We could not process your request. Please try again shortly." });
+      res
+        .status(500)
+        .json({ ok: false, error: "We could not process your request. Please try again shortly." });
       return;
     }
 
@@ -242,35 +242,35 @@ export default withErrorHandling(async function handler(req: any, res: any) {
     // regardless of audience size. If found, this is a duplicate signup.
     const audienceId = process.env.RESEND_AUDIENCE_ID;
     if (audienceId) {
-      const existing = await resend.contacts
-        .get({ audienceId, email })
-        .catch((err) => {
-          // Network-level throw. Treat as "not found" so a transient lookup
-          // failure never blocks a legitimate first-time signup.
-          console.warn("[watchlist] contacts.get threw:", err);
-          return null;
-        });
+      const existing = await resend.contacts.get({ audienceId, email }).catch((err) => {
+        // Network-level throw. Treat as "not found" so a transient lookup
+        // failure never blocks a legitimate first-time signup.
+        console.warn("[watchlist] contacts.get threw:", err);
+        return null;
+      });
 
       if (existing && !existing.error && existing.data) {
         res.status(409).json({ ok: false, code: "DUPLICATE" });
         return;
       }
 
-      const created = await resend.contacts.create({
-        audienceId,
-        email,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } as any).catch((err) => {
-        // Network-level throw. Log and continue — a failed contact create
-        // should not block the confirmation email the user is expecting.
-        console.warn("[watchlist] contacts.create threw:", err);
-        return null;
-      });
+      const created = await resend.contacts
+        .create({
+          audienceId,
+          email,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } as any)
+        .catch((err) => {
+          // Network-level throw. Log and continue — a failed contact create
+          // should not block the confirmation email the user is expecting.
+          console.warn("[watchlist] contacts.create threw:", err);
+          return null;
+        });
 
       if (created && (created as { error?: unknown }).error) {
         console.warn(
           "[watchlist] contacts.create returned error:",
-          JSON.stringify((created as { error: unknown }).error)
+          JSON.stringify((created as { error: unknown }).error),
         );
       }
     }
@@ -279,65 +279,85 @@ export default withErrorHandling(async function handler(req: any, res: any) {
     // Resend v6 SDK returns { data, error } — it does NOT throw on API errors.
     let confirmation: { data: unknown; error: { message: string; name: string } | null };
     try {
-      confirmation = await resend.emails.send({
+      confirmation = (await resend.emails.send({
         from: FROM,
         to: email,
         subject: "You're on the ENICE Watchlist",
         html: confirmationHtml(email),
-      }) as typeof confirmation;
+      })) as typeof confirmation;
     } catch (sendErr) {
       // Network-level throw (rare)
       console.error("[watchlist] Confirmation throw:", sendErr);
-      res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
+      res
+        .status(500)
+        .json({ ok: false, error: "We could not process your request. Please try again." });
       return;
     }
 
     if (confirmation.error) {
       // Log full provider detail privately — never expose to the client
       console.error("[watchlist] Confirmation SDK error:", JSON.stringify(confirmation.error));
-      res.status(500).json({ ok: false, error: "We could not process your request. Please try again shortly." });
+      res
+        .status(500)
+        .json({ ok: false, error: "We could not process your request. Please try again shortly." });
       return;
     }
 
-    // Step 2: Schedule the 3 reminder emails. These are best-effort —
-    // if the Resend plan doesn't support scheduled sends, we still succeed.
-    const reminders = await Promise.allSettled([
-      resend.emails.send({
-        from: FROM,
-        to: email,
+    // Step 2: Schedule the pre-launch reminder emails. These are best-effort — if the
+    // Resend plan doesn't support scheduled sends we still report success.
+    //
+    // Only future timestamps are submitted: Resend rejects a `scheduledAt` in the past,
+    // so once launch day has passed these are skipped rather than failing on every signup.
+    const pending = [
+      {
         subject: "3 Days Until We Engineer the Future — ENICE Group",
         html: threeDayHtml(email),
         scheduledAt: LAUNCH.threeDayReminder,
-      }),
-      resend.emails.send({
-        from: FROM,
-        to: email,
+      },
+      {
         subject: "Tomorrow, Everything Changes — ENICE Group",
         html: oneDayHtml(email),
         scheduledAt: LAUNCH.oneDayReminder,
-      }),
-      resend.emails.send({
-        from: FROM,
-        to: email,
+      },
+      {
         subject: "ENICE Group Is Live — You Have Early Access",
         html: launchHtml(email),
         scheduledAt: LAUNCH.launchMoment,
-      }),
-    ]);
+      },
+    ].filter((m) => isFutureSchedule(m.scheduledAt));
+
+    const reminders = await Promise.allSettled(
+      pending.map((m) =>
+        resend.emails.send({
+          from: FROM,
+          to: email,
+          subject: m.subject,
+          html: m.html,
+          scheduledAt: m.scheduledAt,
+        }),
+      ),
+    );
 
     const scheduled = reminders.filter(
-      (r) => r.status === "fulfilled" && !(r.value as { error?: unknown }).error
+      (r) => r.status === "fulfilled" && !(r.value as { error?: unknown }).error,
     ).length;
 
-    if (scheduled < 3) {
-      console.warn("[watchlist] Some scheduled sends failed:", JSON.stringify(
-        reminders.map((r) => r.status === "fulfilled" ? (r.value as { error?: unknown }).error : r.reason)
-      ));
+    if (scheduled < pending.length) {
+      console.warn(
+        "[watchlist] Some scheduled sends failed:",
+        JSON.stringify(
+          reminders.map((r) =>
+            r.status === "fulfilled" ? (r.value as { error?: unknown }).error : r.reason,
+          ),
+        ),
+      );
     }
 
     res.status(200).json({ ok: true, scheduledReminders: scheduled });
   } catch (err) {
     console.error("[watchlist] Unexpected error:", err);
-    res.status(500).json({ ok: false, error: "We could not process your request. Please try again." });
+    res
+      .status(500)
+      .json({ ok: false, error: "We could not process your request. Please try again." });
   }
 });

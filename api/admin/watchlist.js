@@ -35,7 +35,7 @@ var require_timing_safe_equal = __commonJS({
         throw new Error(msg);
       }
     }
-    function timingSafeEqual(a, b) {
+    function timingSafeEqual2(a, b) {
       if (a.byteLength !== b.byteLength) {
         return false;
       }
@@ -55,7 +55,7 @@ var require_timing_safe_equal = __commonJS({
       }
       return out === 0;
     }
-    exports.timingSafeEqual = timingSafeEqual;
+    exports.timingSafeEqual = timingSafeEqual2;
   }
 });
 
@@ -5841,6 +5841,40 @@ var Resend = class {
 };
 
 // api-src/admin/watchlist.ts
+import { timingSafeEqual } from "node:crypto";
+function secretsMatch(supplied, expected) {
+  if (typeof supplied !== "string") return false;
+  const a = Buffer.from(supplied, "utf8");
+  const b = Buffer.from(expected, "utf8");
+  if (a.length !== b.length) {
+    timingSafeEqual(b, b);
+    return false;
+  }
+  return timingSafeEqual(a, b);
+}
+var attempts = /* @__PURE__ */ new Map();
+var ATTEMPT_WINDOW_MS = 15 * 60 * 1e3;
+var MAX_ATTEMPTS = 10;
+function clientIp(req) {
+  const fwd = req.headers["x-forwarded-for"];
+  const raw = Array.isArray(fwd) ? fwd[0] : fwd;
+  return (typeof raw === "string" ? raw.split(",")[0]?.trim() : "") || "unknown";
+}
+function tooManyAttempts(ip) {
+  const now = Date.now();
+  const entry = attempts.get(ip);
+  if (!entry || now > entry.resetAt) return false;
+  return entry.count >= MAX_ATTEMPTS;
+}
+function recordFailure(ip) {
+  const now = Date.now();
+  const entry = attempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    attempts.set(ip, { count: 1, resetAt: now + ATTEMPT_WINDOW_MS });
+    return;
+  }
+  entry.count++;
+}
 async function handler(req, res) {
   try {
     if (req.method !== "GET") {
@@ -5852,8 +5886,13 @@ async function handler(req, res) {
       res.status(500).json({ ok: false, error: "Admin access is not configured." });
       return;
     }
-    const supplied = req.headers["x-admin-password"];
-    if (supplied !== adminPassword) {
+    const ip = clientIp(req);
+    if (tooManyAttempts(ip)) {
+      res.status(429).json({ ok: false, error: "Too many attempts. Try again later." });
+      return;
+    }
+    if (!secretsMatch(req.headers["x-admin-password"], adminPassword)) {
+      recordFailure(ip);
       res.status(401).json({ ok: false, error: "Invalid password." });
       return;
     }

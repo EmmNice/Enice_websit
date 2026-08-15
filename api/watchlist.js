@@ -5842,13 +5842,17 @@ var Resend = class {
 
 // src/lib/launch.ts
 var LAUNCH_EMAILS = {
-  /** 3 days before launch: July 15 2026 09:00 UTC */
+  /** 3 days before launch. */
   threeDayReminder: "2026-07-15T09:00:00.000Z",
-  /** 1 day before launch: July 17 2026 09:00 UTC */
+  /** 1 day before launch. */
   oneDayReminder: "2026-07-17T09:00:00.000Z",
-  /** Exact launch moment: July 18 2026 00:00 UTC */
+  /** Exact launch moment. */
   launchMoment: "2026-07-18T00:00:00.000Z"
 };
+function isFutureSchedule(iso, now = /* @__PURE__ */ new Date()) {
+  const at = new Date(iso).getTime();
+  return Number.isFinite(at) && at > now.getTime();
+}
 
 // api-src/watchlist.ts
 function withErrorHandling(handler2) {
@@ -6074,36 +6078,46 @@ var watchlist_default = withErrorHandling(async function handler(req, res) {
       res.status(500).json({ ok: false, error: "We could not process your request. Please try again shortly." });
       return;
     }
-    const reminders = await Promise.allSettled([
-      resend.emails.send({
-        from: FROM,
-        to: email,
+    const pending = [
+      {
         subject: "3 Days Until We Engineer the Future \u2014 ENICE Group",
         html: threeDayHtml(email),
         scheduledAt: LAUNCH_EMAILS.threeDayReminder
-      }),
-      resend.emails.send({
-        from: FROM,
-        to: email,
+      },
+      {
         subject: "Tomorrow, Everything Changes \u2014 ENICE Group",
         html: oneDayHtml(email),
         scheduledAt: LAUNCH_EMAILS.oneDayReminder
-      }),
-      resend.emails.send({
-        from: FROM,
-        to: email,
+      },
+      {
         subject: "ENICE Group Is Live \u2014 You Have Early Access",
         html: launchHtml(email),
         scheduledAt: LAUNCH_EMAILS.launchMoment
-      })
-    ]);
+      }
+    ].filter((m) => isFutureSchedule(m.scheduledAt));
+    const reminders = await Promise.allSettled(
+      pending.map(
+        (m) => resend.emails.send({
+          from: FROM,
+          to: email,
+          subject: m.subject,
+          html: m.html,
+          scheduledAt: m.scheduledAt
+        })
+      )
+    );
     const scheduled = reminders.filter(
       (r) => r.status === "fulfilled" && !r.value.error
     ).length;
-    if (scheduled < 3) {
-      console.warn("[watchlist] Some scheduled sends failed:", JSON.stringify(
-        reminders.map((r) => r.status === "fulfilled" ? r.value.error : r.reason)
-      ));
+    if (scheduled < pending.length) {
+      console.warn(
+        "[watchlist] Some scheduled sends failed:",
+        JSON.stringify(
+          reminders.map(
+            (r) => r.status === "fulfilled" ? r.value.error : r.reason
+          )
+        )
+      );
     }
     res.status(200).json({ ok: true, scheduledReminders: scheduled });
   } catch (err) {

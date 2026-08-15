@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, Send, X, ChevronRight, MessageSquare } from "lucide-react";
+import { ArrowLeft, Send, X, ChevronRight } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Message = { from: "bot" | "user"; text: string };
-type View    = "home" | "chat";
+type View = "home" | "chat";
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -16,7 +16,11 @@ async function callChat(messages: { role: string; content: string }[]) {
   });
   const rawText = await res.text();
   let data: { ok: boolean; text?: string; error?: string } | null = null;
-  try { data = JSON.parse(rawText); } catch { /* not JSON */ }
+  try {
+    data = JSON.parse(rawText);
+  } catch {
+    /* not JSON */
+  }
   return {
     ok: res.ok && !!data?.ok,
     text: data?.text ?? null,
@@ -107,13 +111,13 @@ const QUICK_TOPICS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export function AIChatbot() {
-  const [open, setOpen]         = useState(false);
-  const [view, setView]         = useState<View>("home");
+  const [open, setOpen] = useState(false);
+  const [view, setView] = useState<View>("home");
   const [messages, setMessages] = useState<Message[]>([]);
-  const [input, setInput]       = useState("");
-  const [typing, setTyping]     = useState(false);
-  const chattedRef              = useRef(false);
-  const endRef                  = useRef<HTMLDivElement>(null);
+  const [input, setInput] = useState("");
+  const [typing, setTyping] = useState(false);
+  const chattedRef = useRef(false);
+  const endRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -184,8 +188,10 @@ export function AIChatbot() {
     setTyping(true);
 
     try {
-      const history = messages
-        .map((m) => ({ role: m.from === "bot" ? "assistant" : "user", content: m.text }));
+      const history = messages.map((m) => ({
+        role: m.from === "bot" ? "assistant" : "user",
+        content: m.text,
+      }));
       history.push({ role: "user", content: text });
 
       const { ok, text: reply, error, status } = await callChat(history);
@@ -314,12 +320,24 @@ export function AIChatbot() {
                     className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-white"
                     style={{ background: "#1e3a8a" }}
                   >
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                     </svg>
                   </div>
                   <div>
-                    <div className="text-[13px] font-semibold" style={{ color: "var(--foreground)" }}>
+                    <div
+                      className="text-[13px] font-semibold"
+                      style={{ color: "var(--foreground)" }}
+                    >
                       Start a conversation
                     </div>
                     <div className="text-[11px]" style={{ color: "var(--muted-foreground)" }}>
@@ -327,11 +345,17 @@ export function AIChatbot() {
                     </div>
                   </div>
                 </div>
-                <ChevronRight className="h-4 w-4 shrink-0" style={{ color: "var(--muted-foreground)" }} />
+                <ChevronRight
+                  className="h-4 w-4 shrink-0"
+                  style={{ color: "var(--muted-foreground)" }}
+                />
               </button>
 
               {/* Quick topics */}
-              <p className="mb-2 mt-4 px-0.5 text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--muted-foreground)" }}>
+              <p
+                className="mb-2 mt-4 px-0.5 text-[11px] font-semibold uppercase tracking-wider"
+                style={{ color: "var(--muted-foreground)" }}
+              >
                 Common questions
               </p>
               <div className="flex flex-col gap-1.5">
@@ -352,7 +376,10 @@ export function AIChatbot() {
                     }}
                   >
                     <span>{topic}</span>
-                    <ChevronRight className="h-3.5 w-3.5 shrink-0" style={{ color: "var(--muted-foreground)" }} />
+                    <ChevronRight
+                      className="h-3.5 w-3.5 shrink-0"
+                      style={{ color: "var(--muted-foreground)" }}
+                    />
                   </button>
                 ))}
               </div>
@@ -367,7 +394,9 @@ export function AIChatbot() {
               }}
             >
               <span>Powered by</span>
-              <span className="font-semibold" style={{ color: "var(--foreground)" }}>ENICE Group</span>
+              <span className="font-semibold" style={{ color: "var(--foreground)" }}>
+                ENICE Group
+              </span>
             </div>
           </div>
 
@@ -389,9 +418,7 @@ export function AIChatbot() {
               </button>
               <ENiceLogo size={30} />
               <div className="min-w-0">
-                <div className="truncate text-[13px] font-semibold text-white">
-                  ENICE Group
-                </div>
+                <div className="truncate text-[13px] font-semibold text-white">ENICE Group</div>
                 <div className="flex items-center gap-1.5 text-[10px] text-blue-200/80">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
                   Online · AI-powered assistant
@@ -434,7 +461,12 @@ export function AIChatbot() {
                     style={
                       m.from === "user"
                         ? { background: "#1e3a8a", color: "#ffffff", borderBottomRightRadius: 4 }
-                        : { background: "var(--secondary)", color: "var(--foreground)", border: "1px solid var(--border)", borderBottomLeftRadius: 4 }
+                        : {
+                            background: "var(--secondary)",
+                            color: "var(--foreground)",
+                            border: "1px solid var(--border)",
+                            borderBottomLeftRadius: 4,
+                          }
                     }
                   >
                     {m.text}
@@ -447,12 +479,25 @@ export function AIChatbot() {
                   <ENiceLogo size={22} />
                   <div
                     className="rounded-2xl px-3.5 py-3"
-                    style={{ background: "var(--secondary)", border: "1px solid var(--border)", borderBottomLeftRadius: 4 }}
+                    style={{
+                      background: "var(--secondary)",
+                      border: "1px solid var(--border)",
+                      borderBottomLeftRadius: 4,
+                    }}
                   >
                     <div className="flex gap-1">
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50 [animation-delay:-0.3s]" style={{ color: "var(--muted-foreground)" }} />
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50 [animation-delay:-0.15s]" style={{ color: "var(--muted-foreground)" }} />
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50" style={{ color: "var(--muted-foreground)" }} />
+                      <span
+                        className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50 [animation-delay:-0.3s]"
+                        style={{ color: "var(--muted-foreground)" }}
+                      />
+                      <span
+                        className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50 [animation-delay:-0.15s]"
+                        style={{ color: "var(--muted-foreground)" }}
+                      />
+                      <span
+                        className="h-1.5 w-1.5 animate-bounce rounded-full bg-current opacity-50"
+                        style={{ color: "var(--muted-foreground)" }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -462,7 +507,10 @@ export function AIChatbot() {
 
             {/* Input */}
             <form
-              onSubmit={(e) => { e.preventDefault(); handleSend(); }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSend();
+              }}
               className="flex items-center gap-2 p-3"
               style={{
                 background: "var(--background)",
@@ -480,8 +528,12 @@ export function AIChatbot() {
                   border: "1px solid var(--border)",
                   color: "var(--foreground)",
                 }}
-                onFocus={(e) => { e.currentTarget.style.borderColor = "#1e3a8a"; }}
-                onBlur={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#1e3a8a";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "var(--border)";
+                }}
               />
               <button
                 type="submit"

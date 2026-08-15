@@ -1,178 +1,221 @@
 /**
  * POST /functions/v1/pulseassist-early-access
- * Stores a PulseAssist early-access registration and sends a confirmation email.
+ *
+ * Records a PulseAssist early-access registration and sends a confirmation email.
+ * This is a registration/waitlist endpoint — it never grants product access. `product`,
+ * `source` and `status` are set server-side and any client-supplied values are ignored.
+ *
+ * CSRF: authorization is not cookie-based (this endpoint is intentionally public and
+ * unauthenticated), so there is no ambient credential for a cross-site request to abuse.
+ * Abuse is controlled by the origin allow-list, the honeypot, and the rate limits below.
  */
-import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { z } from "npm:zod@4";
+import {
+  buildCors,
+  clientIp,
+  createRateLimiter,
+  jsonResponse,
+  readJsonBody,
+} from "../_shared/http.ts";
+import {
+  earlyAccessConfirmationHtml,
+  earlyAccessNotificationHtml,
+  INTERNAL_RECIPIENT,
+  sendEmail,
+} from "../_shared/email.ts";
 
+const PRODUCT = "PulseAssist";
+const INITIAL_STATUS = "EARLY_ACCESS";
+const SOURCE = "enice_website";
+
+/** Must stay in sync with BUSINESS_TYPES in src/lib/early-access.ts. */
+const BUSINESS_TYPES = [
+  "Bank or financial institution",
+  "Fintech",
+  "Telecom",
+  "Insurance",
+  "E-commerce or retail",
+  "Healthcare",
+  "Logistics",
+  "Government or public sector",
+  "Startup",
+  "Other",
+] as const;
+
+/**
+ * Every field carries an explicit `error` message. Without it, a missing field produced
+ * Zod's internal wording ("Invalid input: expected string, received undefined") because a
+ * `.min()` message only applies once the value is already a string.
+ */
 const BodySchema = z.object({
-  fullName: z.string().trim().min(2, "Please enter your full name.").max(120),
-  email: z.string().trim().toLowerCase().email("Please enter a valid work email address.").max(254),
-  businessName: z.string().trim().min(2, "Please enter your business name.").max(160),
-  businessType: z.string().trim().min(2, "Please select your business type.").max(80),
-  businessNeed: z.string().trim().max(1000).optional().or(z.literal("")),
-  // Honeypot — must stay empty.
-  website: z.string().max(0).optional().or(z.literal("")),
+  fullName: z
+    .string({ error: "Please enter your full name." })
+    .trim()
+    .min(2, "Please enter your full name.")
+    .max(120, "Please keep this under 120 characters."),
+  email: z
+    .string({ error: "Please enter your work email address." })
+    .trim()
+    .toLowerCase()
+    .email("Please enter a valid work email address.")
+    .max(254, "Please enter a valid work email address."),
+  businessName: z
+    .string({ error: "Please enter your business name." })
+    .trim()
+    .min(2, "Please enter your business name.")
+    .max(160, "Please keep this under 160 characters."),
+  businessType: z.enum(BUSINESS_TYPES, {
+    error: "Please select your business type.",
+  }),
+  businessNeed: z
+    .string()
+    .trim()
+    .max(1000, "Please keep this under 1000 characters.")
+    .optional()
+    .default(""),
 });
 
-const FROM = "ENICE Group <noreply@enicehq.com>";
-const NOTIFY_TO = "corporate@enicehq.com";
+// Two independent limits: one stops a single host hammering the endpoint, the other stops
+// the same address being re-submitted repeatedly from rotating IPs.
+const ipLimiter = createRateLimiter(5, 10 * 60 * 1000);
+const emailLimiter = createRateLimiter(3, 60 * 60 * 1000);
 
-// In-memory IP rate limiting (5 requests / 10 min per warm instance).
-const rateLimit = new Map<string, { count: number; resetAt: number }>();
-function isRateLimited(ip: string) {
-  const now = Date.now();
-  const entry = rateLimit.get(ip);
-  if (!entry || now > entry.resetAt) {
-    rateLimit.set(ip, { count: 1, resetAt: now + 600_000 });
-    return false;
+Deno.serve(async (req: Request): Promise<Response> => {
+  const cors = buildCors(req);
+
+  if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (req.method !== "POST") {
+    return jsonResponse({ ok: false, error: "Method not allowed." }, 405, cors);
   }
-  if (entry.count >= 5) return true;
-  entry.count++;
-  return false;
-}
-
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
-}
-
-function json(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
-  });
-}
-
-function confirmationHtml(fullName: string) {
-  const firstName = escapeHtml(fullName.split(/\s+/)[0] || "there");
-  return `<!DOCTYPE html><html><body style="margin:0;padding:0;background:#ffffff;font-family:Helvetica,Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
-  <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
-    <tr><td style="padding:0 0 24px;">
-      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#1e3a8a;font-weight:700;">ENICE Group · PulseAssist</p>
-      <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#111827;">You're on the list, ${firstName}.</h1>
-    </td></tr>
-    <tr><td>
-      <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#111827;">
-        Thank you for your interest in PulseAssist. We have received your early-access request.
-      </p>
-      <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#374151;">
-        Our team reviews every request. We will contact you by email when you are eligible for early access.
-        Submitting this form does not grant product access yet.
-      </p>
-    </td></tr>
-    <tr><td style="padding:24px 0 0;border-top:1px solid #e5e7eb;">
-      <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7280;">
-        ENICE Group · Abuja &amp; Kaduna, Nigeria · corporate@enicehq.com
-      </p>
-    </td></tr>
-  </table>
-</td></tr></table></body></html>`;
-}
-
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return json({ ok: false, error: "Method not allowed." }, 405);
 
   try {
-    const ip =
-      req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-    if (isRateLimited(ip)) {
-      return json({ ok: false, error: "Too many requests. Please try again later." }, 429);
+    if (ipLimiter(clientIp(req))) {
+      return jsonResponse(
+        { ok: false, error: "Too many requests. Please try again later." },
+        429,
+        cors,
+      );
     }
 
-    let raw: unknown;
-    try {
-      raw = await req.json();
-    } catch {
-      return json({ ok: false, error: "Invalid request body." }, 400);
+    const parsedBody = await readJsonBody(req);
+    if (!parsedBody.ok) {
+      const status = parsedBody.reason === "too_large" ? 413 : 400;
+      const error =
+        parsedBody.reason === "too_large" ? "Request body too large." : "Invalid request body.";
+      return jsonResponse({ ok: false, error }, status, cors);
+    }
+    const raw = (parsedBody.value ?? {}) as Record<string, unknown>;
+
+    // Honeypot is checked BEFORE schema validation. Validating it first leaked a 400 that
+    // told a bot exactly which field tripped it; returning a plain 200 without writing
+    // anything makes a rejected submission indistinguishable from a successful one.
+    if (typeof raw.website === "string" && raw.website.trim() !== "") {
+      console.warn("[pulseassist-early-access] honeypot triggered — discarding submission.");
+      return jsonResponse({ ok: true }, 200, cors);
     }
 
     const parsed = BodySchema.safeParse(raw);
     if (!parsed.success) {
-      return json({ ok: false, fieldErrors: parsed.error.flatten().fieldErrors }, 400);
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Please correct the highlighted fields.",
+          fieldErrors: z.flattenError(parsed.error).fieldErrors,
+        },
+        400,
+        cors,
+      );
     }
-    const { fullName, email, businessName, businessType, businessNeed, website } = parsed.data;
-    if (website) return json({ ok: true }); // silently accept bots
+    const { fullName, email, businessName, businessType, businessNeed } = parsed.data;
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
-      { auth: { persistSession: false } },
-    );
+    if (emailLimiter(email)) {
+      return jsonResponse(
+        { ok: false, error: "We already received a request for this email. Please check back." },
+        429,
+        cors,
+      );
+    }
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    if (!supabaseUrl || !serviceRoleKey) {
+      console.error("[pulseassist-early-access] Supabase credentials are not configured.");
+      return jsonResponse(
+        { ok: false, error: "We could not save your request. Please try again shortly." },
+        500,
+        cors,
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { persistSession: false },
+    });
+
+    // `product`, `source` and `status` are server-controlled. The table also has RLS
+    // enabled with no policies, so only the service role used here can reach it.
     const { error } = await supabase.from("early_access_registrations").insert({
-      product: "PulseAssist",
+      product: PRODUCT,
       full_name: fullName,
       email,
       business_name: businessName,
       business_type: businessType,
       business_need: businessNeed || null,
-      source: "enice_website",
-      status: "EARLY_ACCESS",
+      source: SOURCE,
+      status: INITIAL_STATUS,
     });
 
     if (error) {
+      // 23505 = unique_violation on early_access_registrations(product, lower(email)).
       if (error.code === "23505") {
-        return json(
+        return jsonResponse(
           {
             ok: false,
             code: "DUPLICATE",
             error: "This email is already on the PulseAssist early-access list.",
           },
           409,
+          cors,
         );
       }
       console.error("[pulseassist-early-access] insert failed:", error);
-      return json({ ok: false, error: "We could not save your request. Please try again." }, 500);
+      return jsonResponse(
+        { ok: false, error: "We could not save your request. Please try again." },
+        500,
+        cors,
+      );
     }
 
-    const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (resendKey) {
-      const send = (payload: Record<string, unknown>) =>
-        fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${resendKey}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }).then(async (r) => {
-          if (!r.ok) console.error("[pulseassist-early-access] resend error:", r.status, await r.text());
-        });
-
-      await Promise.allSettled([
-        send({
-          from: FROM,
-          to: email,
-          subject: "Your PulseAssist early-access request",
-          html: confirmationHtml(fullName),
+    // Email is best-effort: the registration is already durable, so a delivery failure
+    // must not turn into an error the applicant sees.
+    await Promise.allSettled([
+      sendEmail({
+        to: email,
+        subject: "Your PulseAssist early-access request",
+        html: earlyAccessConfirmationHtml(fullName),
+      }),
+      sendEmail({
+        to: INTERNAL_RECIPIENT,
+        subject: `PulseAssist Early Access — ${businessName}`,
+        html: earlyAccessNotificationHtml({
+          fullName,
+          email,
+          businessName,
+          businessType,
+          businessNeed,
         }),
-        send({
-          from: FROM,
-          to: NOTIFY_TO,
-          subject: `PulseAssist Early Access — ${businessName}`,
-          html: `<p><strong>Name:</strong> ${escapeHtml(fullName)}</p>
-<p><strong>Email:</strong> ${escapeHtml(email)}</p>
-<p><strong>Business:</strong> ${escapeHtml(businessName)}</p>
-<p><strong>Business type:</strong> ${escapeHtml(businessType)}</p>
-<p><strong>Need:</strong> ${escapeHtml(businessNeed || "-")}</p>
-<p><strong>Source:</strong> enice_website</p>`,
-        }),
-      ]);
-    } else {
-      console.warn("[pulseassist-early-access] RESEND_API_KEY missing — confirmation email skipped.");
-    }
+        replyTo: email,
+      }),
+    ]);
 
-    return json({ ok: true });
+    return jsonResponse({ ok: true }, 200, cors);
   } catch (err) {
-    console.error("[pulseassist-early-access] unexpected error:", err);
-    return json({ ok: false, error: "An unexpected error occurred. Please try again." }, 500);
+    const ref = `EA${Date.now().toString(36).toUpperCase()}`;
+    console.error(`[pulseassist-early-access:${ref}]`, err);
+    return jsonResponse(
+      { ok: false, error: "An unexpected error occurred. Please try again.", ref },
+      500,
+      cors,
+    );
   }
 });
