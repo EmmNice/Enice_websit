@@ -6015,28 +6015,14 @@ var FIELD_LIMITS = {
 };
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-// src/lib/early-access-store.server.ts
+// src/lib/resend.server.ts
 init_dist();
-var SEGMENT_NAME = "PulseAssist Early Access";
-var PRODUCT = "PulseAssist";
-var SOURCE = "enice_website";
-var INITIAL_STATUS = "EARLY_ACCESS";
-var PROPERTY_KEYS = {
-  status: "pulseassist_status",
-  businessName: "pulseassist_business_name",
-  businessType: "pulseassist_business_type",
-  businessNeed: "pulseassist_business_need",
-  source: "pulseassist_source",
-  registeredAt: "pulseassist_registered_at",
-  updatedAt: "pulseassist_updated_at"
+var ResendConfigError = class extends Error {
 };
-var ALL_PROPERTY_KEYS = Object.values(PROPERTY_KEYS);
-var EarlyAccessConfigError = class extends Error {
-};
-function client() {
+function resendClient() {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    throw new EarlyAccessConfigError("RESEND_API_KEY is not configured.");
+    throw new ResendConfigError("RESEND_API_KEY is not configured.");
   }
   return new Resend(apiKey);
 }
@@ -6055,17 +6041,19 @@ async function withRetry(label, call, attempts = 3) {
     if (i < attempts - 1) {
       const backoff = 400 * 2 ** i;
       console.warn(
-        `[early-access] ${label} hit a transient error (${last.error?.statusCode}); retrying in ${backoff}ms`
+        `[resend] ${label} hit a transient error (${last.error?.statusCode}); retrying in ${backoff}ms`
       );
       await sleep(backoff);
     }
   }
   return last;
 }
-var propertiesReady = null;
-async function ensureProperties(resend) {
-  if (propertiesReady) return propertiesReady;
-  propertiesReady = (async () => {
+var propertyCache = /* @__PURE__ */ new Map();
+async function ensureProperties(resend, keys) {
+  const cacheKey = [...keys].sort().join(",");
+  const cached = propertyCache.get(cacheKey);
+  if (cached) return cached;
+  const task = (async () => {
     const existing = await withRetry(
       "contactProperties.list",
       () => resend.contactProperties.list({ limit: 100 })
@@ -6074,7 +6062,7 @@ async function ensureProperties(resend) {
       throw new Error(`Could not list contact properties: ${existing.error.message}`);
     }
     const have = new Set((existing.data?.data ?? []).map((p) => p.key));
-    const missing = ALL_PROPERTY_KEYS.filter((k) => !have.has(k));
+    const missing = keys.filter((k) => !have.has(k));
     for (const [index, key] of missing.entries()) {
       if (index > 0) await sleep(THROTTLE_MS);
       const created = await withRetry(
@@ -6086,42 +6074,31 @@ async function ensureProperties(resend) {
       }
     }
   })().catch((err) => {
-    propertiesReady = null;
+    propertyCache.delete(cacheKey);
     throw err;
   });
-  return propertiesReady;
+  propertyCache.set(cacheKey, task);
+  return task;
 }
-var segmentIdCache = null;
-async function resolveSegmentId(resend) {
-  if (segmentIdCache) return segmentIdCache;
-  const configured = process.env.RESEND_EARLY_ACCESS_SEGMENT_ID;
-  if (configured) {
-    segmentIdCache = configured;
-    return configured;
-  }
+var segmentCache = /* @__PURE__ */ new Map();
+async function resolveSegmentId(resend, name, overrideEnvVar) {
+  const override = overrideEnvVar ? process.env[overrideEnvVar] : void 0;
+  if (override) return override;
+  const cached = segmentCache.get(name);
+  if (cached) return cached;
   const list = await withRetry("segments.list", () => resend.segments.list({ limit: 100 }));
   if (list.error) throw new Error(`Could not list segments: ${list.error.message}`);
-  const found = (list.data?.data ?? []).find((s) => s.name === SEGMENT_NAME);
+  const found = (list.data?.data ?? []).find((s) => s.name === name);
   if (found) {
-    segmentIdCache = found.id;
+    segmentCache.set(name, found.id);
     return found.id;
   }
-  const created = await withRetry(
-    "segments.create",
-    () => resend.segments.create({ name: SEGMENT_NAME })
-  );
+  const created = await withRetry("segments.create", () => resend.segments.create({ name }));
   if (created.error || !created.data?.id) {
-    throw new Error(`Could not create the "${SEGMENT_NAME}" segment: ${created.error?.message}`);
+    throw new Error(`Could not create the "${name}" segment: ${created.error?.message}`);
   }
-  segmentIdCache = created.data.id;
+  segmentCache.set(name, created.data.id);
   return created.data.id;
-}
-function splitName(fullName) {
-  const parts = fullName.trim().split(/\s+/);
-  return {
-    firstName: parts[0] ?? "",
-    lastName: parts.length > 1 ? parts.slice(1).join(" ") : null
-  };
 }
 function readProperty(properties, key) {
   const entry = properties?.[key];
@@ -6137,10 +6114,33 @@ async function findContact(resend, email) {
     return null;
   }
 }
+function splitName(fullName) {
+  const parts = fullName.trim().split(/\s+/);
+  return {
+    firstName: parts[0] ?? "",
+    lastName: parts.length > 1 ? parts.slice(1).join(" ") : null
+  };
+}
+
+// src/lib/early-access-store.server.ts
+var SEGMENT_NAME = "PulseAssist Early Access";
+var PRODUCT = "PulseAssist";
+var SOURCE = "enice_website";
+var INITIAL_STATUS = "EARLY_ACCESS";
+var PROPERTY_KEYS = {
+  status: "pulseassist_status",
+  businessName: "pulseassist_business_name",
+  businessType: "pulseassist_business_type",
+  businessNeed: "pulseassist_business_need",
+  source: "pulseassist_source",
+  registeredAt: "pulseassist_registered_at",
+  updatedAt: "pulseassist_updated_at"
+};
+var ALL_PROPERTY_KEYS = Object.values(PROPERTY_KEYS);
 async function registerEarlyAccess(input) {
-  const resend = client();
-  await ensureProperties(resend);
-  const segmentId = await resolveSegmentId(resend);
+  const resend = resendClient();
+  await ensureProperties(resend, ALL_PROPERTY_KEYS);
+  const segmentId = await resolveSegmentId(resend, SEGMENT_NAME, "RESEND_EARLY_ACCESS_SEGMENT_ID");
   const existing = await findContact(resend, input.email);
   if (existing && readProperty(existing.properties, PROPERTY_KEYS.status)) {
     return { outcome: "duplicate" };
@@ -6424,7 +6424,7 @@ async function handler(req, res) {
     }
     res.status(200).json({ ok: true });
   } catch (err) {
-    if (err instanceof EarlyAccessConfigError) {
+    if (err instanceof ResendConfigError) {
       console.error(`[api/early-access:${ref}] not configured:`, err.message);
       res.status(503).json({
         ok: false,

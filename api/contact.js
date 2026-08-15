@@ -5962,6 +5962,175 @@ var FIELD_LIMITS = {
 };
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
+// src/lib/resend.server.ts
+var ResendConfigError = class extends Error {
+};
+function resendClient() {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    throw new ResendConfigError("RESEND_API_KEY is not configured.");
+  }
+  return new Resend(apiKey);
+}
+var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+var THROTTLE_MS = 260;
+function isTransient(error) {
+  if (!error) return false;
+  const status = error.statusCode ?? 0;
+  return status === 429 || status >= 500 || /rate.?limit|too many/i.test(error.message);
+}
+async function withRetry(label, call, attempts = 3) {
+  let last = { data: null, error: null };
+  for (let i = 0; i < attempts; i++) {
+    last = await call();
+    if (!isTransient(last.error)) return last;
+    if (i < attempts - 1) {
+      const backoff = 400 * 2 ** i;
+      console.warn(
+        `[resend] ${label} hit a transient error (${last.error?.statusCode}); retrying in ${backoff}ms`
+      );
+      await sleep(backoff);
+    }
+  }
+  return last;
+}
+var propertyCache = /* @__PURE__ */ new Map();
+async function ensureProperties(resend, keys) {
+  const cacheKey = [...keys].sort().join(",");
+  const cached = propertyCache.get(cacheKey);
+  if (cached) return cached;
+  const task = (async () => {
+    const existing = await withRetry(
+      "contactProperties.list",
+      () => resend.contactProperties.list({ limit: 100 })
+    );
+    if (existing.error) {
+      throw new Error(`Could not list contact properties: ${existing.error.message}`);
+    }
+    const have = new Set((existing.data?.data ?? []).map((p) => p.key));
+    const missing = keys.filter((k) => !have.has(k));
+    for (const [index, key] of missing.entries()) {
+      if (index > 0) await sleep(THROTTLE_MS);
+      const created = await withRetry(
+        `contactProperties.create(${key})`,
+        () => resend.contactProperties.create({ key, type: "string", fallbackValue: null })
+      );
+      if (created.error && !/exist/i.test(created.error.message)) {
+        throw new Error(`Could not create contact property "${key}": ${created.error.message}`);
+      }
+    }
+  })().catch((err) => {
+    propertyCache.delete(cacheKey);
+    throw err;
+  });
+  propertyCache.set(cacheKey, task);
+  return task;
+}
+var segmentCache = /* @__PURE__ */ new Map();
+async function resolveSegmentId(resend, name, overrideEnvVar) {
+  const override = overrideEnvVar ? process.env[overrideEnvVar] : void 0;
+  if (override) return override;
+  const cached = segmentCache.get(name);
+  if (cached) return cached;
+  const list = await withRetry("segments.list", () => resend.segments.list({ limit: 100 }));
+  if (list.error) throw new Error(`Could not list segments: ${list.error.message}`);
+  const found = (list.data?.data ?? []).find((s) => s.name === name);
+  if (found) {
+    segmentCache.set(name, found.id);
+    return found.id;
+  }
+  const created = await withRetry("segments.create", () => resend.segments.create({ name }));
+  if (created.error || !created.data?.id) {
+    throw new Error(`Could not create the "${name}" segment: ${created.error?.message}`);
+  }
+  segmentCache.set(name, created.data.id);
+  return created.data.id;
+}
+function readProperty(properties, key) {
+  const entry = properties?.[key];
+  if (!entry) return "";
+  return typeof entry.value === "string" ? entry.value : String(entry.value);
+}
+async function findContact(resend, email) {
+  try {
+    const res = await withRetry("contacts.get", () => resend.contacts.get({ email }));
+    if (res.error || !res.data) return null;
+    return res.data;
+  } catch {
+    return null;
+  }
+}
+function splitName(fullName) {
+  const parts = fullName.trim().split(/\s+/);
+  return {
+    firstName: parts[0] ?? "",
+    lastName: parts.length > 1 ? parts.slice(1).join(" ") : null
+  };
+}
+
+// src/lib/updates-store.server.ts
+var UPDATES_SEGMENT_NAME = "Product Updates";
+var UPDATES_PROPERTY_KEYS = {
+  subscribedAt: "updates_subscribed_at",
+  source: "updates_source"
+};
+var ALL_KEYS = Object.values(UPDATES_PROPERTY_KEYS);
+async function subscribeToUpdates(input) {
+  const resend = resendClient();
+  await ensureProperties(resend, ALL_KEYS);
+  const segmentId = await resolveSegmentId(
+    resend,
+    UPDATES_SEGMENT_NAME,
+    "RESEND_UPDATES_SEGMENT_ID"
+  );
+  const email = input.email.trim().toLowerCase();
+  const existing = await findContact(resend, email);
+  const alreadySubscribed = Boolean(
+    existing && readProperty(existing.properties, UPDATES_PROPERTY_KEYS.subscribedAt)
+  );
+  const properties = {
+    // Preserve the original opt-in date if there already is one.
+    [UPDATES_PROPERTY_KEYS.subscribedAt]: alreadySubscribed ? readProperty(existing?.properties, UPDATES_PROPERTY_KEYS.subscribedAt) : (/* @__PURE__ */ new Date()).toISOString(),
+    [UPDATES_PROPERTY_KEYS.source]: input.source
+  };
+  const { firstName, lastName } = splitName(input.name);
+  if (existing) {
+    const updated = await withRetry(
+      "contacts.update(updates)",
+      () => resend.contacts.update({
+        email,
+        // Only fill in a name if Resend does not already hold one.
+        firstName: existing.first_name ?? firstName,
+        lastName: existing.last_name ?? lastName,
+        properties
+      })
+    );
+    if (updated.error) throw new Error(`Could not update contact: ${updated.error.message}`);
+  } else {
+    const created = await withRetry(
+      "contacts.create(updates)",
+      () => resend.contacts.create({
+        email,
+        firstName,
+        // `create` accepts `string | undefined` while `update` accepts `string | null`.
+        lastName: lastName ?? void 0,
+        properties,
+        segments: [{ id: segmentId }]
+      })
+    );
+    if (created.error) throw new Error(`Could not create contact: ${created.error.message}`);
+    return { outcome: "subscribed" };
+  }
+  const added = await withRetry(
+    "contacts.segments.add(updates)",
+    () => resend.contacts.segments.add({ email, segmentId })
+  );
+  if (added.error && !/exist|already/i.test(added.error.message)) {
+    throw new Error(`Could not add contact to the segment: ${added.error.message}`);
+  }
+  return alreadySubscribed ? { outcome: "already_subscribed" } : { outcome: "subscribed" };
+}
+
 // api-src/contact.ts
 var FROM = "ENICE Contact <noreply@enicehq.com>";
 var REPLY_FROM = "ENICE Group <noreply@enicehq.com>";
@@ -6010,7 +6179,19 @@ function acknowledgementHtml(name) {
   </table>
 </td></tr></table></body></html>`;
 }
-function notificationHtml(fields) {
+function describeUpdates(outcome) {
+  switch (outcome) {
+    case "subscribed":
+      return "Yes \u2014 added to the Product Updates list";
+    case "already_subscribed":
+      return "Yes \u2014 already on the Product Updates list";
+    case "failed":
+      return "Yes \u2014 but subscribing failed, add them manually in Resend";
+    default:
+      return "No";
+  }
+}
+function notificationHtml(fields, updates) {
   const row = (label, value) => `<tr>
        <td style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#64748b;font-weight:600;width:170px;vertical-align:top;">${escapeHtml2(label)}</td>
        <td style="padding:10px 14px;border:1px solid #e2e8f0;font-size:14px;color:#0f172a;">${escapeHtml2(value || "\u2014")}</td>
@@ -6031,7 +6212,7 @@ function notificationHtml(fields) {
         ${row("Email", fields.email)}
         ${row("Company", fields.company)}
         ${row("Inquiry", fields.inquiry || "General")}
-        ${row("Wants updates", fields.updates ? "Yes" : "No")}
+        ${row("Product updates", describeUpdates(updates))}
         ${row("Submitted from", fields.source)}
       </table>
     </td></tr>
@@ -6094,6 +6275,20 @@ async function handler(req, res) {
       });
       return;
     }
+    let updatesOutcome = "not_requested";
+    if (fields.updates) {
+      try {
+        const result = await subscribeToUpdates({
+          email: fields.email,
+          name: fields.name,
+          source: fields.source
+        });
+        updatesOutcome = result.outcome;
+      } catch (err) {
+        updatesOutcome = "failed";
+        console.error(`[api/contact:${ref}] updates subscription failed:`, err);
+      }
+    }
     const resend = new Resend(apiKey);
     const subject = fields.company ? `Contact: ${fields.inquiry || "General"} \u2014 ${fields.name} (${fields.company})` : `Contact: ${fields.inquiry || "General"} \u2014 ${fields.name}`;
     const notification = await resend.emails.send({
@@ -6101,7 +6296,7 @@ async function handler(req, res) {
       to: TO,
       replyTo: fields.email,
       subject,
-      html: notificationHtml(fields)
+      html: notificationHtml(fields, updatesOutcome)
     });
     if (notification.error) {
       console.error(`[api/contact:${ref}] Resend rejected the notification:`, notification.error);

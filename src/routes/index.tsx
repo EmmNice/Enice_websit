@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
-import { lazy, Suspense } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -29,12 +28,6 @@ import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { ContactSection } from "@/components/site/ContactSection";
-
-// The chatbot is a floating widget that is never part of first paint, so it is split out
-// of the homepage's critical path and fetched after hydration.
-const AIChatbot = lazy(() =>
-  import("@/components/site/AIChatbot").then((m) => ({ default: m.AIChatbot })),
-);
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -932,9 +925,6 @@ function Landing() {
         <ContactSection />
       </main>
       <SiteFooter />
-      <Suspense fallback={null}>
-        <AIChatbot />
-      </Suspense>
     </div>
   );
 }

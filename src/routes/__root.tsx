@@ -1,4 +1,11 @@
-import { Outlet, createRootRoute, useRouter } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Outlet,
+  createRootRoute,
+  useRouter,
+  useRouterState,
+} from "@tanstack/react-router";
+import { lazy, Suspense } from "react";
 import { RefreshCw, ArrowLeft } from "lucide-react";
 import { NotFound } from "@/components/site/NotFound";
 
@@ -98,8 +105,43 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   );
 }
 
+/**
+ * The assistant is a floating widget that is never part of first paint, so it is code-split
+ * and fetched after hydration. It lives here rather than on the homepage so a visitor reading
+ * a product page can ask a question without navigating away — but it is kept off the admin
+ * screens, where it would only be in the way.
+ */
+const AIChatbot = lazy(() =>
+  import("@/components/site/AIChatbot").then((m) => ({ default: m.AIChatbot })),
+);
+
+/**
+ * Injects each route's `head()` output — title, meta, canonical link and JSON-LD — into the
+ * document head.
+ *
+ * Without this, every route's `head()` was computed and then discarded: the whole site served
+ * the single static title and description from index.html, with no canonical links and no
+ * structured data on any page.
+ */
+function RootComponent() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const showAssistant = !pathname.startsWith("/admin");
+
+  return (
+    <>
+      <HeadContent />
+      <Outlet />
+      {showAssistant && (
+        <Suspense fallback={null}>
+          <AIChatbot />
+        </Suspense>
+      )}
+    </>
+  );
+}
+
 export const Route = createRootRoute({
-  component: Outlet,
+  component: RootComponent,
   // Rendered when a route throws `notFound()` (e.g. a blog slug with no Sanity document).
   // Shares the designed 404 with the `/$` splat route so both paths look identical.
   notFoundComponent: NotFound,

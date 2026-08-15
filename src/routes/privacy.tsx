@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { LegalPage } from "@/components/site/LegalPage";
 
 export const Route = createFileRoute("/privacy")({
@@ -10,10 +11,27 @@ export const Route = createFileRoute("/privacy")({
         content:
           "How ENICE Group collects, processes, and protects personal and corporate data across its product ecosystem.",
       },
+      { property: "og:title", content: "Privacy Policy · ENICE Group" },
+      {
+        property: "og:description",
+        content:
+          "How ENICE Group collects, processes, and protects personal and corporate data across its product ecosystem.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE_URL}/privacy` },
+      { name: "twitter:title", content: "Privacy Policy · ENICE Group" },
+      {
+        name: "twitter:description",
+        content:
+          "How ENICE Group collects, processes, and protects personal and corporate data across its product ecosystem.",
+      },
+      { name: "robots", content: "index, follow" },
     ],
+    links: [{ rel: "canonical", href: `${SITE_URL}/privacy` }],
   }),
   component: () => (
     <LegalPage
+      lastUpdated="July 16, 2026"
       kicker="Legal · Data Protection"
       title="Privacy Policy"
       intro="ENICE Group is committed to the highest standards of data protection across our product ecosystem. This policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our commerce platforms, or interact with our infrastructure."

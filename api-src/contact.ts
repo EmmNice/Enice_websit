@@ -24,6 +24,7 @@ import {
   type ApiResponse,
 } from "./lib/http";
 import { EMAIL_RE, FIELD_LIMITS } from "../src/lib/contact";
+import { subscribeToUpdates } from "../src/lib/updates-store.server";
 
 const FROM = "ENICE Contact <noreply@enicehq.com>";
 const REPLY_FROM = "ENICE Group <noreply@enicehq.com>";
@@ -46,6 +47,9 @@ type Submission = {
   updates: boolean;
   source: string;
 };
+
+/** What happened to the "keep me updated" opt-in, reported in the notification email. */
+type UpdatesOutcome = "not_requested" | "subscribed" | "already_subscribed" | "failed";
 
 function readField(value: unknown, max: number): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -92,7 +96,20 @@ function acknowledgementHtml(name: string): string {
 </td></tr></table></body></html>`;
 }
 
-function notificationHtml(fields: Submission): string {
+function describeUpdates(outcome: UpdatesOutcome): string {
+  switch (outcome) {
+    case "subscribed":
+      return "Yes — added to the Product Updates list";
+    case "already_subscribed":
+      return "Yes — already on the Product Updates list";
+    case "failed":
+      return "Yes — but subscribing failed, add them manually in Resend";
+    default:
+      return "No";
+  }
+}
+
+function notificationHtml(fields: Submission, updates: UpdatesOutcome): string {
   const row = (label: string, value: string) =>
     `<tr>
        <td style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#64748b;font-weight:600;width:170px;vertical-align:top;">${escapeHtml(label)}</td>
@@ -115,7 +132,7 @@ function notificationHtml(fields: Submission): string {
         ${row("Email", fields.email)}
         ${row("Company", fields.company)}
         ${row("Inquiry", fields.inquiry || "General")}
-        ${row("Wants updates", fields.updates ? "Yes" : "No")}
+        ${row("Product updates", describeUpdates(updates))}
         ${row("Submitted from", fields.source)}
       </table>
     </td></tr>
@@ -195,6 +212,24 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       return;
     }
 
+    // Opt-in is handled before the notification is composed so its outcome can be reported
+    // in the email. It is deliberately best-effort: failing to add someone to a mailing list
+    // must never stop their message reaching the team.
+    let updatesOutcome: UpdatesOutcome = "not_requested";
+    if (fields.updates) {
+      try {
+        const result = await subscribeToUpdates({
+          email: fields.email,
+          name: fields.name,
+          source: fields.source,
+        });
+        updatesOutcome = result.outcome;
+      } catch (err) {
+        updatesOutcome = "failed";
+        console.error(`[api/contact:${ref}] updates subscription failed:`, err);
+      }
+    }
+
     const resend = new Resend(apiKey);
     const subject = fields.company
       ? `Contact: ${fields.inquiry || "General"} — ${fields.name} (${fields.company})`
@@ -207,7 +242,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       to: TO,
       replyTo: fields.email,
       subject,
-      html: notificationHtml(fields),
+      html: notificationHtml(fields, updatesOutcome),
     });
 
     if (notification.error) {

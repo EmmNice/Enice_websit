@@ -19,12 +19,8 @@ import {
   type EarlyAccessFields,
   type FieldErrors,
 } from "../src/lib/early-access";
-import {
-  EarlyAccessConfigError,
-  PRODUCT,
-  SOURCE,
-  registerEarlyAccess,
-} from "../src/lib/early-access-store.server";
+import { PRODUCT, SOURCE, registerEarlyAccess } from "../src/lib/early-access-store.server";
+import { ResendConfigError } from "../src/lib/resend.server";
 import {
   clientIp,
   createRateLimiter,
@@ -293,7 +289,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     res.status(200).json({ ok: true });
   } catch (err) {
-    if (err instanceof EarlyAccessConfigError) {
+    if (err instanceof ResendConfigError) {
       // Misconfiguration, not the visitor's fault — log the detail, return a safe message.
       console.error(`[api/early-access:${ref}] not configured:`, err.message);
       res.status(503).json({

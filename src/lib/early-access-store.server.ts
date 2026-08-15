@@ -1,33 +1,28 @@
 /**
  * PulseAssist early-access storage, backed by Resend.
  *
- * SERVER ONLY — reads `RESEND_API_KEY`. Never import this from a route or component;
- * it is consumed exclusively by the handlers in `api-src/`.
+ * SERVER ONLY — reads `RESEND_API_KEY`. Never import this from a route or component; it is
+ * consumed exclusively by the handlers in `api-src/`.
  *
- * ## Why Resend rather than a database
+ * One Resend contact per applicant, added to a dedicated segment, with the application held
+ * in custom Contact Properties. Contacts are global per email address, so property keys are
+ * namespaced with `pulseassist_` and cannot collide with the product-updates list or
+ * anything added later.
  *
- * Resend is the project's single backend for both transactional email and stored form
- * data. Keeping registrations there means one vendor, one API key, no migrations, and no
- * separate deploy step — the handlers ship with the site through `api-src/`.
- *
- * ## How a registration is represented
- *
- * One Resend contact, added to a dedicated segment, with the application stored in custom
- * Contact Properties. Contacts are global per email address, so property keys are
- * namespaced with `pulseassist_` so they cannot collide with anything added later.
- *
- * ## Constraints this design inherits from the Resend API
- *
- * - `contacts.list()` returns only `id/email/first_name/last_name/created_at/unsubscribed`.
- *   Custom properties come back only from `contacts.get()`, so listing registrations with
- *   their business details costs one request per row (see `listRegistrations`).
- * - Pagination exposes `limit` only (max 100) with no cursor, so at most 100 registrations
- *   are readable through the API. Beyond that, use the Resend dashboard.
- * - A property key must exist before it can be set on a contact; values for unknown keys
- *   are silently dropped. `ensureProperties()` provisions them idempotently so a forgotten
- *   setup step cannot quietly discard application data.
+ * The client, retry and provisioning helpers live in `resend.server.ts`, shared with the
+ * updates list. See that module for the API constraints this design works around.
  */
-import { Resend } from "resend";
+import {
+  ensureProperties,
+  findContact,
+  joinName,
+  readProperty,
+  resendClient,
+  resolveSegmentId,
+  splitName,
+  withRetry,
+  type RawProperties,
+} from "./resend.server";
 import { EARLY_ACCESS_STATUSES, type EarlyAccessStatus } from "./early-access";
 
 export const SEGMENT_NAME = "PulseAssist Early Access";
@@ -62,169 +57,10 @@ export type Registration = {
   updatedAt: string;
 };
 
-export class EarlyAccessConfigError extends Error {}
-
-function client(): Resend {
-  const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    throw new EarlyAccessConfigError("RESEND_API_KEY is not configured.");
-  }
-  return new Resend(apiKey);
-}
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
-
-/** Resend's default limit is around 2 requests/second. */
-const THROTTLE_MS = 260;
-
-type ResendResult<T> = {
-  data: T | null;
-  error: { message: string; statusCode: number | null } | null;
-};
-
-function isTransient(error: { message: string; statusCode: number | null } | null): boolean {
-  if (!error) return false;
-  const status = error.statusCode ?? 0;
-  return status === 429 || status >= 500 || /rate.?limit|too many/i.test(error.message);
-}
-
-/**
- * Retries a Resend call on rate limiting and server errors.
- *
- * Provisioning issues nine calls in quick succession, which tripped Resend's per-second
- * limit and made the first request after a cold start fail outright — observed in
- * production on the very first live submission. Callers are retried with backoff instead.
- */
-async function withRetry<T>(
-  label: string,
-  call: () => Promise<ResendResult<T>>,
-  attempts = 3,
-): Promise<ResendResult<T>> {
-  let last: ResendResult<T> = { data: null, error: null };
-  for (let i = 0; i < attempts; i++) {
-    last = await call();
-    if (!isTransient(last.error)) return last;
-    if (i < attempts - 1) {
-      const backoff = 400 * 2 ** i;
-      console.warn(
-        `[early-access] ${label} hit a transient error (${last.error?.statusCode}); retrying in ${backoff}ms`,
-      );
-      await sleep(backoff);
-    }
-  }
-  return last;
-}
-
-// ── Provisioning (cached per warm instance) ──────────────────────────────────
-
-let propertiesReady: Promise<void> | null = null;
-
-async function ensureProperties(resend: Resend): Promise<void> {
-  if (propertiesReady) return propertiesReady;
-
-  propertiesReady = (async () => {
-    const existing = await withRetry("contactProperties.list", () =>
-      resend.contactProperties.list({ limit: 100 }),
-    );
-    if (existing.error) {
-      throw new Error(`Could not list contact properties: ${existing.error.message}`);
-    }
-    const have = new Set((existing.data?.data ?? []).map((p) => p.key));
-    const missing = ALL_PROPERTY_KEYS.filter((k) => !have.has(k));
-
-    // Spaced out to stay under Resend's per-second limit. This only runs until every key
-    // exists, so the steady-state cost is the single list call above.
-    for (const [index, key] of missing.entries()) {
-      if (index > 0) await sleep(THROTTLE_MS);
-      const created = await withRetry(`contactProperties.create(${key})`, () =>
-        resend.contactProperties.create({ key, type: "string", fallbackValue: null }),
-      );
-      // A concurrent cold start may have created it first; that is not an error.
-      if (created.error && !/exist/i.test(created.error.message)) {
-        throw new Error(`Could not create contact property "${key}": ${created.error.message}`);
-      }
-    }
-  })().catch((err) => {
-    // Do not cache a failure — the next request should retry provisioning.
-    propertiesReady = null;
-    throw err;
-  });
-
-  return propertiesReady;
-}
-
-let segmentIdCache: string | null = null;
-
-async function resolveSegmentId(resend: Resend): Promise<string> {
-  if (segmentIdCache) return segmentIdCache;
-
-  const configured = process.env.RESEND_EARLY_ACCESS_SEGMENT_ID;
-  if (configured) {
-    segmentIdCache = configured;
-    return configured;
-  }
-
-  // Self-provision by name so deploying does not require creating the segment by hand.
-  const list = await withRetry("segments.list", () => resend.segments.list({ limit: 100 }));
-  if (list.error) throw new Error(`Could not list segments: ${list.error.message}`);
-
-  const found = (list.data?.data ?? []).find((s) => s.name === SEGMENT_NAME);
-  if (found) {
-    segmentIdCache = found.id;
-    return found.id;
-  }
-
-  const created = await withRetry("segments.create", () =>
-    resend.segments.create({ name: SEGMENT_NAME }),
-  );
-  if (created.error || !created.data?.id) {
-    throw new Error(`Could not create the "${SEGMENT_NAME}" segment: ${created.error?.message}`);
-  }
-  segmentIdCache = created.data.id;
-  return created.data.id;
-}
-
-// ── Helpers ─────────────────────────────────────────────────────────────────
-
-/** Resend stores names in two fields; keep the split reversible for display. */
-export function splitName(fullName: string): { firstName: string; lastName: string | null } {
-  const parts = fullName.trim().split(/\s+/);
-  return {
-    firstName: parts[0] ?? "",
-    lastName: parts.length > 1 ? parts.slice(1).join(" ") : null,
-  };
-}
-
-function joinName(firstName: string | null, lastName: string | null): string {
-  return [firstName, lastName].filter(Boolean).join(" ").trim();
-}
-
-type RawProperties = Record<
-  string,
-  { type: "string"; value: string } | { type: "number"; value: number }
->;
-
-function readProperty(properties: RawProperties | undefined, key: string): string {
-  const entry = properties?.[key];
-  if (!entry) return "";
-  return typeof entry.value === "string" ? entry.value : String(entry.value);
-}
-
 function toStatus(raw: string): EarlyAccessStatus {
   return (EARLY_ACCESS_STATUSES as readonly string[]).includes(raw)
     ? (raw as EarlyAccessStatus)
     : INITIAL_STATUS;
-}
-
-/** `contacts.get` errors when the address is unknown; treat that as "not found". */
-async function findContact(resend: Resend, email: string) {
-  try {
-    const res = await withRetry("contacts.get", () => resend.contacts.get({ email }));
-    if (res.error || !res.data) return null;
-    return res.data;
-  } catch {
-    return null;
-  }
 }
 
 // ── Public API ──────────────────────────────────────────────────────────────
@@ -238,9 +74,9 @@ export async function registerEarlyAccess(input: {
   businessType: string;
   businessNeed: string;
 }): Promise<RegisterResult> {
-  const resend = client();
-  await ensureProperties(resend);
-  const segmentId = await resolveSegmentId(resend);
+  const resend = resendClient();
+  await ensureProperties(resend, ALL_PROPERTY_KEYS);
+  const segmentId = await resolveSegmentId(resend, SEGMENT_NAME, "RESEND_EARLY_ACCESS_SEGMENT_ID");
 
   const existing = await findContact(resend, input.email);
 
@@ -307,8 +143,8 @@ export async function listRegistrations(limit = 100): Promise<{
   registrations: Registration[];
   truncated: boolean;
 }> {
-  const resend = client();
-  const segmentId = await resolveSegmentId(resend);
+  const resend = resendClient();
+  const segmentId = await resolveSegmentId(resend, SEGMENT_NAME, "RESEND_EARLY_ACCESS_SEGMENT_ID");
 
   const capped = Math.min(Math.max(limit, 1), 100);
   const list = await withRetry("contacts.list", () =>
@@ -360,8 +196,8 @@ export async function updateRegistrationStatus(
   email: string,
   status: EarlyAccessStatus,
 ): Promise<UpdateStatusResult> {
-  const resend = client();
-  await ensureProperties(resend);
+  const resend = resendClient();
+  await ensureProperties(resend, ALL_PROPERTY_KEYS);
 
   const existing = await findContact(resend, email);
   if (!existing) return { outcome: "not_found" };
@@ -377,10 +213,4 @@ export async function updateRegistrationStatus(
   );
   if (res.error) throw new Error(`Could not update status: ${res.error.message}`);
   return { outcome: "updated" };
-}
-
-/** Test seam: clears the per-instance provisioning caches. */
-export function __resetCaches(): void {
-  propertiesReady = null;
-  segmentIdCache = null;
 }
