@@ -84,25 +84,22 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-border bg-background">
-      {/* System status ribbon */}
+      {/*
+        System status ribbon.
+
+        This previously asserted "PulsePay Network: Operational" and "PulseAssist Engine:
+        Operational" as hardcoded text on every page of the site — it would have claimed both
+        platforms were healthy in the middle of an outage. Nothing here checks anything, so it
+        no longer claims anything: it points at /status, where the checks actually run.
+      */}
       <div className="border-b border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[11px] font-medium text-muted-foreground">
-            <span className="inline-flex items-center gap-2">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              PulsePay Network: <span className="font-semibold text-foreground">Operational</span>
-            </span>
-            <span className="inline-flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              PulseAssist Engine: <span className="font-semibold text-foreground">Operational</span>
-            </span>
-          </div>
+          <p className="text-[11px] font-medium text-muted-foreground">
+            Platform availability is checked live on the status page.
+          </p>
           <Link
             to="/status"
-            className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground transition-colors hover:text-foreground"
+            className="text-[10px] font-semibold tracking-[0.22em] text-muted-foreground uppercase transition-colors hover:text-foreground"
           >
             View Status Page →
           </Link>
@@ -175,9 +172,13 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* Bottom bar */}
+      {/*
+        Bottom bar. The extra bottom and right padding keeps this clear of the floating
+        assistant launcher, which is fixed to the bottom-right corner and was sitting on top of
+        the tagline.
+      */}
       <div className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-5 py-6 sm:flex-row sm:items-center sm:px-8">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-5 pt-6 pb-24 sm:flex-row sm:items-center sm:px-8 sm:pt-6 sm:pb-6 sm:pr-28">
           <p className="text-[11px] font-medium text-muted-foreground">
             © {year} ENICE Group. All rights reserved.
           </p>
