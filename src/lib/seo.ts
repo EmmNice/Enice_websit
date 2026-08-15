@@ -18,6 +18,104 @@ import { SITE_URL } from "./site";
 export const SITE_NAME = "ENICE Group";
 export const TWITTER_HANDLE = "@ENICEHQ";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
+export const CORPORATE_EMAIL = "corporate@enicehq.com";
+
+/**
+ * Official social profiles, in one place.
+ *
+ * Used by the footer for links and by the Organization structured data as `sameAs`, which is
+ * how a search engine connects this domain to those accounts and treats them as the same
+ * entity. Without `sameAs` there is nothing tying the site to the brand's profiles.
+ */
+export const SOCIAL_PROFILES = [
+  { label: "X (Twitter)", href: "https://x.com/ENICEHQ" },
+  { label: "Instagram", href: "https://www.instagram.com/enicehq" },
+  { label: "Facebook", href: "https://www.facebook.com/share/18CwCS1iYf/" },
+  { label: "LinkedIn", href: "https://www.linkedin.com/company/enicehq" },
+] as const;
+
+/**
+ * Organization entity for the homepage.
+ *
+ * Kept deliberately complete — name, logo, contact, location, founding date and `sameAs` — as
+ * these are the properties a search engine reads when deciding whether it knows enough about a
+ * brand to show a panel for it.
+ */
+export function organizationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${SITE_URL}/#organization`,
+    name: SITE_NAME,
+    alternateName: "ENICE",
+    url: `${SITE_URL}/`,
+    logo: {
+      "@type": "ImageObject",
+      url: `${SITE_URL}/favicon.png`,
+      width: 256,
+      height: 256,
+    },
+    image: DEFAULT_OG_IMAGE,
+    description:
+      "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
+    email: CORPORATE_EMAIL,
+    foundingDate: "2026",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Abuja",
+      addressRegion: "FCT",
+      addressCountry: "NG",
+    },
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        contactType: "customer support",
+        email: CORPORATE_EMAIL,
+        availableLanguage: ["English"],
+      },
+    ],
+    sameAs: SOCIAL_PROFILES.map((p) => p.href),
+    subOrganization: [
+      {
+        "@type": "FinancialProduct",
+        name: "PulsePay",
+        description: "Virtual card issuance, programmable wallets, and embedded treasury.",
+      },
+      {
+        "@type": "Organization",
+        name: "PulseAssist",
+        description: "Multi-tenant AI conversational SaaS for banking and telecom.",
+      },
+      {
+        "@type": "FinancialProduct",
+        name: "ePulse",
+        description: "Digital banking infrastructure.",
+      },
+      {
+        "@type": "FinancialProduct",
+        name: "PulseX",
+        description: "Global digital asset trading exchange.",
+      },
+    ],
+  };
+}
+
+/**
+ * WebSite entity. Declaring the site's name is what allows a search engine to show
+ * "ENICE Group" as the site name in results instead of falling back to the bare domain.
+ */
+export function webSiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    name: SITE_NAME,
+    alternateName: "ENICE",
+    url: `${SITE_URL}/`,
+    publisher: { "@id": `${SITE_URL}/#organization` },
+    inLanguage: "en",
+  };
+}
 
 export type PageSeo = {
   title: string;
@@ -173,7 +271,14 @@ export function pageHead(pathname: string, jsonLd: unknown[] = []) {
   };
 }
 
-/** Convenience for pages with no structured data. */
-export function simplePageHead(pathname: string) {
-  return pageHead(pathname);
+/**
+ * Structured data worth baking into the static HTML, keyed by pathname.
+ *
+ * Most JSON-LD is left to client injection because only crawlers that execute JavaScript read
+ * it. The Organization and WebSite entities are the exception: they describe the brand itself,
+ * so they are cheap insurance against any indexer that does not run scripts.
+ */
+export function prerenderJsonLd(pathname: string): unknown[] {
+  if (pathname === "/") return [organizationJsonLd(), webSiteJsonLd()];
+  return [];
 }

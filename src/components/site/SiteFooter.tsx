@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Logo } from "./Logo";
 import { Mail, MapPin } from "lucide-react";
+import { SOCIAL_PROFILES } from "@/lib/seo";
 
 function XIcon({ className }: { className?: string }) {
   return (
@@ -73,12 +74,19 @@ const FOOTER_COLS = [
   },
 ];
 
-const SOCIAL_LINKS = [
-  { href: "https://x.com/ENICEHQ", label: "X (Twitter)", Icon: XIcon },
-  { href: "https://www.instagram.com/enicehq", label: "Instagram", Icon: InstagramIcon },
-  { href: "https://www.facebook.com/share/1Nx7q11BZK/", label: "Facebook", Icon: FacebookIcon },
-  { href: "https://www.linkedin.com/company/enicehq", label: "LinkedIn", Icon: LinkedInIcon },
-];
+const ICONS: Record<string, typeof XIcon> = {
+  "X (Twitter)": XIcon,
+  Instagram: InstagramIcon,
+  Facebook: FacebookIcon,
+  LinkedIn: LinkedInIcon,
+};
+
+// URLs come from SOCIAL_PROFILES so the footer and the Organization `sameAs` cannot disagree.
+const SOCIAL_LINKS = SOCIAL_PROFILES.map((p) => ({
+  href: p.href,
+  label: p.label,
+  Icon: ICONS[p.label],
+}));
 
 export function SiteFooter() {
   const year = new Date().getFullYear();
