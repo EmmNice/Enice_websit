@@ -271,13 +271,67 @@ export function pageHead(pathname: string, jsonLd: unknown[] = []) {
 }
 
 /**
+ * Breadcrumb trail for a page.
+ *
+ * Two purposes: it tells a search engine how pages relate to each other, and it is what
+ * produces the `enicehq.com › Products › PulsePay` line in a result instead of a bare URL.
+ * Pass the trail without the site root, which is prepended here.
+ */
+export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [{ name: "Home", path: "/" }, ...trail].map((item, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: item.name,
+      item: canonicalUrl(item.path),
+    })),
+  };
+}
+
+/**
+ * FAQ markup built from the questions already on the page.
+ *
+ * Only valid because those questions and answers are genuinely visible to visitors —
+ * declaring FAQ markup for content that is not on the page is a guidelines violation.
+ */
+export function faqJsonLd(faqs: readonly { q: string; a: string }[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${SITE_URL}/#faq`,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.q,
+      acceptedAnswer: { "@type": "Answer", text: faq.a },
+    })),
+  };
+}
+
+/**
+ * Reference to the Organization entity rather than a fresh copy of it.
+ *
+ * Every product page previously declared its own inline `Organization`, which reads to a
+ * search engine as several loosely-related organisations that happen to share a name. Pointing
+ * at one `@id` instead ties the products to a single brand, which is what allows them to be
+ * understood — and surfaced — as that brand's product family.
+ */
+export const ORGANIZATION_REF = { "@id": `${SITE_URL}/#organization` } as const;
+
+/**
  * Structured data worth baking into the static HTML, keyed by pathname.
  *
  * Most JSON-LD is left to client injection because only crawlers that execute JavaScript read
  * it. The Organization and WebSite entities are the exception: they describe the brand itself,
  * so they are cheap insurance against any indexer that does not run scripts.
  */
-export function prerenderJsonLd(pathname: string): unknown[] {
-  if (pathname === "/") return [organizationJsonLd(), webSiteJsonLd()];
+export function prerenderJsonLd(pathname: string, faqs: readonly { q: string; a: string }[] = []) {
+  if (pathname === "/") {
+    const entities: unknown[] = [organizationJsonLd(), webSiteJsonLd()];
+    if (faqs.length > 0) entities.push(faqJsonLd(faqs));
+    return entities;
+  }
   return [];
 }

@@ -5,7 +5,7 @@ import { AlertCircle, ArrowRight, Check, Loader2, Mail, MapPin } from "lucide-re
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
-import { pageHead } from "@/lib/seo";
+import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
 import {
   EMPTY_CONTACT,
   FIELD_LIMITS,
@@ -19,6 +19,7 @@ import {
 export const Route = createFileRoute("/contact")({
   head: () =>
     pageHead("/contact", [
+      breadcrumbJsonLd([{ name: "Contact", path: "/contact" }]),
       {
         "@context": "https://schema.org",
         "@type": "ContactPage",

@@ -48,11 +48,11 @@ function escapeText(value) {
  * import it. Keeping one source of truth is the entire point — duplicating the copy here
  * would guarantee it drifts from what the router renders.
  */
-async function loadSeoModule() {
-  const outfile = join(ROOT, "node_modules", ".cache", "prerender-seo.mjs");
+async function loadModule(entry, name) {
+  const outfile = join(ROOT, "node_modules", ".cache", `prerender-${name}.mjs`);
   await mkdir(dirname(outfile), { recursive: true });
   await build({
-    entryPoints: [join(ROOT, "src/lib/seo.ts")],
+    entryPoints: [join(ROOT, entry)],
     outfile,
     bundle: true,
     format: "esm",
@@ -151,15 +151,20 @@ async function main() {
     process.exit(1);
   }
 
-  const { PAGE_SEO, buildMeta, canonicalUrl, DEFAULT_OG_IMAGE, prerenderJsonLd } =
-    await loadSeoModule();
+  const { PAGE_SEO, buildMeta, canonicalUrl, DEFAULT_OG_IMAGE, prerenderJsonLd } = await loadModule(
+    "src/lib/seo.ts",
+    "seo",
+  );
+  const { FAQS } = await loadModule("src/lib/faqs.ts", "faqs");
   const shell = await readFile(join(DIST, "index.html"), "utf8");
+  const faqs = FAQS;
+  console.log(`[prerender] ${faqs.length} FAQ entries found for FAQPage markup`);
 
   let written = 0;
 
   for (const [pathname, seo] of Object.entries(PAGE_SEO)) {
     const url = canonicalUrl(pathname);
-    const head = renderHead(buildMeta(seo, url), url, prerenderJsonLd(pathname));
+    const head = renderHead(buildMeta(seo, url), url, prerenderJsonLd(pathname, faqs));
     const file = await writePage(pathname, head, shell);
     console.log(`[prerender] ${pathname.padEnd(26)} -> ${file}`);
     written++;

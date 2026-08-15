@@ -15,11 +15,15 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
-import { pageHead } from "@/lib/seo";
+import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/pulsepay")({
   head: () =>
     pageHead("/portfolio/pulsepay", [
+      breadcrumbJsonLd([
+        { name: "Products", path: "/portfolio" },
+        { name: "PulsePay", path: "/portfolio/pulsepay" },
+      ]),
       {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
@@ -34,11 +38,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
           availability: "https://schema.org/InStock",
           description: "Request access via corporate@enicehq.com",
         },
-        author: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-        },
+        author: ORGANIZATION_REF,
         featureList: [
           "Instant virtual Naira and USD card issuance",
           "Built-in KYC and identity verification",

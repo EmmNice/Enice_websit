@@ -3,11 +3,12 @@ import { SITE_URL } from "@/lib/site";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Roadmap } from "@/components/site/Roadmap";
-import { pageHead } from "@/lib/seo";
+import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/roadmap")({
   head: () =>
     pageHead("/roadmap", [
+      breadcrumbJsonLd([{ name: "Roadmap", path: "/roadmap" }]),
       {
         "@context": "https://schema.org",
         "@type": "WebPage",
@@ -15,11 +16,7 @@ export const Route = createFileRoute("/roadmap")({
         description:
           "Public product roadmap for ENICE Group: completed milestones, active products, and what we are building next.",
         url: `${SITE_URL}/roadmap`,
-        publisher: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-        },
+        publisher: ORGANIZATION_REF,
       },
     ]),
   component: RoadmapPage,

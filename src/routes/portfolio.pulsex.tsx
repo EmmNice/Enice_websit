@@ -14,11 +14,15 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SHADOW_CARD } from "@/lib/design";
-import { pageHead } from "@/lib/seo";
+import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/pulsex")({
   head: () =>
     pageHead("/portfolio/pulsex", [
+      breadcrumbJsonLd([
+        { name: "Products", path: "/portfolio" },
+        { name: "PulseX", path: "/portfolio/pulsex" },
+      ]),
       {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
@@ -29,11 +33,7 @@ export const Route = createFileRoute("/portfolio/pulsex")({
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web, iOS, Android",
         releaseNotes: "Expected Q3 2027",
-        author: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-        },
+        author: ORGANIZATION_REF,
         offers: {
           "@type": "Offer",
           availability: "https://schema.org/PreOrder",
