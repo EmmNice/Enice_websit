@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { LegalPage } from "@/components/site/LegalPage";
 
 export const Route = createFileRoute("/terms")({
@@ -10,10 +11,27 @@ export const Route = createFileRoute("/terms")({
         content:
           "Terms governing access to and use of ENICE Group platforms, APIs, and infrastructure services.",
       },
+      { property: "og:title", content: "Terms of Service · ENICE Group" },
+      {
+        property: "og:description",
+        content:
+          "Terms governing access to and use of ENICE Group platforms, APIs, and infrastructure services.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE_URL}/terms` },
+      { name: "twitter:title", content: "Terms of Service · ENICE Group" },
+      {
+        name: "twitter:description",
+        content:
+          "Terms governing access to and use of ENICE Group platforms, APIs, and infrastructure services.",
+      },
+      { name: "robots", content: "index, follow" },
     ],
+    links: [{ rel: "canonical", href: `${SITE_URL}/terms` }],
   }),
   component: () => (
     <LegalPage
+      lastUpdated="July 16, 2026"
       kicker="Legal · Service Agreement"
       title="Terms of Service"
       intro="By accessing or using the websites, infrastructure, or commerce platforms operated by ENICE Group, you agree to be bound by these Terms of Service. If you do not agree, please discontinue use immediately."

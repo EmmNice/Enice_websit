@@ -7,11 +7,14 @@ export function LegalPage({
   kicker,
   title,
   intro,
+  /** Each policy is revised independently, so the date is supplied per page. */
+  lastUpdated,
   sections,
 }: {
   kicker: string;
   title: string;
   intro: string;
+  lastUpdated: string;
   sections: { heading: string; body: ReactNode }[];
 }) {
   return (
@@ -30,7 +33,7 @@ export function LegalPage({
               {intro}
             </p>
             <div className="mt-6 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Last updated · July 16, 2026
+              Last updated · {lastUpdated}
             </div>
           </div>
         </section>

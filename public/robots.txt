@@ -1,35 +1,11 @@
 User-agent: *
 Allow: /
 
-# Block admin and API routes
+# Admin screens hold no public content and are also marked noindex.
 Disallow: /admin
 Disallow: /admin/
+
+# Serverless endpoints, not pages.
 Disallow: /api/
-Disallow: /.mcp/
-
-# Allow all major search engine bots explicitly
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Slurp
-Allow: /
-
-User-agent: DuckDuckBot
-Allow: /
-
-User-agent: Baiduspider
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: LinkedInBot
-Allow: /
 
 Sitemap: https://enicehq.com/sitemap.xml

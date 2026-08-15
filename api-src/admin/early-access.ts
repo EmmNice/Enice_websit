@@ -12,10 +12,10 @@
 import { timingSafeEqual } from "node:crypto";
 import { EARLY_ACCESS_STATUSES, type EarlyAccessStatus } from "../../src/lib/early-access";
 import {
-  EarlyAccessConfigError,
   listRegistrations,
   updateRegistrationStatus,
 } from "../../src/lib/early-access-store.server";
+import { ResendConfigError } from "../../src/lib/resend.server";
 import {
   clientIp,
   createAttemptLimiter,
@@ -114,7 +114,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     res.status(405).json({ ok: false, error: "Method not allowed." });
   } catch (err) {
-    if (err instanceof EarlyAccessConfigError) {
+    if (err instanceof ResendConfigError) {
       console.error(`[api/admin/early-access:${ref}] not configured:`, err.message);
       res.status(503).json({ ok: false, error: "Storage is not configured.", ref });
       return;

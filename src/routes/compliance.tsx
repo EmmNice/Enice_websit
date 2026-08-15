@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { SITE_URL } from "@/lib/site";
 import { LegalPage } from "@/components/site/LegalPage";
 
 export const Route = createFileRoute("/compliance")({
@@ -9,10 +10,25 @@ export const Route = createFileRoute("/compliance")({
         name: "description",
         content: "Regulatory posture, registrations, and compliance program of ENICE Group.",
       },
+      { property: "og:title", content: "Regulatory Compliance · ENICE Group" },
+      {
+        property: "og:description",
+        content: "Regulatory posture, registrations, and compliance program of ENICE Group.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: `${SITE_URL}/compliance` },
+      { name: "twitter:title", content: "Regulatory Compliance · ENICE Group" },
+      {
+        name: "twitter:description",
+        content: "Regulatory posture, registrations, and compliance program of ENICE Group.",
+      },
+      { name: "robots", content: "index, follow" },
     ],
+    links: [{ rel: "canonical", href: `${SITE_URL}/compliance` }],
   }),
   component: () => (
     <LegalPage
+      lastUpdated="July 16, 2026"
       kicker="Compliance · Regulatory Posture"
       title="Regulatory Compliance"
       intro="ENICE Group operates with transparency, integrity, and full adherence to global and local statutory frameworks. As a product-driven technology company, our compliance program covers the platforms we build and operate."
