@@ -4,10 +4,7 @@ import { Lock, RefreshCw, Users, Download } from "lucide-react";
 
 export const Route = createFileRoute("/admin/watchlist")({
   head: () => ({
-    meta: [
-      { title: "Watchlist — Admin" },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
+    meta: [{ title: "Watchlist — Admin" }, { name: "robots", content: "noindex, nofollow" }],
   }),
   component: AdminWatchlistPage,
 });
@@ -22,9 +19,7 @@ type Contact = {
 const STORAGE_KEY = "enice-admin-password";
 
 function AdminWatchlistPage() {
-  const [password, setPassword] = useState(
-    () => sessionStorage.getItem(STORAGE_KEY) ?? ""
-  );
+  const [password, setPassword] = useState(() => sessionStorage.getItem(STORAGE_KEY) ?? "");
   const [input, setInput] = useState("");
   const [contacts, setContacts] = useState<Contact[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -98,13 +93,9 @@ function AdminWatchlistPage() {
         >
           <div className="mb-6 flex items-center gap-2">
             <Lock className="h-5 w-5 text-primary" />
-            <h1 className="text-lg font-semibold text-foreground">
-              Admin Access
-            </h1>
+            <h1 className="text-lg font-semibold text-foreground">Admin Access</h1>
           </div>
-          <label className="mb-1 block text-sm font-medium text-muted-foreground">
-            Password
-          </label>
+          <label className="mb-1 block text-sm font-medium text-muted-foreground">Password</label>
           <input
             type="password"
             autoFocus
@@ -112,9 +103,7 @@ function AdminWatchlistPage() {
             onChange={(e) => setInput(e.target.value)}
             className="mb-4 w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground outline-none focus:ring-2 focus:ring-primary"
           />
-          {error && (
-            <p className="mb-4 text-sm text-destructive">{error}</p>
-          )}
+          {error && <p className="mb-4 text-sm text-destructive">{error}</p>}
           <button
             type="submit"
             disabled={loading}
@@ -133,9 +122,7 @@ function AdminWatchlistPage() {
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
-            <h1 className="text-xl font-semibold text-foreground">
-              Watchlist Sign-Ups
-            </h1>
+            <h1 className="text-xl font-semibold text-foreground">Watchlist Sign-Ups</h1>
             {contacts && (
               <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
                 {contacts.length}

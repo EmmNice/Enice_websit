@@ -17,8 +17,7 @@ export const Route = createFileRoute("/contact")({
       { property: "og:title", content: "Contact ENICE Group" },
       {
         property: "og:description",
-        content:
-          "Get in touch about product access, integration, licensing, or partnerships.",
+        content: "Get in touch about product access, integration, licensing, or partnerships.",
       },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "ENICE Group" },
@@ -33,8 +32,7 @@ export const Route = createFileRoute("/contact")({
       { name: "twitter:title", content: "Contact ENICE Group" },
       {
         name: "twitter:description",
-        content:
-          "Get in touch about product access, integration, licensing, or partnerships.",
+        content: "Get in touch about product access, integration, licensing, or partnerships.",
       },
       { name: "robots", content: "index, follow" },
     ],
@@ -143,7 +141,6 @@ function ContactPage() {
     }
   }
 
-
   return (
     <div className="min-h-screen bg-background text-foreground antialiased">
       <SiteHeader />
@@ -158,8 +155,8 @@ function ContactPage() {
             Get in Touch
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">
-            Reach the ENICE Group team about product access, platform integration,
-            enterprise licensing, or technology partnerships.
+            Reach the ENICE Group team about product access, platform integration, enterprise
+            licensing, or technology partnerships.
           </p>
         </div>
       </section>
@@ -167,7 +164,6 @@ function ContactPage() {
       {/* Form + sidebar */}
       <section className="bg-secondary py-20 sm:py-28">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[1fr_1.4fr]">
-
           {/* Sidebar */}
           <aside className="flex flex-col gap-6">
             {/* Direct channels */}
@@ -199,9 +195,7 @@ function ContactPage() {
                     <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                       Headquarters
                     </div>
-                    <div className="mt-1 text-sm text-foreground">
-                      Abuja, Nigeria
-                    </div>
+                    <div className="mt-1 text-sm text-foreground">Abuja, Nigeria</div>
                     <div className="mt-0.5 text-[11px] text-muted-foreground">
                       WAT, UTC+1. Business hours 9am to 6pm
                     </div>
@@ -220,15 +214,31 @@ function ContactPage() {
               </div>
               <ol className="mt-6 space-y-5">
                 {[
-                  { step: "01", title: "Review", body: "We review your inquiry within one business day." },
-                  { step: "02", title: "Routing", body: "Your message goes to whoever is best placed to answer: engineering, commercial, or leadership." },
-                  { step: "03", title: "Response", body: "You get a real reply within two business days, not an auto-response." },
+                  {
+                    step: "01",
+                    title: "Review",
+                    body: "We review your inquiry within one business day.",
+                  },
+                  {
+                    step: "02",
+                    title: "Routing",
+                    body: "Your message goes to whoever is best placed to answer: engineering, commercial, or leadership.",
+                  },
+                  {
+                    step: "03",
+                    title: "Response",
+                    body: "You get a real reply within two business days, not an auto-response.",
+                  },
                 ].map((s) => (
                   <li key={s.step} className="flex gap-4">
-                    <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-primary/60 mt-0.5 shrink-0">{s.step}</span>
+                    <span className="font-mono text-[10px] font-bold tracking-[0.18em] text-primary/60 mt-0.5 shrink-0">
+                      {s.step}
+                    </span>
                     <div>
                       <div className="text-[12px] font-semibold text-foreground">{s.title}</div>
-                      <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">{s.body}</p>
+                      <p className="mt-1 text-[12px] leading-relaxed text-muted-foreground">
+                        {s.body}
+                      </p>
                     </div>
                   </li>
                 ))}
@@ -243,8 +253,8 @@ function ContactPage() {
               <div className="flex items-start gap-3">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" strokeWidth={2.5} />
                 <p className="text-[12px] leading-relaxed text-muted-foreground">
-                  All inquiries are handled under ENICE Group's privacy policy.
-                  We don't share your data with third parties without your consent.
+                  All inquiries are handled under ENICE Group's privacy policy. We don't share your
+                  data with third parties without your consent.
                 </p>
               </div>
             </div>
@@ -265,8 +275,8 @@ function ContactPage() {
                   Message received
                 </h3>
                 <p className="mt-3 max-w-md break-words text-sm leading-relaxed text-muted-foreground">
-                  Thanks, {form.name.split(" ")[0] || "there"}. Our team replies within one
-                  business day to{" "}
+                  Thanks, {form.name.split(" ")[0] || "there"}. Our team replies within one business
+                  day to{" "}
                   <span className="break-all font-medium text-foreground">
                     {form.email || "the email you entered"}
                   </span>
@@ -282,7 +292,6 @@ function ContactPage() {
               </div>
             ) : (
               <form className="space-y-6" onSubmit={handleSubmit}>
-
                 {/* Error banner */}
                 {status === "error" && (
                   <div className="flex items-start gap-3 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -296,7 +305,6 @@ function ContactPage() {
                     </p>
                   </div>
                 )}
-
 
                 <div className="grid gap-5 sm:grid-cols-2">
                   <Field
@@ -334,9 +342,13 @@ function ContactPage() {
                     required
                     className="mt-2 block w-full rounded-md border border-input bg-background px-3.5 py-2.5 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/15"
                   >
-                    <option value="" disabled>Select nature of inquiry…</option>
+                    <option value="" disabled>
+                      Select nature of inquiry…
+                    </option>
                     {INQUIRY_OPTIONS.map((o) => (
-                      <option key={o} value={o}>{o}</option>
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -347,9 +359,7 @@ function ContactPage() {
                   </label>
                   <textarea
                     value={form.message}
-                    onChange={(e) =>
-                      setForm({ ...form, message: e.target.value.slice(0, 2000) })
-                    }
+                    onChange={(e) => setForm({ ...form, message: e.target.value.slice(0, 2000) })}
                     rows={6}
                     required
                     placeholder="Tell us about the product, integration, partnership, or access request."
@@ -379,11 +389,9 @@ function ContactPage() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   )}
                 </button>
-
               </form>
             )}
           </div>
-
         </div>
       </section>
 

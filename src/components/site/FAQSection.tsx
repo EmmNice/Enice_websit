@@ -38,7 +38,6 @@ export function FAQSection() {
   return (
     <section className="border-t border-border bg-secondary py-24 sm:py-32">
       <div className="mx-auto max-w-3xl px-5 sm:px-8">
-
         <Reveal>
           <div className="text-center">
             <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
@@ -73,7 +72,6 @@ export function FAQSection() {
             </Accordion>
           </div>
         </Reveal>
-
       </div>
     </section>
   );

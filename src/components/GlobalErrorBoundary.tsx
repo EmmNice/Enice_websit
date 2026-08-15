@@ -105,8 +105,7 @@ function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
 
         {/* Body copy — exact text requested */}
         <p className="mb-10 max-w-sm text-[15px] leading-relaxed text-white/45">
-          We are fixing it right now — please refresh the page or try again
-          shortly.
+          We are fixing it right now — please refresh the page or try again shortly.
         </p>
 
         {/* Actions */}
@@ -129,10 +128,7 @@ function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
         {/* Footer */}
         <p className="mt-12 text-[11px] text-white/20">
           If this keeps happening, contact us at{" "}
-          <a
-            href="mailto:corporate@enicehq.com"
-            className="transition-colors hover:text-white/50"
-          >
+          <a href="mailto:corporate@enicehq.com" className="transition-colors hover:text-white/50">
             corporate@enicehq.com
           </a>
         </p>

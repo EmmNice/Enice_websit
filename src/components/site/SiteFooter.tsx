@@ -12,7 +12,14 @@ function XIcon({ className }: { className?: string }) {
 
 function InstagramIcon({ className }: { className?: string }) {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden className={className} fill="none" stroke="currentColor" strokeWidth="1.6">
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    >
       <rect x="3" y="3" width="18" height="18" rx="5" />
       <circle cx="12" cy="12" r="4" />
       <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
@@ -31,7 +38,7 @@ function FacebookIcon({ className }: { className?: string }) {
 function LinkedInIcon({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden className={className} fill="currentColor">
-      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
     </svg>
   );
 }
@@ -79,7 +86,6 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-border bg-background">
-
       {/* System status ribbon */}
       <div className="border-b border-border bg-secondary/50">
         <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
@@ -89,13 +95,11 @@ export function SiteFooter() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              PulsePay Network:{" "}
-              <span className="font-semibold text-foreground">Operational</span>
+              PulsePay Network: <span className="font-semibold text-foreground">Operational</span>
             </span>
             <span className="inline-flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-emerald-500" />
-              PulseAssist Engine:{" "}
-              <span className="font-semibold text-foreground">Operational</span>
+              PulseAssist Engine: <span className="font-semibold text-foreground">Operational</span>
             </span>
           </div>
           <Link
@@ -110,14 +114,12 @@ export function SiteFooter() {
       {/* Main footer body */}
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
         <div className="grid gap-12 lg:grid-cols-[1.8fr_repeat(3,1fr)]">
-
           {/* Brand column */}
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-              ENICE Group is a technology company building, owning, and
-              operating the financial and AI platforms that power global
-              commerce.
+              ENICE Group is a technology company building, owning, and operating the financial and
+              AI platforms that power global commerce.
             </p>
 
             {/* Social icons */}
@@ -186,7 +188,6 @@ export function SiteFooter() {
           </p>
         </div>
       </div>
-
     </footer>
   );
 }

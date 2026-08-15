@@ -93,39 +93,42 @@ const MILESTONES: Milestone[] = [
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
-const STATUS_CONFIG: Record<Status, {
-  label: string;
-  icon: React.ElementType;
-  pill: string;
-  dot: string;
-}> = {
+const STATUS_CONFIG: Record<
+  Status,
+  {
+    label: string;
+    icon: React.ElementType;
+    pill: string;
+    dot: string;
+  }
+> = {
   completed: {
     label: "Completed",
     icon: CheckCircle2,
     pill: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    dot:  "bg-emerald-500",
+    dot: "bg-emerald-500",
   },
   "in-progress": {
     label: "In Progress",
     icon: Zap,
     pill: "bg-blue-50 text-blue-700 border-blue-200",
-    dot:  "bg-primary",
+    dot: "bg-primary",
   },
   planned: {
     label: "Planned",
     icon: Clock,
     pill: "bg-secondary text-muted-foreground border-border",
-    dot:  "bg-muted-foreground/40",
+    dot: "bg-muted-foreground/40",
   },
 };
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
 const TABS: { key: "all" | Status; label: string }[] = [
-  { key: "all",         label: "All" },
-  { key: "completed",   label: "Completed" },
+  { key: "all", label: "All" },
+  { key: "completed", label: "Completed" },
   { key: "in-progress", label: "In Progress" },
-  { key: "planned",     label: "Planned" },
+  { key: "planned", label: "Planned" },
 ];
 
 // ─── Card ─────────────────────────────────────────────────────────────────────
@@ -135,13 +138,16 @@ function MilestoneCard({ m }: { m: Milestone }) {
   const Icon = cfg.icon;
 
   return (
-    <article className="group relative flex flex-col rounded-xl border border-border bg-background p-7 transition-all hover:-translate-y-0.5 hover:shadow-md"
+    <article
+      className="group relative flex flex-col rounded-xl border border-border bg-background p-7 transition-all hover:-translate-y-0.5 hover:shadow-md"
       style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)" }}
     >
       {/* Top row */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${cfg.pill}`}>
+          <span
+            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${cfg.pill}`}
+          >
             <Icon className="h-3 w-3" strokeWidth={2.5} />
             {cfg.label}
           </span>
@@ -160,14 +166,15 @@ function MilestoneCard({ m }: { m: Milestone }) {
       </h3>
 
       {/* Body */}
-      <p className="mt-3 text-[13.5px] leading-relaxed text-muted-foreground">
-        {m.body}
-      </p>
+      <p className="mt-3 text-[13.5px] leading-relaxed text-muted-foreground">{m.body}</p>
 
       {/* Tags */}
       <div className="mt-5 flex flex-wrap gap-2">
         {m.tags.map((t) => (
-          <span key={t} className="rounded-md bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
+          <span
+            key={t}
+            className="rounded-md bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
+          >
             {t}
           </span>
         ))}
@@ -181,21 +188,18 @@ function MilestoneCard({ m }: { m: Milestone }) {
 export function Roadmap() {
   const [tab, setTab] = useState<"all" | Status>("all");
 
-  const filtered = tab === "all"
-    ? MILESTONES
-    : MILESTONES.filter((m) => m.status === tab);
+  const filtered = tab === "all" ? MILESTONES : MILESTONES.filter((m) => m.status === tab);
 
   const counts = {
-    all:          MILESTONES.length,
-    completed:    MILESTONES.filter((m) => m.status === "completed").length,
-    "in-progress":MILESTONES.filter((m) => m.status === "in-progress").length,
-    planned:      MILESTONES.filter((m) => m.status === "planned").length,
+    all: MILESTONES.length,
+    completed: MILESTONES.filter((m) => m.status === "completed").length,
+    "in-progress": MILESTONES.filter((m) => m.status === "in-progress").length,
+    planned: MILESTONES.filter((m) => m.status === "planned").length,
   };
 
   return (
     <section id="roadmap" className="border-t border-border bg-background py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-5 sm:px-8">
-
         {/* Header */}
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div className="max-w-2xl">
@@ -206,8 +210,8 @@ export function Roadmap() {
               Built step by step, for the long run.
             </h2>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              Our roadmap follows the maturity of the platforms we operate,
-              sequenced so each step builds on the last.
+              Our roadmap follows the maturity of the platforms we operate, sequenced so each step
+              builds on the last.
             </p>
           </div>
           <Link
@@ -270,9 +274,13 @@ export function Roadmap() {
               }`}
             >
               {t.label}
-              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                tab === t.key ? "bg-primary/10 text-primary" : "bg-transparent text-muted-foreground/60"
-              }`}>
+              <span
+                className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                  tab === t.key
+                    ? "bg-primary/10 text-primary"
+                    : "bg-transparent text-muted-foreground/60"
+                }`}
+              >
                 {counts[t.key]}
               </span>
             </button>
@@ -290,10 +298,11 @@ export function Roadmap() {
         {filtered.length === 0 && (
           <div className="mt-8 flex flex-col items-center justify-center rounded-xl border border-border bg-secondary/40 py-16 text-center">
             <Circle className="h-8 w-8 text-muted-foreground/30" />
-            <p className="mt-4 text-[14px] text-muted-foreground">No milestones in this category yet.</p>
+            <p className="mt-4 text-[14px] text-muted-foreground">
+              No milestones in this category yet.
+            </p>
           </div>
         )}
-
       </div>
     </section>
   );

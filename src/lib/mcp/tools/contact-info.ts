@@ -10,8 +10,7 @@ const CONTACT = {
 export default defineTool({
   name: "get_contact_info",
   title: "Get ENICE Group contact info",
-  description:
-    "Return public contact information for ENICE Group partnerships and inquiries.",
+  description: "Return public contact information for ENICE Group partnerships and inquiries.",
   inputSchema: {},
   annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
   handler: () => ({

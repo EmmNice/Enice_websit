@@ -28,15 +28,15 @@ The homepage can be previewed before the launch gate with `/?preview=1`.
 
 ## Environment variables
 
-| Variable | Required | Purpose |
-|---|---|---|
-| `RESEND_API_KEY` | Yes (production) | Sends watchlist emails |
-| `RESEND_AUDIENCE_ID` | Yes (production) | Resend Audience ID for duplicate detection |
-| `AI_PROVIDER` | Yes (chatbot) | One of: `bedrock`, `openai`, `anthropic`, `gemini`, `deepseek`, `grok`, `openrouter`, `custom`. Default: `bedrock` |
-| `AI_API_KEY` | Yes (chatbot) | AWS Access Key ID (Bedrock) or API key for other providers |
-| `AI_API_SECRET` | Bedrock only | AWS Secret Access Key |
-| `AI_REGION` | Bedrock only | AWS region, default `us-east-1` |
-| `AI_MODEL` | No | Override the provider's default model |
+| Variable             | Required         | Purpose                                                                                                            |
+| -------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `RESEND_API_KEY`     | Yes (production) | Sends watchlist emails                                                                                             |
+| `RESEND_AUDIENCE_ID` | Yes (production) | Resend Audience ID for duplicate detection                                                                         |
+| `AI_PROVIDER`        | Yes (chatbot)    | One of: `bedrock`, `openai`, `anthropic`, `gemini`, `deepseek`, `grok`, `openrouter`, `custom`. Default: `bedrock` |
+| `AI_API_KEY`         | Yes (chatbot)    | AWS Access Key ID (Bedrock) or API key for other providers                                                         |
+| `AI_API_SECRET`      | Bedrock only     | AWS Secret Access Key                                                                                              |
+| `AI_REGION`          | Bedrock only     | AWS region, default `us-east-1`                                                                                    |
+| `AI_MODEL`           | No               | Override the provider's default model                                                                              |
 
 In dev, if `RESEND_API_KEY` is absent the form returns a stub success so you can test the UI. If AI credentials are absent, the chatbot falls back to a static contact message.
 

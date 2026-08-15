@@ -3,8 +3,7 @@ import { ArrowRight, Check, Loader2, Mail } from "lucide-react";
 
 type FormState = "idle" | "loading" | "success" | "duplicate" | "error";
 
-const FRIENDLY_FALLBACK =
-  "Something went wrong on our end. Please try again in a moment.";
+const FRIENDLY_FALLBACK = "Something went wrong on our end. Please try again in a moment.";
 
 /**
  * Email capture block for the homepage. Posts to the same /api/watchlist
@@ -64,8 +63,7 @@ export function NewsletterSignup() {
         <div
           className="rounded-2xl border border-border bg-background p-6 sm:p-12"
           style={{
-            boxShadow:
-              "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)",
+            boxShadow: "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)",
           }}
         >
           <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr] lg:items-center">
@@ -77,8 +75,8 @@ export function NewsletterSignup() {
                 Product news, straight from the team
               </h2>
               <p className="mt-3 max-w-md text-[15px] leading-relaxed text-muted-foreground">
-                Launch dates, platform updates, and early access to what we
-                release next. No noise, and you can leave any time.
+                Launch dates, platform updates, and early access to what we release next. No noise,
+                and you can leave any time.
               </p>
             </div>
 
@@ -118,9 +116,7 @@ export function NewsletterSignup() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="you@company.com"
-                        aria-describedby={
-                          state === "error" ? "newsletter-error" : undefined
-                        }
+                        aria-describedby={state === "error" ? "newsletter-error" : undefined}
                         className="h-12 w-full rounded-lg border border-border bg-background pl-10 pr-3 text-[15px] text-foreground outline-none transition-colors placeholder:text-muted-foreground/70 focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/20"
                       />
                     </div>

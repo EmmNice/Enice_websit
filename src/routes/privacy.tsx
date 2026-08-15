@@ -23,23 +23,20 @@ export const Route = createFileRoute("/privacy")({
           body: (
             <div className="space-y-4">
               <p>
-                <span className="font-medium text-foreground">Personal data.</span>{" "}
-                Name, email address, phone number, shipping and billing addresses,
-                and business registration details when you interact with our
-                platforms or venture services.
+                <span className="font-medium text-foreground">Personal data.</span> Name, email
+                address, phone number, shipping and billing addresses, and business registration
+                details when you interact with our platforms or venture services.
               </p>
               <p>
-                <span className="font-medium text-foreground">Financial data.</span>{" "}
-                Payment details, bank account information, and transaction
-                history processed through our commerce infrastructure. All
-                financial transactions are encrypted and handled by secure
-                third-party processors.
+                <span className="font-medium text-foreground">Financial data.</span> Payment
+                details, bank account information, and transaction history processed through our
+                commerce infrastructure. All financial transactions are encrypted and handled by
+                secure third-party processors.
               </p>
               <p>
-                <span className="font-medium text-foreground">Technical data.</span>{" "}
-                IP address, browser type, operating system, and tracking data
-                collected through cookies to help us maintain performance and
-                service quality.
+                <span className="font-medium text-foreground">Technical data.</span> IP address,
+                browser type, operating system, and tracking data collected through cookies to help
+                us maintain performance and service quality.
               </p>
             </div>
           ),
@@ -66,13 +63,12 @@ export const Route = createFileRoute("/privacy")({
                 </li>
                 <li>
                   <span className="font-medium text-foreground">Service providers.</span>{" "}
-                  Third-party vendors that handle payment processing, data
-                  analysis, hosting, and infrastructure delivery.
+                  Third-party vendors that handle payment processing, data analysis, hosting, and
+                  infrastructure delivery.
                 </li>
                 <li>
-                  <span className="font-medium text-foreground">Legal authorities.</span>{" "}
-                  When required by law to comply with regulatory audits or legal
-                  processes.
+                  <span className="font-medium text-foreground">Legal authorities.</span> When
+                  required by law to comply with regulatory audits or legal processes.
                 </li>
               </ul>
             </div>
@@ -82,12 +78,11 @@ export const Route = createFileRoute("/privacy")({
           heading: "Security and International Transfers",
           body: (
             <p>
-              We use industry-standard administrative, technical, and physical
-              security measures, including zero-trust architecture and row-level
-              security, to protect your data. Because we operate platforms for
-              global commerce, your data may be transferred to and maintained on
-              servers outside your country. We make sure every transfer complies
-              with applicable data protection laws.
+              We use industry-standard administrative, technical, and physical security measures,
+              including zero-trust architecture and row-level security, to protect your data.
+              Because we operate platforms for global commerce, your data may be transferred to and
+              maintained on servers outside your country. We make sure every transfer complies with
+              applicable data protection laws.
             </p>
           ),
         },
@@ -95,9 +90,9 @@ export const Route = createFileRoute("/privacy")({
           heading: "Your Rights",
           body: (
             <p>
-              Depending on where you live, you may have the right to access,
-              correct, delete, or restrict the processing of your personal data.
-              To exercise any of these rights, write to{" "}
+              Depending on where you live, you may have the right to access, correct, delete, or
+              restrict the processing of your personal data. To exercise any of these rights, write
+              to{" "}
               <a
                 href="mailto:privacy@enicehq.com"
                 className="font-medium text-primary hover:underline"

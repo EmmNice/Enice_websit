@@ -175,7 +175,7 @@ export function SiteHeader() {
               ENICE Group
             </div>
             <p className="mt-1 text-[12px] text-muted-foreground">
-               Building products for what's next.
+              Building products for what's next.
             </p>
           </div>
         </aside>

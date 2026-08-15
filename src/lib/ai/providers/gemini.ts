@@ -12,8 +12,13 @@ import type { AIMessage, AIProvider, AIResponse } from "../types";
 const DEFAULT_MODEL = "gemini-2.0-flash";
 const BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 
-interface GeminiPart { text: string }
-interface GeminiContent { role: "user" | "model"; parts: GeminiPart[] }
+interface GeminiPart {
+  text: string;
+}
+interface GeminiContent {
+  role: "user" | "model";
+  parts: GeminiPart[];
+}
 interface GeminiResponse {
   candidates?: Array<{ content: { parts: GeminiPart[] } }>;
   error?: { message: string };

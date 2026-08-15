@@ -60,25 +60,23 @@ function RoadmapPage() {
     <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
       <main id="main">
-
-      {/* Page header */}
-      <div className="border-b border-border bg-secondary/40 py-14 sm:py-20">
-        <div className="mx-auto max-w-7xl px-5 sm:px-8">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-            Execution · Product Timeline
+        {/* Page header */}
+        <div className="border-b border-border bg-secondary/40 py-14 sm:py-20">
+          <div className="mx-auto max-w-7xl px-5 sm:px-8">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
+              Execution · Product Timeline
+            </div>
+            <h1 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-foreground sm:text-4xl md:text-5xl">
+              Roadmap
+            </h1>
+            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
+              Milestones completed, products in progress, and what we're building next. We publish
+              this openly so partners can plan ahead.
+            </p>
           </div>
-          <h1 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-foreground sm:text-4xl md:text-5xl">
-            Roadmap
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-            Milestones completed, products in progress, and what we're building
-            next. We publish this openly so partners can plan ahead.
-          </p>
         </div>
-      </div>
 
-      <Roadmap />
-
+        <Roadmap />
       </main>
       <SiteFooter />
     </div>

@@ -147,7 +147,7 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
         setErrorMsg(FRIENDLY_FALLBACK);
       }
     },
-    [email, formState]
+    [email, formState],
   );
 
   return (
@@ -177,7 +177,6 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
 
       {/* ── Content ── */}
       <div className="relative z-10 mx-auto flex w-full max-w-2xl flex-col items-center text-center">
-
         {/* Wordmark */}
         <div className="mb-10 flex items-center gap-3 sm:mb-12">
           <span
@@ -211,8 +210,8 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
 
         {/* Sub-copy */}
         <p className="mb-12 max-w-lg text-base leading-relaxed text-white/45 sm:mb-14 sm:text-lg">
-          A technology group building payments, AI, and financial platforms for
-          Africa, with room to grow globally.
+          A technology group building payments, AI, and financial platforms for Africa, with room to
+          grow globally.
         </p>
 
         {/* ── Countdown ── */}
@@ -279,9 +278,7 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
               </div>
 
               {formState === "duplicate" && (
-                <p className="mt-3 text-xs text-white/60">
-                  You're already on the watchlist.
-                </p>
+                <p className="mt-3 text-xs text-white/60">You're already on the watchlist.</p>
               )}
 
               {formState === "error" && (
@@ -292,8 +289,8 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
               )}
 
               <p className="mt-3 text-[11px] text-white/25">
-                No spam. You'll receive four emails in total: a confirmation, two
-                reminders, and the launch announcement.
+                No spam. You'll receive four emails in total: a confirmation, two reminders, and the
+                launch announcement.
               </p>
             </form>
           )}
@@ -305,10 +302,7 @@ export function ComingSoon({ onLaunched }: ComingSoonProps) {
           <span className="h-3 w-px bg-white/10" />
           <span>Est. 2026</span>
           <span className="h-3 w-px bg-white/10" />
-          <a
-            href="mailto:corporate@enicehq.com"
-            className="transition-colors hover:text-white/50"
-          >
+          <a href="mailto:corporate@enicehq.com" className="transition-colors hover:text-white/50">
             corporate@enicehq.com
           </a>
         </div>

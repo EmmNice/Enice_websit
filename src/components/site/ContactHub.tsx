@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Check, Send } from "lucide-react";
 
-const SHADOW_CARD =
-  "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)";
+const SHADOW_CARD = "0 1px 2px 0 rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)";
 
 export function ContactHub() {
   const [form, setForm] = useState({
@@ -46,8 +45,8 @@ export function ContactHub() {
             Start a conversation with ENICE Group.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-            For partnerships, enterprise integrations, and platform inquiries.
-            We respond within one business day.
+            For partnerships, enterprise integrations, and platform inquiries. We respond within one
+            business day.
           </p>
         </div>
 
@@ -140,15 +139,7 @@ export function ContactHub() {
   );
 }
 
-function Field({
-  label,
-  input,
-  error,
-}: {
-  label: string;
-  input: React.ReactNode;
-  error?: string;
-}) {
+function Field({ label, input, error }: { label: string; input: React.ReactNode; error?: string }) {
   return (
     <label className="block">
       <span className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">

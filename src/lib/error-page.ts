@@ -7,9 +7,7 @@
 export function renderErrorPage(statusCode = 500): string {
   const isServerError = statusCode >= 500;
 
-  const headline = isServerError
-    ? "Something went wrong on our end."
-    : "This page didn't load.";
+  const headline = isServerError ? "Something went wrong on our end." : "This page didn't load.";
 
   return `<!doctype html>
 <html lang="en">
