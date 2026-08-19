@@ -115,6 +115,14 @@ const PORTFOLIO_PREVIEW = [
     stat2: { label: "Concurrent Tenants", value: "∞" },
     to: "/portfolio/pulseassist" as const,
   },
+  {
+    tag: "Venture · Fintech Infrastructure",
+    name: "Payment Collection",
+    desc: "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
+    stat1: { label: "Launch", value: "Q1 2027" },
+    stat2: { label: "Integration", value: "1 API" },
+    to: "/portfolio/payment-collection" as const,
+  },
 ];
 
 const COMPLIANCE_BADGES = [
@@ -600,7 +608,7 @@ function Landing() {
               </div>
             </Reveal>
 
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div className="grid gap-6 lg:grid-cols-3">
               {PORTFOLIO_PREVIEW.map((p, i) => (
                 <Reveal key={p.name} delay={i * 80}>
                   <article
@@ -675,7 +683,7 @@ function Landing() {
                             </div>
                           </div>
                         </div>
-                      ) : (
+                      ) : i === 1 ? (
                         /* PulseAssist queue visual */
                         <div className="absolute inset-0 flex items-center justify-center p-6">
                           <div className="w-full max-w-xs space-y-2">
@@ -709,6 +717,32 @@ function Landing() {
                                 </span>
                               </div>
                             ))}
+                          </div>
+                        </div>
+                      ) : (
+                        /* Payment Collection notification visual */
+                        <div className="absolute inset-0 flex items-center justify-center p-6">
+                          <div
+                            className="w-full max-w-[220px] rounded-xl border border-border bg-background p-4"
+                            style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.06)" }}
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-50 ring-1 ring-emerald-200">
+                                <Check className="h-4 w-4 text-emerald-600" strokeWidth={2.5} />
+                              </span>
+                              <div>
+                                <div className="text-[11px] font-semibold text-foreground">
+                                  Payment Received
+                                </div>
+                                <div className="text-[9px] text-muted-foreground">
+                                  from a customer
+                                </div>
+                              </div>
+                            </div>
+                            <div className="mt-3 font-mono text-xl font-semibold tracking-tight text-foreground">
+                              ₦45,000.00
+                            </div>
+                            <div className="mt-1 text-[9px] text-muted-foreground/70">Just now</div>
                           </div>
                         </div>
                       )}
