@@ -117,7 +117,7 @@ const PORTFOLIO_PREVIEW = [
   },
   {
     tag: "Venture · Fintech Infrastructure",
-    name: "Payment Collection",
+    name: "PulsePay Payment Collection",
     desc: "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
     stat1: { label: "Launch", value: "Q1 2027" },
     stat2: { label: "Integration", value: "1 API" },
@@ -720,10 +720,10 @@ function Landing() {
                           </div>
                         </div>
                       ) : (
-                        /* Payment Collection notification visual */
+                        /* PulsePay Payment Collection notification visual */
                         <div className="absolute inset-0 flex items-center justify-center p-6">
                           <div
-                            className="w-full max-w-[220px] rounded-xl border border-border bg-background p-4"
+                            className="w-full max-w-[260px] rounded-xl border border-border bg-background p-4"
                             style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.06)" }}
                           >
                             <div className="flex items-center gap-2">
@@ -743,6 +743,23 @@ function Landing() {
                               ₦45,000.00
                             </div>
                             <div className="mt-1 text-[9px] text-muted-foreground/70">Just now</div>
+                            <div className="mt-4 space-y-1.5 border-t border-border pt-3">
+                              {[
+                                "Customer pays",
+                                "Payment processed",
+                                "Business receives funds",
+                              ].map((step, i) => (
+                                <div
+                                  key={step}
+                                  className="flex items-center gap-2 text-[10px] text-muted-foreground"
+                                >
+                                  <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-secondary text-[8px] font-semibold text-foreground/70">
+                                    {i + 1}
+                                  </span>
+                                  {step}
+                                </div>
+                              ))}
+                            </div>
                           </div>
                         </div>
                       )}

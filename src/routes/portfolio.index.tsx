@@ -43,8 +43,8 @@ export const Route = createFileRoute("/portfolio/")({
           },
           {
             "@type": "SoftwareApplication",
-            name: "ePulse",
-            url: `${SITE_URL}/portfolio/epulse`,
+            name: "PulsePay Payment Collection",
+            url: `${SITE_URL}/portfolio/payment-collection`,
             applicationCategory: "FinanceApplication",
           },
           {
@@ -55,8 +55,8 @@ export const Route = createFileRoute("/portfolio/")({
           },
           {
             "@type": "SoftwareApplication",
-            name: "PulsePay Payment Collection",
-            url: `${SITE_URL}/portfolio/payment-collection`,
+            name: "ePulse",
+            url: `${SITE_URL}/portfolio/epulse`,
             applicationCategory: "FinanceApplication",
           },
         ],
@@ -312,7 +312,7 @@ function PortfolioIndexPage() {
             </div>
 
             <div className="grid gap-8 lg:grid-cols-2">
-              {/* ── ePulse ── */}
+              {/* ── PulsePay Payment Collection ── */}
               <article
                 className="flex flex-col overflow-hidden rounded-xl border border-border bg-background"
                 style={{ boxShadow: SHADOW_CARD }}
@@ -326,66 +326,73 @@ function PortfolioIndexPage() {
                         "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(37,99,235,0.10) 0%, transparent 70%)",
                     }}
                   />
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
-                    <div className="flex items-center gap-3">
-                      <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
-                        <Wallet className="h-7 w-7 text-primary" strokeWidth={1.5} />
-                      </div>
-                      <div className="text-left">
-                        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Global Finance
-                        </div>
-                        <div className="text-xl font-bold tracking-tight text-foreground">
-                          e<span className="text-primary">Pulse</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex w-full max-w-xs flex-wrap justify-center gap-2">
-                      {["🇺🇸 USD", "🇬🇧 GBP", "🇪🇺 EUR", "🇳🇬 NGN"].map((c) => (
-                        <span
-                          key={c}
-                          className="rounded-md border border-border bg-background px-3 py-1 text-[11px] font-semibold text-foreground/80"
-                          style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.06)" }}
-                        >
-                          {c}
+                  <div className="absolute inset-0 flex items-center justify-center p-6">
+                    <div
+                      className="w-full max-w-[240px] rounded-xl border border-border bg-background p-4"
+                      style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.06)" }}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-50 ring-1 ring-emerald-200">
+                          <CheckCircle2 className="h-4 w-4 text-emerald-600" strokeWidth={2} />
                         </span>
-                      ))}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground/70">
-                      Multi-currency · Cross-border · Lifestyle
+                        <div>
+                          <div className="text-[11px] font-semibold text-foreground">
+                            Payment Received
+                          </div>
+                          <div className="text-[9px] text-muted-foreground">from a customer</div>
+                        </div>
+                      </div>
+                      <div className="mt-3 font-mono text-xl font-semibold tracking-tight text-foreground">
+                        ₦45,000.00
+                      </div>
+                      <div className="mt-1 text-[9px] text-muted-foreground/70">Just now</div>
+                      <div className="mt-4 space-y-1.5 border-t border-border pt-3">
+                        {["Customer pays", "Payment processed", "Business receives funds"].map(
+                          (step, i) => (
+                            <div
+                              key={step}
+                              className="flex items-center gap-2 text-[10px] text-muted-foreground"
+                            >
+                              <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-secondary text-[8px] font-semibold text-foreground/70">
+                                {i + 1}
+                              </span>
+                              {step}
+                            </div>
+                          ),
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-1 flex-col p-8 sm:p-10">
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/8 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
-                      <span className="h-1 w-1 rounded-full bg-primary" />
-                      In Development
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/8 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-600">
+                      <span className="h-1 w-1 rounded-full bg-amber-500" />
+                      Planned
                     </span>
                     <span className="text-[10px] font-medium text-muted-foreground">
-                      Launch: TBA
+                      Launch: Q1 2027
                     </span>
                   </div>
                   <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
-                    ePulse
+                    PulsePay Payment Collection
                   </h2>
                   <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                    ENICE Group's upcoming global financial platform, built for freelancers, remote
-                    workers, creators, and global businesses who earn, send, and spend across
-                    borders.
+                    Simple, reliable payment infrastructure that lets businesses accept and manage
+                    customer payments through a single, developer friendly integration.
                   </p>
                   <div className="mt-8 flex flex-wrap gap-3">
                     <Link
-                      to="/portfolio/epulse"
+                      to="/portfolio/payment-collection"
                       className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-                      aria-label="Learn more about ePulse"
+                      aria-label="Learn more about PulsePay Payment Collection"
                     >
                       View Details
                       <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                     </Link>
                     <a
-                      href="mailto:corporate@enicehq.com?subject=Join%20the%20ePulse%20waitlist"
+                      href="mailto:corporate@enicehq.com?subject=Join%20the%20Payment%20Collection%20waitlist"
                       className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-[12px] font-semibold text-foreground transition-colors hover:bg-secondary"
                     >
                       Join Waitlist
@@ -492,7 +499,7 @@ function PortfolioIndexPage() {
                 </div>
               </article>
 
-              {/* ── PulsePay Payment Collection ── */}
+              {/* ── ePulse ── */}
               <article
                 className="flex flex-col overflow-hidden rounded-xl border border-border bg-background"
                 style={{ boxShadow: SHADOW_CARD }}
@@ -506,58 +513,66 @@ function PortfolioIndexPage() {
                         "radial-gradient(ellipse 70% 60% at 50% 0%, rgba(37,99,235,0.10) 0%, transparent 70%)",
                     }}
                   />
-                  <div className="absolute inset-0 flex items-center justify-center p-8">
-                    <div
-                      className="w-full max-w-[220px] rounded-xl border border-border bg-background p-4"
-                      style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.06)" }}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-50 ring-1 ring-emerald-200">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-600" strokeWidth={2} />
-                        </span>
-                        <div>
-                          <div className="text-[11px] font-semibold text-foreground">
-                            Payment Received
-                          </div>
-                          <div className="text-[9px] text-muted-foreground">from a customer</div>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
+                    <div className="flex items-center gap-3">
+                      <div className="grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
+                        <Wallet className="h-7 w-7 text-primary" strokeWidth={1.5} />
+                      </div>
+                      <div className="text-left">
+                        <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                          Global Finance
+                        </div>
+                        <div className="text-xl font-bold tracking-tight text-foreground">
+                          e<span className="text-primary">Pulse</span>
                         </div>
                       </div>
-                      <div className="mt-3 font-mono text-xl font-semibold tracking-tight text-foreground">
-                        ₦45,000.00
-                      </div>
-                      <div className="mt-1 text-[9px] text-muted-foreground/70">Just now</div>
+                    </div>
+                    <div className="flex w-full max-w-xs flex-wrap justify-center gap-2">
+                      {["🇺🇸 USD", "🇬🇧 GBP", "🇪🇺 EUR", "🇳🇬 NGN"].map((c) => (
+                        <span
+                          key={c}
+                          className="rounded-md border border-border bg-background px-3 py-1 text-[11px] font-semibold text-foreground/80"
+                          style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.06)" }}
+                        >
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground/70">
+                      Multi-currency · Cross-border · Lifestyle
                     </div>
                   </div>
                 </div>
 
                 <div className="flex flex-1 flex-col p-8 sm:p-10">
                   <div className="flex items-center gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-500/20 bg-amber-500/8 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-amber-600">
-                      <span className="h-1 w-1 rounded-full bg-amber-500" />
-                      Planned
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/8 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
+                      <span className="h-1 w-1 rounded-full bg-primary" />
+                      In Development
                     </span>
                     <span className="text-[10px] font-medium text-muted-foreground">
-                      Launch: Q1 2027
+                      Launch: TBA
                     </span>
                   </div>
                   <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground">
-                    Payment Collection
+                    ePulse
                   </h2>
                   <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                    Simple, reliable payment infrastructure that lets businesses accept and manage
-                    customer payments through a single, developer friendly integration.
+                    ENICE Group's upcoming global financial platform, built for freelancers, remote
+                    workers, creators, and global businesses who earn, send, and spend across
+                    borders.
                   </p>
                   <div className="mt-8 flex flex-wrap gap-3">
                     <Link
-                      to="/portfolio/payment-collection"
+                      to="/portfolio/epulse"
                       className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-                      aria-label="Learn more about Payment Collection"
+                      aria-label="Learn more about ePulse"
                     >
                       View Details
                       <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                     </Link>
                     <a
-                      href="mailto:corporate@enicehq.com?subject=Join%20the%20Payment%20Collection%20waitlist"
+                      href="mailto:corporate@enicehq.com?subject=Join%20the%20ePulse%20waitlist"
                       className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-2.5 text-[12px] font-semibold text-foreground transition-colors hover:bg-secondary"
                     >
                       Join Waitlist
