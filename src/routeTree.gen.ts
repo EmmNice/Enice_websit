@@ -25,6 +25,7 @@ import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
 import { Route as PortfolioEpulseRouteImport } from './routes/portfolio.epulse'
+import { Route as PortfolioPaymentCollectionRouteImport } from './routes/portfolio.payment-collection'
 import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pulseassist'
 import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
 import { Route as PortfolioPulsexRouteImport } from './routes/portfolio.pulsex'
@@ -109,6 +110,12 @@ const PortfolioEpulseRoute = PortfolioEpulseRouteImport.update({
   path: '/epulse',
   getParentRoute: () => PortfolioRoute,
 } as any)
+const PortfolioPaymentCollectionRoute =
+  PortfolioPaymentCollectionRouteImport.update({
+    id: '/payment-collection',
+    path: '/payment-collection',
+    getParentRoute: () => PortfolioRoute,
+  } as any)
 const PortfolioPulseassistRoute = PortfolioPulseassistRouteImport.update({
   id: '/pulseassist',
   path: '/pulseassist',
@@ -140,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/admin/early-access': typeof AdminEarlyAccessRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
+  '/portfolio/payment-collection': typeof PortfolioPaymentCollectionRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
@@ -160,6 +168,7 @@ export interface FileRoutesByTo {
   '/admin/early-access': typeof AdminEarlyAccessRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
+  '/portfolio/payment-collection': typeof PortfolioPaymentCollectionRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
@@ -182,6 +191,7 @@ export interface FileRoutesById {
   '/admin/early-access': typeof AdminEarlyAccessRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/portfolio/epulse': typeof PortfolioEpulseRoute
+  '/portfolio/payment-collection': typeof PortfolioPaymentCollectionRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/admin/early-access'
     | '/blog/$slug'
     | '/portfolio/epulse'
+    | '/portfolio/payment-collection'
     | '/portfolio/pulseassist'
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/early-access'
     | '/blog/$slug'
     | '/portfolio/epulse'
+    | '/portfolio/payment-collection'
     | '/portfolio/pulseassist'
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
@@ -246,6 +258,7 @@ export interface FileRouteTypes {
     | '/admin/early-access'
     | '/blog/$slug'
     | '/portfolio/epulse'
+    | '/portfolio/payment-collection'
     | '/portfolio/pulseassist'
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
@@ -384,6 +397,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioEpulseRouteImport
       parentRoute: typeof PortfolioRoute
     }
+    '/portfolio/payment-collection': {
+      id: '/portfolio/payment-collection'
+      path: '/payment-collection'
+      fullPath: '/portfolio/payment-collection'
+      preLoaderRoute: typeof PortfolioPaymentCollectionRouteImport
+      parentRoute: typeof PortfolioRoute
+    }
     '/portfolio/pulseassist': {
       id: '/portfolio/pulseassist'
       path: '/pulseassist'
@@ -410,6 +430,7 @@ declare module '@tanstack/react-router' {
 
 interface PortfolioRouteChildren {
   PortfolioEpulseRoute: typeof PortfolioEpulseRoute
+  PortfolioPaymentCollectionRoute: typeof PortfolioPaymentCollectionRoute
   PortfolioPulseassistRoute: typeof PortfolioPulseassistRoute
   PortfolioPulsepayRoute: typeof PortfolioPulsepayRoute
   PortfolioPulsexRoute: typeof PortfolioPulsexRoute
@@ -418,6 +439,7 @@ interface PortfolioRouteChildren {
 
 const PortfolioRouteChildren: PortfolioRouteChildren = {
   PortfolioEpulseRoute: PortfolioEpulseRoute,
+  PortfolioPaymentCollectionRoute: PortfolioPaymentCollectionRoute,
   PortfolioPulseassistRoute: PortfolioPulseassistRoute,
   PortfolioPulsepayRoute: PortfolioPulsepayRoute,
   PortfolioPulsexRoute: PortfolioPulsexRoute,

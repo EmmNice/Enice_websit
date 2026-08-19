@@ -81,6 +81,15 @@ const MILESTONES: Milestone[] = [
     tags: ["Crypto", "Exchange", "Global"],
   },
   {
+    when: "Q1 2027",
+    quarter: "Q1 2027",
+    status: "planned",
+    product: "PulsePay",
+    title: "Payment Collection Launch",
+    body: "PulsePay Payment Collection launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
+    tags: ["Fintech", "Payments", "API"],
+  },
+  {
     when: "2027",
     quarter: "2027",
     status: "planned",
