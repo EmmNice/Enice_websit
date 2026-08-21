@@ -183,6 +183,11 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     description:
       "PulsePay Payment Collection is ENICE Group's upcoming payment infrastructure for businesses, launching Q1 2027. Accept and manage customer payments through a single, developer friendly API.",
   },
+  "/about-pulseassist-beta": {
+    title: "About the PulseAssist Beta | ENICE Group",
+    description:
+      "PulseAssist has been built and internally tested to deliver faster, more intelligent, and more consistent customer support. The September 2026 Beta opens the platform to selected early users.",
+  },
   "/roadmap": {
     title: "Product Roadmap | ENICE Group",
     description:

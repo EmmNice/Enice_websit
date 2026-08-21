@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { isPulseAssistEarlyAccessActive } from "@/lib/beta-announcement";
 
 const inputClass =
   "mt-1.5 w-full rounded-md border border-border bg-background px-3 py-2.5 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15 disabled:opacity-60 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus:ring-destructive/15";
@@ -387,6 +388,10 @@ export function PulseAssistEarlyAccessModal({
 /**
  * Single shared entry point for every PulseAssist early-access CTA on the site. Renders a
  * button that opens the modal in place — it never navigates.
+ *
+ * Tied to the same beta launch window as the announcement modal: once that window closes, this
+ * disappears from every page it's rendered on (product pages, the beta announcement, the beta
+ * detail page) without needing to touch each call site individually.
  */
 export function PulseAssistEarlyAccessButton({
   className,
@@ -398,6 +403,7 @@ export function PulseAssistEarlyAccessButton({
   showIcon?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  if (!isPulseAssistEarlyAccessActive()) return null;
   return (
     <>
       <button type="button" onClick={() => setOpen(true)} className={className}>

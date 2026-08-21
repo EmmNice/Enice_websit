@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AboutPulseassistBetaRouteImport } from './routes/about-pulseassist-beta'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DocsRouteImport } from './routes/docs'
@@ -43,6 +44,11 @@ const SplatRoute = SplatRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutPulseassistBetaRoute = AboutPulseassistBetaRouteImport.update({
+  id: '/about-pulseassist-beta',
+  path: '/about-pulseassist-beta',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ComplianceRoute = ComplianceRouteImport.update({
@@ -136,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/about-pulseassist-beta': typeof AboutPulseassistBetaRoute
   '/compliance': typeof ComplianceRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/about-pulseassist-beta': typeof AboutPulseassistBetaRoute
   '/compliance': typeof ComplianceRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
@@ -180,6 +188,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
+  '/about-pulseassist-beta': typeof AboutPulseassistBetaRoute
   '/compliance': typeof ComplianceRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/about-pulseassist-beta'
     | '/compliance'
     | '/contact'
     | '/docs'
@@ -226,6 +236,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/about-pulseassist-beta'
     | '/compliance'
     | '/contact'
     | '/docs'
@@ -247,6 +258,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
+    | '/about-pulseassist-beta'
     | '/compliance'
     | '/contact'
     | '/docs'
@@ -270,6 +282,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   AboutRoute: typeof AboutRoute
+  AboutPulseassistBetaRoute: typeof AboutPulseassistBetaRoute
   ComplianceRoute: typeof ComplianceRoute
   ContactRoute: typeof ContactRoute
   DocsRoute: typeof DocsRoute
@@ -304,6 +317,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about-pulseassist-beta': {
+      id: '/about-pulseassist-beta'
+      path: '/about-pulseassist-beta'
+      fullPath: '/about-pulseassist-beta'
+      preLoaderRoute: typeof AboutPulseassistBetaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/compliance': {
@@ -454,6 +474,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   AboutRoute: AboutRoute,
+  AboutPulseassistBetaRoute: AboutPulseassistBetaRoute,
   ComplianceRoute: ComplianceRoute,
   ContactRoute: ContactRoute,
   DocsRoute: DocsRoute,
