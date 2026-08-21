@@ -105,9 +105,9 @@ export function BetaLaunchAnnouncement() {
 
             <div className="relative px-6 pb-8 pt-9 sm:px-9 sm:pb-10 sm:pt-11">
               {/* Badge */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-400/10 px-3.5 py-1.5">
-                <Sparkles className="h-3 w-3 text-blue-300" strokeWidth={2} />
-                <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-300">
+              <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-blue-400/25 bg-blue-400/10 px-3.5 py-1.5">
+                <Sparkles className="h-3 w-3 shrink-0 text-blue-300" strokeWidth={2} />
+                <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-300">
                   PulseAssist Beta Launch
                 </span>
               </div>
