@@ -172,6 +172,11 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     description:
       "PulseX is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem.",
   },
+  "/about-pulseassist-beta": {
+    title: "About the PulseAssist Beta | ENICE Group",
+    description:
+      "PulseAssist has been built and internally tested to deliver faster, more intelligent, and more consistent customer support. The September 2026 Beta opens the platform to selected early users.",
+  },
   "/roadmap": {
     title: "Product Roadmap | ENICE Group",
     description:
