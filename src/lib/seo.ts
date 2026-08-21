@@ -95,6 +95,12 @@ export function organizationJsonLd() {
         name: "PulseX",
         description: "Global digital asset trading exchange.",
       },
+      {
+        "@type": "FinancialProduct",
+        name: "PulsePay Payment Collection",
+        description:
+          "Payment infrastructure for businesses to accept and manage customer payments.",
+      },
     ],
   };
 }
@@ -150,7 +156,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/portfolio": {
     title: "Products | ENICE Group",
     description:
-      "PulsePay, PulseAssist, ePulse, and PulseX: the products built and operated by ENICE Group.",
+      "PulsePay, PulseAssist, PulsePay Payment Collection, ePulse, and PulseX: the products built and operated by ENICE Group.",
   },
   "/portfolio/pulsepay": {
     title: "PulsePay | Virtual Payment Platform by ENICE Group",
@@ -171,6 +177,11 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     title: "PulseX | Digital Asset Platform by ENICE Group",
     description:
       "PulseX is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem.",
+  },
+  "/portfolio/payment-collection": {
+    title: "PulsePay Payment Collection | ENICE Group",
+    description:
+      "PulsePay Payment Collection is ENICE Group's upcoming payment infrastructure for businesses, launching Q1 2027. Accept and manage customer payments through a single, developer friendly API.",
   },
   "/about-pulseassist-beta": {
     title: "About the PulseAssist Beta | ENICE Group",
