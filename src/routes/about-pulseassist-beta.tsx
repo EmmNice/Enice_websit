@@ -50,9 +50,9 @@ function AboutPulseAssistBetaPage() {
           />
 
           <div className="relative mx-auto max-w-4xl px-5 py-20 sm:px-8 sm:py-28">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/25 bg-blue-400/10 px-4 py-1.5">
-              <Sparkles className="h-3 w-3 text-blue-300" strokeWidth={2} />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-300">
+            <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-blue-400/25 bg-blue-400/10 px-4 py-1.5">
+              <Sparkles className="h-3 w-3 shrink-0 text-blue-300" strokeWidth={2} />
+              <span className="whitespace-nowrap text-[9px] font-semibold uppercase tracking-[0.12em] text-blue-300 sm:text-[11px] sm:tracking-[0.2em]">
                 September 2026 · PulseAssist Beta
               </span>
             </div>
