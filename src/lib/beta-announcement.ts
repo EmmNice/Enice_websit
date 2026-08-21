@@ -4,12 +4,11 @@
  * retires the moment the announcement does.
  *
  * The cutoff is enforced here, in code, and re-evaluated against the visitor's clock on every
- * render. It does not depend on localStorage or a cookie to decide whether the announcement is
- * still current — those are only used below to remember that a given browser has already seen
- * it, so a visitor is never interrupted twice. That split matters: a visitor with storage
- * disabled, or a visitor who has never opened the site before, must still never see the
- * announcement after the deadline, and they will not, because the date check runs regardless of
- * what is or isn't in storage.
+ * render. There is deliberately no localStorage/cookie "already seen" flag: the announcement is
+ * expected to reappear on every fresh page load for as long as this window is active, and the
+ * *only* thing that permanently stops it from appearing again is the expiry date below. A
+ * visitor who dismissed it a minute ago will see it again the next time they load the site,
+ * right up until the deadline.
  *
  * To retire the announcement (and the linked CTA) immediately, for any reason: flip
  * `BETA_ANNOUNCEMENT_ENABLED` to `false`. To change the cutoff, edit `BETA_ANNOUNCEMENT_EXPIRY`.
@@ -48,10 +47,3 @@ export function isBetaAnnouncementActive(): boolean {
 export function isPulseAssistEarlyAccessActive(): boolean {
   return isBetaAnnouncementActive();
 }
-
-/**
- * localStorage key marking "this browser has already been shown the announcement". Bump the
- * version suffix (`.v1` → `.v2`) to make it reappear once for everyone after a content change,
- * without needing to touch the expiry date.
- */
-export const BETA_ANNOUNCEMENT_STORAGE_KEY = "enice.betaAnnouncement.seen.v1";
