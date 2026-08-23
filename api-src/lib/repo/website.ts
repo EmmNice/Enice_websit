@@ -855,7 +855,50 @@ const DEFAULT_SECTIONS: {
     group: "Home",
     type: "logoStrip",
     order: 40,
-    fields: { heading: "Working with", items: [] },
+    fields: {
+      heading: "Working with",
+      // The infrastructure providers, each with a self-hosted brand logo (public/partners/*.svg),
+      // so the strip is populated on a fresh install. Existing databases are seeded the same set
+      // by migration 3. An administrator can edit, reorder or remove any of these.
+      items: [
+        {
+          name: "Amazon Web Services",
+          tagline: "Cloud Infrastructure",
+          logo: "/partners/aws.svg",
+          url: "https://aws.amazon.com",
+        },
+        {
+          name: "Google Cloud",
+          tagline: "AI & Compute",
+          logo: "/partners/googlecloud.svg",
+          url: "https://cloud.google.com",
+        },
+        {
+          name: "Supabase",
+          tagline: "Database & Auth",
+          logo: "/partners/supabase.svg",
+          url: "https://supabase.com",
+        },
+        {
+          name: "Vercel",
+          tagline: "Edge Delivery",
+          logo: "/partners/vercel.svg",
+          url: "https://vercel.com",
+        },
+        {
+          name: "AWS Activate",
+          tagline: "Startup Program",
+          logo: "/partners/aws-activate.svg",
+          url: "https://aws.amazon.com/activate/",
+        },
+        {
+          name: "Resend",
+          tagline: "Transactional Email",
+          logo: "/partners/resend.svg",
+          url: "https://resend.com",
+        },
+      ],
+    },
   },
   {
     key: "home.faq",

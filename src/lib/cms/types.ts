@@ -449,6 +449,7 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
         max: 24,
         of: [
           { key: "name", label: "Name", type: "text", required: true },
+          { key: "tagline", label: "Tagline (sub-line)", type: "text" },
           { key: "logo", label: "Logo", type: "image" },
           { key: "url", label: "Website", type: "url" },
         ],
@@ -832,6 +833,7 @@ export type AiChangeKind = (typeof AI_CHANGE_KINDS)[number];
 export const AI_CHANGE_STATUSES = [
   "queued",
   "analyzing",
+  "answered",
   "proposed",
   "changes_requested",
   "approved",
@@ -852,6 +854,11 @@ export const AI_CHANGE_STATUS_META: Record<
     label: "Analysing",
     tone: "info",
     description: "Inspecting the website structure and design system.",
+  },
+  answered: {
+    label: "Answered",
+    tone: "neutral",
+    description: "A question the AI answered. Nothing was changed.",
   },
   proposed: {
     label: "Awaiting review",

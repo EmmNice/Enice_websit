@@ -201,6 +201,7 @@ var init_types = __esm({
             max: 24,
             of: [
               { key: "name", label: "Name", type: "text", required: true },
+              { key: "tagline", label: "Tagline (sub-line)", type: "text" },
               { key: "logo", label: "Logo", type: "image" },
               { key: "url", label: "Website", type: "url" }
             ]
@@ -372,6 +373,7 @@ var init_types = __esm({
     AI_CHANGE_STATUSES = [
       "queued",
       "analyzing",
+      "answered",
       "proposed",
       "changes_requested",
       "approved",
@@ -2964,6 +2966,37 @@ CREATE INDEX IF NOT EXISTS knowledge_entries_status_idx
   ON knowledge_entries (status, updated_at DESC);
 CREATE INDEX IF NOT EXISTS knowledge_entries_recent_idx
   ON knowledge_entries (updated_at DESC);
+`
+        )
+      },
+      {
+        id: 3,
+        name: "seed_partner_logos",
+        sql: (
+          /* sql */
+          `
+-- Populate the homepage partners strip with the infrastructure providers, each with a
+-- self-hosted brand logo (public/partners/*.svg). Before this, the strip's default content was
+-- empty, so once the homepage was wired to the CMS it showed only whatever an administrator had
+-- typed. This seeds the providers so the strip looks complete out of the box, while leaving any
+-- partners the administrator already added in place \u2014 their entries are kept, the providers are
+-- prepended. Guarded on the AWS entry so re-running (or an operator who already added AWS) is a
+-- no-op rather than creating duplicates.
+UPDATE site_sections
+SET fields = jsonb_set(
+  COALESCE(fields, '{}'::jsonb),
+  '{items}',
+  '[
+    {"name":"Amazon Web Services","tagline":"Cloud Infrastructure","logo":"/partners/aws.svg","url":"https://aws.amazon.com"},
+    {"name":"Google Cloud","tagline":"AI & Compute","logo":"/partners/googlecloud.svg","url":"https://cloud.google.com"},
+    {"name":"Supabase","tagline":"Database & Auth","logo":"/partners/supabase.svg","url":"https://supabase.com"},
+    {"name":"Vercel","tagline":"Edge Delivery","logo":"/partners/vercel.svg","url":"https://vercel.com"},
+    {"name":"AWS Activate","tagline":"Startup Program","logo":"/partners/aws-activate.svg","url":"https://aws.amazon.com/activate/"},
+    {"name":"Resend","tagline":"Transactional Email","logo":"/partners/resend.svg","url":"https://resend.com"}
+  ]'::jsonb || COALESCE(fields->'items', '[]'::jsonb)
+)
+WHERE key = 'home.partners'
+  AND NOT (COALESCE(fields->'items', '[]'::jsonb) @> '[{"name":"Amazon Web Services"}]'::jsonb);
 `
         )
       }
@@ -86562,7 +86595,50 @@ var init_website = __esm({
         group: "Home",
         type: "logoStrip",
         order: 40,
-        fields: { heading: "Working with", items: [] }
+        fields: {
+          heading: "Working with",
+          // The infrastructure providers, each with a self-hosted brand logo (public/partners/*.svg),
+          // so the strip is populated on a fresh install. Existing databases are seeded the same set
+          // by migration 3. An administrator can edit, reorder or remove any of these.
+          items: [
+            {
+              name: "Amazon Web Services",
+              tagline: "Cloud Infrastructure",
+              logo: "/partners/aws.svg",
+              url: "https://aws.amazon.com"
+            },
+            {
+              name: "Google Cloud",
+              tagline: "AI & Compute",
+              logo: "/partners/googlecloud.svg",
+              url: "https://cloud.google.com"
+            },
+            {
+              name: "Supabase",
+              tagline: "Database & Auth",
+              logo: "/partners/supabase.svg",
+              url: "https://supabase.com"
+            },
+            {
+              name: "Vercel",
+              tagline: "Edge Delivery",
+              logo: "/partners/vercel.svg",
+              url: "https://vercel.com"
+            },
+            {
+              name: "AWS Activate",
+              tagline: "Startup Program",
+              logo: "/partners/aws-activate.svg",
+              url: "https://aws.amazon.com/activate/"
+            },
+            {
+              name: "Resend",
+              tagline: "Transactional Email",
+              logo: "/partners/resend.svg",
+              url: "https://resend.com"
+            }
+          ]
+        }
       },
       {
         key: "home.faq",
@@ -91553,11 +91629,19 @@ ARCHITECTURE
 ${websiteContext}
 
 CLASSIFY THE REQUEST as exactly one of:
-- "content": achievable by editing data the Website Manager already owns \u2014 the copy or images in
-  an existing section, its visibility, a new page assembled from existing section types, or
-  navigation and footer entries. Prefer this whenever it is possible.
-- "code": genuinely requires source changes \u2014 a new section *type*, a new interactive component,
-  a change to how something is rendered, or anything touching the build or API.
+- "answer": the input is a question, a greeting, or a request for information rather than an
+  instruction to change something \u2014 for example "what can you do?", "what sections exist?",
+  "how do I add a partner?". Reply conversationally; do not invent a change. Use the site context
+  above to be specific and accurate.
+- "content": an actionable change achievable by editing data the Website Manager already owns \u2014
+  the copy or images in an existing section, its visibility, a new page assembled from existing
+  section types, or navigation and footer entries. Prefer this over "code" whenever possible.
+- "code": an actionable change that genuinely requires source changes \u2014 a new section *type*, a
+  new interactive component, a change to how something is rendered, or anything touching the
+  build or API.
+
+When in doubt between "answer" and a change, prefer "answer" and explain what you could change and
+how to ask for it \u2014 never fail or return an empty proposal.
 
 RULES
 - Only use section types and field names listed above. Never invent one.
@@ -91566,7 +91650,15 @@ RULES
 - Never propose changes to authentication, billing, secrets or the admin panel itself.
 - If the request is ambiguous, say so in "summary" and propose the most conservative reading.
 
-RESPOND WITH JSON ONLY. No markdown fences, no commentary. Shape:
+RESPOND WITH JSON ONLY. No markdown fences, no commentary.
+
+For a question, use this shape:
+{
+  "kind": "answer",
+  "answer": "A helpful, plain-language reply. Plain sentences, no markdown."
+}
+
+For an actionable change, use this shape:
 {
   "kind": "content" | "code",
   "summary": "2-4 sentences: what you understood and what you will change.",
@@ -91636,19 +91728,34 @@ async function createChangeRequest(rawPrompt, actor) {
     ];
     const provider = createAIProvider();
     const response = await provider.complete(messages2);
-    const parsed = parseProposal(response.text);
-    await sql`
-      UPDATE ai_change_requests SET
-        kind = ${parsed.kind},
-        status = ${"proposed"},
-        summary = ${parsed.summary},
-        plan = ${json(parsed.plan)},
-        content_edits = ${json(parsed.contentEdits)},
-        code_edits = ${json(parsed.codeEdits)},
-        checks = ${json(initialChecks(parsed.kind))},
-        updated_at = now()
-      WHERE id = ${id}
-    `;
+    const parsed = parseResponse(response.text);
+    if (parsed.type === "answer") {
+      await sql`
+        UPDATE ai_change_requests SET
+          status = ${"answered"},
+          summary = ${parsed.answer},
+          plan = ${json([])},
+          content_edits = ${json([])},
+          code_edits = ${json([])},
+          checks = ${json([])},
+          updated_at = now()
+        WHERE id = ${id}
+      `;
+    } else {
+      const proposal = parsed.proposal;
+      await sql`
+        UPDATE ai_change_requests SET
+          kind = ${proposal.kind},
+          status = ${"proposed"},
+          summary = ${proposal.summary},
+          plan = ${json(proposal.plan)},
+          content_edits = ${json(proposal.contentEdits)},
+          code_edits = ${json(proposal.codeEdits)},
+          checks = ${json(initialChecks(proposal.kind))},
+          updated_at = now()
+        WHERE id = ${id}
+      `;
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[cms] AI change request ${id} failed:`, error);
@@ -91707,17 +91814,24 @@ function initialChecks(kind) {
     }
   ];
 }
-function parseProposal(text) {
+function parseResponse(text) {
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
-  if (start === -1 || end <= start) {
-    throw new Error("The AI did not return a usable proposal. Try rephrasing the request.");
+  let raw = null;
+  if (start !== -1 && end > start) {
+    try {
+      raw = JSON.parse(text.slice(start, end + 1));
+    } catch {
+      raw = null;
+    }
   }
-  let raw;
-  try {
-    raw = JSON.parse(text.slice(start, end + 1));
-  } catch {
-    throw new Error("The AI's proposal could not be read. Try rephrasing the request.");
+  if (!raw || typeof raw !== "object") {
+    return { type: "answer", answer: sanitizeMultilineText(text, 4e3) || "\u2026" };
+  }
+  const isAnswer = raw.kind === "answer" || typeof raw.answer === "string" && !raw.plan && !raw.contentEdits && !raw.codeEdits;
+  if (isAnswer) {
+    const answer = sanitizeMultilineText(typeof raw.answer === "string" ? raw.answer : text, 4e3);
+    return { type: "answer", answer: answer || "\u2026" };
   }
   const kind = raw.kind === "code" ? "code" : "content";
   const plan = (Array.isArray(raw.plan) ? raw.plan.slice(0, 12) : []).map((step) => {
@@ -91744,11 +91858,14 @@ function parseProposal(text) {
     };
   });
   return {
-    kind,
-    summary: sanitizeMultilineText(raw.summary, 2e3) || "No summary was provided.",
-    plan,
-    contentEdits,
-    codeEdits
+    type: "proposal",
+    proposal: {
+      kind,
+      summary: sanitizeMultilineText(raw.summary, 2e3) || "No summary was provided.",
+      plan,
+      contentEdits,
+      codeEdits
+    }
   };
 }
 function normalizeContentEdit(input) {
