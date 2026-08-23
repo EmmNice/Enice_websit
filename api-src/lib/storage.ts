@@ -493,6 +493,70 @@ async function deleteS3Object(storageKey: string): Promise<void> {
 }
 
 /**
+ * Reads an object's bytes back from the bucket, signing with an `Authorization` header.
+ *
+ * Uploads go straight from the browser to storage, so the bytes never pass through a function
+ * on the way in. When the server needs them afterwards — to extract the text of an uploaded PDF
+ * for the knowledge base — it fetches them here with a signed GET, so the read works whether or
+ * not the bucket is publicly readable.
+ */
+async function getS3Object(storageKey: string): Promise<Uint8Array> {
+  const config = storageConfig();
+  if (!config) throw new StorageNotConfiguredError();
+
+  const host = hostFor(config);
+  const canonicalUri = canonicalPathFor(config, storageKey);
+  const { amzDate, dateStamp } = amzDates();
+  const payloadHash = sha256Hex("");
+
+  const canonicalHeaders = `host:${host}\nx-amz-content-sha256:${payloadHash}\nx-amz-date:${amzDate}\n`;
+  const signedHeaders = "host;x-amz-content-sha256;x-amz-date";
+  const canonicalRequest = [
+    "GET",
+    canonicalUri,
+    "",
+    canonicalHeaders,
+    signedHeaders,
+    payloadHash,
+  ].join("\n");
+
+  const credentialScope = `${dateStamp}/${config.region}/s3/aws4_request`;
+  const stringToSign = [
+    "AWS4-HMAC-SHA256",
+    amzDate,
+    credentialScope,
+    sha256Hex(canonicalRequest),
+  ].join("\n");
+
+  const signature = createHmac(
+    "sha256",
+    signingKey(config.secretAccessKey, dateStamp, config.region, "s3"),
+  )
+    .update(stringToSign, "utf8")
+    .digest("hex");
+
+  const response = await fetch(`https://${host}${canonicalUri}`, {
+    headers: {
+      Host: host,
+      "x-amz-content-sha256": payloadHash,
+      "x-amz-date": amzDate,
+      Authorization:
+        `AWS4-HMAC-SHA256 Credential=${config.accessKeyId}/${credentialScope}, ` +
+        `SignedHeaders=${signedHeaders}, Signature=${signature}`,
+    },
+  });
+
+  if (!response.ok) {
+    const detail = await response.text().catch(() => response.statusText);
+    throw new Error(
+      `Object storage refused the read (${response.status}): ${detail.slice(0, 300)}`,
+    );
+  }
+
+  return new Uint8Array(await response.arrayBuffer());
+}
+
+/**
  * Confirms an object exists and reports its size.
  *
  * Called after a presigned upload so the recorded size is the bucket's own figure rather than
@@ -660,6 +724,18 @@ async function headBlobObject(storageKey: string): Promise<HeadResult> {
   }
 }
 
+async function getBlobObject(storageKey: string): Promise<Uint8Array> {
+  const config = requireBlobConfig();
+  // `head` returns a `downloadUrl` that carries its own access, so a private store is readable
+  // here without exposing a public URL.
+  const meta = await head(storageKey, blobCredentials(config));
+  const response = await fetch(meta.downloadUrl ?? meta.url);
+  if (!response.ok) {
+    throw new Error(`Blob refused the read (${response.status}).`);
+  }
+  return new Uint8Array(await response.arrayBuffer());
+}
+
 // ─── Backend dispatch ────────────────────────────────────────────────────────
 
 /**
@@ -714,6 +790,24 @@ export async function headObject(storageKey: string): Promise<HeadResult> {
       return headS3Object(storageKey);
     case "blob":
       return headBlobObject(storageKey);
+    default:
+      throw new StorageNotConfiguredError();
+  }
+}
+
+/**
+ * Reads an object's raw bytes back from storage.
+ *
+ * Used after a browser-direct upload, when the server needs the content it never saw — extracting
+ * the text of an uploaded PDF for the knowledge base. Works regardless of backend or public
+ * readability, because both paths authenticate the read.
+ */
+export async function getObject(storageKey: string): Promise<Uint8Array> {
+  switch (mediaBackend()) {
+    case "s3":
+      return getS3Object(storageKey);
+    case "blob":
+      return getBlobObject(storageKey);
     default:
       throw new StorageNotConfiguredError();
   }

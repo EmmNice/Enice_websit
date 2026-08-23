@@ -165,6 +165,44 @@ request ─▶ AI drafts a proposal ─▶ review ─▶ approve ─▶ apply (c
 
 ---
 
+## Assistant knowledge base
+
+The **public** website chatbot (the widget on the marketing site, `POST /api/chat`) answers from a
+static persona prompt plus whatever is curated here, under **Assistant knowledge** in the sidebar.
+This is how the chatbot is "trained" without a code change: add a fact, and the assistant can use
+it on the next question.
+
+Two kinds of entry, one table:
+
+- **Notes** — typed directly. A title and the facts, in plain sentences.
+- **PDFs** — uploaded, with the text extracted server-side. The document's bytes go straight to
+  object storage (the same presign → browser-upload → confirm path as the media library, so a
+  25 MB PDF never passes through a function); the server then reads it back once, extracts the
+  text, and stores that. Only the text is what the assistant reads. A scanned PDF with no text
+  layer is rejected with an explanation rather than stored empty.
+
+Each entry is `active` or `disabled`; only `active` entries are ever shown to the assistant, so a
+fact can be parked without deleting it.
+
+**How retrieval works.** On each visitor message, the chat handler runs a Postgres full-text search
+(`websearch_to_tsquery` over a `to_tsvector` gin index — the same mechanism content search uses, no
+extension required) and injects the best-matching entries into the system prompt under a
+`CURATED KNOWLEDGE` heading it is told to treat as authoritative. When a message matches nothing
+lexically, the most recent active entries are used, so the assistant is always working from curated
+facts. Retrieval is best-effort: if the database is unreachable the widget still answers from the
+static prompt, exactly as before.
+
+Deliberately **not** vector embeddings: that would need `CREATE EXTENSION vector` (which managed
+Postgres may refuse) and an embedding API call per write and per query. For a curated set of company
+facts, native full-text search is simpler, cheaper, and enough. `retrieveForChat` is the single seam
+to change if that ever stops being true.
+
+Requires `DATABASE_URL`. PDF upload additionally requires media storage (Vercel Blob or
+`MEDIA_S3_*`); typed notes work with only the database. Managing the base needs the
+`ai.knowledge.read` / `ai.knowledge.write` permissions (Owner and Administrator by default).
+
+---
+
 ## Architecture notes
 
 - **Shared model** (`src/lib/cms/`) is isomorphic — imported by the browser, the serverless

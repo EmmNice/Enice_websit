@@ -82,6 +82,10 @@ export const PERMISSIONS = [
   "ai.approve",
   "ai.deploy",
 
+  // AI assistant knowledge base (what the public chatbot is trained on).
+  "ai.knowledge.read",
+  "ai.knowledge.write",
+
   // Administration.
   "admins.read",
   "admins.write",
@@ -125,6 +129,12 @@ export const PERMISSION_META: Record<Permission, PermissionMeta> = {
   "ai.request": { label: "Ask the AI for website changes", group: "AI" },
   "ai.approve": { label: "Approve AI proposals", group: "AI", sensitive: true },
   "ai.deploy": { label: "Deploy approved code changes", group: "AI", sensitive: true },
+  "ai.knowledge.read": { label: "View the assistant knowledge base", group: "AI" },
+  "ai.knowledge.write": {
+    label: "Edit what the assistant knows (incl. uploading PDFs)",
+    group: "AI",
+    sensitive: true,
+  },
 
   "admins.read": { label: "View administrators", group: "Administration" },
   "admins.write": {
@@ -167,6 +177,8 @@ export const ROLE_PERMISSIONS: Record<AdminRole, readonly Permission[]> = {
     "ai.read",
     "ai.request",
     "ai.approve",
+    "ai.knowledge.read",
+    "ai.knowledge.write",
     "admins.read",
     "activity.read",
   ],

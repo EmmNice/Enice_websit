@@ -26,6 +26,8 @@ import type {
   ContentStatus,
   ContentSummary,
   DashboardSnapshot,
+  KnowledgeEntry,
+  KnowledgeStatus,
   ManagedPage,
   MediaAsset,
   SearchHit,
@@ -673,3 +675,91 @@ export const ai = {
   openPullRequest: (id: string) =>
     post<{ request: AiChangeRequest }>(`/ai/requests/${id}/pull-request`),
 };
+
+// ─── AI assistant knowledge base ─────────────────────────────────────────────
+
+export interface KnowledgeStats {
+  total: number;
+  active: number;
+}
+
+export const knowledge = {
+  list: (
+    params: { search?: string; status?: KnowledgeStatus; limit?: number; offset?: number } = {},
+  ) =>
+    get<{
+      entries: KnowledgeEntry[];
+      total: number;
+      stats: KnowledgeStats;
+      storageConfigured: boolean;
+    }>(`/knowledge${query({ ...params })}`),
+
+  read: (id: string) => get<{ entry: KnowledgeEntry }>(`/knowledge/${id}`),
+
+  createNote: (input: { title: string; body: string; tags?: string[] }) =>
+    post<{ entry: KnowledgeEntry }>("/knowledge", input),
+
+  update: (
+    id: string,
+    input: { title?: string; body?: string; tags?: string[]; status?: KnowledgeStatus },
+  ) => patch<{ entry: KnowledgeEntry }>(`/knowledge/${id}`, input),
+
+  remove: (id: string) => remove<{ deleted: boolean; id: string }>(`/knowledge/${id}`),
+};
+
+/**
+ * Adds a PDF to the knowledge base end to end: sign an upload, PUT the bytes straight to storage,
+ * then ask the server to extract the text and store it as an entry.
+ *
+ * Mirrors `uploadFile`, but the file never becomes a media-library asset — it exists only to be
+ * read once for its text. Extraction can take a moment for a large document, so the ingest call
+ * is given a longer timeout than a normal request.
+ */
+export async function uploadKnowledgePdf(
+  file: File,
+  options: { title?: string; onProgress?: (fraction: number) => void } = {},
+): Promise<{ entry: KnowledgeEntry; pages: number; truncated: boolean }> {
+  const { upload } = await post<{ upload: PresignedUpload }>("/knowledge/upload-url", {
+    filename: file.name,
+    mimeType: file.type || "application/pdf",
+    sizeBytes: file.size,
+  });
+
+  await new Promise<void>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", upload.uploadUrl, true);
+    for (const [name, value] of Object.entries(upload.headers)) xhr.setRequestHeader(name, value);
+
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) options.onProgress?.(event.loaded / event.total);
+    };
+    xhr.onload = () =>
+      xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(
+            new CmsError(
+              xhr.status,
+              `Storage rejected the upload (${xhr.status}). Check the bucket's CORS policy allows PUT from this origin.`,
+              "upload_failed",
+            ),
+          );
+    xhr.onerror = () =>
+      reject(
+        new CmsError(
+          0,
+          "The upload failed. This is usually the bucket's CORS policy — it must allow PUT from this origin.",
+          "upload_failed",
+        ),
+      );
+    xhr.onabort = () => reject(new CmsError(0, "The upload was cancelled.", "upload_aborted"));
+    xhr.send(file);
+  });
+
+  // Extraction reads the whole document server-side, so allow well beyond the default timeout.
+  return request<{ entry: KnowledgeEntry; pages: number; truncated: boolean }>(
+    "POST",
+    "/knowledge/ingest",
+    { storageKey: upload.storageKey, filename: file.name, title: options.title },
+    { timeoutMs: 120_000 },
+  );
+}

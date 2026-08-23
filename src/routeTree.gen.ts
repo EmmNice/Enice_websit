@@ -26,6 +26,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminAiRouteImport } from './routes/admin/ai'
 import { Route as AdminEarlyAccessRouteImport } from './routes/admin/early-access'
 import { Route as AdminInviteRouteImport } from './routes/admin/invite'
+import { Route as AdminKnowledgeRouteImport } from './routes/admin/knowledge'
 import { Route as AdminMediaRouteImport } from './routes/admin/media'
 import { Route as AnnouncementsIndexRouteImport } from './routes/announcements.index'
 import { Route as AnnouncementsSlugRouteImport } from './routes/announcements.$slug'
@@ -140,6 +141,11 @@ const AdminEarlyAccessRoute = AdminEarlyAccessRouteImport.update({
 const AdminInviteRoute = AdminInviteRouteImport.update({
   id: '/invite',
   path: '/invite',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminMediaRoute = AdminMediaRouteImport.update({
@@ -317,6 +323,7 @@ export interface FileRoutesByFullPath {
   '/admin/ai': typeof AdminAiRoute
   '/admin/early-access': typeof AdminEarlyAccessRoute
   '/admin/invite': typeof AdminInviteRoute
+  '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/media': typeof AdminMediaRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -364,6 +371,7 @@ export interface FileRoutesByTo {
   '/admin/ai': typeof AdminAiRoute
   '/admin/early-access': typeof AdminEarlyAccessRoute
   '/admin/invite': typeof AdminInviteRoute
+  '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/media': typeof AdminMediaRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -414,6 +422,7 @@ export interface FileRoutesById {
   '/admin/ai': typeof AdminAiRoute
   '/admin/early-access': typeof AdminEarlyAccessRoute
   '/admin/invite': typeof AdminInviteRoute
+  '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/media': typeof AdminMediaRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
@@ -465,6 +474,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/early-access'
     | '/admin/invite'
+    | '/admin/knowledge'
     | '/admin/media'
     | '/announcements/$slug'
     | '/blog/$slug'
@@ -512,6 +522,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/early-access'
     | '/admin/invite'
+    | '/admin/knowledge'
     | '/admin/media'
     | '/announcements/$slug'
     | '/blog/$slug'
@@ -561,6 +572,7 @@ export interface FileRouteTypes {
     | '/admin/ai'
     | '/admin/early-access'
     | '/admin/invite'
+    | '/admin/knowledge'
     | '/admin/media'
     | '/announcements/$slug'
     | '/blog/$slug'
@@ -735,6 +747,13 @@ declare module '@tanstack/react-router' {
       path: '/invite'
       fullPath: '/admin/invite'
       preLoaderRoute: typeof AdminInviteRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/knowledge': {
+      id: '/admin/knowledge'
+      path: '/knowledge'
+      fullPath: '/admin/knowledge'
+      preLoaderRoute: typeof AdminKnowledgeRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/media': {
@@ -954,6 +973,7 @@ interface AdminRouteChildren {
   AdminAiRoute: typeof AdminAiRoute
   AdminEarlyAccessRoute: typeof AdminEarlyAccessRoute
   AdminInviteRoute: typeof AdminInviteRoute
+  AdminKnowledgeRoute: typeof AdminKnowledgeRoute
   AdminMediaRoute: typeof AdminMediaRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminAdministrationActivityRoute: typeof AdminAdministrationActivityRoute
@@ -979,6 +999,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAiRoute: AdminAiRoute,
   AdminEarlyAccessRoute: AdminEarlyAccessRoute,
   AdminInviteRoute: AdminInviteRoute,
+  AdminKnowledgeRoute: AdminKnowledgeRoute,
   AdminMediaRoute: AdminMediaRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminAdministrationActivityRoute: AdminAdministrationActivityRoute,

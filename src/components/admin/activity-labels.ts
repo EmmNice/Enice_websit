@@ -59,6 +59,10 @@ export const ACTIVITY_LABELS: Record<ActivityAction, string> = {
   "ai.rejected": "rejected the AI change",
   "ai.applied": "applied the AI change",
   "ai.deployed": "opened a pull request for",
+
+  "knowledge.created": "added to the assistant knowledge base",
+  "knowledge.updated": "edited in the assistant knowledge base",
+  "knowledge.deleted": "removed from the assistant knowledge base",
 };
 
 /**
@@ -123,6 +127,9 @@ export const ACTIVITY_FILTER_GROUPS: { label: string; actions: ActivityAction[] 
       "ai.rejected",
       "ai.applied",
       "ai.deployed",
+      "knowledge.created",
+      "knowledge.updated",
+      "knowledge.deleted",
     ],
   },
 ];
