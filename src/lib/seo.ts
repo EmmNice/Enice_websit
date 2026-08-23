@@ -198,6 +198,16 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     description:
       "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PulseAssist, and the rest of our platform.",
   },
+  "/news/": {
+    title: "News and Changelog | ENICE Group",
+    description:
+      "Announcements, new services, partnerships, milestones, and platform updates from ENICE Group.",
+  },
+  "/announcements/": {
+    title: "Announcements | ENICE Group",
+    description:
+      "Company announcements, product launches, new services, partnerships and events from ENICE Group.",
+  },
   "/docs": {
     title: "API Documentation · ENICE Group",
     description:

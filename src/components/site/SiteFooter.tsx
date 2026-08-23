@@ -50,7 +50,9 @@ const FOOTER_COLS = [
   {
     heading: "Updates",
     links: [
-      { label: "Blog & Announcements", to: "/blog/" },
+      { label: "Blog", to: "/blog/" },
+      { label: "News & Changelog", to: "/news/" },
+      { label: "Announcements", to: "/announcements/" },
       { label: "Roadmap", to: "/roadmap" },
       { label: "System Status", to: "/status" },
     ],

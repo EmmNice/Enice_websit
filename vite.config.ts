@@ -40,6 +40,20 @@ const API_ROUTES: Record<string, string> = {
   "/api/ping": "/api-src/ping.ts",
 };
 
+/**
+ * Endpoints that own a whole path prefix and route internally.
+ *
+ * The Website Manager's API is two functions serving ~60 paths between them (see
+ * `api-src/lib/router.ts` for why). In production `vercel.json` rewrites the prefix onto the
+ * function; here the handler is mounted on the prefix and Vite strips it from `req.url`, which
+ * `resolveRequestPath` then reads. Unlike API_ROUTES these must match sub-paths, not just an
+ * exact hit.
+ */
+const API_PREFIX_ROUTES: Record<string, string> = {
+  "/api/cms": "/api-src/cms.ts",
+  "/api/site": "/api-src/site.ts",
+};
+
 const MAX_BODY_BYTES = 100 * 1024;
 
 async function readBody(req: IncomingMessage): Promise<string | undefined> {
@@ -76,11 +90,12 @@ function apiBridgePlugin(): Plugin {
   return {
     name: "enice-dev-api-bridge",
     configureServer(server: ViteDevServer) {
-      for (const [route, modulePath] of Object.entries(API_ROUTES)) {
+      const mount = (route: string, modulePath: string, exactOnly: boolean) => {
         server.middlewares.use(route, async (req, res, next) => {
-          // Only handle an exact match; anything deeper falls through to the SPA.
+          // Exact-match endpoints let anything deeper fall through to the SPA. Prefix endpoints
+          // claim the whole subtree and do their own routing.
           const path = (req.url ?? "/").split("?")[0];
-          if (path !== "/" && path !== "") return next();
+          if (exactOnly && path !== "/" && path !== "") return next();
 
           const response = decorateResponse(res);
 
@@ -125,7 +140,13 @@ function apiBridgePlugin(): Plugin {
             }
           }
         });
-      }
+      };
+
+      // Prefix routes are mounted first: `/api/cms` must claim `/api/cms/content` before any
+      // exact-match middleware gets a chance to reject it.
+      for (const [route, modulePath] of Object.entries(API_PREFIX_ROUTES))
+        mount(route, modulePath, false);
+      for (const [route, modulePath] of Object.entries(API_ROUTES)) mount(route, modulePath, true);
     },
   };
 }
@@ -144,9 +165,7 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: true,
     watch: {
-      // Exclude the Sanity studio directory from Vite file-watching
-      // to avoid ENOSPC (too many file watchers) errors.
-      ignored: ["**/studio-enice-group/**", "**/.cache/**"],
+      ignored: ["**/.cache/**", "**/.verify/**"],
     },
   },
   build: {
@@ -163,9 +182,6 @@ export default defineConfig({
           if (!id.includes("node_modules")) return;
           if (/node_modules[\\/](react|react-dom|scheduler)[\\/]/.test(id)) return "vendor-react";
           if (/node_modules[\\/]@tanstack[\\/]/.test(id)) return "vendor-tanstack";
-          if (/node_modules[\\/](@sanity|@portabletext|groq|get-it)[\\/]/.test(id)) {
-            return "vendor-sanity";
-          }
           if (/node_modules[\\/]lucide-react[\\/]/.test(id)) return "vendor-icons";
           if (/node_modules[\\/]@radix-ui[\\/]/.test(id)) return "vendor-radix";
           return undefined;

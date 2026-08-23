@@ -8,7 +8,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://cdn.sanity.io; connect-src 'self' https://*.apicdn.sanity.io https://*.api.sanity.io; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' https:; connect-src 'self' https:; frame-src https://www.youtube-nocookie.com https://player.vimeo.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
         },
         {
           "key": "Strict-Transport-Security",
@@ -48,5 +48,13 @@
       ]
     }
   ],
-  "rewrites": [{ "source": "/((?!api/)[^.]*)", "destination": "/index.html" }]
+  "rewrites": [
+    {
+      "comment": "The Website Manager's API is two functions that route internally, so the sub-path is passed as the namespaced `__route` query parameter (namespaced because endpoints may take a `path` parameter of their own). These must precede the SPA rewrite: Vercel applies rewrites in order.",
+      "source": "/api/cms/:path*",
+      "destination": "/api/cms?__route=:path*"
+    },
+    { "source": "/api/site/:path*", "destination": "/api/site?__route=:path*" },
+    { "source": "/((?!api/)[^.]*)", "destination": "/index.html" }
+  ]
 }

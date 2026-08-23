@@ -1,80 +1,67 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { SITE_URL } from "@/lib/site";
-
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Rss } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { sanityClient, ALL_POSTS_QUERY } from "@/lib/sanity";
 import { pageHead } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
+import {
+  categoryBadgeClasses,
+  fetchContentList,
+  formatPublishedDate,
+  type PublicSummary,
+} from "@/lib/cms/public-client";
 
-interface Post {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  category: string;
-  publishedAt: string;
-  excerpt: string;
-  mainImageUrl?: string;
-}
-
-const CATEGORY_STYLES: Record<string, string> = {
-  BLOG: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  CHANGELOG: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  UPDATE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  ANNOUNCEMENT: "bg-violet-500/10 text-violet-400 border-violet-500/20",
-  PRODUCT: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-};
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-function PostCard({ post }: { post: Post }) {
-  const tag = CATEGORY_STYLES[post.category] ?? "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
-
+/**
+ * The blog index.
+ *
+ * Reads from `/api/site/content/blog` — the ENICE Website Manager's own public API — rather than
+ * from an external CMS. Same-origin, so it needs no CSP allowance, and edge-cached, so the common
+ * case never reaches the database.
+ */
+function PostCard({ post }: { post: PublicSummary }) {
   return (
     <Link
       to="/blog/$slug"
-      params={{ slug: post.slug.current }}
+      params={{ slug: post.slug }}
       className="group flex flex-col rounded-xl border border-white/[0.07] bg-white/[0.03] p-6 transition-all duration-200 hover:border-blue-500/30 hover:bg-white/[0.05]"
     >
-      {/* Cover image */}
-      {post.mainImageUrl && (
+      {post.coverImageUrl && (
         <div className="mb-5 overflow-hidden rounded-lg">
           <img
-            src={post.mainImageUrl}
+            src={post.coverImageUrl}
             alt={post.title}
+            loading="lazy"
+            decoding="async"
             className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </div>
       )}
 
-      {/* Category tag */}
-      <span
-        className={`mb-3 inline-flex w-fit items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-[0.18em] ${tag}`}
-      >
-        {post.category}
-      </span>
+      {post.category && (
+        <span
+          className={`mb-3 inline-flex w-fit items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-[0.18em] ${categoryBadgeClasses(post.category)}`}
+        >
+          {post.category.toUpperCase()}
+        </span>
+      )}
 
-      {/* Title */}
-      <h2 className="mb-2 text-base font-bold leading-snug text-white transition-colors group-hover:text-blue-400">
+      <h2 className="mb-2 text-base leading-snug font-bold text-white transition-colors group-hover:text-blue-400">
         {post.title}
       </h2>
 
-      {/* Date */}
-      <p className="mb-3 text-[11px] font-medium tracking-wide text-zinc-500">
-        {formatDate(post.publishedAt)}
+      <p className="mb-3 flex items-center gap-2 text-[11px] font-medium tracking-wide text-zinc-500">
+        <span>{formatPublishedDate(post.publishedAt)}</span>
+        {post.readingMinutes > 0 && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span>{post.readingMinutes} min read</span>
+          </>
+        )}
       </p>
 
-      {/* Excerpt — 2 lines */}
       <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{post.excerpt}</p>
 
-      {/* Read more */}
       <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-blue-400 opacity-0 transition-opacity group-hover:opacity-100">
         Read article <ArrowUpRight className="h-3.5 w-3.5" />
       </div>
@@ -97,28 +84,35 @@ function EmptyState() {
 }
 
 function BlogPage() {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<PublicSummary[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState<string>("ALL");
+  const [activeCategory, setActiveCategory] = useState("ALL");
 
   useEffect(() => {
-    sanityClient
-      .fetch<Post[]>(ALL_POSTS_QUERY)
-      .then(setPosts)
-      .catch(console.error)
-      .finally(() => setLoading(false));
+    let cancelled = false;
+
+    fetchContentList("blog", { limit: 60 }).then((result) => {
+      // Guarded so a navigation away mid-flight cannot set state on an unmounted component.
+      if (cancelled) return;
+      setPosts(result.items);
+      setCategories(result.categories);
+      setLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const categories = ["ALL", ...Array.from(new Set(posts.map((p) => p.category)))];
   const filtered =
-    activeCategory === "ALL" ? posts : posts.filter((p) => p.category === activeCategory);
+    activeCategory === "ALL" ? posts : posts.filter((post) => post.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white">
       <SiteHeader />
 
-      {/* Hero */}
-      <section className="border-b border-white/[0.06] bg-gradient-to-b from-[#0f172a] to-[#09090b] px-5 pb-16 pt-28 sm:px-8">
+      <section className="border-b border-white/[0.06] bg-gradient-to-b from-[#0f172a] to-[#09090b] px-5 pt-28 pb-16 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <p className="mb-3 text-[11px] font-bold tracking-[0.22em] text-blue-400 uppercase">
             ENICE Group Dispatch
@@ -133,34 +127,34 @@ function BlogPage() {
         </div>
       </section>
 
-      {/* Filter tabs */}
-      <section className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#09090b]/90 px-5 backdrop-blur-xl sm:px-8">
-        <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto py-3">
-          {!loading &&
-            categories.map((cat) => (
+      {/* The filter bar is only worth showing once there is more than one category to pick. */}
+      {!loading && categories.length > 1 && (
+        <section className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#09090b]/90 px-5 backdrop-blur-xl sm:px-8">
+          <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto py-3">
+            {["ALL", ...categories].map((category) => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+                key={category}
+                onClick={() => setActiveCategory(category)}
                 className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide transition-all ${
-                  activeCategory === cat
+                  activeCategory === category
                     ? "bg-blue-600 text-white"
                     : "text-zinc-500 hover:text-white"
                 }`}
               >
-                {cat}
+                {category === "ALL" ? "ALL" : category.toUpperCase()}
               </button>
             ))}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
-      {/* Grid */}
       <section className="px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-7xl">
           {loading ? (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
+              {[1, 2, 3].map((index) => (
                 <div
-                  key={i}
+                  key={index}
                   className="h-72 animate-pulse rounded-xl border border-white/[0.07] bg-white/[0.03]"
                 />
               ))}
@@ -172,7 +166,7 @@ function BlogPage() {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {filtered.map((post) => (
-                <PostCard key={post._id} post={post} />
+                <PostCard key={post.id} post={post} />
               ))}
             </div>
           )}

@@ -4857,6 +4857,14 @@ async function render(node) {
   }
   return render2(node);
 }
+function buildRecipientsQuery(options) {
+  const { type, email, bounceType, ...pagination } = options;
+  const searchParams = new URLSearchParams(buildPaginationQuery(pagination));
+  searchParams.set("type", type);
+  if (email !== void 0) searchParams.set("email", email);
+  if (bounceType !== void 0) searchParams.set("bounce_type", bounceType);
+  return searchParams.toString();
+}
 function parseContactPropertyFromApi(contactProperty) {
   return {
     id: contactProperty.id,
@@ -4885,6 +4893,22 @@ function parseDomainToApiOptions(domain) {
     tls: domain.tls,
     tracking_subdomain: domain.trackingSubdomain
   };
+}
+function buildMetricsQuery(options) {
+  const params = {
+    start_date: options.startDate,
+    end_date: options.endDate,
+    timezone: options.timezone,
+    granularity: options.granularity,
+    metrics: options.metrics?.join(","),
+    dimensions: options.dimensions?.join(","),
+    domain_id: options.domainId?.join(","),
+    email_id: options.emailId?.join(","),
+    broadcast_id: options.broadcastId?.join(",")
+  };
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) if (value !== void 0 && value !== "") searchParams.set(key, value);
+  return searchParams.toString();
 }
 function buildSuppressionsQuery(options) {
   const { origin, ...pagination } = options;
@@ -4929,7 +4953,7 @@ var init_dist = __esm({
   "node_modules/resend/dist/index.mjs"() {
     init_postal_mime();
     import_standardwebhooks = __toESM(require_dist(), 1);
-    version = "6.20.0";
+    version = "6.22.0";
     ApiKeys = class {
       constructor(resend) {
         this.resend = resend;
@@ -4940,6 +4964,9 @@ var init_dist = __esm({
       async list(options = {}) {
         const url = buildPaginationUrl("/api-keys", options);
         return await this.resend.get(url);
+      }
+      async update(id, payload) {
+        return await this.resend.patch(`/api-keys/${id}`, payload);
       }
       async remove(id) {
         return await this.resend.delete(`/api-keys/${id}`);
@@ -5055,6 +5082,14 @@ var init_dist = __esm({
       }
       async get(id) {
         return await this.resend.get(`/broadcasts/${id}`);
+      }
+      async recipients(id, options) {
+        const url = `/broadcasts/${id}/recipients?${buildRecipientsQuery(options)}`;
+        return await this.resend.get(url);
+      }
+      async clickedLinks(id, options = {}) {
+        const url = buildPaginationUrl(`/broadcasts/${id}/clicked-links`, options);
+        return await this.resend.get(url);
       }
       async remove(id) {
         return await this.resend.delete(`/broadcasts/${id}`);
@@ -5584,6 +5619,14 @@ var init_dist = __esm({
       }
       async cancel(id) {
         return await this.resend.post(`/emails/${id}/cancel`);
+      }
+      async share(id, payload) {
+        return await this.resend.post(`/emails/${id}/share`, { expires_in: payload?.expiresIn });
+      }
+      async metrics(options = {}) {
+        const queryString = buildMetricsQuery(options);
+        const url = queryString ? `/emails/metrics?${queryString}` : "/emails/metrics";
+        return await this.resend.get(url);
       }
     };
     Events = class {
