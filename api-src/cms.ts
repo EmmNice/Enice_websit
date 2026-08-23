@@ -793,7 +793,7 @@ router.add("GET /media", async ({ query }) => {
   return { ...result, storageConfigured: isMediaStorageConfigured() };
 });
 
-router.add("POST /media/presign", async ({ body }) => ({ upload: requestUpload(body) }));
+router.add("POST /media/presign", async ({ body }) => ({ upload: await requestUpload(body) }));
 
 router.add("POST /media/confirm", async ({ req, body, identity }) => {
   const asset = await confirmUpload(body, identity);

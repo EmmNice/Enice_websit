@@ -134,15 +134,16 @@ export async function getMedia(id: string): Promise<MediaAsset | null> {
  *
  * Nothing is written to the database here — see the note at the top of the module.
  */
-export function requestUpload(input: {
+export async function requestUpload(input: {
   filename?: unknown;
   mimeType?: unknown;
   sizeBytes?: unknown;
   folder?: unknown;
-}): PresignedUpload {
+}): Promise<PresignedUpload> {
   if (!isMediaStorageConfigured()) {
     throw badRequest(
-      "Media storage is not configured yet. Add the MEDIA_S3_* environment variables, or paste an external image URL instead.",
+      "Media storage is not configured yet. Connect a Vercel Blob store to this project, add " +
+        "the MEDIA_S3_* environment variables, or paste an external image URL instead.",
     );
   }
 
@@ -157,6 +158,7 @@ export function requestUpload(input: {
   return presignUpload({
     filename,
     mimeType,
+    sizeBytes,
     folder: typeof input.folder === "string" ? input.folder : "",
   });
 }
@@ -206,7 +208,7 @@ export async function confirmUpload(
       id, storage_key, url, filename, mime_type, size_bytes, width, height,
       alt, folder, uploaded_by_email
     ) VALUES (
-      ${id}, ${storageKey}, ${publicUrlFor(storageKey)},
+      ${id}, ${storageKey}, ${head.url ?? publicUrlFor(storageKey)},
       ${sanitizeText(input.filename, 200) || storageKey.split("/").pop() || "file"},
       ${mimeType}, ${head.sizeBytes},
       ${Number.isFinite(width) && width > 0 ? Math.trunc(width) : null},

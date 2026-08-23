@@ -166,19 +166,19 @@ saved]` subject, so a lead is never silently lost.
 
 See `.env.example` for the full list. Server-side only:
 
-| Variable                         | Required           | Purpose                                             |
-| -------------------------------- | ------------------ | --------------------------------------------------- |
-| `DATABASE_URL`                   | Website Manager    | Postgres connection string (pooled endpoint)        |
-| `CMS_SECRET`                     | Website Manager    | ≥32 random chars; encrypts 2FA secrets, signs CSRF  |
-| `CMS_OWNER_EMAIL` / `_PASSWORD`  | first deploy       | Bootstraps the first Owner; ignored once one exists |
-| `MEDIA_S3_*`                     | media uploads      | S3-compatible bucket for the media library          |
-| `GITHUB_TOKEN` / `_REPOSITORY`   | AI code changes    | Lets the AI manager open pull requests              |
-| `RESEND_API_KEY`                 | production         | All email, plus early-access storage                |
-| `ADMIN_PASSWORD`                 | early-access page  | Gates the legacy `/admin/early-access` screen       |
-| `RESEND_EARLY_ACCESS_SEGMENT_ID` | no                 | Pin a specific segment instead of lookup-by-name    |
-| `AI_PROVIDER`                    | assistant          | `bedrock` (default), `openai`, `anthropic`, …       |
-| `AI_API_KEY` / `AI_API_SECRET`   | assistant + AI CMS | Provider credentials; Bedrock needs both            |
-| `AI_REGION`                      | Bedrock            | Defaults to `us-east-1`                             |
+| Variable                         | Required           | Purpose                                               |
+| -------------------------------- | ------------------ | ----------------------------------------------------- |
+| `DATABASE_URL`                   | Website Manager    | Postgres connection string (pooled endpoint)          |
+| `CMS_SECRET`                     | Website Manager    | ≥32 random chars; encrypts 2FA secrets, signs CSRF    |
+| `CMS_OWNER_EMAIL` / `_PASSWORD`  | first deploy       | Bootstraps the first Owner; ignored once one exists   |
+| `MEDIA_S3_*`                     | media uploads      | S3-compatible bucket (or connect a Vercel Blob store) |
+| `GITHUB_TOKEN` / `_REPOSITORY`   | AI code changes    | Lets the AI manager open pull requests                |
+| `RESEND_API_KEY`                 | production         | All email, plus early-access storage                  |
+| `ADMIN_PASSWORD`                 | early-access page  | Gates the legacy `/admin/early-access` screen         |
+| `RESEND_EARLY_ACCESS_SEGMENT_ID` | no                 | Pin a specific segment instead of lookup-by-name      |
+| `AI_PROVIDER`                    | assistant          | `bedrock` (default), `openai`, `anthropic`, …         |
+| `AI_API_KEY` / `AI_API_SECRET`   | assistant + AI CMS | Provider credentials; Bedrock needs both              |
+| `AI_REGION`                      | Bedrock            | Defaults to `us-east-1`                               |
 
 The Website Manager degrades safely: with no `DATABASE_URL` it shows a setup screen (naming the
 missing variables) rather than crashing, and the public site keeps working with empty content
@@ -229,6 +229,20 @@ concurrent cold starts are safe) — there is no separate migration step to forg
 
 The install command is deliberately `npm install` rather than bun: bun installs on Vercel
 were intermittently failing with connection errors. Local development still uses bun.
+
+### Why `build:api` injects a `require` banner
+
+The functions are bundled as ESM, where `require` does not exist. esbuild replaces any `require`
+it cannot resolve statically with a stub that throws _"Dynamic require of … is not supported"_ —
+at the moment the call runs, not at build time. `@vercel/blob` reaches `jose` through
+`@vercel/oidc`, and that dependency is CommonJS and calls `require("node:buffer")`, so the throw
+would surface in production on whichever request first touched it.
+
+The banner defines a real `require` via `createRequire`, which esbuild's generated helper then
+prefers over its stub. It is worth knowing that without it the failure hides: tree-shaking can
+drop the offending module when only part of the SDK is reachable, so the bundle imports cleanly
+and crashes later, once a code path is added that keeps it. That is precisely the OIDC path — the
+default way Vercel connects a Blob store.
 
 ### Admin subdomain (optional)
 

@@ -26,6 +26,7 @@
 
 import { randomUUID } from "node:crypto";
 import postgres from "postgres";
+import { findEnv } from "./env";
 import { MIGRATIONS, MIGRATION_LOCK_KEY, MIGRATIONS_TABLE_SQL } from "./schema";
 
 // ─── Errors ──────────────────────────────────────────────────────────────────
@@ -84,6 +85,10 @@ let client: Sql | null = null;
 /** A value we are willing to treat as a connection string. */
 const POSTGRES_URL = /^postgres(ql)?:\/\/[^\s]/i;
 
+function isPostgresUrl(value: string): boolean {
+  return POSTGRES_URL.test(value);
+}
+
 /**
  * Variable names that may hold the connection string, most preferred first.
  *
@@ -103,40 +108,18 @@ const URL_VARIABLES = [
 /**
  * Finds the Postgres connection string in the environment.
  *
- * ## Why this is not just `process.env.DATABASE_URL`
- *
- * Vercel lets an operator attach a database store under a *prefix*, and the prefix is applied to
- * every variable the provider publishes. Connecting Neon under the prefix `DATABASE` produces
- * `DATABASE_DATABASE_URL`, not `DATABASE_URL`. Those variables are owned by the integration and
- * cannot be renamed by hand, so a resolver that insisted on the bare name would leave the
- * operator with a database that is correctly provisioned, correctly connected, and still
- * unreachable — with no way to fix it short of tearing the store down and re-adding it.
- *
- * So each known name is accepted either exactly or as a `_`-delimited suffix, and the candidate
- * must actually look like a Postgres URL. Requiring the scheme is what makes the suffix match
- * safe: the same integrations also publish ARNs, hostnames and project IDs, and none of those
- * can be mistaken for a connection string.
- *
- * Preference order is by name, not by discovery order, because `process.env` ordering is not
- * guaranteed and a database that is chosen at random between deployments is worse than one that
- * is missing. Within a single name, the shortest matching variable wins, so an explicitly set
- * `DATABASE_URL` always beats a prefixed one an integration happened to inject.
+ * Accepts a prefixed variable name as well as a bare one, because Vercel applies a store's prefix
+ * to every variable the provider publishes — Neon under the prefix `DATABASE` yields
+ * `DATABASE_DATABASE_URL` and no `DATABASE_URL` at all. See `findEnv` for the matching rules and
+ * why they are safe. Requiring a `postgres://` scheme is what stops the suffix match from picking
+ * up the ARNs, hostnames and project ids the same integrations publish alongside.
  */
 export function resolveDatabaseUrl(env: NodeJS.ProcessEnv = process.env): {
   url: string;
   variable: string;
 } | null {
-  for (const name of URL_VARIABLES) {
-    const matches = Object.keys(env)
-      .filter((key) => key === name || key.endsWith(`_${name}`))
-      .filter((key) => POSTGRES_URL.test((env[key] ?? "").trim()))
-      .sort((a, b) => a.length - b.length || a.localeCompare(b));
-
-    const variable = matches[0];
-    if (variable !== undefined) return { url: (env[variable] as string).trim(), variable };
-  }
-
-  return null;
+  const match = findEnv(URL_VARIABLES, isPostgresUrl, env);
+  return match === null ? null : { url: match.value, variable: match.name };
 }
 
 export function databaseUrl(): string | undefined {
