@@ -8306,10 +8306,35 @@ function respondWithError(res, error, ref) {
   console.error(`[api/cms:${ref}]`, error);
   res.status(500).json({
     ok: false,
-    error: "Something went wrong on our side. The reference below is in the server logs.",
+    error: `Something went wrong on our side. ${faultSummary(error)}`,
     code: "internal_error",
+    fault: faultFields(error),
     ref
   });
+}
+function faultFields(error) {
+  const e = error ?? {};
+  const fields = {};
+  const set = (key, value) => {
+    if (typeof value === "string" && value !== "") fields[key] = value.slice(0, 80);
+    else if (typeof value === "number") fields[key] = String(value);
+  };
+  set("name", e.name);
+  set("code", e.code);
+  set("constraint", e.constraint_name);
+  set("table", e.table_name);
+  set("column", e.column_name);
+  set("routine", e.routine);
+  set("syscall", e.syscall);
+  return fields;
+}
+function faultSummary(error) {
+  const fields = faultFields(error);
+  const parts = Object.entries(fields).map(([key, value]) => `${key}=${value}`);
+  if (!fields.code && error instanceof Error && error.message) {
+    parts.push(`message=${error.message.slice(0, 160)}`);
+  }
+  return parts.length === 0 ? "No detail was available." : `Fault: ${parts.join(" ")}.`;
 }
 export {
   handler as default

@@ -1151,8 +1151,74 @@ function respondWithError(res: ApiResponse, error: unknown, ref: string): void {
   console.error(`[api/cms:${ref}]`, error);
   res.status(500).json({
     ok: false,
-    error: "Something went wrong on our side. The reference below is in the server logs.",
+    error: `Something went wrong on our side. ${faultSummary(error)}`,
     code: "internal_error",
+    fault: faultFields(error),
     ref,
   });
+}
+
+/**
+ * The structural facts about a fault, safe to return to the caller.
+ *
+ * ## Why a 500 says anything at all
+ *
+ * The generic "something went wrong, the reference is in the logs" is the right default for a
+ * public API, where an error message is an information leak and the operator can always read the
+ * logs. Neither holds here. This is a private, invitation-only panel, and its operator may be an
+ * administrator on a phone with no access to platform logs at all — for whom an opaque 500 beside
+ * a password field is unactionable. A fault that cannot be described cannot be reported, and a
+ * fault that cannot be reported does not get fixed.
+ *
+ * ## What is deliberately excluded
+ *
+ * Only *structural* fields are exposed: the error's class, the SQLSTATE, and the schema object
+ * involved. Postgres's `detail` and `hint` are never included, because those echo the offending
+ * row's values — the one place a database error genuinely can leak data. Free-text messages are
+ * truncated and only used for non-database faults, where they name a property or type rather than
+ * a value.
+ */
+function faultFields(error: unknown): Record<string, string> {
+  const e = (error ?? {}) as {
+    name?: string;
+    code?: string;
+    constraint_name?: string;
+    table_name?: string;
+    column_name?: string;
+    routine?: string;
+    errno?: number;
+    syscall?: string;
+  };
+
+  const fields: Record<string, string> = {};
+  const set = (key: string, value: unknown): void => {
+    if (typeof value === "string" && value !== "") fields[key] = value.slice(0, 80);
+    else if (typeof value === "number") fields[key] = String(value);
+  };
+
+  set("name", e.name);
+  // For a Postgres error this is the five-character SQLSTATE; for a socket failure, a code such
+  // as ECONNREFUSED or ETIMEDOUT. Either identifies the failure precisely on its own.
+  set("code", e.code);
+  set("constraint", e.constraint_name);
+  set("table", e.table_name);
+  set("column", e.column_name);
+  set("routine", e.routine);
+  set("syscall", e.syscall);
+
+  return fields;
+}
+
+/** The same facts as one short sentence, for a screen that shows a single line of red text. */
+function faultSummary(error: unknown): string {
+  const fields = faultFields(error);
+  const parts = Object.entries(fields).map(([key, value]) => `${key}=${value}`);
+
+  // A message is worth including only when the structural fields say nothing useful, which in
+  // practice means a programming error rather than a database one.
+  if (!fields.code && error instanceof Error && error.message) {
+    parts.push(`message=${error.message.slice(0, 160)}`);
+  }
+
+  return parts.length === 0 ? "No detail was available." : `Fault: ${parts.join(" ")}.`;
 }
