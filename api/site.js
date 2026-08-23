@@ -2634,6 +2634,54 @@ WHERE key = 'home.partners'
   AND NOT (COALESCE(fields->'items', '[]'::jsonb) @> '[{"name":"Amazon Web Services"}]'::jsonb);
 `
     )
+  },
+  {
+    id: 4,
+    name: "repair_partners_section",
+    sql: (
+      /* sql */
+      `
+-- Repair the homepage partners strip so it is present, visible and populated regardless of the
+-- state it was left in while editing. Migration 3 only updated an existing row's items; if the
+-- row was missing or had been hidden/unpublished, the strip would still not appear once the
+-- homepage reads it from the CMS. This upserts the section: it creates it if absent, forces it
+-- back to visible + published, and ensures the infrastructure providers are present (prepended,
+-- keeping any partners already added). Idempotent \u2014 providers are only added when absent.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES (
+  'home.partners', 'Partners strip', 'Home', 'logoStrip', true, 'published',
+  '{"heading":"Working with","items":[
+    {"name":"Amazon Web Services","tagline":"Cloud Infrastructure","logo":"/partners/aws.svg","url":"https://aws.amazon.com"},
+    {"name":"Google Cloud","tagline":"AI & Compute","logo":"/partners/googlecloud.svg","url":"https://cloud.google.com"},
+    {"name":"Supabase","tagline":"Database & Auth","logo":"/partners/supabase.svg","url":"https://supabase.com"},
+    {"name":"Vercel","tagline":"Edge Delivery","logo":"/partners/vercel.svg","url":"https://vercel.com"},
+    {"name":"AWS Activate","tagline":"Startup Program","logo":"/partners/aws-activate.svg","url":"https://aws.amazon.com/activate/"},
+    {"name":"Resend","tagline":"Transactional Email","logo":"/partners/resend.svg","url":"https://resend.com"}
+  ]}'::jsonb,
+  40
+)
+ON CONFLICT (key) DO UPDATE SET
+  visible = true,
+  status = 'published',
+  fields = jsonb_set(
+    COALESCE(site_sections.fields, '{}'::jsonb),
+    '{items}',
+    CASE
+      WHEN COALESCE(site_sections.fields->'items', '[]'::jsonb) @> '[{"name":"Amazon Web Services"}]'::jsonb
+        THEN site_sections.fields->'items'
+      ELSE '[
+        {"name":"Amazon Web Services","tagline":"Cloud Infrastructure","logo":"/partners/aws.svg","url":"https://aws.amazon.com"},
+        {"name":"Google Cloud","tagline":"AI & Compute","logo":"/partners/googlecloud.svg","url":"https://cloud.google.com"},
+        {"name":"Supabase","tagline":"Database & Auth","logo":"/partners/supabase.svg","url":"https://supabase.com"},
+        {"name":"Vercel","tagline":"Edge Delivery","logo":"/partners/vercel.svg","url":"https://vercel.com"},
+        {"name":"AWS Activate","tagline":"Startup Program","logo":"/partners/aws-activate.svg","url":"https://aws.amazon.com/activate/"},
+        {"name":"Resend","tagline":"Transactional Email","logo":"/partners/resend.svg","url":"https://resend.com"}
+      ]'::jsonb || COALESCE(site_sections.fields->'items', '[]'::jsonb)
+    END
+  ),
+  updated_at = now();
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (
