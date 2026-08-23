@@ -26,7 +26,41 @@
  */
 
 import { createHash, createHmac } from "node:crypto";
+import { BlobNotFoundError, del, head, issueSignedToken, presignUrl } from "@vercel/blob";
 import { mediaCategoryFor, MEDIA_LIMITS } from "../../src/lib/cms/types";
+import { findEnv } from "./env";
+
+// ─── Backends ────────────────────────────────────────────────────────────────
+
+/**
+ * Where uploaded media lives.
+ *
+ * Two backends, because the two have genuinely different costs. `s3` speaks the S3 API and works
+ * against AWS, Cloudflare R2, Backblaze B2, MinIO and DigitalOcean Spaces, but the operator has
+ * to create a bucket, mint keys and set five variables. `blob` is Vercel's own store: a couple of
+ * clicks in the dashboard and the credential is injected automatically, with no keys to copy.
+ *
+ * Both are driven through the same three-step contract — presign, the browser uploads directly,
+ * then confirm — so nothing above this module needs to know which one is in use. In particular,
+ * the bytes never pass through a function in either case, which matters because Vercel caps a
+ * function request body at 4.5 MB and the media library accepts video up to 200 MB.
+ */
+export type MediaBackend = "s3" | "blob";
+
+/**
+ * Which backend to use, or null when neither is configured.
+ *
+ * S3 wins when both are present. Configuring S3 takes deliberate effort — a bucket and three
+ * secrets — whereas a Blob token can appear simply because someone connected a store to the
+ * project, so treating S3 as the more specific intent is the less surprising rule. It is also the
+ * safer one: existing media rows hold S3 URLs, and silently starting to write new uploads
+ * somewhere else would leave a library split across two providers.
+ */
+export function mediaBackend(): MediaBackend | null {
+  if (storageConfig() !== null) return "s3";
+  if (blobConfig() !== null) return "blob";
+  return null;
+}
 
 // ─── Configuration ───────────────────────────────────────────────────────────
 
@@ -81,18 +115,81 @@ function isAwsEndpoint(endpoint: string): boolean {
 }
 
 export function isMediaStorageConfigured(): boolean {
-  return storageConfig() !== null;
+  return mediaBackend() !== null;
 }
 
 /** Thrown when a media operation runs without storage configured. */
 export class StorageNotConfiguredError extends Error {
   constructor() {
     super(
-      "Media storage is not configured. Set MEDIA_S3_BUCKET, MEDIA_S3_ACCESS_KEY_ID and " +
-        "MEDIA_S3_SECRET_ACCESS_KEY (plus MEDIA_S3_ENDPOINT for non-AWS providers).",
+      "Media storage is not configured. Either connect a Vercel Blob store to this project, " +
+        "or set MEDIA_S3_BUCKET, MEDIA_S3_ACCESS_KEY_ID and MEDIA_S3_SECRET_ACCESS_KEY (plus " +
+        "MEDIA_S3_ENDPOINT for non-AWS providers).",
     );
     this.name = "StorageNotConfiguredError";
   }
+}
+
+// ─── Vercel Blob configuration ───────────────────────────────────────────────
+
+export interface BlobConfig {
+  /** Long-lived read-write token, when that is how the store was connected. */
+  token?: string;
+  /** OIDC pair, which is how Vercel connects a store by default. */
+  oidcToken?: string;
+  storeId?: string;
+  /** Public objects get a URL the site can render directly; private ones do not. */
+  access: "public" | "private";
+}
+
+/**
+ * Reads Blob configuration from the environment.
+ *
+ * Credentials are resolved through `findEnv` rather than read directly, so a store attached under
+ * a prefix works — `MEDIA_BLOB_READ_WRITE_TOKEN` as readily as `BLOB_READ_WRITE_TOKEN`. Whatever
+ * is found is then passed to the SDK *explicitly*, because the SDK's own fallback reads only the
+ * bare names from `process.env` and would not see a prefixed variable at all.
+ *
+ * Vercel connects a store with OIDC by default (`BLOB_STORE_ID` plus a rotating
+ * `VERCEL_OIDC_TOKEN`) and adds a static read-write token alongside. Either is enough here.
+ */
+export function blobConfig(): BlobConfig | null {
+  const token = findEnv(["BLOB_READ_WRITE_TOKEN"])?.value;
+  const storeId = findEnv(["BLOB_STORE_ID"])?.value;
+  const oidcToken = findEnv(["VERCEL_OIDC_TOKEN"])?.value;
+
+  const hasOidc = Boolean(storeId && oidcToken);
+  if (!token && !hasOidc) return null;
+
+  // Objects must be publicly readable for the website to render them. Overridable because a
+  // deployment might front the store with something else, but public is the only default that
+  // produces a working media library.
+  const access = process.env.MEDIA_BLOB_ACCESS?.trim() === "private" ? "private" : "public";
+
+  return {
+    ...(token ? { token } : {}),
+    ...(hasOidc ? { oidcToken, storeId } : {}),
+    access,
+  };
+}
+
+/** Credentials in the shape every Blob SDK call takes. */
+function blobCredentials(config: BlobConfig): {
+  token?: string;
+  oidcToken?: string;
+  storeId?: string;
+} {
+  return {
+    ...(config.token ? { token: config.token } : {}),
+    ...(config.oidcToken ? { oidcToken: config.oidcToken } : {}),
+    ...(config.storeId ? { storeId: config.storeId } : {}),
+  };
+}
+
+function requireBlobConfig(): BlobConfig {
+  const config = blobConfig();
+  if (!config) throw new StorageNotConfiguredError();
+  return config;
 }
 
 // ─── SigV4 helpers ───────────────────────────────────────────────────────────
@@ -216,6 +313,15 @@ export interface PresignedUpload {
   expiresInSeconds: number;
 }
 
+/** What the store reports about an object after an upload. */
+export interface HeadResult {
+  exists: boolean;
+  sizeBytes: number;
+  mimeType: string | null;
+  /** The store's own URL for the object, authoritative on both backends. */
+  url: string | null;
+}
+
 /** Validation outcome for a requested upload. */
 export type UploadValidation = { ok: true } | { ok: false; error: string };
 
@@ -257,7 +363,7 @@ export function validateUpload(mimeType: string, sizeBytes: number): UploadValid
  * Five minutes is deliberately short: long enough for a large file on a slow connection to
  * *start*, short enough that a leaked URL is nearly worthless.
  */
-export function presignUpload(options: {
+function presignS3Upload(options: {
   filename: string;
   mimeType: string;
   folder?: string;
@@ -329,7 +435,7 @@ export function presignUpload(options: {
  * Deletion is never delegated to the browser: a presigned DELETE that leaked would let anyone
  * remove media. The request is made from the function, where the credentials stay.
  */
-export async function deleteObject(storageKey: string): Promise<void> {
+async function deleteS3Object(storageKey: string): Promise<void> {
   const config = storageConfig();
   if (!config) throw new StorageNotConfiguredError();
 
@@ -393,9 +499,7 @@ export async function deleteObject(storageKey: string): Promise<void> {
  * the number the client claimed, and so a row is never created for an upload that silently
  * failed.
  */
-export async function headObject(
-  storageKey: string,
-): Promise<{ exists: boolean; sizeBytes: number; mimeType: string | null }> {
+async function headS3Object(storageKey: string): Promise<HeadResult> {
   const config = storageConfig();
   if (!config) throw new StorageNotConfiguredError();
 
@@ -442,11 +546,175 @@ export async function headObject(
     },
   });
 
-  if (!response.ok) return { exists: false, sizeBytes: 0, mimeType: null };
+  if (!response.ok) return { exists: false, sizeBytes: 0, mimeType: null, url: null };
 
   return {
     exists: true,
     sizeBytes: Number(response.headers.get("content-length") ?? "0"),
     mimeType: response.headers.get("content-type"),
+    url: publicUrlFor(storageKey),
   };
+}
+
+// ─── Vercel Blob operations ──────────────────────────────────────────────────
+
+/**
+ * Mints a signed PUT URL for a single object.
+ *
+ * Signed URLs are what let Blob fit the same contract as S3: the browser receives a URL scoped to
+ * one operation on one pathname, uploads straight to the store, and the long-lived credential
+ * never leaves the function.
+ *
+ * `allowedContentTypes` and `maximumSizeInBytes` are the important part. The signature *is* the
+ * authorisation — once issued, the store honours whatever it permits — so the media allowlist and
+ * the per-category size ceiling are bound into it, exactly as the S3 path binds `Content-Type`
+ * into `SignedHeaders`. Without the size bound, one upload could fill the store.
+ *
+ * `addRandomSuffix` is off because `buildStorageKey` has already added one; letting Blob add a
+ * second would mean the pathname we signed is not the pathname we could later look up.
+ * `allowOverwrite` is off so a replayed URL cannot clobber an existing object.
+ */
+async function presignBlobUpload(options: {
+  filename: string;
+  mimeType: string;
+  folder?: string;
+  sizeBytes?: number;
+  expiresInSeconds?: number;
+}): Promise<PresignedUpload> {
+  const config = requireBlobConfig();
+  const credentials = blobCredentials(config);
+
+  const expiresInSeconds = Math.min(Math.max(options.expiresInSeconds ?? 300, 60), 3600);
+  const storageKey = buildStorageKey(options.filename, options.folder);
+  const validUntil = Date.now() + expiresInSeconds * 1000;
+
+  const category = mediaCategoryFor(options.mimeType);
+  const declared = Number(options.sizeBytes);
+  const ceiling = category ? MEDIA_LIMITS[category].maxBytes : undefined;
+  const maximumSizeInBytes =
+    Number.isFinite(declared) && declared > 0 && ceiling
+      ? Math.min(Math.trunc(declared), ceiling)
+      : ceiling;
+
+  // Scoped to this pathname and this operation, so the token cannot be repurposed even before
+  // it is turned into a URL.
+  const signedToken = await issueSignedToken({
+    ...credentials,
+    pathname: storageKey,
+    operations: ["put"],
+    validUntil,
+    allowedContentTypes: [options.mimeType],
+    ...(maximumSizeInBytes ? { maximumSizeInBytes } : {}),
+  });
+
+  const { presignedUrl } = await presignUrl(signedToken, {
+    operation: "put",
+    access: config.access,
+    pathname: storageKey,
+    validUntil,
+    allowedContentTypes: [options.mimeType],
+    ...(maximumSizeInBytes ? { maximumSizeInBytes } : {}),
+    addRandomSuffix: false,
+    allowOverwrite: false,
+  });
+
+  return {
+    uploadUrl: presignedUrl,
+    headers: { "Content-Type": options.mimeType },
+    storageKey,
+    // Blob decides the final URL, and it is only knowable once the object exists. The confirm
+    // step reads it from the store rather than guessing, so this is a best-effort value for a
+    // caller that wants to show something immediately; nothing persists it.
+    publicUrl: "",
+    expiresInSeconds,
+  };
+}
+
+async function deleteBlobObject(storageKey: string): Promise<void> {
+  const config = requireBlobConfig();
+  try {
+    await del(storageKey, blobCredentials(config));
+  } catch (error) {
+    // Deleting something already gone is the outcome we wanted, and matches the S3 path, which
+    // treats a 404 as success.
+    if (error instanceof BlobNotFoundError) return;
+    throw error;
+  }
+}
+
+async function headBlobObject(storageKey: string): Promise<HeadResult> {
+  const config = requireBlobConfig();
+  try {
+    const result = await head(storageKey, blobCredentials(config));
+    return {
+      exists: true,
+      sizeBytes: result.size,
+      mimeType: result.contentType ?? null,
+      url: result.url,
+    };
+  } catch (error) {
+    if (error instanceof BlobNotFoundError) {
+      return { exists: false, sizeBytes: 0, mimeType: null, url: null };
+    }
+    throw error;
+  }
+}
+
+// ─── Backend dispatch ────────────────────────────────────────────────────────
+
+/**
+ * Signs an upload the browser can perform directly.
+ *
+ * Async for both backends even though the S3 signature is pure computation, so the contract does
+ * not change shape depending on which store is configured.
+ */
+export async function presignUpload(options: {
+  filename: string;
+  mimeType: string;
+  folder?: string;
+  sizeBytes?: number;
+  expiresInSeconds?: number;
+}): Promise<PresignedUpload> {
+  switch (mediaBackend()) {
+    case "s3":
+      return presignS3Upload(options);
+    case "blob":
+      return presignBlobUpload(options);
+    default:
+      throw new StorageNotConfiguredError();
+  }
+}
+
+/**
+ * Deletes an object.
+ *
+ * Never delegated to the browser on either backend: a leaked delete URL would let anyone remove
+ * media, so the request is always made from the function where the credentials stay.
+ */
+export async function deleteObject(storageKey: string): Promise<void> {
+  switch (mediaBackend()) {
+    case "s3":
+      return deleteS3Object(storageKey);
+    case "blob":
+      return deleteBlobObject(storageKey);
+    default:
+      throw new StorageNotConfiguredError();
+  }
+}
+
+/**
+ * Confirms an object exists, and reports the store's own view of it.
+ *
+ * The size comes from the store rather than from the client, and the URL likewise — Blob assigns
+ * the final URL itself, so asking is the only way to know it.
+ */
+export async function headObject(storageKey: string): Promise<HeadResult> {
+  switch (mediaBackend()) {
+    case "s3":
+      return headS3Object(storageKey);
+    case "blob":
+      return headBlobObject(storageKey);
+    default:
+      throw new StorageNotConfiguredError();
+  }
 }

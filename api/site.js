@@ -1,3 +1,5 @@
+import{createRequire as __nodeCreateRequire}from'node:module';const require=__nodeCreateRequire(import.meta.url);
+
 // src/lib/cms/types.ts
 var CONTENT_KINDS = ["blog", "announcement", "update", "news"];
 var CONTENT_KIND_META = {
@@ -2243,6 +2245,19 @@ function osUsername() {
   }
 }
 
+// api-src/lib/env.ts
+function findEnv(names, accept = () => true, env = process.env) {
+  for (const name of names) {
+    const matches = Object.keys(env).filter((key) => key === name || key.endsWith(`_${name}`)).filter((key) => {
+      const value = (env[key] ?? "").trim();
+      return value !== "" && accept(value);
+    }).sort((a, b2) => a.length - b2.length || a.localeCompare(b2));
+    const match = matches[0];
+    if (match !== void 0) return { name: match, value: env[match].trim() };
+  }
+  return null;
+}
+
 // api-src/lib/schema.ts
 var MIGRATIONS = [
   {
@@ -2561,6 +2576,9 @@ var DatabaseNotConfiguredError = class extends Error {
 };
 var client = null;
 var POSTGRES_URL = /^postgres(ql)?:\/\/[^\s]/i;
+function isPostgresUrl(value) {
+  return POSTGRES_URL.test(value);
+}
 var URL_VARIABLES = [
   "DATABASE_URL",
   "POSTGRES_URL",
@@ -2569,12 +2587,8 @@ var URL_VARIABLES = [
   "POSTGRES_URL_NON_POOLING"
 ];
 function resolveDatabaseUrl(env = process.env) {
-  for (const name of URL_VARIABLES) {
-    const matches = Object.keys(env).filter((key) => key === name || key.endsWith(`_${name}`)).filter((key) => POSTGRES_URL.test((env[key] ?? "").trim())).sort((a, b2) => a.length - b2.length || a.localeCompare(b2));
-    const variable = matches[0];
-    if (variable !== void 0) return { url: env[variable].trim(), variable };
-  }
-  return null;
+  const match = findEnv(URL_VARIABLES, isPostgresUrl, env);
+  return match === null ? null : { url: match.value, variable: match.name };
 }
 function isDatabaseConfigured() {
   return resolveDatabaseUrl() !== null;

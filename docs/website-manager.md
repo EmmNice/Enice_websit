@@ -117,10 +117,32 @@ be reverted.
 
 ## Media
 
-An S3-compatible bucket (`MEDIA_S3_*`) holds the bytes; only metadata is in Postgres. Uploads go
-straight from the browser to the bucket via a short-lived presigned `PUT`, and the row is written
-only after the object is confirmed to exist. Without a bucket configured the panel still works —
-uploads are disabled and content can reference external image URLs instead.
+Object storage holds the bytes; only metadata is in Postgres. Uploads go straight from the browser
+to the store via a short-lived presigned `PUT`, and the row is written only after the object is
+confirmed to exist. Without storage configured the panel still works — uploads are disabled and
+content can reference external image URLs instead.
+
+Two backends satisfy that contract:
+
+- **Vercel Blob** — create a store in the dashboard and connect it to the project. Vercel injects
+  the credentials, so there is nothing to copy by hand.
+- **S3-compatible** (`MEDIA_S3_*`) — AWS S3, Cloudflare R2, Backblaze B2, MinIO or DigitalOcean
+  Spaces, using a hand-rolled SigV4 signer rather than the AWS SDK.
+
+S3 wins if both are configured, because it takes deliberate effort to set up whereas a Blob token
+can appear merely because someone connected a store — and because silently moving new uploads to a
+different provider would split the library in two.
+
+Neither backend routes the bytes through a function. That is not only a latency choice: Vercel caps
+a function request body at 4.5 MB, and the library accepts video up to 200 MB, so a proxied upload
+could not work at all. On Blob this is done with a signed URL scoped to a single `put` on a single
+pathname, carrying the media allowlist and the per-category size ceiling in the signature itself —
+the same guarantees the S3 path gets from binding `Content-Type` into `SignedHeaders`. Deletes are
+never delegated to the browser on either backend.
+
+Blob assigns an object's final URL itself, so the confirm step reads the URL back from the store
+rather than deriving it. The S3 path reports its own derived URL through the same field, so nothing
+above the storage module needs to know which backend is in use.
 
 ---
 

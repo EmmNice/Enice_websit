@@ -12,7 +12,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "build:api": "esbuild api-src/*.ts api-src/admin/*.ts --bundle --platform=node --format=esm --outbase=api-src --outdir=api",
+    "build:api": "esbuild api-src/*.ts api-src/admin/*.ts --bundle --platform=node --format=esm --outbase=api-src --outdir=api --banner:js=\"import{createRequire as __nodeCreateRequire}from'node:module';const require=__nodeCreateRequire(import.meta.url);\"",
     "verify": "npm run format:check && npm run lint && npm run typecheck && npm run build && npm run build:api",
     "vercel-build": "npm run build && npm run build:api",
     "prerender": "node scripts/prerender.mjs"
@@ -24,6 +24,7 @@
     "@tailwindcss/vite": "^4.2.1",
     "@tanstack/react-router": "^1.168.25",
     "@tanstack/router-plugin": "^1.167.28",
+    "@vercel/blob": "^2.8.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.575.0",

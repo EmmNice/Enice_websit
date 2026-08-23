@@ -1,3 +1,5 @@
+import{createRequire as __nodeCreateRequire}from'node:module';const require=__nodeCreateRequire(import.meta.url);
+
 // src/lib/ai/providers/bedrock.ts
 function getSubtle() {
   if (typeof globalThis.crypto !== "undefined" && globalThis.crypto.subtle) {
