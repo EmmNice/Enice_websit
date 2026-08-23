@@ -47,10 +47,16 @@ import { getPageByPath, getSettings, listSections, publishDuePages } from "./lib
  * publish is visible on reload rather than being pinned in someone's local cache for an hour.
  * `stale-while-revalidate` means the one request that arrives after expiry is still served
  * instantly from cache while the refresh happens behind it.
+ *
+ * These are kept deliberately short. This is a CMS: an administrator who changes a heading and
+ * reloads expects to see it, not to wait out a five-minute edge cache. A ~15s window still
+ * absorbs traffic bursts (many hits collapse onto one origin fetch) while making an edit visible
+ * almost immediately. `stale-while-revalidate` is small for the same reason — a long tail would
+ * keep serving the pre-edit copy well after the change.
  */
-const CACHE_CONTENT = "public, max-age=0, s-maxage=60, stale-while-revalidate=300";
-/** Settings and sections change less often and are needed by every page, so they cache longer. */
-const CACHE_SETTINGS = "public, max-age=0, s-maxage=300, stale-while-revalidate=3600";
+const CACHE_CONTENT = "public, max-age=0, s-maxage=15, stale-while-revalidate=30";
+/** Settings and sections are needed by every page; same short freshness so edits show quickly. */
+const CACHE_SETTINGS = "public, max-age=0, s-maxage=15, stale-while-revalidate=30";
 
 const router = new Router<null>();
 
