@@ -3205,8 +3205,8 @@ function defaultSettings() {
 }
 
 // api-src/site.ts
-var CACHE_CONTENT = "public, max-age=0, s-maxage=60, stale-while-revalidate=300";
-var CACHE_SETTINGS = "public, max-age=0, s-maxage=300, stale-while-revalidate=3600";
+var CACHE_CONTENT = "public, max-age=0, s-maxage=15, stale-while-revalidate=30";
+var CACHE_SETTINGS = "public, max-age=0, s-maxage=15, stale-while-revalidate=30";
 var router = new Router();
 async function seoContext() {
   const settings = await getSettings();
