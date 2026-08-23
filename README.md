@@ -185,6 +185,20 @@ missing variables) rather than crashing, and the public site keeps working with 
 collections. `ADMIN_PASSWORD` (the legacy early-access screen) is compared in constant time and
 guarded by a failed-attempt limiter.
 
+#### Database attached under a prefix
+
+Vercel applies an optional prefix to every variable a database integration publishes, so
+connecting Neon under the prefix `DATABASE` produces `DATABASE_DATABASE_URL` and no
+`DATABASE_URL` at all. Integration-managed variables are read-only, which would otherwise leave
+a correctly provisioned database permanently unreachable. A prefixed name is therefore accepted:
+any variable ending in `_DATABASE_URL`, `_POSTGRES_URL`, `_POSTGRES_PRISMA_URL`,
+`_DATABASE_URL_UNPOOLED` or `_POSTGRES_URL_NON_POOLING` whose value begins with `postgres://` or
+`postgresql://`. Requiring the scheme is what makes this safe — the same integrations also
+publish ARNs, hostnames and project IDs, which can never be mistaken for a connection string.
+Bare names beat prefixed ones and pooled endpoints beat direct ones, so the choice does not
+change between deployments. On connect, the function logs the variable name it selected (never
+the value).
+
 ### Local testing without sending real email
 
 The Resend SDK reads `RESEND_BASE_URL`, so pointing it at a local stub exercises the real
