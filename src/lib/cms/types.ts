@@ -369,8 +369,19 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
     icon: "Sparkles",
     fields: [
       { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the headline." },
-      { key: "heading", label: "Headline", type: "text", required: true },
-      { key: "subheading", label: "Supporting copy", type: "textarea" },
+      {
+        key: "heading",
+        label: "Headline",
+        type: "text",
+        required: true,
+        help: "Style with **bold** and [[highlight]] (highlight shows in the accent colour). A new line splits the headline.",
+      },
+      {
+        key: "subheading",
+        label: "Supporting copy",
+        type: "textarea",
+        help: "Supports **bold** and [[highlight]].",
+      },
       { key: "primaryCtaLabel", label: "Primary button label", type: "text" },
       { key: "primaryCtaUrl", label: "Primary button URL", type: "url" },
       { key: "secondaryCtaLabel", label: "Secondary button label", type: "text" },

@@ -3129,6 +3129,32 @@ ON CONFLICT (key) DO UPDATE SET
   updated_at = now();
 `
     )
+  },
+  {
+    id: 5,
+    name: "hero_current_copy",
+    sql: (
+      /* sql */
+      `
+-- The homepage hero is now rendered from this section. Set its content to the copy the site
+-- already displays, so wiring it changes nothing visible. Only applied when the hero still holds
+-- the original generic seed heading, so an operator who has edited it is left untouched. In the
+-- heading, a newline splits the line and [[...]] marks the phrase shown in the accent colour.
+UPDATE site_sections
+SET fields = fields || '{
+  "eyebrow": "Technology Group \xB7 Building for Africa",
+  "heading": "We build the technology\\n[[behind Africa''s next]]\\ngeneration of\\nbusinesses.",
+  "subheading": "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
+  "primaryCtaLabel": "Explore our products",
+  "primaryCtaUrl": "/portfolio",
+  "secondaryCtaLabel": "What we build",
+  "secondaryCtaUrl": "/about"
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'heading' = 'Technology products for financial services, commerce, and communication';
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (

@@ -780,14 +780,15 @@ const DEFAULT_SECTIONS: {
     type: "hero",
     order: 10,
     fields: {
-      eyebrow: "ENICE GROUP",
-      heading: "Technology products for financial services, commerce, and communication",
+      eyebrow: "Technology Group · Building for Africa",
+      // \n splits the headline across lines; [[…]] renders the phrase in the accent colour.
+      heading: "We build the technology\n[[behind Africa's next]]\ngeneration of\nbusinesses.",
       subheading:
-        "ENICE Group builds, owns, and operates the platforms behind modern payments, digital banking, and enterprise AI.",
+        "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
       primaryCtaLabel: "Explore our products",
       primaryCtaUrl: "/portfolio",
-      secondaryCtaLabel: "Contact us",
-      secondaryCtaUrl: "/contact",
+      secondaryCtaLabel: "What we build",
+      secondaryCtaUrl: "/about",
     },
   },
   {
