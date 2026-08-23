@@ -35,7 +35,9 @@ export class DatabaseNotConfiguredError extends Error {
   constructor() {
     super(
       "The Website Manager database is not configured. Set DATABASE_URL to a Postgres " +
-        "connection string (a pooled endpoint is recommended).",
+        "connection string (a pooled endpoint is recommended). If the database was attached " +
+        "through a Vercel integration under a prefix, the prefixed name is also accepted — " +
+        "the value simply has to begin with postgres:// or postgresql://.",
     );
     this.name = "DatabaseNotConfiguredError";
   }
@@ -79,14 +81,70 @@ export type Sql = postgres.Sql<Record<string, never>>;
 
 let client: Sql | null = null;
 
+/** A value we are willing to treat as a connection string. */
+const POSTGRES_URL = /^postgres(ql)?:\/\/[^\s]/i;
+
+/**
+ * Variable names that may hold the connection string, most preferred first.
+ *
+ * Pooled endpoints come before direct ones because each serverless invocation opens its own
+ * connection, and the unpooled endpoint runs out of them far sooner. `POSTGRES_URL_NO_SSL` is
+ * deliberately absent: this CMS holds credentials and audit history, so an unencrypted link to
+ * it is never the right default.
+ */
+const URL_VARIABLES = [
+  "DATABASE_URL",
+  "POSTGRES_URL",
+  "POSTGRES_PRISMA_URL",
+  "DATABASE_URL_UNPOOLED",
+  "POSTGRES_URL_NON_POOLING",
+] as const;
+
+/**
+ * Finds the Postgres connection string in the environment.
+ *
+ * ## Why this is not just `process.env.DATABASE_URL`
+ *
+ * Vercel lets an operator attach a database store under a *prefix*, and the prefix is applied to
+ * every variable the provider publishes. Connecting Neon under the prefix `DATABASE` produces
+ * `DATABASE_DATABASE_URL`, not `DATABASE_URL`. Those variables are owned by the integration and
+ * cannot be renamed by hand, so a resolver that insisted on the bare name would leave the
+ * operator with a database that is correctly provisioned, correctly connected, and still
+ * unreachable — with no way to fix it short of tearing the store down and re-adding it.
+ *
+ * So each known name is accepted either exactly or as a `_`-delimited suffix, and the candidate
+ * must actually look like a Postgres URL. Requiring the scheme is what makes the suffix match
+ * safe: the same integrations also publish ARNs, hostnames and project IDs, and none of those
+ * can be mistaken for a connection string.
+ *
+ * Preference order is by name, not by discovery order, because `process.env` ordering is not
+ * guaranteed and a database that is chosen at random between deployments is worse than one that
+ * is missing. Within a single name, the shortest matching variable wins, so an explicitly set
+ * `DATABASE_URL` always beats a prefixed one an integration happened to inject.
+ */
+export function resolveDatabaseUrl(env: NodeJS.ProcessEnv = process.env): {
+  url: string;
+  variable: string;
+} | null {
+  for (const name of URL_VARIABLES) {
+    const matches = Object.keys(env)
+      .filter((key) => key === name || key.endsWith(`_${name}`))
+      .filter((key) => POSTGRES_URL.test((env[key] ?? "").trim()))
+      .sort((a, b) => a.length - b.length || a.localeCompare(b));
+
+    const variable = matches[0];
+    if (variable !== undefined) return { url: (env[variable] as string).trim(), variable };
+  }
+
+  return null;
+}
+
 export function databaseUrl(): string | undefined {
-  // POSTGRES_URL is what Vercel Postgres injects; DATABASE_URL is the conventional name and
-  // takes precedence so an operator can always override the platform's value.
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL || undefined;
+  return resolveDatabaseUrl()?.url;
 }
 
 export function isDatabaseConfigured(): boolean {
-  return Boolean(databaseUrl());
+  return resolveDatabaseUrl() !== null;
 }
 
 /**
@@ -117,8 +175,14 @@ function sslSetting(url: string): postgres.Options<Record<string, never>>["ssl"]
 export function db(): Sql {
   if (client) return client;
 
-  const url = databaseUrl();
-  if (!url) throw new DatabaseNotConfiguredError();
+  const resolved = resolveDatabaseUrl();
+  if (resolved === null) throw new DatabaseNotConfiguredError();
+  const { url, variable } = resolved;
+
+  // The variable *name* only — never the value, which carries the password. With prefixed
+  // integration variables in play, "which one did it pick?" is the first question worth
+  // answering when a deployment talks to a database nobody expected.
+  console.log(`[db] connecting using ${variable}`);
 
   client = postgres(url, {
     max: 1,

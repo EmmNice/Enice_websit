@@ -2554,17 +2554,30 @@ var MIGRATION_LOCK_KEY = "8324119407551002";
 var DatabaseNotConfiguredError = class extends Error {
   constructor() {
     super(
-      "The Website Manager database is not configured. Set DATABASE_URL to a Postgres connection string (a pooled endpoint is recommended)."
+      "The Website Manager database is not configured. Set DATABASE_URL to a Postgres connection string (a pooled endpoint is recommended). If the database was attached through a Vercel integration under a prefix, the prefixed name is also accepted \u2014 the value simply has to begin with postgres:// or postgresql://."
     );
     this.name = "DatabaseNotConfiguredError";
   }
 };
 var client = null;
-function databaseUrl() {
-  return process.env.DATABASE_URL || process.env.POSTGRES_URL || void 0;
+var POSTGRES_URL = /^postgres(ql)?:\/\/[^\s]/i;
+var URL_VARIABLES = [
+  "DATABASE_URL",
+  "POSTGRES_URL",
+  "POSTGRES_PRISMA_URL",
+  "DATABASE_URL_UNPOOLED",
+  "POSTGRES_URL_NON_POOLING"
+];
+function resolveDatabaseUrl(env = process.env) {
+  for (const name of URL_VARIABLES) {
+    const matches = Object.keys(env).filter((key) => key === name || key.endsWith(`_${name}`)).filter((key) => POSTGRES_URL.test((env[key] ?? "").trim())).sort((a, b2) => a.length - b2.length || a.localeCompare(b2));
+    const variable = matches[0];
+    if (variable !== void 0) return { url: env[variable].trim(), variable };
+  }
+  return null;
 }
 function isDatabaseConfigured() {
-  return Boolean(databaseUrl());
+  return resolveDatabaseUrl() !== null;
 }
 function sslSetting(url) {
   if (/[?&]sslmode=/.test(url)) return void 0;
@@ -2577,8 +2590,10 @@ function sslSetting(url) {
 }
 function db() {
   if (client) return client;
-  const url = databaseUrl();
-  if (!url) throw new DatabaseNotConfiguredError();
+  const resolved = resolveDatabaseUrl();
+  if (resolved === null) throw new DatabaseNotConfiguredError();
+  const { url, variable } = resolved;
+  console.log(`[db] connecting using ${variable}`);
   client = src_default(url, {
     max: 1,
     idle_timeout: 20,
