@@ -2603,6 +2603,37 @@ CREATE INDEX IF NOT EXISTS knowledge_entries_recent_idx
   ON knowledge_entries (updated_at DESC);
 `
     )
+  },
+  {
+    id: 3,
+    name: "seed_partner_logos",
+    sql: (
+      /* sql */
+      `
+-- Populate the homepage partners strip with the infrastructure providers, each with a
+-- self-hosted brand logo (public/partners/*.svg). Before this, the strip's default content was
+-- empty, so once the homepage was wired to the CMS it showed only whatever an administrator had
+-- typed. This seeds the providers so the strip looks complete out of the box, while leaving any
+-- partners the administrator already added in place \u2014 their entries are kept, the providers are
+-- prepended. Guarded on the AWS entry so re-running (or an operator who already added AWS) is a
+-- no-op rather than creating duplicates.
+UPDATE site_sections
+SET fields = jsonb_set(
+  COALESCE(fields, '{}'::jsonb),
+  '{items}',
+  '[
+    {"name":"Amazon Web Services","tagline":"Cloud Infrastructure","logo":"/partners/aws.svg","url":"https://aws.amazon.com"},
+    {"name":"Google Cloud","tagline":"AI & Compute","logo":"/partners/googlecloud.svg","url":"https://cloud.google.com"},
+    {"name":"Supabase","tagline":"Database & Auth","logo":"/partners/supabase.svg","url":"https://supabase.com"},
+    {"name":"Vercel","tagline":"Edge Delivery","logo":"/partners/vercel.svg","url":"https://vercel.com"},
+    {"name":"AWS Activate","tagline":"Startup Program","logo":"/partners/aws-activate.svg","url":"https://aws.amazon.com/activate/"},
+    {"name":"Resend","tagline":"Transactional Email","logo":"/partners/resend.svg","url":"https://resend.com"}
+  ]'::jsonb || COALESCE(fields->'items', '[]'::jsonb)
+)
+WHERE key = 'home.partners'
+  AND NOT (COALESCE(fields->'items', '[]'::jsonb) @> '[{"name":"Amazon Web Services"}]'::jsonb);
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (

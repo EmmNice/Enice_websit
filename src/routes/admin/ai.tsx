@@ -7,6 +7,7 @@ import {
   Code2,
   FileEdit,
   GitPullRequest,
+  MessageSquare,
   RotateCcw,
   Send,
   Sparkles,
@@ -81,7 +82,10 @@ function AiManagerScreen() {
       const { request } = await ai.create(prompt.trim());
       setPrompt("");
       setRequests((current) => [request, ...current]);
-      if (request.status === "proposed") {
+      if (request.status === "answered") {
+        setSelected(request);
+        toast.success("Answer ready");
+      } else if (request.status === "proposed") {
         setSelected(request);
         toast.success("Proposal ready", "Review it before anything is applied.");
       } else if (request.status === "failed") {
@@ -179,7 +183,9 @@ function AiManagerScreen() {
                 ].join(" ")}
               >
                 <span className="bg-secondary text-muted-foreground mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
-                  {request.kind === "code" ? (
+                  {request.status === "answered" ? (
+                    <MessageSquare className="h-4 w-4" />
+                  ) : request.kind === "code" ? (
                     <Code2 className="h-4 w-4" />
                   ) : (
                     <FileEdit className="h-4 w-4" />
@@ -190,8 +196,12 @@ function AiManagerScreen() {
                     {request.prompt}
                   </span>
                   <span className="text-muted-foreground block text-[11px]">
-                    {request.kind === "code" ? "Code change" : "Content change"} ·{" "}
-                    {formatRelativeTime(request.createdAt)}
+                    {request.status === "answered"
+                      ? "Question"
+                      : request.kind === "code"
+                        ? "Code change"
+                        : "Content change"}{" "}
+                    · {formatRelativeTime(request.createdAt)}
                     {request.requestedByEmail ? ` · ${request.requestedByEmail}` : ""}
                   </span>
                 </span>
@@ -263,6 +273,7 @@ function RequestDetail({
   const meta = AI_CHANGE_STATUS_META[request.status];
   const canApprove = can("ai.approve");
   const canDeploy = can("ai.deploy");
+  const isAnswer = request.status === "answered";
 
   const act = async (label: string, action: () => Promise<{ request: AiChangeRequest }>) => {
     setBusy(true);
@@ -278,7 +289,12 @@ function RequestDetail({
   };
 
   return (
-    <Modal open={Boolean(request)} onClose={onClose} title="AI proposal" size="xl">
+    <Modal
+      open={Boolean(request)}
+      onClose={onClose}
+      title={isAnswer ? "AI answer" : "AI proposal"}
+      size="xl"
+    >
       <div className="space-y-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -299,9 +315,11 @@ function RequestDetail({
         {request.summary && (
           <div>
             <p className="text-muted-foreground mb-1 text-[11px] font-semibold tracking-wider uppercase">
-              What the AI understood
+              {isAnswer ? "Answer" : "What the AI understood"}
             </p>
-            <p className="text-foreground/85 text-[13px] leading-relaxed">{request.summary}</p>
+            <p className="text-foreground/85 text-[13px] leading-relaxed whitespace-pre-wrap">
+              {request.summary}
+            </p>
           </div>
         )}
 

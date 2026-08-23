@@ -205,11 +205,19 @@ ARCHITECTURE
 ${websiteContext}
 
 CLASSIFY THE REQUEST as exactly one of:
-- "content": achievable by editing data the Website Manager already owns — the copy or images in
-  an existing section, its visibility, a new page assembled from existing section types, or
-  navigation and footer entries. Prefer this whenever it is possible.
-- "code": genuinely requires source changes — a new section *type*, a new interactive component,
-  a change to how something is rendered, or anything touching the build or API.
+- "answer": the input is a question, a greeting, or a request for information rather than an
+  instruction to change something — for example "what can you do?", "what sections exist?",
+  "how do I add a partner?". Reply conversationally; do not invent a change. Use the site context
+  above to be specific and accurate.
+- "content": an actionable change achievable by editing data the Website Manager already owns —
+  the copy or images in an existing section, its visibility, a new page assembled from existing
+  section types, or navigation and footer entries. Prefer this over "code" whenever possible.
+- "code": an actionable change that genuinely requires source changes — a new section *type*, a
+  new interactive component, a change to how something is rendered, or anything touching the
+  build or API.
+
+When in doubt between "answer" and a change, prefer "answer" and explain what you could change and
+how to ask for it — never fail or return an empty proposal.
 
 RULES
 - Only use section types and field names listed above. Never invent one.
@@ -218,7 +226,15 @@ RULES
 - Never propose changes to authentication, billing, secrets or the admin panel itself.
 - If the request is ambiguous, say so in "summary" and propose the most conservative reading.
 
-RESPOND WITH JSON ONLY. No markdown fences, no commentary. Shape:
+RESPOND WITH JSON ONLY. No markdown fences, no commentary.
+
+For a question, use this shape:
+{
+  "kind": "answer",
+  "answer": "A helpful, plain-language reply. Plain sentences, no markdown."
+}
+
+For an actionable change, use this shape:
 {
   "kind": "content" | "code",
   "summary": "2-4 sentences: what you understood and what you will change.",
@@ -313,20 +329,37 @@ export async function createChangeRequest(
 
     const provider = createAIProvider();
     const response = await provider.complete(messages);
-    const parsed = parseProposal(response.text);
+    const parsed = parseResponse(response.text);
 
-    await sql`
-      UPDATE ai_change_requests SET
-        kind = ${parsed.kind},
-        status = ${"proposed"},
-        summary = ${parsed.summary},
-        plan = ${json(parsed.plan)},
-        content_edits = ${json(parsed.contentEdits)},
-        code_edits = ${json(parsed.codeEdits)},
-        checks = ${json(initialChecks(parsed.kind))},
-        updated_at = now()
-      WHERE id = ${id}
-    `;
+    if (parsed.type === "answer") {
+      // A question, not a change. Record the answer and stop — nothing is proposed, so there is
+      // nothing to review, approve or fail.
+      await sql`
+        UPDATE ai_change_requests SET
+          status = ${"answered"},
+          summary = ${parsed.answer},
+          plan = ${json([])},
+          content_edits = ${json([])},
+          code_edits = ${json([])},
+          checks = ${json([])},
+          updated_at = now()
+        WHERE id = ${id}
+      `;
+    } else {
+      const proposal = parsed.proposal;
+      await sql`
+        UPDATE ai_change_requests SET
+          kind = ${proposal.kind},
+          status = ${"proposed"},
+          summary = ${proposal.summary},
+          plan = ${json(proposal.plan)},
+          content_edits = ${json(proposal.contentEdits)},
+          code_edits = ${json(proposal.codeEdits)},
+          checks = ${json(initialChecks(proposal.kind))},
+          updated_at = now()
+        WHERE id = ${id}
+      `;
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`[cms] AI change request ${id} failed:`, error);
@@ -413,18 +446,36 @@ interface ParsedProposal {
  * reached the review screen unvalidated would be reviewed against something other than what
  * would actually be applied.
  */
-function parseProposal(text: string): ParsedProposal {
+type ParsedResponse =
+  { type: "answer"; answer: string } | { type: "proposal"; proposal: ParsedProposal };
+
+function parseResponse(text: string): ParsedResponse {
   const start = text.indexOf("{");
   const end = text.lastIndexOf("}");
-  if (start === -1 || end <= start) {
-    throw new Error("The AI did not return a usable proposal. Try rephrasing the request.");
+
+  let raw: Record<string, unknown> | null = null;
+  if (start !== -1 && end > start) {
+    try {
+      raw = JSON.parse(text.slice(start, end + 1)) as Record<string, unknown>;
+    } catch {
+      raw = null;
+    }
   }
 
-  let raw: Record<string, unknown>;
-  try {
-    raw = JSON.parse(text.slice(start, end + 1)) as Record<string, unknown>;
-  } catch {
-    throw new Error("The AI's proposal could not be read. Try rephrasing the request.");
+  // No parseable JSON object — the model replied in prose. That is almost always a conversational
+  // answer to a question, so surface it as one rather than failing the request. This is what makes
+  // "what can you do?" get an answer instead of an error.
+  if (!raw || typeof raw !== "object") {
+    return { type: "answer", answer: sanitizeMultilineText(text, 4_000) || "…" };
+  }
+
+  // An explicit answer, or a JSON object carrying an answer and no proposal payload.
+  const isAnswer =
+    raw.kind === "answer" ||
+    (typeof raw.answer === "string" && !raw.plan && !raw.contentEdits && !raw.codeEdits);
+  if (isAnswer) {
+    const answer = sanitizeMultilineText(typeof raw.answer === "string" ? raw.answer : text, 4_000);
+    return { type: "answer", answer: answer || "…" };
   }
 
   const kind: AiChangeKind = raw.kind === "code" ? "code" : "content";
@@ -458,11 +509,14 @@ function parseProposal(text: string): ParsedProposal {
   });
 
   return {
-    kind,
-    summary: sanitizeMultilineText(raw.summary, 2_000) || "No summary was provided.",
-    plan,
-    contentEdits,
-    codeEdits,
+    type: "proposal",
+    proposal: {
+      kind,
+      summary: sanitizeMultilineText(raw.summary, 2_000) || "No summary was provided.",
+      plan,
+      contentEdits,
+      codeEdits,
+    },
   };
 }
 
