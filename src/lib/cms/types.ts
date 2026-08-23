@@ -790,6 +790,9 @@ export const ACTIVITY_ACTIONS = [
   "ai.rejected",
   "ai.applied",
   "ai.deployed",
+  "knowledge.created",
+  "knowledge.updated",
+  "knowledge.deleted",
 ] as const;
 export type ActivityAction = (typeof ACTIVITY_ACTIONS)[number];
 
@@ -979,3 +982,50 @@ export interface SearchHit {
   href: string;
   updatedAt: string | null;
 }
+
+// ─── AI assistant knowledge base ─────────────────────────────────────────────
+
+/** Where a knowledge entry's text came from. */
+export const KNOWLEDGE_SOURCE_KINDS = ["note", "pdf"] as const;
+export type KnowledgeSourceKind = (typeof KNOWLEDGE_SOURCE_KINDS)[number];
+
+/** Whether an entry is eligible to be surfaced to the assistant. */
+export const KNOWLEDGE_STATUSES = ["active", "disabled"] as const;
+export type KnowledgeStatus = (typeof KNOWLEDGE_STATUSES)[number];
+
+/**
+ * A single fact (or document) the public chatbot can ground its answers in.
+ *
+ * A `note` is typed directly; a `pdf` is the text extracted from an uploaded document, whose
+ * bytes live in object storage (`sourceUrl`). Only `active` entries are retrieved at chat time.
+ */
+export interface KnowledgeEntry {
+  id: string;
+  title: string;
+  body: string;
+  sourceKind: KnowledgeSourceKind;
+  /** Original filename, for a PDF-sourced entry. */
+  sourceName: string | null;
+  /** Where the source document is readable, for a PDF-sourced entry. */
+  sourceUrl: string | null;
+  status: KnowledgeStatus;
+  tags: string[];
+  /** Character count of the body, so the UI can show how much was captured. */
+  characters: number;
+  createdByEmail: string | null;
+  updatedByEmail: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** The largest PDF the knowledge base will accept, mirroring the media document ceiling. */
+export const KNOWLEDGE_PDF_MAX_BYTES = 25 * 1024 * 1024;
+
+/**
+ * Upper bound on the text stored per entry.
+ *
+ * Defined here rather than beside the PDF extractor so the repo and the chat handler can share it
+ * without importing the (heavy) PDF library — importing the extractor only to read a number would
+ * drag `unpdf` into the public chat bundle.
+ */
+export const KNOWLEDGE_MAX_CHARS = 200_000;

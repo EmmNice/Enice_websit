@@ -35,6 +35,7 @@ import {
   BRAND_PALETTES,
   BUTTON_STYLES,
   TYPE_PAIRINGS,
+  KNOWLEDGE_PDF_MAX_BYTES,
 } from "../src/lib/cms/types";
 import {
   ADMIN_ROLES,
@@ -84,7 +85,14 @@ import {
   verifyTotp,
 } from "./lib/crypto";
 import { listActivity, recordActivity } from "./lib/audit";
-import { isMediaStorageConfigured } from "./lib/storage";
+import {
+  deleteObject,
+  getObject,
+  headObject,
+  isMediaStorageConfigured,
+  presignUpload as presignStorageUpload,
+} from "./lib/storage";
+import { extractPdfText } from "./lib/pdf";
 import {
   HttpError,
   Router,
@@ -93,6 +101,8 @@ import {
   enumValue,
   intParam,
   notFound,
+  optionalString,
+  requiredString,
   resolveRequestPath,
 } from "./lib/router";
 import {
@@ -147,6 +157,14 @@ import {
   verifyOwnPassword,
 } from "./lib/repo/admins";
 import { dashboardSnapshot, globalSearch, publishingQueues } from "./lib/repo/insights";
+import {
+  createKnowledge,
+  deleteKnowledge,
+  getKnowledge,
+  knowledgeStats,
+  listKnowledge,
+  updateKnowledge,
+} from "./lib/repo/knowledge";
 import {
   applyChangeRequest,
   approveChangeRequest,
@@ -232,6 +250,14 @@ const ROUTE_PERMISSIONS: Record<string, Permission> = {
   "POST /ai/requests/:id/apply": "ai.approve",
   "POST /ai/requests/:id/rollback": "ai.approve",
   "POST /ai/requests/:id/pull-request": "ai.deploy",
+
+  "GET /knowledge": "ai.knowledge.read",
+  "POST /knowledge": "ai.knowledge.write",
+  "POST /knowledge/upload-url": "ai.knowledge.write",
+  "POST /knowledge/ingest": "ai.knowledge.write",
+  "GET /knowledge/:id": "ai.knowledge.read",
+  "PATCH /knowledge/:id": "ai.knowledge.write",
+  "DELETE /knowledge/:id": "ai.knowledge.write",
 };
 
 const router = new Router<AdminIdentity>();
@@ -830,6 +856,145 @@ router.add("DELETE /media/:id", async ({ req, params, identity }) => {
     entityLabel: asset.filename,
   });
   return { deleted: true, id: asset.id };
+});
+
+// ─── AI assistant knowledge base ─────────────────────────────────────────────
+
+router.add("GET /knowledge", async ({ query }) => {
+  const statusParam = query.get("status");
+  const result = await listKnowledge({
+    search: query.get("search") ?? undefined,
+    status: statusParam === "active" || statusParam === "disabled" ? statusParam : undefined,
+    limit: intParam(query, "limit", 50, 200) || 50,
+    offset: intParam(query, "offset", 0, 100_000),
+  });
+  return {
+    ...result,
+    stats: await knowledgeStats(),
+    storageConfigured: isMediaStorageConfigured(),
+  };
+});
+
+router.add("POST /knowledge", async ({ req, body, identity }) => {
+  const entry = await createKnowledge({ ...body, sourceKind: "note" }, identity);
+  await recordActivity(req, identity, "knowledge.created", {
+    entityType: "knowledge",
+    entityId: entry.id,
+    entityLabel: entry.title || "Untitled note",
+    metadata: { sourceKind: "note", characters: entry.characters },
+  });
+  return { entry };
+});
+
+// Signs a browser-direct PDF upload. The knowledge base only ever ingests PDFs, so the type is
+// pinned here rather than left to the caller — the signature then physically cannot authorise
+// anything else.
+router.add("POST /knowledge/upload-url", async ({ body }) => {
+  if (!isMediaStorageConfigured()) {
+    throw badRequest(
+      "File storage is not configured yet, so PDFs cannot be uploaded. Connect a Vercel Blob " +
+        "store (or the MEDIA_S3_* variables), or paste the text directly instead.",
+    );
+  }
+  const filename = requiredString(body, "filename");
+  const mimeType = optionalString(body, "mimeType") ?? "application/pdf";
+  if (mimeType !== "application/pdf") {
+    throw badRequest("Only PDF files can be added to the knowledge base.");
+  }
+  const sizeBytes = Number(body.sizeBytes);
+  if (Number.isFinite(sizeBytes) && sizeBytes > KNOWLEDGE_PDF_MAX_BYTES) {
+    throw badRequest(
+      `That PDF exceeds the ${Math.round(KNOWLEDGE_PDF_MAX_BYTES / (1024 * 1024))} MB limit.`,
+    );
+  }
+
+  const upload = await presignStorageUpload({
+    filename,
+    mimeType,
+    sizeBytes: Number.isFinite(sizeBytes) && sizeBytes > 0 ? sizeBytes : undefined,
+    folder: "knowledge",
+  });
+  return { upload };
+});
+
+// After the browser has PUT the bytes, pull them back, extract the text, and store it. The PDF's
+// bytes are never persisted in the row — only the text the assistant can actually read.
+router.add("POST /knowledge/ingest", async ({ req, body, identity }) => {
+  const storageKey = requiredString(body, "storageKey");
+  const filename = optionalString(body, "filename") ?? "document.pdf";
+  const title = optionalString(body, "title") ?? filename.replace(/\.pdf$/i, "");
+
+  const head = await headObject(storageKey);
+  if (!head.exists) {
+    throw badRequest("That upload did not complete. Please try uploading the PDF again.");
+  }
+
+  let extraction;
+  try {
+    extraction = await extractPdfText(await getObject(storageKey));
+  } catch {
+    await deleteObject(storageKey).catch(() => {});
+    throw badRequest("That file could not be read as a PDF. Please check it and try again.");
+  }
+
+  if (!extraction.text) {
+    await deleteObject(storageKey).catch(() => {});
+    throw badRequest(
+      "No text could be extracted — the PDF looks like scanned images rather than selectable " +
+        "text. Type the key facts in as a note instead.",
+    );
+  }
+
+  const entry = await createKnowledge(
+    {
+      title,
+      body: extraction.text,
+      sourceKind: "pdf",
+      sourceName: filename,
+      sourceUrl: head.url,
+      storageKey,
+    },
+    identity,
+  );
+  await recordActivity(req, identity, "knowledge.created", {
+    entityType: "knowledge",
+    entityId: entry.id,
+    entityLabel: entry.title || filename,
+    metadata: { sourceKind: "pdf", pages: extraction.pages, characters: entry.characters },
+  });
+  return { entry, pages: extraction.pages, truncated: extraction.truncated };
+});
+
+router.add("GET /knowledge/:id", async ({ params }) => {
+  const entry = await getKnowledge(params.id);
+  if (!entry) throw notFound("That knowledge entry");
+  return { entry };
+});
+
+router.add("PATCH /knowledge/:id", async ({ req, params, body, identity }) => {
+  const entry = await updateKnowledge(params.id, body, identity);
+  await recordActivity(req, identity, "knowledge.updated", {
+    entityType: "knowledge",
+    entityId: entry.id,
+    entityLabel: entry.title || "Untitled entry",
+    metadata: { status: entry.status },
+  });
+  return { entry };
+});
+
+router.add("DELETE /knowledge/:id", async ({ req, params, identity }) => {
+  const { entry, storageKey } = await deleteKnowledge(params.id);
+  // A PDF-sourced entry owns its uploaded file; remove it too so deleting the entry does not
+  // leave an orphaned object behind. Best-effort — a failed cleanup must not fail the delete.
+  if (storageKey) {
+    await deleteObject(storageKey).catch(() => {});
+  }
+  await recordActivity(req, identity, "knowledge.deleted", {
+    entityType: "knowledge",
+    entityId: entry.id,
+    entityLabel: entry.title || "Untitled entry",
+  });
+  return { deleted: true, id: entry.id };
 });
 
 // ─── Administrators and roles ────────────────────────────────────────────────

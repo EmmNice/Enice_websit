@@ -328,6 +328,54 @@ CREATE INDEX IF NOT EXISTS ai_change_requests_recent_idx
   ON ai_change_requests (created_at DESC);
 `,
   },
+  {
+    id: 2,
+    name: "knowledge_base",
+    sql: /* sql */ `
+-- ─── AI assistant knowledge base ────────────────────────────────────────────
+-- Curated facts the PUBLIC chatbot (api/chat) grounds its answers in, so the site owner
+-- can teach the assistant without a code change to the static system prompt.
+--
+-- An entry is either a typed note or the text extracted from an uploaded PDF; 'source_kind'
+-- records which. The bytes of a PDF live in object storage like any other media — only the
+-- extracted text is stored here, because that is what retrieval needs.
+--
+-- Retrieval is native Postgres full-text search over 'search_text' (title + body), exactly as
+-- content_items and media_assets already do. Deliberately NOT pgvector: that needs
+-- CREATE EXTENSION, which managed Postgres may refuse, and would break the zero-extension
+-- guarantee the rest of this schema keeps. 'english' is a core dictionary, no extension needed.
+CREATE TABLE IF NOT EXISTS knowledge_entries (
+  id                uuid PRIMARY KEY,
+  title             text NOT NULL DEFAULT '',
+  body              text NOT NULL DEFAULT '',
+  -- 'note' (typed) | 'pdf' (extracted). Kept as text, not an enum, so a new source needs
+  -- no migration.
+  source_kind       text NOT NULL DEFAULT 'note',
+  -- Original filename for a PDF, so the UI can show what an entry came from.
+  source_name       text,
+  -- Where the uploaded document is readable, when the entry came from one.
+  source_url        text,
+  storage_key       text,
+  -- 'active' entries are eligible for retrieval; 'disabled' are kept but never surfaced to
+  -- the assistant, so an entry can be parked without deleting it.
+  status            text NOT NULL DEFAULT 'active',
+  tags              text[] NOT NULL DEFAULT '{}',
+  -- Derived on write (title || ' ' || body). Never selected back; only fed to to_tsvector.
+  search_text       text NOT NULL DEFAULT '',
+  created_by_email  text,
+  updated_by_email  text,
+  created_at        timestamptz NOT NULL DEFAULT now(),
+  updated_at        timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS knowledge_entries_search_idx
+  ON knowledge_entries USING gin (to_tsvector('english', search_text));
+CREATE INDEX IF NOT EXISTS knowledge_entries_status_idx
+  ON knowledge_entries (status, updated_at DESC);
+CREATE INDEX IF NOT EXISTS knowledge_entries_recent_idx
+  ON knowledge_entries (updated_at DESC);
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

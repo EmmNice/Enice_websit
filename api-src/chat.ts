@@ -5,6 +5,8 @@
 
 import { createAIProvider, SYSTEM_PROMPT } from "../src/lib/ai/index";
 import type { AIMessage } from "../src/lib/ai/types";
+import { ensureMigrated, isDatabaseConfigured } from "./lib/db";
+import { retrieveForChat } from "./lib/repo/knowledge";
 import {
   clientIp,
   createRateLimiter,
@@ -15,6 +17,51 @@ import {
 } from "./lib/http";
 
 const isRateLimited = createRateLimiter(10, 5 * 60 * 1000);
+
+/**
+ * Builds the system prompt for a turn, grounding it in the curated knowledge base.
+ *
+ * The static `SYSTEM_PROMPT` is the assistant's persona and baseline facts. On top of it we add
+ * the knowledge-base entries most relevant to what the visitor just asked, so the site owner can
+ * teach the assistant new facts without a code change.
+ *
+ * This must never break the widget. If the database is not configured, is unreachable, or holds
+ * nothing relevant, the assistant simply answers from the static prompt alone — exactly as it did
+ * before the knowledge base existed. Every failure here is swallowed for that reason.
+ */
+async function buildSystemPrompt(history: AIMessage[]): Promise<string> {
+  if (!isDatabaseConfigured()) return SYSTEM_PROMPT;
+
+  try {
+    // The chat function is separate from the admin API, so the knowledge table may not have been
+    // created yet on a brand-new database. Running migrations here makes the endpoint
+    // self-sufficient; it is memoised per instance, so this is cheap after the first call.
+    await ensureMigrated();
+
+    const latestQuestion = [...history].reverse().find((m) => m.role === "user")?.content ?? "";
+    const entries = await retrieveForChat(latestQuestion);
+    if (entries.length === 0) return SYSTEM_PROMPT;
+
+    const block = entries
+      .map((entry, i) => `[${i + 1}] ${entry.title || "Untitled"}\n${entry.body}`)
+      .join("\n\n");
+
+    return `${SYSTEM_PROMPT}
+
+---
+
+# CURATED KNOWLEDGE
+The following facts have been provided by ENICE Group specifically to inform your answers. Treat
+them as authoritative: when they add to or conflict with anything above, prefer them. Do not
+mention "the knowledge base" or that this information was supplied to you — simply answer from it.
+
+${block}`;
+  } catch (err) {
+    // Retrieval is best-effort. Log for diagnosis, then answer from the static prompt.
+    console.error("[api/chat] knowledge retrieval skipped:", err);
+    return SYSTEM_PROMPT;
+  }
+}
 
 export default async function handler(req: ApiRequest, res: ApiResponse) {
   try {
@@ -50,7 +97,8 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       return res.status(400).json({ ok: false, error: "No valid messages provided." });
     }
 
-    const messages: AIMessage[] = [{ role: "system", content: SYSTEM_PROMPT }, ...history];
+    const systemPrompt = await buildSystemPrompt(history);
+    const messages: AIMessage[] = [{ role: "system", content: systemPrompt }, ...history];
 
     const provider = createAIProvider();
     const result = await provider.complete(messages);

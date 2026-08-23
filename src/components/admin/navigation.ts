@@ -169,6 +169,15 @@ export const NAV_GROUPS: NavGroup[] = [
         description: "Ask for larger website changes and review proposals",
         keywords: ["assistant", "generate", "propose"],
       },
+      {
+        label: "Assistant knowledge",
+        to: "/admin/knowledge",
+        icon: "BookOpen",
+        permission: "ai.knowledge.read",
+        matchPrefix: true,
+        description: "Teach the website chatbot facts and upload PDFs",
+        keywords: ["chatbot", "train", "knowledge base", "pdf", "faq", "context"],
+      },
     ],
   },
   {
