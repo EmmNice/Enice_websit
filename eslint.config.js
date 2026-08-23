@@ -16,8 +16,7 @@ export default tseslint.config(
       // is written by the TanStack Router plugin. Linting either one is noise.
       "api/**",
       "src/routeTree.gen.ts",
-      // Sanity Studio is a separate package with its own React version and toolchain.
-      "studio-enice-group/**",
+      ".verify/**",
     ],
   },
   {
@@ -64,6 +63,14 @@ export default tseslint.config(
     // Vendored shadcn/ui primitives. Co-locating a `cva` variant export with the
     // component is the upstream convention, so the react-refresh heuristic is noise here.
     files: ["src/components/ui/**/*.{ts,tsx}"],
+    rules: { "react-refresh/only-export-components": "off" },
+  },
+  {
+    // Website Manager components. A context provider and its `use*` hook belong in one file —
+    // that is what keeps the context object private — and the same applies to `useConfirm`
+    // beside `ConfirmDialog`. Splitting them to satisfy a fast-refresh heuristic would make the
+    // code worse, and the admin panel is not a hot-reload-sensitive surface.
+    files: ["src/components/admin/**/*.{ts,tsx}"],
     rules: { "react-refresh/only-export-components": "off" },
   },
   eslintPluginPrettier,

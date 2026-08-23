@@ -11,5 +11,5 @@ bun.lock
 api
 routeTree.gen.ts
 
-# Separate package with its own toolchain.
-studio-enice-group
+# Local verification harness, never committed.
+.verify

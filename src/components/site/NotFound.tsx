@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
  *
  * Two different ones used to exist: the designed page below (reached via the `/$` splat
  * route for unmatched URLs) and a bare unstyled fallback in `__root.tsx` used whenever a
- * loader threw `notFound()` — for example a blog slug with no matching Sanity document.
+ * loader threw `notFound()` — for example a blog slug with no matching published article.
  * Both paths now render this component.
  */
 export function NotFound() {

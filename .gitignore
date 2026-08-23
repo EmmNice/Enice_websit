@@ -37,3 +37,9 @@ node_modules
 *.njsproj
 *.sln
 *.sw?
+.verify/
+
+
+# The repository's lockfile is bun.lock. package-lock.json is only produced by
+# incidental `npm install` runs (Vercel uses `npm install`, which does not need it).
+package-lock.json

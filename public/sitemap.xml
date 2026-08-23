@@ -77,6 +77,18 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://enicehq.com/news/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://enicehq.com/announcements/</loc>
+    <lastmod>2026-08-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://enicehq.com/docs</loc>
     <lastmod>2026-08-15</lastmod>
     <changefreq>monthly</changefreq>

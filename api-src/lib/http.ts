@@ -19,6 +19,12 @@ export interface ApiResponse {
   status(code: number): ApiResponse;
   json(payload: unknown): void;
   headersSent?: boolean;
+  /**
+   * Both Vercel's response object and the dev bridge's decorated `ServerResponse` inherit this
+   * from Node, so it is safe to require. The Website Manager needs it to issue `Set-Cookie` for
+   * session and CSRF cookies, and `Cache-Control` on public content responses.
+   */
+  setHeader(name: string, value: string | string[]): void;
 }
 
 export type ApiHandler = (req: ApiRequest, res: ApiResponse) => Promise<void> | void;

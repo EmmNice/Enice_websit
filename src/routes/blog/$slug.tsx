@@ -1,113 +1,65 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { SITE_URL } from "@/lib/site";
-import { ArrowLeft, Calendar, Tag } from "lucide-react";
-import { PortableText } from "@portabletext/react";
-import type { PortableTextComponents } from "@portabletext/react";
+import { ArrowUpRight } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
-import { sanityClient, POST_BY_SLUG_QUERY } from "@/lib/sanity";
+import { ArticleView } from "@/components/site/ArticleView";
+import { SITE_URL } from "@/lib/site";
+import {
+  categoryBadgeClasses,
+  fetchArticle,
+  formatPublishedDate,
+  type PublicArticle,
+} from "@/lib/cms/public-client";
 
-interface Post {
-  _id: string;
-  title: string;
-  slug: { current: string };
-  category: string;
-  publishedAt: string;
-  excerpt: string;
-  mainImageUrl?: string;
-  body: unknown[];
+/**
+ * A blog article.
+ *
+ * Content comes from the ENICE Website Manager's public API. The layout itself lives in
+ * `ArticleView`, which the admin panel's preview also renders — so what an author previews is
+ * produced by the same code that serves this page.
+ */
+function RelatedPosts({ related }: { related: PublicArticle["related"] }) {
+  if (related.length === 0) return null;
+
+  return (
+    <section className="mt-16 border-t border-white/[0.07] pt-10">
+      <h2 className="mb-6 text-[11px] font-bold tracking-[0.22em] text-zinc-500 uppercase">
+        More from ENICE Group
+      </h2>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {related.map((post) => (
+          <Link
+            key={post.id}
+            to="/blog/$slug"
+            params={{ slug: post.slug }}
+            className="group rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 transition-colors hover:border-blue-500/30 hover:bg-white/[0.04]"
+          >
+            {post.category && (
+              <span
+                className={`mb-2 inline-flex w-fit items-center rounded-full border px-2 py-0.5 text-[9px] font-bold tracking-[0.16em] ${categoryBadgeClasses(post.category)}`}
+              >
+                {post.category.toUpperCase()}
+              </span>
+            )}
+            <h3 className="mb-1.5 text-sm leading-snug font-bold text-white transition-colors group-hover:text-blue-400">
+              {post.title}
+            </h3>
+            <p className="mb-2 text-[11px] text-zinc-500">
+              {formatPublishedDate(post.publishedAt)}
+            </p>
+            <p className="line-clamp-2 text-[13px] leading-relaxed text-zinc-400">{post.excerpt}</p>
+            <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-blue-400 opacity-0 transition-opacity group-hover:opacity-100">
+              Read <ArrowUpRight className="h-3 w-3" />
+            </span>
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
 }
-
-const CATEGORY_STYLES: Record<string, string> = {
-  BLOG: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  CHANGELOG: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  UPDATE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  ANNOUNCEMENT: "bg-violet-500/10 text-violet-400 border-violet-500/20",
-  PRODUCT: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-};
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-// ─── Portable Text component overrides ───────────────────────────────────────
-
-const ptComponents: PortableTextComponents = {
-  block: {
-    normal: ({ children }) => (
-      <p className="mb-6 text-[17px] leading-8 text-zinc-300">{children}</p>
-    ),
-    h2: ({ children }) => (
-      <h2 className="mb-4 mt-10 text-2xl font-bold tracking-tight text-white">{children}</h2>
-    ),
-    h3: ({ children }) => (
-      <h3 className="mb-3 mt-8 text-xl font-bold tracking-tight text-white">{children}</h3>
-    ),
-    blockquote: ({ children }) => (
-      <blockquote className="mb-6 border-l-2 border-blue-500 pl-5 italic text-zinc-400">
-        {children}
-      </blockquote>
-    ),
-  },
-  marks: {
-    strong: ({ children }) => <strong className="font-bold text-white">{children}</strong>,
-    em: ({ children }) => <em className="italic text-zinc-300">{children}</em>,
-    code: ({ children }) => (
-      <code className="rounded bg-white/[0.07] px-1.5 py-0.5 font-mono text-[0.85em] text-blue-300">
-        {children}
-      </code>
-    ),
-  },
-  list: {
-    bullet: ({ children }) => (
-      <ul className="mb-6 space-y-2 pl-6 text-[17px] leading-8 text-zinc-300">{children}</ul>
-    ),
-    number: ({ children }) => (
-      <ol className="mb-6 list-decimal space-y-2 pl-6 text-[17px] leading-8 text-zinc-300">
-        {children}
-      </ol>
-    ),
-  },
-  listItem: {
-    bullet: ({ children }) => (
-      <li className="relative pl-2 before:absolute before:-left-4 before:text-blue-400 before:content-['·']">
-        {children}
-      </li>
-    ),
-    number: ({ children }) => <li>{children}</li>,
-  },
-  types: {
-    image: ({ value }: { value: { asset?: { url?: string }; alt?: string; caption?: string } }) => {
-      if (!value?.asset?.url) return null;
-      return (
-        <figure className="my-8">
-          <img
-            src={value.asset.url}
-            alt={value.alt ?? ""}
-            className="w-full rounded-2xl object-cover"
-          />
-          {value.caption && (
-            <figcaption className="mt-3 text-center text-xs text-zinc-500">
-              {value.caption}
-            </figcaption>
-          )}
-        </figure>
-      );
-    },
-  },
-};
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 function ArticlePage() {
-  const post = Route.useLoaderData();
-
-  const tagStyle =
-    CATEGORY_STYLES[post.category] ?? "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
+  const { item, related } = Route.useLoaderData();
 
   return (
     <div className="min-h-screen bg-[#09090b] text-white">
@@ -115,68 +67,21 @@ function ArticlePage() {
 
       <main className="px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-2xl">
-          {/* Back link */}
-          <Link
-            to="/blog/"
-            className="mb-10 inline-flex items-center gap-1.5 text-xs font-semibold text-zinc-500 transition-colors hover:text-white"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Blog
-          </Link>
-
-          <article>
-            {/* Category + date */}
-            <div className="mb-5 flex flex-wrap items-center gap-3">
-              <span
-                className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold tracking-[0.18em] ${tagStyle}`}
-              >
-                <Tag className="h-3 w-3" />
-                {post.category}
-              </span>
-              <span className="inline-flex items-center gap-1.5 text-xs text-zinc-500">
-                <Calendar className="h-3.5 w-3.5" />
-                {formatDate(post.publishedAt)}
-              </span>
-            </div>
-
-            {/* Title */}
-            <h1 className="mb-5 text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
-              {post.title}
-            </h1>
-
-            {/* Excerpt lead */}
-            <p className="mb-10 text-lg leading-relaxed text-zinc-400">{post.excerpt}</p>
-
-            {/* Cover image */}
-            {post.mainImageUrl && (
-              <img
-                src={post.mainImageUrl}
-                alt={post.title}
-                className="mb-10 w-full rounded-2xl object-cover"
-              />
-            )}
-
-            {/* Divider */}
-            <div className="mb-10 h-px bg-white/[0.07]" />
-
-            {/* Body */}
-            <div className="prose-enice">
-              {post.body?.length > 0 ? (
-                <PortableText
-                  value={post.body as Parameters<typeof PortableText>[0]["value"]}
-                  components={ptComponents}
-                />
-              ) : (
-                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-8 py-10 text-center">
-                  <p className="text-base font-semibold text-white/80">
-                    This article is being prepared.
-                  </p>
-                  <p className="mt-2 text-sm text-zinc-500">
-                    The full piece will be published here shortly. Check back soon.
-                  </p>
-                </div>
-              )}
-            </div>
-          </article>
+          <ArticleView
+            article={{
+              title: item.title,
+              excerpt: item.excerpt,
+              category: item.category,
+              tags: item.tags,
+              coverImageUrl: item.coverImageUrl,
+              author: item.author,
+              publishedAt: item.publishedAt,
+              body: item.body,
+            }}
+            theme="dark"
+            backLink={{ label: "Back to Blog", href: "/blog/" }}
+            footerSlot={<RelatedPosts related={related} />}
+          />
         </div>
       </main>
 
@@ -185,70 +90,70 @@ function ArticlePage() {
   );
 }
 
-function slugToTitle(slug: string) {
-  return slug
-    .split("-")
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
-}
-
 export const Route = createFileRoute("/blog/$slug")({
   /**
-   * Loaded before the component renders so `head()` can build the title, description and
-   * structured data from the actual post. Previously these were derived from the slug, which
-   * meant search results and social cards showed a guessed title like "My Post Title" rather
-   * than the real one, and never the real excerpt.
+   * Loaded before render so `head()` can build the title, description and structured data from the
+   * real article rather than guessing from the slug.
+   *
+   * The API resolves SEO server-side — applying overrides, then values derived from the content,
+   * then the site defaults — so this route consumes finished metadata instead of reimplementing
+   * that precedence.
    */
   loader: async ({ params }) => {
-    const post = await sanityClient.fetch<Post | null>(POST_BY_SLUG_QUERY, { slug: params.slug });
-    if (!post) throw notFound();
-    return post;
+    const article = await fetchArticle("blog", params.slug);
+    if (!article) throw notFound();
+    return article;
   },
+
   head: ({ params, loaderData }) => {
-    const url = `${SITE_URL}/blog/${params.slug}`;
-    // `loaderData` is undefined while the loader is pending or if it threw; fall back to a
-    // slug-derived title so the tags are never empty.
-    const title = loaderData?.title ?? slugToTitle(params.slug);
-    const pageTitle = `${title} | ENICE Group Blog`;
-    const description =
-      loaderData?.excerpt?.trim() ||
-      `Read "${title}" on the ENICE Group blog: product updates, changelog entries, and announcements.`;
-    const image = loaderData?.mainImageUrl || `${SITE_URL}/og.png`;
-    const published = loaderData?.publishedAt;
+    // `loaderData` is absent while the loader is pending or if it threw; the slug-derived
+    // fallbacks keep the tags populated rather than empty.
+    const url = loaderData?.item.url
+      ? `${SITE_URL}${loaderData.item.url}`
+      : `${SITE_URL}/blog/${params.slug}`;
+    const seo = loaderData?.seo;
+    const title = seo?.title ?? params.slug.replace(/-/g, " ");
+    const description = seo?.description ?? "An article from the ENICE Group blog.";
+    const image = seo?.ogImage ?? `${SITE_URL}/og.png`;
+    const published = loaderData?.item.publishedAt;
+    const updated = loaderData?.item.updatedAt;
 
     return {
       meta: [
-        { title: pageTitle },
+        { title },
         { name: "description", content: description },
-        { property: "og:title", content: pageTitle },
-        { property: "og:description", content: description },
+        { name: "robots", content: seo?.index === false ? "noindex, nofollow" : "index, follow" },
+        { property: "og:title", content: seo?.ogTitle ?? title },
+        { property: "og:description", content: seo?.ogDescription ?? description },
         { property: "og:type", content: "article" },
         { property: "og:site_name", content: "ENICE Group" },
         { property: "og:url", content: url },
         { property: "og:image", content: image },
-        { property: "og:image:alt", content: title },
+        { property: "og:image:alt", content: loaderData?.item.title ?? title },
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:site", content: "@ENICEHQ" },
         { name: "twitter:image", content: image },
-        { name: "twitter:title", content: pageTitle },
-        { name: "twitter:description", content: description },
-        { name: "robots", content: "index, follow" },
+        { name: "twitter:title", content: seo?.ogTitle ?? title },
+        { name: "twitter:description", content: seo?.ogDescription ?? description },
       ],
-      links: [{ rel: "canonical", href: url }],
+      links: [{ rel: "canonical", href: seo?.canonicalUrl ?? url }],
       scripts: [
         {
           type: "application/ld+json",
           children: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
-            headline: title,
+            headline: loaderData?.item.title ?? title,
             description,
             url,
             mainEntityOfPage: url,
             image,
-            ...(published ? { datePublished: published, dateModified: published } : {}),
-            ...(loaderData?.category ? { articleSection: loaderData.category } : {}),
+            ...(published ? { datePublished: published } : {}),
+            ...(updated ? { dateModified: updated } : {}),
+            ...(loaderData?.item.category ? { articleSection: loaderData.item.category } : {}),
+            ...(loaderData?.item.author?.name
+              ? { author: { "@type": "Person", name: loaderData.item.author.name } }
+              : {}),
             publisher: {
               "@type": "Organization",
               name: "ENICE Group",
@@ -265,12 +170,18 @@ export const Route = createFileRoute("/blog/$slug")({
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
               { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE_URL}/blog/` },
-              { "@type": "ListItem", position: 3, name: title, item: url },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: loaderData?.item.title ?? title,
+                item: url,
+              },
             ],
           }),
         },
       ],
     };
   },
+
   component: ArticlePage,
 });

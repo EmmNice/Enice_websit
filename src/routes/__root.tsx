@@ -155,7 +155,7 @@ function RootComponent() {
 
 export const Route = createRootRoute({
   component: RootComponent,
-  // Rendered when a route throws `notFound()` (e.g. a blog slug with no Sanity document).
+  // Rendered when a route throws `notFound()` (e.g. a blog slug with no published article).
   // Shares the designed 404 with the `/$` splat route so both paths look identical.
   notFoundComponent: NotFound,
   errorComponent: ErrorComponent,
