@@ -109,8 +109,18 @@ there are no `VITE_`-prefixed variables.
 `/api/cms` and `/api/site` are each a single Vercel function that routes internally (there is a
 cap on function count, and ~60 endpoints would otherwise be ~60 functions). `vercel.json` rewrites
 `/api/cms/:path*` and `/api/site/:path*` onto them via a `__route` query parameter, and
-`src/lib/router.ts` dispatches. `vite dev` mounts the same handlers on those prefixes so local and
-production behave identically.
+`api-src/lib/router.ts` dispatches. `vite dev` mounts the same handlers on those prefixes so local
+and production behave identically.
+
+Two constraints on those rewrites, neither of which `vercel.json` can document itself — it is
+strict JSON, and the schema rejects any property outside `source` / `destination` / `has` /
+`missing`:
+
+- **They must stay ahead of the SPA rewrite.** Vercel applies rewrites in order, and
+  `/((?!api/)[^.]*)` would otherwise swallow them.
+- **The parameter is `__route`, not `path`.** An endpoint may take a `path` parameter of its own —
+  `/api/site/page?path=/about` does — and two parameters of the same name would collide, with the
+  endpoint silently receiving the route instead of its own value.
 
 `vite dev` serves these by loading the same handler modules through Vite's SSR pipeline
 (see `apiBridgePlugin` in `vite.config.ts`), so local and production behaviour match.

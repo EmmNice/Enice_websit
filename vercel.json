@@ -49,11 +49,7 @@
     }
   ],
   "rewrites": [
-    {
-      "comment": "The Website Manager's API is two functions that route internally, so the sub-path is passed as the namespaced `__route` query parameter (namespaced because endpoints may take a `path` parameter of their own). These must precede the SPA rewrite: Vercel applies rewrites in order.",
-      "source": "/api/cms/:path*",
-      "destination": "/api/cms?__route=:path*"
-    },
+    { "source": "/api/cms/:path*", "destination": "/api/cms?__route=:path*" },
     { "source": "/api/site/:path*", "destination": "/api/site?__route=:path*" },
     { "source": "/((?!api/)[^.]*)", "destination": "/index.html" }
   ]
