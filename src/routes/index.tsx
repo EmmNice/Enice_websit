@@ -27,6 +27,8 @@ import { FAQS } from "@/lib/faqs";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { ContactSection } from "@/components/site/ContactSection";
 import { faqJsonLd, organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
 
@@ -135,6 +137,11 @@ const COMPLIANCE_BADGES = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function Landing() {
+  // Editable homepage sections. Each reads its CMS content and falls back to the built-in copy
+  // below, so the page is identical until an administrator edits a section and reflects the edit
+  // from then on. Text fields accept the **bold** / [[highlight]] styling syntax.
+  const hero = useSectionFields("home.hero");
+
   return (
     <div className="min-h-dvh w-full overflow-x-hidden bg-background text-foreground antialiased selection:bg-primary/15">
       <ScrollProgress />
@@ -195,7 +202,10 @@ function Landing() {
                       <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-blue-400" />
                     </span>
                     <span className="whitespace-nowrap text-[11px] font-semibold tracking-[0.06em] text-white/60 sm:tracking-[0.12em]">
-                      Technology Group · Building for Africa
+                      <StyledText
+                        text={fieldText(hero, "eyebrow", "Technology Group · Building for Africa")}
+                        accentClassName="text-blue-400"
+                      />
                     </span>
                   </div>
 
@@ -204,13 +214,14 @@ function Landing() {
                     className="animate-hero-up text-[2.1rem] font-bold leading-[0.95] tracking-[-0.04em] text-white sm:text-6xl lg:text-7xl xl:text-[5.25rem]"
                     style={{ animationDelay: "100ms" }}
                   >
-                    We build the technology
-                    <br />
-                    <span className="text-blue-400">behind Africa's next</span>
-                    <br />
-                    generation of
-                    <br />
-                    businesses.
+                    <StyledText
+                      text={fieldText(
+                        hero,
+                        "heading",
+                        "We build the technology\n[[behind Africa's next]]\ngeneration of\nbusinesses.",
+                      )}
+                      accentClassName="text-blue-400"
+                    />
                   </h1>
 
                   {/* Subheadline */}
@@ -218,8 +229,14 @@ function Landing() {
                     className="animate-hero-up mt-5 max-w-xl text-base leading-relaxed text-white/55 sm:mt-8 sm:text-lg"
                     style={{ animationDelay: "200ms" }}
                   >
-                    ENICE Group builds, owns, and operates technology products for financial
-                    services, commerce, and business communication.
+                    <StyledText
+                      text={fieldText(
+                        hero,
+                        "subheading",
+                        "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
+                      )}
+                      accentClassName="text-blue-400"
+                    />
                   </p>
 
                   {/* CTAs */}
@@ -227,19 +244,19 @@ function Landing() {
                     className="animate-hero-up mt-7 flex flex-wrap gap-3 sm:mt-10"
                     style={{ animationDelay: "300ms" }}
                   >
-                    <Link
-                      to="/portfolio"
+                    <a
+                      href={fieldText(hero, "primaryCtaUrl", "/portfolio")}
                       className="group inline-flex h-11 items-center gap-2 rounded-md bg-white px-6 text-[13px] font-semibold text-[#060912] transition-all hover:bg-white/90 sm:h-12 sm:px-7"
                     >
-                      Explore our products
+                      {fieldText(hero, "primaryCtaLabel", "Explore our products")}
                       <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                    </Link>
-                    <Link
-                      to="/about"
+                    </a>
+                    <a
+                      href={fieldText(hero, "secondaryCtaUrl", "/about")}
                       className="inline-flex h-11 items-center gap-2 rounded-md border border-white/15 bg-white/5 px-6 text-[13px] font-semibold text-white/80 backdrop-blur-sm transition-all hover:border-white/25 hover:bg-white/10 hover:text-white sm:h-12 sm:px-7"
                     >
-                      What we build
-                    </Link>
+                      {fieldText(hero, "secondaryCtaLabel", "What we build")}
+                    </a>
                   </div>
 
                   {/* Trust signals */}

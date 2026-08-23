@@ -121,8 +121,19 @@ var init_types = __esm({
         icon: "Sparkles",
         fields: [
           { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the headline." },
-          { key: "heading", label: "Headline", type: "text", required: true },
-          { key: "subheading", label: "Supporting copy", type: "textarea" },
+          {
+            key: "heading",
+            label: "Headline",
+            type: "text",
+            required: true,
+            help: "Style with **bold** and [[highlight]] (highlight shows in the accent colour). A new line splits the headline."
+          },
+          {
+            key: "subheading",
+            label: "Supporting copy",
+            type: "textarea",
+            help: "Supports **bold** and [[highlight]]."
+          },
           { key: "primaryCtaLabel", label: "Primary button label", type: "text" },
           { key: "primaryCtaUrl", label: "Primary button URL", type: "url" },
           { key: "secondaryCtaLabel", label: "Secondary button label", type: "text" },
@@ -3045,6 +3056,32 @@ ON CONFLICT (key) DO UPDATE SET
     END
   ),
   updated_at = now();
+`
+        )
+      },
+      {
+        id: 5,
+        name: "hero_current_copy",
+        sql: (
+          /* sql */
+          `
+-- The homepage hero is now rendered from this section. Set its content to the copy the site
+-- already displays, so wiring it changes nothing visible. Only applied when the hero still holds
+-- the original generic seed heading, so an operator who has edited it is left untouched. In the
+-- heading, a newline splits the line and [[...]] marks the phrase shown in the accent colour.
+UPDATE site_sections
+SET fields = fields || '{
+  "eyebrow": "Technology Group \xB7 Building for Africa",
+  "heading": "We build the technology\\n[[behind Africa''s next]]\\ngeneration of\\nbusinesses.",
+  "subheading": "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
+  "primaryCtaLabel": "Explore our products",
+  "primaryCtaUrl": "/portfolio",
+  "secondaryCtaLabel": "What we build",
+  "secondaryCtaUrl": "/about"
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'heading' = 'Technology products for financial services, commerce, and communication';
 `
         )
       }
@@ -86569,13 +86606,14 @@ var init_website = __esm({
         type: "hero",
         order: 10,
         fields: {
-          eyebrow: "ENICE GROUP",
-          heading: "Technology products for financial services, commerce, and communication",
-          subheading: "ENICE Group builds, owns, and operates the platforms behind modern payments, digital banking, and enterprise AI.",
+          eyebrow: "Technology Group \xB7 Building for Africa",
+          // \n splits the headline across lines; [[…]] renders the phrase in the accent colour.
+          heading: "We build the technology\n[[behind Africa's next]]\ngeneration of\nbusinesses.",
+          subheading: "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
           primaryCtaLabel: "Explore our products",
           primaryCtaUrl: "/portfolio",
-          secondaryCtaLabel: "Contact us",
-          secondaryCtaUrl: "/contact"
+          secondaryCtaLabel: "What we build",
+          secondaryCtaUrl: "/about"
         }
       },
       {
