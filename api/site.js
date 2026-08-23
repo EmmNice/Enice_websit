@@ -2579,14 +2579,16 @@ function resolveDatabaseUrl(env = process.env) {
 function isDatabaseConfigured() {
   return resolveDatabaseUrl() !== null;
 }
-function sslSetting(url) {
-  if (/[?&]sslmode=/.test(url)) return void 0;
+function sslOptions(url) {
+  if (/[?&]sslmode=/i.test(url)) return {};
   try {
     const { hostname } = new URL(url);
-    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") return false;
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") {
+      return { ssl: false };
+    }
   } catch {
   }
-  return "require";
+  return { ssl: "require" };
 }
 function db() {
   if (client) return client;
@@ -2600,7 +2602,8 @@ function db() {
     connect_timeout: 15,
     // Named prepared statements are incompatible with transaction-mode poolers.
     prepare: false,
-    ssl: sslSetting(url),
+    // Spread, never assigned: see sslOptions on why `ssl: undefined` would disable TLS.
+    ...sslOptions(url),
     // Postgres emits notices for every `IF NOT EXISTS` no-op during migration; they are
     // expected and would otherwise fill the function logs on each cold start.
     onnotice: () => {

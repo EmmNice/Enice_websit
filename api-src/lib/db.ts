@@ -148,21 +148,40 @@ export function isDatabaseConfigured(): boolean {
 }
 
 /**
- * Chooses a TLS mode for the connection.
+ * Chooses a TLS mode for the connection, as options to *spread* into the driver config.
  *
- * Local development against a container needs TLS off, while every managed provider requires
- * it. An explicit `sslmode` in the URL always wins so an operator can pin `verify-full` with
- * their own CA bundle.
+ * Local development against a container needs TLS off, while every managed provider requires it.
+ * An explicit `sslmode` in the URL always wins so an operator can pin `verify-full` with their
+ * own CA bundle.
+ *
+ * ## Why this returns an object rather than a value
+ *
+ * postgres.js merges its options by *key presence*, not by definedness:
+ *
+ * ```js
+ * const value = k in o ? o[k] : k in query ? … : d
+ * ```
+ *
+ * So passing `ssl: undefined` to mean "no opinion, use the URL" does the opposite: the key is
+ * present, `undefined` wins, and both the `sslmode` in the connection string and the driver's own
+ * default are discarded — silently turning TLS off. Against a provider that requires TLS, such as
+ * Neon, every connection then fails, and it fails at connect time with a message that says
+ * nothing about SSL. Returning a partial object means the key is genuinely absent when we have no
+ * opinion, which is the only way to defer to the URL.
  */
-function sslSetting(url: string): postgres.Options<Record<string, never>>["ssl"] {
-  if (/[?&]sslmode=/.test(url)) return undefined;
+function sslOptions(url: string): Pick<postgres.Options<Record<string, never>>, "ssl"> {
+  // postgres.js maps `sslmode` in the query string onto its own `ssl` option, including
+  // `disable` → false. Leaving the key out lets that happen.
+  if (/[?&]sslmode=/i.test(url)) return {};
   try {
     const { hostname } = new URL(url);
-    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") return false;
+    if (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1") {
+      return { ssl: false };
+    }
   } catch {
     // An unparseable URL will fail at connect time with a clearer error than anything here.
   }
-  return "require";
+  return { ssl: "require" };
 }
 
 /**
@@ -190,7 +209,8 @@ export function db(): Sql {
     connect_timeout: 15,
     // Named prepared statements are incompatible with transaction-mode poolers.
     prepare: false,
-    ssl: sslSetting(url),
+    // Spread, never assigned: see sslOptions on why `ssl: undefined` would disable TLS.
+    ...sslOptions(url),
     // Postgres emits notices for every `IF NOT EXISTS` no-op during migration; they are
     // expected and would otherwise fill the function logs on each cold start.
     onnotice: () => {},
