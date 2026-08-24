@@ -28,7 +28,7 @@ import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { StyledText } from "@/components/site/StyledText";
-import { useSectionFields, fieldText } from "@/lib/cms/use-section";
+import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
 import { ContactSection } from "@/components/site/ContactSection";
 import { faqJsonLd, organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
 
@@ -141,6 +141,15 @@ function Landing() {
   // below, so the page is identical until an administrator edits a section and reflects the edit
   // from then on. Text fields accept the **bold** / [[highlight]] styling syntax.
   const hero = useSectionFields("home.hero");
+  const statistics = useSectionFields("home.statistics");
+  const products = useSectionFields("home.products");
+
+  // The hero's stats strip. Rows missing a value are skipped rather than rendered blank.
+  const stats = fieldItems(statistics, "items", HERO_STATS, (row) => {
+    const value = typeof row.value === "string" ? row.value.trim() : "";
+    const label = typeof row.label === "string" ? row.label.trim() : "";
+    return value ? { value, label } : null;
+  });
 
   return (
     <div className="min-h-dvh w-full overflow-x-hidden bg-background text-foreground antialiased selection:bg-primary/15">
@@ -416,9 +425,9 @@ function Landing() {
           <div className="relative z-10 border-t border-white/8">
             <div className="mx-auto max-w-7xl px-5 sm:px-8">
               <div className="grid grid-cols-2 divide-x divide-y divide-white/8 md:grid-cols-4 md:divide-y-0">
-                {HERO_STATS.map((s, i) => (
+                {stats.map((s, i) => (
                   <div
-                    key={s.label}
+                    key={`${s.label}-${i}`}
                     className="animate-hero-up p-5 sm:p-7"
                     style={{ animationDelay: `${500 + i * 80}ms` }}
                   >
@@ -446,16 +455,25 @@ function Landing() {
             <Reveal>
               <div className="mb-16 max-w-3xl">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.26em] text-primary">
-                  What we're building
+                  {fieldText(products, "eyebrow", "What we're building")}
                 </div>
                 <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-[3.25rem]">
-                  Products and platforms.
-                  <br />
-                  Built to one standard.
+                  <StyledText
+                    text={fieldText(
+                      products,
+                      "heading",
+                      "Products and platforms.\nBuilt to one standard.",
+                    )}
+                  />
                 </h2>
                 <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                  ENICE Group takes hard problems in financial services and business communication
-                  and turns them into products people can rely on.
+                  <StyledText
+                    text={fieldText(
+                      products,
+                      "subheading",
+                      "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on.",
+                    )}
+                  />
                 </p>
               </div>
             </Reveal>

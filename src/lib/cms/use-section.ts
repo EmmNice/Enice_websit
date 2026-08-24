@@ -64,3 +64,23 @@ export function fieldText(
   const value = fields?.[key];
   return typeof value === "string" && value.trim() ? value : fallback;
 }
+
+/**
+ * Reads a repeater field, mapping each row through `pick` and dropping rows it rejects.
+ *
+ * Falls back to the built-in list when the section is unmanaged or every row is unusable, so a
+ * half-filled repeater can never render an empty band.
+ */
+export function fieldItems<T>(
+  fields: Record<string, unknown> | null,
+  key: string,
+  fallback: T[],
+  pick: (row: Record<string, unknown>) => T | null,
+): T[] {
+  const raw = fields?.[key];
+  if (!Array.isArray(raw)) return fallback;
+  const mapped = raw
+    .map((row) => pick((row ?? {}) as Record<string, unknown>))
+    .filter((row): row is T => row !== null);
+  return mapped.length > 0 ? mapped : fallback;
+}

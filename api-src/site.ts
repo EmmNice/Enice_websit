@@ -25,6 +25,7 @@
 import type { ContentKind } from "../src/lib/cms/types";
 import { CONTENT_KINDS, CONTENT_KIND_META } from "../src/lib/cms/types";
 import { SITE_URL } from "../src/lib/site";
+import { PAGE_SEO, canonicalUrl } from "../src/lib/seo";
 import { resolveSeo, FALLBACK_SEO_DEFAULTS } from "../src/lib/cms/seo-resolve";
 import { errorRef, type ApiRequest, type ApiResponse } from "./lib/http";
 import { ensureMigrated, isDatabaseConfigured } from "./lib/db";
@@ -38,7 +39,13 @@ import {
   HttpError,
 } from "./lib/router";
 import { getContentBySlug, listContent } from "./lib/repo/content";
-import { getPageByPath, getSettings, listSections, publishDuePages } from "./lib/repo/website";
+import {
+  getPageByPath,
+  getSettings,
+  listPages,
+  listSections,
+  publishDuePages,
+} from "./lib/repo/website";
 
 /**
  * Edge cache policy.
@@ -287,6 +294,115 @@ router.add("GET /page", async ({ res, query }) => {
  * Consumed by the prerender step at build time and available at runtime for sitemap generation,
  * so a newly published post becomes discoverable without anyone editing `public/sitemap.xml`.
  */
+/**
+ * `sitemap.xml`, generated from the routes in code plus everything published in the CMS.
+ *
+ * This replaces a hand-maintained `public/sitemap.xml`, which listed only the static routes and
+ * carried a fixed `lastmod`. The consequence was that publishing an article — the whole point of
+ * the Website Manager — never told Google the page existed, and every stated modification date was
+ * a lie. Serving it from a function means a post is discoverable the moment it is published, with
+ * no rebuild.
+ *
+ * `lastmod` is the item's real `updatedAt`, which is what search engines actually use to decide
+ * whether to recrawl. `changefreq` and `priority` are deliberately omitted: Google states it
+ * ignores them, and inventing values adds noise to a file that should be trustworthy.
+ *
+ * If the database is unreachable, the static routes are still emitted. A partial sitemap is far
+ * better than a 500, which would tell a crawler the site is broken.
+ */
+/**
+ * The routes defined in code. A route marked `noindex` is excluded — listing a page in the sitemap
+ * while telling robots to skip it is contradictory.
+ */
+function staticEntries(): { url: string; lastmod?: string }[] {
+  return Object.entries(PAGE_SEO)
+    .filter(([, seo]) => !seo.robots?.includes("noindex"))
+    .map(([path]) => ({ url: canonicalUrl(path) }));
+}
+
+/** Routes only, for when the database cannot be read. Always valid, never empty. */
+function staticSitemap(): string {
+  return renderSitemap(staticEntries());
+}
+
+function renderSitemap(entries: { url: string; lastmod?: string }[]): string {
+  // De-duplicate, keeping the first occurrence, so a managed page at a static route cannot appear
+  // twice — a duplicate <loc> makes the document invalid to some validators.
+  const seen = new Set<string>();
+  const unique = entries.filter((entry) => {
+    if (seen.has(entry.url)) return false;
+    seen.add(entry.url);
+    return true;
+  });
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...unique.map((entry) => {
+      const lastmod = entry.lastmod ? `    <lastmod>${entry.lastmod.slice(0, 10)}</lastmod>\n` : "";
+      return `  <url>\n    <loc>${escapeXml(entry.url)}</loc>\n${lastmod}  </url>`;
+    }),
+    "</urlset>",
+    "",
+  ].join("\n");
+}
+
+async function buildSitemap(): Promise<string> {
+  const entries = staticEntries();
+
+  if (isDatabaseConfigured()) {
+    try {
+      await ensureMigrated();
+      const [content, pages, settings] = await Promise.all([
+        Promise.all(
+          (["blog", "news", "announcement"] as const).map((kind) =>
+            listContent({ kind, status: "published", limit: 500, sort: "published" }),
+          ),
+        ),
+        listPages(),
+        getSettings(),
+      ]);
+
+      const context = { siteUrl: SITE_URL, defaults: settings.seo };
+
+      for (const item of content.flatMap((result) => result.items)) {
+        const path = publicPath(item.kind, item.slug);
+        const seo = resolveSeo(
+          item.seo,
+          { title: item.title, excerpt: item.excerpt, image: item.coverImageUrl, path },
+          context,
+        );
+        // Honour a per-item or site-wide noindex, exactly as the page's own meta tags do.
+        if (!seo.index) continue;
+        entries.push({
+          url: canonicalUrl(path),
+          lastmod: item.updatedAt ?? item.publishedAt ?? undefined,
+        });
+      }
+
+      // Managed pages the administrator created, which have no entry in PAGE_SEO.
+      for (const page of pages) {
+        if (page.status !== "published" || page.systemRoute) continue;
+        entries.push({ url: canonicalUrl(page.path), lastmod: page.updatedAt ?? undefined });
+      }
+    } catch (error) {
+      console.error("[api/site] sitemap content omitted:", error);
+    }
+  }
+
+  return renderSitemap(entries);
+}
+
+/** XML-escapes a URL. Ampersands in a query string would otherwise break the document. */
+function escapeXml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+}
+
 router.add("GET /urls", async ({ res }) => {
   res.setHeader("Cache-Control", CACHE_SETTINGS);
 
@@ -352,6 +468,25 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
   if (method !== "GET" && method !== "HEAD") {
     res.setHeader("Cache-Control", "no-store");
     res.status(405).json({ ok: false, error: "This endpoint is read-only." });
+    return;
+  }
+
+  // The sitemap is handled ahead of everything below because it is the one response that is not
+  // JSON. Falling into the degraded or error paths would emit a JSON body under an XML content
+  // type — an unparseable sitemap, which is worse for search engines than a stale one. It builds
+  // its own content and never throws: with no database, or a failure while reading it, the static
+  // routes are still served.
+  if (path === "/sitemap") {
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    res.setHeader("Cache-Control", CACHE_CONTENT);
+    let body: string;
+    try {
+      body = await buildSitemap();
+    } catch (error) {
+      console.error(`[api/site:${ref}] sitemap fell back to static routes:`, error);
+      body = staticSitemap();
+    }
+    res.status(200).end(body);
     return;
   }
 

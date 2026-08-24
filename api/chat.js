@@ -3155,6 +3155,42 @@ WHERE key = 'home.hero'
   AND fields->>'heading' = 'Technology products for financial services, commerce, and communication';
 `
     )
+  },
+  {
+    id: 6,
+    name: "home_bands_current_copy",
+    sql: (
+      /* sql */
+      `
+-- The hero's statistics strip and the product band's heading are now rendered from these
+-- sections, so set them to the copy the site already displays \u2014 wiring them changes nothing
+-- visible. Each is guarded on its original seed value, so a band an operator has already edited
+-- is left alone.
+UPDATE site_sections
+SET fields = fields || '{
+  "heading": "Built for scale",
+  "items": [
+    {"value":"4","label":"Products in Ecosystem"},
+    {"value":"99.99%","label":"Infrastructure SLA"},
+    {"value":"< 14ms","label":"API Latency P50"},
+    {"value":"AES-256","label":"Encryption Standard"}
+  ]
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'home.statistics'
+  AND fields->'items' @> '[{"label":"Products in the portfolio"}]'::jsonb;
+
+UPDATE site_sections
+SET fields = fields || '{
+  "eyebrow": "What we''re building",
+  "heading": "Products and platforms.\\nBuilt to one standard.",
+  "subheading": "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on."
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'home.products'
+  AND fields->>'heading' = 'What we build';
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (

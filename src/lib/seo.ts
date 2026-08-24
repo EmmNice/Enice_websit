@@ -134,8 +134,12 @@ export type PageSeo = {
 };
 
 /**
- * Every indexable route. Keys are the canonical pathname, matching `public/sitemap.xml`.
- * Adding a page means adding it here and to the sitemap.
+ * Every indexable route, keyed by canonical pathname.
+ *
+ * This is the single source of truth: `sitemap.xml` is generated from these entries plus whatever
+ * is published in the CMS (see the `sitemap` route in `api-src/site.ts`), so adding a page here
+ * puts it in the sitemap automatically. A route carrying a `noindex` in `robots` is excluded from
+ * the sitemap, since listing a page while asking robots to skip it is contradictory.
  */
 export const PAGE_SEO: Record<string, PageSeo> = {
   "/": {

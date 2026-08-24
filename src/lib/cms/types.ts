@@ -406,8 +406,19 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
     icon: "LayoutGrid",
     fields: [
       { key: "eyebrow", label: "Eyebrow", type: "text" },
-      { key: "heading", label: "Heading", type: "text", required: true },
-      { key: "subheading", label: "Supporting copy", type: "textarea" },
+      {
+        key: "heading",
+        label: "Heading",
+        type: "text",
+        required: true,
+        help: "Style with **bold** and [[highlight]]. A new line splits the heading.",
+      },
+      {
+        key: "subheading",
+        label: "Supporting copy",
+        type: "textarea",
+        help: "Supports **bold** and [[highlight]].",
+      },
       {
         key: "items",
         label: "Features",

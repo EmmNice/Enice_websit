@@ -51,6 +51,7 @@
   "rewrites": [
     { "source": "/api/cms/:path*", "destination": "/api/cms?__route=:path*" },
     { "source": "/api/site/:path*", "destination": "/api/site?__route=:path*" },
+    { "source": "/sitemap.xml", "destination": "/api/site?__route=sitemap" },
     { "source": "/((?!api/)[^.]*)", "destination": "/index.html" }
   ]
 }

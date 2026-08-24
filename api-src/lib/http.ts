@@ -25,6 +25,12 @@ export interface ApiResponse {
    * session and CSRF cookies, and `Cache-Control` on public content responses.
    */
   setHeader(name: string, value: string | string[]): void;
+  /**
+   * Writes a raw body. Inherited from Node by both Vercel's response and the dev bridge's
+   * decorated `ServerResponse`, so it is safe to require. Needed for responses that are not
+   * JSON — the sitemap is XML.
+   */
+  end(body?: string): void;
 }
 
 export type ApiHandler = (req: ApiRequest, res: ApiResponse) => Promise<void> | void;

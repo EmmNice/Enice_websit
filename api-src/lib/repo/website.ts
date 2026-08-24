@@ -800,9 +800,10 @@ const DEFAULT_SECTIONS: {
     fields: {
       heading: "Built for scale",
       items: [
-        { value: "5", label: "Products in the portfolio" },
-        { value: "24/7", label: "Platform monitoring" },
-        { value: "2026", label: "Founded" },
+        { value: "4", label: "Products in Ecosystem" },
+        { value: "99.99%", label: "Infrastructure SLA" },
+        { value: "< 14ms", label: "API Latency P50" },
+        { value: "AES-256", label: "Encryption Standard" },
       ],
     },
   },
@@ -813,9 +814,10 @@ const DEFAULT_SECTIONS: {
     type: "featureGrid",
     order: 30,
     fields: {
-      eyebrow: "PORTFOLIO",
-      heading: "What we build",
-      subheading: "Five platforms across payments, banking, digital assets, and enterprise AI.",
+      eyebrow: "What we're building",
+      heading: "Products and platforms.\nBuilt to one standard.",
+      subheading:
+        "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on.",
       items: [
         {
           icon: "CreditCard",

@@ -61,6 +61,91 @@ var KNOWLEDGE_PDF_MAX_BYTES = 25 * 1024 * 1024;
 // src/lib/site.ts
 var SITE_URL = "https://enicehq.com";
 
+// src/lib/seo.ts
+var DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
+var PAGE_SEO = {
+  "/": {
+    title: "ENICE Group | Technology Products for Africa",
+    description: "ENICE Group builds, owns, and operates products for financial services, commerce, and business communication."
+  },
+  "/about": {
+    title: "About ENICE Group | A Technology Company Building African Infrastructure",
+    description: "ENICE Group builds and operates software platforms for digital commerce, financial services, and enterprise AI. Here is our story, our mission, and how we work."
+  },
+  "/contact": {
+    title: "Contact ENICE Group",
+    description: "Reach ENICE Group about product access, platform integration, enterprise licensing, partnerships, or general inquiries at corporate@enicehq.com."
+  },
+  "/portfolio": {
+    title: "Products | ENICE Group",
+    description: "PulsePay, PulseAssist, PulsePay Payment Collection, ePulse, and PulseX: the products built and operated by ENICE Group."
+  },
+  "/portfolio/pulsepay": {
+    title: "PulsePay | Virtual Payment Platform by ENICE Group",
+    description: "PulsePay by ENICE Group: virtual Naira and USD card issuance, built-in KYC, programmable wallets, peer-to-peer transfers, and fraud monitoring for modern commerce."
+  },
+  "/portfolio/pulseassist": {
+    title: "PulseAssist | Enterprise AI Operations Platform by ENICE Group",
+    description: "PulseAssist by ENICE Group is a multi-tenant AI operations platform for banking, fintech, and telecom. It handles customer support, runs policy-bound agents, hands off to live agents in real time, and keeps compliance-ready audit trails."
+  },
+  "/portfolio/epulse": {
+    title: "ePulse | Global Financial Platform by ENICE Group",
+    description: "ePulse is ENICE Group's upcoming global financial platform built for freelancers, remote workers, creators, and global businesses. Multi-currency accounts, international transfers, gift cards, and lifestyle services."
+  },
+  "/portfolio/pulsex": {
+    title: "PulseX | Digital Asset Platform by ENICE Group",
+    description: "PulseX is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem."
+  },
+  "/portfolio/payment-collection": {
+    title: "PulsePay Payment Collection | ENICE Group",
+    description: "PulsePay Payment Collection is ENICE Group's upcoming payment infrastructure for businesses, launching Q1 2027. Accept and manage customer payments through a single, developer friendly API."
+  },
+  "/about-pulseassist-beta": {
+    title: "About the PulseAssist Beta | ENICE Group",
+    description: "PulseAssist has been built and internally tested to deliver faster, more intelligent, and more consistent customer support. The September 2026 Beta opens the platform to selected early users."
+  },
+  "/roadmap": {
+    title: "Product Roadmap | ENICE Group",
+    description: "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist live, and what we are building next, including ePulse, PulseX, and the ENICE Core."
+  },
+  "/blog/": {
+    title: "Blog and Updates | ENICE Group",
+    description: "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PulseAssist, and the rest of our platform."
+  },
+  "/news/": {
+    title: "News and Changelog | ENICE Group",
+    description: "Announcements, new services, partnerships, milestones, and platform updates from ENICE Group."
+  },
+  "/announcements/": {
+    title: "Announcements | ENICE Group",
+    description: "Company announcements, product launches, new services, partnerships and events from ENICE Group."
+  },
+  "/docs": {
+    title: "API Documentation \xB7 ENICE Group",
+    description: "ENICE Core API reference: authentication, endpoints, rate limits, and webhooks for verified integrators."
+  },
+  "/status": {
+    title: "System Status | ENICE Group",
+    description: "Live availability of the ENICE Group public API and website, checked from your browser."
+  },
+  "/privacy": {
+    title: "Privacy Policy \xB7 ENICE Group",
+    description: "How ENICE Group collects, processes, and protects personal and corporate data across its product ecosystem."
+  },
+  "/terms": {
+    title: "Terms of Service \xB7 ENICE Group",
+    description: "Terms governing access to and use of ENICE Group platforms, APIs, and infrastructure services."
+  },
+  "/compliance": {
+    title: "Regulatory Compliance \xB7 ENICE Group",
+    description: "Regulatory posture, registrations, and compliance program of ENICE Group."
+  }
+};
+function canonicalUrl(pathname) {
+  return pathname === "/" ? `${SITE_URL}/` : `${SITE_URL}${pathname}`;
+}
+var ORGANIZATION_REF = { "@id": `${SITE_URL}/#organization` };
+
 // src/lib/cms/seo-resolve.ts
 var MAX_TITLE_LENGTH = 60;
 var MAX_DESCRIPTION_LENGTH = 160;
@@ -2708,6 +2793,42 @@ WHERE key = 'home.hero'
   AND fields->>'heading' = 'Technology products for financial services, commerce, and communication';
 `
     )
+  },
+  {
+    id: 6,
+    name: "home_bands_current_copy",
+    sql: (
+      /* sql */
+      `
+-- The hero's statistics strip and the product band's heading are now rendered from these
+-- sections, so set them to the copy the site already displays \u2014 wiring them changes nothing
+-- visible. Each is guarded on its original seed value, so a band an operator has already edited
+-- is left alone.
+UPDATE site_sections
+SET fields = fields || '{
+  "heading": "Built for scale",
+  "items": [
+    {"value":"4","label":"Products in Ecosystem"},
+    {"value":"99.99%","label":"Infrastructure SLA"},
+    {"value":"< 14ms","label":"API Latency P50"},
+    {"value":"AES-256","label":"Encryption Standard"}
+  ]
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'home.statistics'
+  AND fields->'items' @> '[{"label":"Products in the portfolio"}]'::jsonb;
+
+UPDATE site_sections
+SET fields = fields || '{
+  "eyebrow": "What we''re building",
+  "heading": "Products and platforms.\\nBuilt to one standard.",
+  "subheading": "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on."
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'home.products'
+  AND fields->>'heading' = 'What we build';
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (
@@ -3081,6 +3202,16 @@ function mapPage(row) {
     revision: row.revision
   };
 }
+async function listPages() {
+  const rows = await db()`
+    SELECT id, path, title, summary, status, sections, seo, system_route,
+           published_at, scheduled_for, archived_at, created_at, updated_at,
+           updated_by_email, revision
+    FROM cms_pages
+    ORDER BY system_route DESC, path ASC
+  `;
+  return rows.map(mapPage);
+}
 async function getPageByPath(path, publishedOnly = true) {
   const sql = db();
   const rows = await sql`
@@ -3384,6 +3515,74 @@ router.add("GET /page", async ({ res, query }) => {
     seo
   };
 });
+function staticEntries() {
+  return Object.entries(PAGE_SEO).filter(([, seo]) => !seo.robots?.includes("noindex")).map(([path]) => ({ url: canonicalUrl(path) }));
+}
+function staticSitemap() {
+  return renderSitemap(staticEntries());
+}
+function renderSitemap(entries) {
+  const seen = /* @__PURE__ */ new Set();
+  const unique = entries.filter((entry) => {
+    if (seen.has(entry.url)) return false;
+    seen.add(entry.url);
+    return true;
+  });
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
+    ...unique.map((entry) => {
+      const lastmod = entry.lastmod ? `    <lastmod>${entry.lastmod.slice(0, 10)}</lastmod>
+` : "";
+      return `  <url>
+    <loc>${escapeXml(entry.url)}</loc>
+${lastmod}  </url>`;
+    }),
+    "</urlset>",
+    ""
+  ].join("\n");
+}
+async function buildSitemap() {
+  const entries = staticEntries();
+  if (isDatabaseConfigured()) {
+    try {
+      await ensureMigrated();
+      const [content, pages, settings] = await Promise.all([
+        Promise.all(
+          ["blog", "news", "announcement"].map(
+            (kind) => listContent({ kind, status: "published", limit: 500, sort: "published" })
+          )
+        ),
+        listPages(),
+        getSettings()
+      ]);
+      const context = { siteUrl: SITE_URL, defaults: settings.seo };
+      for (const item of content.flatMap((result) => result.items)) {
+        const path = publicPath(item.kind, item.slug);
+        const seo = resolveSeo(
+          item.seo,
+          { title: item.title, excerpt: item.excerpt, image: item.coverImageUrl, path },
+          context
+        );
+        if (!seo.index) continue;
+        entries.push({
+          url: canonicalUrl(path),
+          lastmod: item.updatedAt ?? item.publishedAt ?? void 0
+        });
+      }
+      for (const page of pages) {
+        if (page.status !== "published" || page.systemRoute) continue;
+        entries.push({ url: canonicalUrl(page.path), lastmod: page.updatedAt ?? void 0 });
+      }
+    } catch (error) {
+      console.error("[api/site] sitemap content omitted:", error);
+    }
+  }
+  return renderSitemap(entries);
+}
+function escapeXml(value) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
 router.add("GET /urls", async ({ res }) => {
   res.setHeader("Cache-Control", CACHE_SETTINGS);
   const [blog, news, announcements, pagesSettings] = await Promise.all([
@@ -3432,6 +3631,19 @@ async function handler(req, res) {
   if (method !== "GET" && method !== "HEAD") {
     res.setHeader("Cache-Control", "no-store");
     res.status(405).json({ ok: false, error: "This endpoint is read-only." });
+    return;
+  }
+  if (path === "/sitemap") {
+    res.setHeader("Content-Type", "application/xml; charset=utf-8");
+    res.setHeader("Cache-Control", CACHE_CONTENT);
+    let body;
+    try {
+      body = await buildSitemap();
+    } catch (error) {
+      console.error(`[api/site:${ref}] sitemap fell back to static routes:`, error);
+      body = staticSitemap();
+    }
+    res.status(200).end(body);
     return;
   }
   try {
