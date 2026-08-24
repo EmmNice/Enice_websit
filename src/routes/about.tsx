@@ -79,6 +79,42 @@ const PRINCIPLES = [
   },
 ];
 
+/**
+ * The "What We Build" paragraphs, as the band's `body` field would hold them.
+ *
+ * The product names carry `**…**` rather than a hard-coded `<strong>` so they stay part of the
+ * editable text; `ProseBandBody` renders them with this band's own emphasis style, which is what
+ * the markup used before.
+ */
+const BUILD_PARAGRAPHS = [
+  "We find a real gap, design a product around what it takes to close it, build it to a high standard, launch it, and then operate it with the same discipline we used to build it. We don't hand products off. We own the full lifecycle.",
+  "We work across areas where technical complexity meets real-world consequence: financial infrastructure and digital banking, AI-powered enterprise communication and automation, developer tools and API infrastructure, digital commerce systems, cloud infrastructure, and longer-horizon research.",
+  "Our two current products are the foundation of this. **PulsePay** is our financial infrastructure platform, a Naira-native payment processing and digital banking system built for Nigerian businesses, from high-frequency transactions to compliance. **PulseAssist** is our enterprise AI platform, a communication and automation layer that helps enterprise teams cut down on procedural overhead.",
+  "These are the first two products in a lineup we plan to grow the same way: deliberately, and to a high standard.",
+];
+
+const FOUNDING_TEAM = [
+  {
+    initial: "CEO",
+    role: "Founder & Chief Executive Officer",
+    scope: "Corporate strategy, venture direction, and ecosystem growth.",
+  },
+  {
+    initial: "CTO",
+    role: "Chief Technology Officer",
+    scope: "Platform architecture, engineering standards, and infrastructure design.",
+  },
+  {
+    initial: "COO",
+    role: "Chief Operations Officer",
+    scope: "Product delivery, partner operations, and compliance execution.",
+  },
+];
+
+/** The email link is expressed as `[label](mailto:…)` so the address stays editable. */
+const TEAM_FOOTNOTE =
+  "Our founding team prefers to let the work speak. Executive contact is available through [corporate@enicehq.com](mailto:corporate@enicehq.com) for qualified enterprise and partnership inquiries.";
+
 const VERTICALS = [
   {
     label: "Financial Infrastructure",
@@ -113,35 +149,52 @@ const VERTICALS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 /**
- * One of the About page's numbered prose bands.
+ * Initials for a leadership badge, used only when the badge text is left blank.
  *
- * The five bands are structurally identical — a number, a heading, and a few paragraphs — so they
- * share this component rather than repeating the markup five times. The classes are exactly those
- * the page already used, including the dark variant, so making these editable does not alter the
- * typography.
- *
- * Paragraphs come from the section's `body`, separated by blank lines. The built-in copy is used
- * until the section is edited, so the page is unchanged in the meantime.
+ * The badge is a fixed-size ring and an empty one reads as a rendering fault, so a member added
+ * without one still gets something legible derived from their role.
  */
-function ProseBand({
-  number,
-  sectionKey,
-  heading,
-  paragraphs,
-  dark = false,
-}: {
-  number: string;
-  sectionKey: string;
-  heading: string;
-  paragraphs: string[];
-  dark?: boolean;
-}) {
-  const fields = useSectionFields(sectionKey);
-  const body = fieldText(fields, "body", paragraphs.join("\n\n"));
-  const rendered = body
+function badgeFor(role: string): string {
+  const initials = role
+    .split(/[^A-Za-z]+/)
+    .filter((word) => word.length > 2)
+    .map((word) => word[0].toUpperCase())
+    .join("");
+  return initials.slice(0, 3) || role.slice(0, 3).toUpperCase();
+}
+
+/** Splits a body field into paragraphs on blank lines, the way every band on this page reads it. */
+function paragraphsOf(body: string): string[] {
+  return body
     .split(/\n\s*\n/)
     .map((p) => p.trim())
     .filter(Boolean);
+}
+
+/**
+ * The two-column layout every prose band on this page uses: a number and heading on the left,
+ * paragraphs on the right.
+ *
+ * Separate from `ProseBand` because "What We Build" needs this exact markup but reads its heading
+ * and body from a section that also carries a grid of focus areas — so it resolves its own fields
+ * and passes the resulting strings in, rather than having this component fetch them again.
+ *
+ * `boldClassName` matters: the dark bands emphasise with `text-white font-semibold`, and the
+ * default `font-bold` would visibly change them.
+ */
+function ProseBandBody({
+  number,
+  heading,
+  body,
+  dark = false,
+}: {
+  number: string;
+  heading: string;
+  body: string;
+  dark?: boolean;
+}) {
+  const accentClassName = dark ? "text-blue-400" : "text-primary";
+  const boldClassName = dark ? "text-white font-semibold" : "font-bold";
 
   return (
     <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
@@ -159,8 +212,9 @@ function ProseBand({
           }`}
         >
           <StyledText
-            text={fieldText(fields, "heading", heading)}
-            accentClassName={dark ? "text-blue-400" : "text-primary"}
+            text={heading}
+            accentClassName={accentClassName}
+            boldClassName={boldClassName}
           />
         </h2>
       </div>
@@ -169,11 +223,12 @@ function ProseBand({
           dark ? "text-white/60" : "text-muted-foreground"
         }`}
       >
-        {rendered.map((paragraph, i) => (
+        {paragraphsOf(body).map((paragraph, i) => (
           <p key={i}>
             <StyledText
               text={paragraph}
-              accentClassName={dark ? "text-blue-400" : "text-primary"}
+              accentClassName={accentClassName}
+              boldClassName={boldClassName}
             />
           </p>
         ))}
@@ -182,10 +237,45 @@ function ProseBand({
   );
 }
 
+/**
+ * One of the About page's numbered prose bands.
+ *
+ * The bands are structurally identical — a number, a heading, and a few paragraphs — so they share
+ * this component rather than repeating the markup. Paragraphs come from the section's `body`,
+ * separated by blank lines. The built-in copy is used until the section is edited, so the page is
+ * unchanged in the meantime.
+ */
+function ProseBand({
+  number,
+  sectionKey,
+  heading,
+  paragraphs,
+  dark = false,
+}: {
+  number: string;
+  sectionKey: string;
+  heading: string;
+  paragraphs: string[];
+  dark?: boolean;
+}) {
+  const fields = useSectionFields(sectionKey);
+
+  return (
+    <ProseBandBody
+      number={number}
+      heading={fieldText(fields, "heading", heading)}
+      body={fieldText(fields, "body", paragraphs.join("\n\n"))}
+      dark={dark}
+    />
+  );
+}
+
 function AboutPage() {
   // Editable bands, each falling back to the copy below until the section is edited.
   const hero = useSectionFields("about.hero");
   const values = useSectionFields("about.values");
+  const build = useSectionFields("about.build");
+  const team = useSectionFields("about.team");
 
   // The principles cards. Numbering is positional, so nobody maintains /01, /02 by hand.
   const principles = fieldItems(values, "items", PRINCIPLES, (row) => {
@@ -194,6 +284,29 @@ function AboutPage() {
     return {
       title,
       body: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
+  // The focus areas under "What We Build". A row without a label is skipped rather than rendered
+  // as an empty tile.
+  const focusAreas = fieldItems(build, "items", VERTICALS, (row) => {
+    const label = typeof row.label === "string" ? row.label.trim() : "";
+    if (!label) return null;
+    return {
+      label,
+      description: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
+  // The leadership cards. The badge falls back to the role's first letters when left blank, so a
+  // new member never renders an empty badge.
+  const members = fieldItems(team, "items", FOUNDING_TEAM, (row) => {
+    const role = typeof row.role === "string" ? row.role.trim() : "";
+    if (!role) return null;
+    return {
+      role,
+      scope: typeof row.remit === "string" ? row.remit.trim() : "",
+      initial: typeof row.initials === "string" ? row.initials.trim() : "",
     };
   });
 
@@ -282,51 +395,27 @@ function AboutPage() {
         {/* ── 5. WHAT WE BUILD ────────────────────────────────────────────── */}
         <section className="border-b border-border bg-[#060912] py-24 sm:py-32">
           <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
-              <div>
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-400/70">
-                  /05
-                </span>
-                <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-white sm:text-4xl">
-                  What We Build
-                </h2>
-              </div>
-              <div className="space-y-6 text-[16px] leading-relaxed text-white/60">
-                <p>
-                  We find a real gap, design a product around what it takes to close it, build it to
-                  a high standard, launch it, and then operate it with the same discipline we used
-                  to build it. We don't hand products off. We own the full lifecycle.
-                </p>
-                <p>
-                  We work across areas where technical complexity meets real-world consequence:
-                  financial infrastructure and digital banking, AI-powered enterprise communication
-                  and automation, developer tools and API infrastructure, digital commerce systems,
-                  cloud infrastructure, and longer-horizon research.
-                </p>
-                <p>
-                  Our two current products are the foundation of this.{" "}
-                  <strong className="text-white font-semibold">PulsePay</strong> is our financial
-                  infrastructure platform, a Naira-native payment processing and digital banking
-                  system built for Nigerian businesses, from high-frequency transactions to
-                  compliance. <strong className="text-white font-semibold">PulseAssist</strong> is
-                  our enterprise AI platform, a communication and automation layer that helps
-                  enterprise teams cut down on procedural overhead.
-                </p>
-                <p>
-                  These are the first two products in a lineup we plan to grow the same way:
-                  deliberately, and to a high standard.
-                </p>
-              </div>
-            </div>
+            <ProseBandBody
+              number="/05"
+              heading={fieldText(build, "heading", "What We Build")}
+              body={fieldText(build, "body", BUILD_PARAGRAPHS.join("\n\n"))}
+              dark
+            />
 
-            {/* Verticals grid */}
+            {/* Focus areas grid */}
             <div className="mt-16 grid gap-px border border-white/8 bg-white/8 sm:grid-cols-2 lg:grid-cols-3 rounded-xl overflow-hidden">
-              {VERTICALS.map((v) => (
+              {focusAreas.map((v) => (
                 <div key={v.label} className="bg-[#060912] p-8">
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-400">
-                    {v.label}
+                    <StyledText text={v.label} accentClassName="text-white" />
                   </div>
-                  <p className="mt-3 text-sm leading-relaxed text-white/50">{v.description}</p>
+                  <p className="mt-3 text-sm leading-relaxed text-white/50">
+                    <StyledText
+                      text={v.description}
+                      accentClassName="text-blue-400"
+                      boldClassName="text-white font-semibold"
+                    />
+                  </p>
                 </div>
               ))}
             </div>
@@ -341,32 +430,21 @@ function AboutPage() {
                 /05b
               </span>
               <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
-                The Founding Team
+                <StyledText text={fieldText(team, "heading", "The Founding Team")} />
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-                ENICE Group was founded by operators and engineers who spent years inside the
-                problems they now build solutions for.
+                <StyledText
+                  text={fieldText(
+                    team,
+                    "subheading",
+                    "ENICE Group was founded by operators and engineers who spent years inside the problems they now build solutions for.",
+                  )}
+                />
               </p>
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  role: "Founder & Chief Executive Officer",
-                  scope: "Corporate strategy, venture direction, and ecosystem growth.",
-                  initial: "CEO",
-                },
-                {
-                  role: "Chief Technology Officer",
-                  scope: "Platform architecture, engineering standards, and infrastructure design.",
-                  initial: "CTO",
-                },
-                {
-                  role: "Chief Operations Officer",
-                  scope: "Product delivery, partner operations, and compliance execution.",
-                  initial: "COO",
-                },
-              ].map((m) => (
+              {members.map((m) => (
                 <div
                   key={m.role}
                   className="flex flex-col gap-5 rounded-xl border border-border bg-background p-7"
@@ -377,14 +455,16 @@ function AboutPage() {
                   {/* Avatar placeholder */}
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/8 ring-1 ring-primary/15">
                     <span className="font-mono text-[11px] font-bold tracking-[0.18em] text-primary">
-                      {m.initial}
+                      {m.initial || badgeFor(m.role)}
                     </span>
                   </div>
                   <div>
                     <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
-                      {m.role}
+                      <StyledText text={m.role} accentClassName="text-foreground" />
                     </div>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{m.scope}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      <StyledText text={m.scope} />
+                    </p>
                   </div>
                 </div>
               ))}
@@ -392,15 +472,7 @@ function AboutPage() {
 
             <div className="mt-8 rounded-xl border border-border bg-secondary/60 px-6 py-5">
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Our founding team prefers to let the work speak. Executive contact is available
-                through{" "}
-                <a
-                  href="mailto:corporate@enicehq.com"
-                  className="font-medium text-foreground underline-offset-2 hover:underline"
-                >
-                  corporate@enicehq.com
-                </a>{" "}
-                for qualified enterprise and partnership inquiries.
+                <StyledText text={fieldText(team, "footnote", TEAM_FOOTNOTE)} />
               </p>
             </div>
           </div>

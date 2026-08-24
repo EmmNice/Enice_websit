@@ -318,10 +318,12 @@ export interface PageSection {
 export const SECTION_TYPES = [
   "hero",
   "prose",
+  "proseGrid",
   "richText",
   "featureGrid",
   "statistics",
   "logoStrip",
+  "teamGrid",
   "testimonials",
   "cta",
   "faq",
@@ -372,9 +374,13 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
       { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the headline." },
       {
         key: "heading",
-        label: "Headline",
-        type: "text",
+        // A textarea, not a single-line input, because the headline is deliberately broken across
+        // lines — the homepage's is four. A `text` field cannot express that: its control accepts
+        // no newline, and `sanitizeText` collapses whitespace on write, so saving the section would
+        // silently flatten an existing multi-line headline into one line.
+        type: "textarea",
         required: true,
+        label: "Headline",
         help: "Style with **bold** and [[highlight]] (highlight shows in the accent colour). A new line splits the headline.",
       },
       {
@@ -419,6 +425,44 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
       },
     ],
   },
+  /**
+   * A text band that also carries a grid of short focus areas.
+   *
+   * Neither `prose` nor `featureGrid` describes this shape on its own, and pairing the two would
+   * put a required-but-never-rendered heading on the grid half — a field the operator fills in and
+   * then cannot find on the page. One schema keeps every field they see connected to something.
+   */
+  proseGrid: {
+    type: "proseGrid",
+    label: "Text band with focus areas",
+    description: "A heading and paragraphs, followed by a grid of short focus areas.",
+    icon: "LayoutList",
+    fields: [
+      {
+        key: "heading",
+        label: "Heading",
+        type: "text",
+        help: "Style with **bold** and [[highlight]].",
+      },
+      {
+        key: "body",
+        label: "Paragraphs",
+        type: "textarea",
+        required: true,
+        help: "Leave a blank line between paragraphs. Supports **bold** and [[highlight]].",
+      },
+      {
+        key: "items",
+        label: "Focus areas",
+        type: "repeater",
+        max: 12,
+        of: [
+          { key: "label", label: "Label", type: "text", required: true },
+          { key: "description", label: "Description", type: "textarea" },
+        ],
+      },
+    ],
+  },
   richText: {
     type: "richText",
     label: "Rich text",
@@ -439,7 +483,9 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
       {
         key: "heading",
         label: "Heading",
-        type: "text",
+        // A textarea for the same reason as the hero's headline: these headings are split across
+        // lines, and a single-line `text` field would flatten them on save.
+        type: "textarea",
         required: true,
         help: "Style with **bold** and [[highlight]]. A new line splits the heading.",
       },
@@ -512,6 +558,48 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
           { key: "logo", label: "Logo", type: "image" },
           { key: "url", label: "Website", type: "url" },
         ],
+      },
+    ],
+  },
+  teamGrid: {
+    type: "teamGrid",
+    label: "Team",
+    description: "Leadership or team members, with a closing note beneath the cards.",
+    icon: "Users",
+    fields: [
+      {
+        key: "heading",
+        label: "Heading",
+        type: "text",
+        help: "Style with **bold** and [[highlight]].",
+      },
+      {
+        key: "subheading",
+        label: "Supporting copy",
+        type: "textarea",
+        help: "Supports **bold** and [[highlight]].",
+      },
+      {
+        key: "items",
+        label: "Team members",
+        type: "repeater",
+        max: 12,
+        of: [
+          {
+            key: "initials",
+            label: "Badge text",
+            type: "text",
+            help: "The short label shown in the badge, e.g. CEO.",
+          },
+          { key: "role", label: "Role", type: "text", required: true },
+          { key: "remit", label: "What they own", type: "textarea" },
+        ],
+      },
+      {
+        key: "footnote",
+        label: "Closing note",
+        type: "textarea",
+        help: "Shown in a panel under the cards. Add a link with [text](mailto:someone@example.com) or [text](https://example.com).",
       },
     ],
   },

@@ -18,6 +18,8 @@ import {
   type ContactFields,
 } from "@/lib/contact";
 
+const CORPORATE_EMAIL = "corporate@enicehq.com";
+
 export const Route = createFileRoute("/contact")({
   head: () =>
     pageHead("/contact", [
@@ -46,8 +48,13 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
-  // The page header, editable through the `contact.details` section.
+  // The page header and the address in the sidebar, editable through the `contact.details` section.
   const details = useSectionFields("contact.details");
+  // A typo would otherwise produce a mailto link that silently does nothing.
+  const emailField = fieldText(details, "email", CORPORATE_EMAIL);
+  const corporateEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailField)
+    ? emailField
+    : CORPORATE_EMAIL;
 
   const id = useId();
   const formRef = useRef<HTMLFormElement>(null);
@@ -169,10 +176,10 @@ function ContactPage() {
                       Corporate
                     </div>
                     <a
-                      href="mailto:corporate@enicehq.com"
+                      href={`mailto:${corporateEmail}`}
                       className="mt-1 block text-sm text-foreground hover:text-primary transition-colors"
                     >
-                      corporate@enicehq.com
+                      {corporateEmail}
                     </a>
                   </div>
                 </li>
