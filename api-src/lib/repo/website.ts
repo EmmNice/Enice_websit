@@ -818,36 +818,32 @@ const DEFAULT_SECTIONS: {
       heading: "Products and platforms.\nBuilt to one standard.",
       subheading:
         "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on.",
+      // The three cards the homepage product band renders. `index` numbering is derived from
+      // position, and bullets are one per line.
       items: [
         {
-          icon: "CreditCard",
-          title: "PulsePay",
-          description: "Virtual card issuance, programmable wallets, and embedded treasury.",
-          url: "/portfolio/pulsepay",
+          icon: "Banknote",
+          kicker: "Fintech",
+          title: "Financial Infrastructure Systems",
+          description:
+            "Transaction networks, ledger databases, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
+          bullets: "Virtual Card Issuance\nTreasury and Ledger\nKYC and Compliance Tooling",
         },
         {
-          icon: "Bot",
-          title: "PulseAssist",
-          description: "Multi-tenant AI operations platform for banking, fintech, and telecom.",
-          url: "/portfolio/pulseassist",
+          icon: "BrainCircuit",
+          kicker: "Artificial Intelligence",
+          title: "Autonomous Enterprise AI",
+          description:
+            "Conversational AI that handles customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms.",
+          bullets: "Autonomous Customer Support\nPolicy-Bound AI Agents\nWorkflow Automation",
         },
         {
-          icon: "Landmark",
-          title: "ePulse",
-          description: "Global financial platform for freelancers, creators, and businesses.",
-          url: "/portfolio/epulse",
-        },
-        {
-          icon: "TrendingUp",
-          title: "PulseX",
-          description: "Digital asset trading and management.",
-          url: "/portfolio/pulsex",
-        },
-        {
-          icon: "Wallet",
-          title: "Payment Collection",
-          description: "Payment infrastructure for businesses to accept and manage payments.",
-          url: "/portfolio/payment-collection",
+          icon: "Boxes",
+          kicker: "Product Engineering",
+          title: "Products built to operate",
+          description:
+            "We build, own, and operate full-stack products. Each platform starts from a real customer problem and goes through engineering, launch, and day-to-day operation.",
+          bullets: "Product Ownership\nPlatform Engineering\nContinuous Operation",
         },
       ],
     },
