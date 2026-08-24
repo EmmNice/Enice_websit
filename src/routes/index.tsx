@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -46,10 +47,34 @@ const HERO_STATS = [
   { value: "AES-256", label: "Encryption Standard" },
 ];
 
+/**
+ * Icons an editor may name on a CMS-managed card.
+ *
+ * A curated map rather than importing all of lucide: the full set would add a large amount of
+ * JavaScript to the public bundle for the sake of a handful of names. Anything unrecognised falls
+ * back to a neutral icon, so a typo degrades to a sensible default instead of an empty box.
+ */
+const CARD_ICONS: Record<string, LucideIcon> = {
+  Banknote,
+  BrainCircuit,
+  Boxes,
+  Cpu,
+  Database,
+  Globe,
+  FileCheck2,
+  CreditCard,
+  ShieldCheck,
+  Wifi,
+  Lock,
+};
+
+function cardIcon(name: string): LucideIcon {
+  return CARD_ICONS[name] ?? Boxes;
+}
+
 const VERTICALS = [
   {
     icon: Banknote,
-    index: "01",
     kicker: "Fintech",
     title: "Financial Infrastructure Systems",
     desc: "Transaction networks, ledger databases, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
@@ -57,7 +82,6 @@ const VERTICALS = [
   },
   {
     icon: BrainCircuit,
-    index: "02",
     kicker: "Artificial Intelligence",
     title: "Autonomous Enterprise AI",
     desc: "Conversational AI that handles customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms.",
@@ -65,7 +89,6 @@ const VERTICALS = [
   },
   {
     icon: Boxes,
-    index: "03",
     kicker: "Product Engineering",
     title: "Products built to operate",
     desc: "We build, own, and operate full-stack products. Each platform starts from a real customer problem and goes through engineering, launch, and day-to-day operation.",
@@ -149,6 +172,26 @@ function Landing() {
     const value = typeof row.value === "string" ? row.value.trim() : "";
     const label = typeof row.label === "string" ? row.label.trim() : "";
     return value ? { value, label } : null;
+  });
+
+  // The three product cards. `index` is derived from position, so an editor never maintains
+  // numbering by hand, and bullets are one per line in a single field.
+  const verticals = fieldItems(products, "items", VERTICALS, (row) => {
+    const title = typeof row.title === "string" ? row.title.trim() : "";
+    if (!title) return null;
+    return {
+      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
+      kicker: typeof row.kicker === "string" ? row.kicker.trim() : "",
+      title,
+      desc: typeof row.description === "string" ? row.description.trim() : "",
+      bullets:
+        typeof row.bullets === "string"
+          ? row.bullets
+              .split("\n")
+              .map((line) => line.trim())
+              .filter(Boolean)
+          : [],
+    };
   });
 
   return (
@@ -479,7 +522,7 @@ function Landing() {
             </Reveal>
 
             <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border lg:grid-cols-3">
-              {VERTICALS.map((v, i) => (
+              {verticals.map((v, i) => (
                 <Reveal key={v.title} delay={i * 60}>
                   <article className="group flex h-full flex-col bg-white p-10 transition-colors hover:bg-secondary/40 xl:p-12">
                     <div className="flex items-start justify-between">
@@ -487,19 +530,21 @@ function Landing() {
                         <v.icon className="h-6 w-6" strokeWidth={1.5} />
                       </div>
                       <span className="font-mono text-[11px] font-bold tracking-[0.22em] text-muted-foreground/40">
-                        /{v.index}
+                        /{String(i + 1).padStart(2, "0")}
                       </span>
                     </div>
 
                     <div className="mt-8">
-                      <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
-                        {v.kicker}
-                      </div>
+                      {v.kicker && (
+                        <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
+                          {v.kicker}
+                        </div>
+                      )}
                       <h3 className="mt-2 text-[1.4rem] font-bold leading-snug tracking-tight text-foreground">
-                        {v.title}
+                        <StyledText text={v.title} />
                       </h3>
                       <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                        {v.desc}
+                        <StyledText text={v.desc} />
                       </p>
                     </div>
 

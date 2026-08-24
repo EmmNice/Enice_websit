@@ -2829,6 +2829,47 @@ WHERE key = 'home.products'
   AND fields->>'heading' = 'What we build';
 `
     )
+  },
+  {
+    id: 7,
+    name: "home_product_cards",
+    sql: (
+      /* sql */
+      `
+-- The homepage product band renders its cards from this section's items. Its seeded items were a
+-- five-entry product list that the homepage never rendered, so set them to the three cards the
+-- band actually shows \u2014 wiring the cards changes nothing visible, and they become editable.
+-- Guarded on the original seed (the PulsePay entry), so a list an operator has already edited is
+-- left untouched. Bullets are newline-separated in one field; card numbering is positional.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[
+  {
+    "icon": "Banknote",
+    "kicker": "Fintech",
+    "title": "Financial Infrastructure Systems",
+    "description": "Transaction networks, ledger databases, and virtual card infrastructure built for Nigeria''s digital economy, with room to expand across the region.",
+    "bullets": "Virtual Card Issuance\\nTreasury and Ledger\\nKYC and Compliance Tooling"
+  },
+  {
+    "icon": "BrainCircuit",
+    "kicker": "Artificial Intelligence",
+    "title": "Autonomous Enterprise AI",
+    "description": "Conversational AI that handles customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms.",
+    "bullets": "Autonomous Customer Support\\nPolicy-Bound AI Agents\\nWorkflow Automation"
+  },
+  {
+    "icon": "Boxes",
+    "kicker": "Product Engineering",
+    "title": "Products built to operate",
+    "description": "We build, own, and operate full-stack products. Each platform starts from a real customer problem and goes through engineering, launch, and day-to-day operation.",
+    "bullets": "Product Ownership\\nPlatform Engineering\\nContinuous Operation"
+  }
+]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.products'
+  AND fields->'items' @> '[{"title":"PulsePay"}]'::jsonb;
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (
