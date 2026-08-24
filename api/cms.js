@@ -283,7 +283,19 @@ var init_types = __esm({
         description: "Expandable questions and answers.",
         icon: "CircleHelp",
         fields: [
-          { key: "heading", label: "Heading", type: "text" },
+          { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the heading." },
+          {
+            key: "heading",
+            label: "Heading",
+            type: "text",
+            help: "Style with **bold** and [[highlight]]."
+          },
+          {
+            key: "subheading",
+            label: "Supporting copy",
+            type: "textarea",
+            help: "Supports **bold** and [[highlight]]."
+          },
           {
             key: "items",
             label: "Questions",
@@ -291,7 +303,13 @@ var init_types = __esm({
             max: 30,
             of: [
               { key: "question", label: "Question", type: "text", required: true },
-              { key: "answer", label: "Answer", type: "textarea", required: true }
+              {
+                key: "answer",
+                label: "Answer",
+                type: "textarea",
+                required: true,
+                help: "Plain text. These answers are also published as FAQ search markup, so keep them factual and avoid styling."
+              }
             ]
           }
         ]
@@ -302,8 +320,19 @@ var init_types = __esm({
         description: "Contact details alongside the enquiry form.",
         icon: "Mail",
         fields: [
-          { key: "heading", label: "Heading", type: "text" },
-          { key: "subheading", label: "Supporting copy", type: "textarea" },
+          { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the heading." },
+          {
+            key: "heading",
+            label: "Heading",
+            type: "text",
+            help: "Style with **bold** and [[highlight]]."
+          },
+          {
+            key: "subheading",
+            label: "Supporting copy",
+            type: "textarea",
+            help: "Supports **bold** and [[highlight]]."
+          },
           { key: "email", label: "Email address", type: "text" },
           { key: "showForm", label: "Show the enquiry form", type: "boolean" }
         ]
@@ -3177,6 +3206,124 @@ SET fields = jsonb_set(fields, '{items}', '[
     updated_at = now()
 WHERE key = 'home.products'
   AND fields->'items' @> '[{"title":"PulsePay"}]'::jsonb;
+`
+        )
+      },
+      {
+        id: 8,
+        name: "home_faq_current_copy",
+        sql: (
+          /* sql */
+          `
+-- The homepage FAQ is now rendered from this section, and its FAQPage search markup is generated
+-- from the same questions, so the two can never describe different things. Seed the section with
+-- the questions the page already shows. Guarded on the items list still being empty, so an FAQ an
+-- operator has already written is left untouched.
+UPDATE site_sections
+SET fields = fields || '{
+  "eyebrow": "Frequently asked",
+  "heading": "Questions, answered.",
+  "subheading": "A plain look at the company, the products, and the technology behind them.",
+  "items": [
+    {
+      "question": "What does ENICE Group build?",
+      "answer": "ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform. PulseAssist handles AI-powered business communication and customer support."
+    },
+    {
+      "question": "Which problems are ENICE products built to solve?",
+      "answer": "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, and ePulse and PulseX extend the ecosystem into digital banking and digital assets."
+    },
+    {
+      "question": "What does the ENICE Core provide?",
+      "answer": "A shared AI and automation pipeline, a fast ledger and payment core, an automated KYC and compliance layer, and a global cloud grid. Every product inherits the same scale, security, and observability from day one."
+    },
+    {
+      "question": "How does ENICE Group approach security and compliance?",
+      "answer": "We run a zero-trust architecture with per-tenant database isolation, row-level security, audit logging, and continuous monitoring. Every system is built for regulatory readiness from day one and aligned with SOC 2 control objectives."
+    },
+    {
+      "question": "How can businesses access ENICE products?",
+      "answer": "Businesses and institutions can reach the ENICE team through the Contact page to ask about product access, licensing, or integration requirements."
+    }
+  ]
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'home.faq'
+  AND COALESCE(jsonb_array_length(fields->'items'), 0) = 0;
+`
+        )
+      },
+      {
+        id: 9,
+        name: "about_contact_current_copy",
+        sql: (
+          /* sql */
+          `
+-- The About page header and principles band, and the Contact page header, now render from these
+-- sections. Seed them with the copy those pages already show, so wiring changes nothing visible.
+-- 'about.hero' did not exist before, so it is inserted; the other two are updated only while they
+-- still hold their original seed values, leaving an edited band untouched.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.hero', 'About page header', 'About', 'hero', true, 'published',
+  '{
+  "eyebrow": "About ENICE Group",
+  "heading": "We build technology products. [[Then we operate them.]]",
+  "subheading": "ENICE Group is the parent company behind a growing set of software products. We find real problems in financial services, commerce, and business communication, then build and run the platforms that solve them."
+}'::jsonb, 105)
+ON CONFLICT (key) DO NOTHING;
+
+UPDATE site_sections
+SET fields = fields || '{
+  "heading": "Our Principles",
+  "subheading": "These aren''t aspirational values written for a careers page. They''re the standards we hold every decision, every system, and every person on the team to.",
+  "items": [
+    {
+      "title": "Long-Term Thinking",
+      "description": "We evaluate decisions against decades, not quarters. We want companies that outlast trends and survive economic cycles. We won''t trade long-term integrity for short-term convenience."
+    },
+    {
+      "title": "Engineering Excellence",
+      "description": "We hold our engineering to the standards of regulated industries. Our codebases are documented, our APIs are versioned and backward-compatible, and our system designs favour resilience over novelty."
+    },
+    {
+      "title": "Security by Design",
+      "description": "Security isn''t added after a product ships. It''s built in from the start. Zero-trust architecture, per-tenant data isolation, end-to-end encryption, and continuous threat modelling are standard across every product we run. We treat our partners'' data as our responsibility."
+    },
+    {
+      "title": "Customer Obsession",
+      "description": "We measure ourselves by outcomes for the people we serve, not feature counts. Every product decision traces back to a real constraint facing a specific type of business, and our job is to remove it."
+    },
+    {
+      "title": "Institutional Quality",
+      "description": "We build for enterprise, not for early adopters willing to tolerate rough edges. Our documentation, onboarding, support, and SLA commitments are built to satisfy legal, compliance, and procurement teams at serious organisations."
+    },
+    {
+      "title": "Responsible AI",
+      "description": "AI can help or cause real harm. Our AI systems ship with clear guardrails, full auditability, and ongoing human oversight. We don''t release a capability until we''re confident in its reliability and we can explain how it works."
+    },
+    {
+      "title": "Continuous Innovation",
+      "description": "Staying relevant takes sustained investment in research and experimentation. It isn''t one team''s job, it''s built into how every product team works. We set aside engineering time for exploratory work because what we build in five years doesn''t have a name yet."
+    },
+    {
+      "title": "Ownership Mentality",
+      "description": "Everyone at ENICE, from engineers to operations leads, is expected to think like an owner: accountable, deeply knowledgeable in their domain, and biased toward action. We trust people to lead, and we hold them to that standard."
+    }
+  ]
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'about.values'
+  AND COALESCE(jsonb_array_length(fields->'items'), 0) = 0;
+
+UPDATE site_sections
+SET fields = fields || '{
+  "eyebrow": "Corporate Engagement",
+  "heading": "Get in Touch",
+  "subheading": "Reach the ENICE Group team about product access, platform integration, enterprise licensing, or technology partnerships."
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'contact.details'
+  AND fields->>'heading' = 'Contact ENICE Group';
 `
         )
       }
@@ -86821,7 +86968,33 @@ var init_website = __esm({
         group: "Home",
         type: "faq",
         order: 50,
-        fields: { heading: "Frequently asked questions", items: [] }
+        fields: {
+          eyebrow: "Frequently asked",
+          heading: "Questions, answered.",
+          subheading: "A plain look at the company, the products, and the technology behind them.",
+          items: [
+            {
+              question: "What does ENICE Group build?",
+              answer: "ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform. PulseAssist handles AI-powered business communication and customer support."
+            },
+            {
+              question: "Which problems are ENICE products built to solve?",
+              answer: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, and ePulse and PulseX extend the ecosystem into digital banking and digital assets."
+            },
+            {
+              question: "What does the ENICE Core provide?",
+              answer: "A shared AI and automation pipeline, a fast ledger and payment core, an automated KYC and compliance layer, and a global cloud grid. Every product inherits the same scale, security, and observability from day one."
+            },
+            {
+              question: "How does ENICE Group approach security and compliance?",
+              answer: "We run a zero-trust architecture with per-tenant database isolation, row-level security, audit logging, and continuous monitoring. Every system is built for regulatory readiness from day one and aligned with SOC 2 control objectives."
+            },
+            {
+              question: "How can businesses access ENICE products?",
+              answer: "Businesses and institutions can reach the ENICE team through the Contact page to ask about product access, licensing, or integration requirements."
+            }
+          ]
+        }
       },
       {
         key: "home.cta",
@@ -86838,6 +87011,18 @@ var init_website = __esm({
         }
       },
       {
+        key: "about.hero",
+        label: "About page header",
+        group: "About",
+        type: "hero",
+        order: 105,
+        fields: {
+          eyebrow: "About ENICE Group",
+          heading: "We build technology products. [[Then we operate them.]]",
+          subheading: "ENICE Group is the parent company behind a growing set of software products. We find real problems in financial services, commerce, and business communication, then build and run the platforms that solve them."
+        }
+      },
+      {
         key: "about.intro",
         label: "About introduction",
         group: "About",
@@ -86851,7 +87036,44 @@ var init_website = __esm({
         group: "About",
         type: "featureGrid",
         order: 120,
-        fields: { heading: "How we work", items: [] }
+        fields: {
+          heading: "Our Principles",
+          subheading: "These aren't aspirational values written for a careers page. They're the standards we hold every decision, every system, and every person on the team to.",
+          items: [
+            {
+              title: "Long-Term Thinking",
+              description: "We evaluate decisions against decades, not quarters. We want companies that outlast trends and survive economic cycles. We won't trade long-term integrity for short-term convenience."
+            },
+            {
+              title: "Engineering Excellence",
+              description: "We hold our engineering to the standards of regulated industries. Our codebases are documented, our APIs are versioned and backward-compatible, and our system designs favour resilience over novelty."
+            },
+            {
+              title: "Security by Design",
+              description: "Security isn't added after a product ships. It's built in from the start. Zero-trust architecture, per-tenant data isolation, end-to-end encryption, and continuous threat modelling are standard across every product we run. We treat our partners' data as our responsibility."
+            },
+            {
+              title: "Customer Obsession",
+              description: "We measure ourselves by outcomes for the people we serve, not feature counts. Every product decision traces back to a real constraint facing a specific type of business, and our job is to remove it."
+            },
+            {
+              title: "Institutional Quality",
+              description: "We build for enterprise, not for early adopters willing to tolerate rough edges. Our documentation, onboarding, support, and SLA commitments are built to satisfy legal, compliance, and procurement teams at serious organisations."
+            },
+            {
+              title: "Responsible AI",
+              description: "AI can help or cause real harm. Our AI systems ship with clear guardrails, full auditability, and ongoing human oversight. We don't release a capability until we're confident in its reliability and we can explain how it works."
+            },
+            {
+              title: "Continuous Innovation",
+              description: "Staying relevant takes sustained investment in research and experimentation. It isn't one team's job, it's built into how every product team works. We set aside engineering time for exploratory work because what we build in five years doesn't have a name yet."
+            },
+            {
+              title: "Ownership Mentality",
+              description: "Everyone at ENICE, from engineers to operations leads, is expected to think like an owner: accountable, deeply knowledgeable in their domain, and biased toward action. We trust people to lead, and we hold them to that standard."
+            }
+          ]
+        }
       },
       {
         key: "contact.details",
@@ -86860,8 +87082,9 @@ var init_website = __esm({
         type: "contact",
         order: 210,
         fields: {
-          heading: "Contact ENICE Group",
-          subheading: "We reply to every enquiry.",
+          eyebrow: "Corporate Engagement",
+          heading: "Get in Touch",
+          subheading: "Reach the ENICE Group team about product access, platform integration, enterprise licensing, or technology partnerships.",
           email: "corporate@enicehq.com",
           showForm: true
         }

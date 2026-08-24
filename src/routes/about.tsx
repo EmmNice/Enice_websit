@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
 import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
@@ -111,6 +113,20 @@ const VERTICALS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function AboutPage() {
+  // Editable bands, each falling back to the copy below until the section is edited.
+  const hero = useSectionFields("about.hero");
+  const values = useSectionFields("about.values");
+
+  // The principles cards. Numbering is positional, so nobody maintains /01, /02 by hand.
+  const principles = fieldItems(values, "items", PRINCIPLES, (row) => {
+    const title = typeof row.title === "string" ? row.title.trim() : "";
+    if (!title) return null;
+    return {
+      title,
+      body: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
@@ -120,16 +136,27 @@ function AboutPage() {
           <div className="mx-auto max-w-5xl px-5 sm:px-8">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-400">
               <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-              About ENICE Group
+              {fieldText(hero, "eyebrow", "About ENICE Group")}
             </div>
             <h1 className="mt-6 max-w-4xl text-[2rem] font-bold leading-[1.04] tracking-[-0.035em] text-white sm:text-6xl md:text-7xl">
-              We build technology products.{" "}
-              <span className="text-blue-400">Then we operate them.</span>
+              <StyledText
+                text={fieldText(
+                  hero,
+                  "heading",
+                  "We build technology products. [[Then we operate them.]]",
+                )}
+                accentClassName="text-blue-400"
+              />
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/60 sm:mt-8 sm:text-xl">
-              ENICE Group is the parent company behind a growing set of software products. We find
-              real problems in financial services, commerce, and business communication, then build
-              and run the platforms that solve them.
+              <StyledText
+                text={fieldText(
+                  hero,
+                  "subheading",
+                  "ENICE Group is the parent company behind a growing set of software products. We find real problems in financial services, commerce, and business communication, then build and run the platforms that solve them.",
+                )}
+                accentClassName="text-blue-400"
+              />
             </p>
           </div>
         </section>
@@ -374,23 +401,28 @@ function AboutPage() {
                 /06
               </span>
               <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
-                Our Principles
+                <StyledText text={fieldText(values, "heading", "Our Principles")} />
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-                These aren't aspirational values written for a careers page. They're the standards
-                we hold every decision, every system, and every person on the team to.
+                <StyledText
+                  text={fieldText(
+                    values,
+                    "subheading",
+                    "These aren't aspirational values written for a careers page. They're the standards we hold every decision, every system, and every person on the team to.",
+                  )}
+                />
               </p>
             </div>
 
             <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-              {PRINCIPLES.map((p) => (
+              {principles.map((p, i) => (
                 <article
-                  key={p.index}
+                  key={p.title}
                   className="rounded-xl border border-border bg-background p-8"
                 >
                   <div className="flex items-start gap-4">
                     <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-muted-foreground shrink-0 mt-0.5">
-                      /{p.index}
+                      /{String(i + 1).padStart(2, "0")}
                     </span>
                     <div>
                       <h3 className="text-lg font-semibold tracking-tight text-foreground">

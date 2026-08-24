@@ -217,16 +217,13 @@ async function main() {
     "src/lib/seo.ts",
     "seo",
   );
-  const { FAQS } = await loadModule("src/lib/faqs.ts", "faqs");
   const shell = await readFile(join(DIST, "index.html"), "utf8");
-  const faqs = FAQS;
-  console.log(`[prerender] ${faqs.length} FAQ entries found for FAQPage markup`);
 
   let written = 0;
 
   for (const [pathname, seo] of Object.entries(PAGE_SEO)) {
     const url = canonicalUrl(pathname);
-    const head = renderHead(buildMeta(seo, url), url, prerenderJsonLd(pathname, faqs));
+    const head = renderHead(buildMeta(seo, url), url, prerenderJsonLd(pathname));
     const file = await writePage(pathname, head, shell);
     console.log(`[prerender] ${pathname.padEnd(26)} -> ${file}`);
     written++;

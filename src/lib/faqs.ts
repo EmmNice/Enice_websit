@@ -1,12 +1,11 @@
 /**
- * Homepage FAQ content.
+ * Built-in homepage FAQ content.
  *
- * Lives apart from the component so three consumers can share one copy: the accordion that
- * renders it, `faqJsonLd()` which turns it into FAQ markup, and the prerender script which
- * bakes that markup into the static HTML.
- *
- * Declaring FAQ markup for content that is not visible on the page violates search guidelines,
- * so the schema must always be generated from this array rather than a second copy of it.
+ * The questions are editable through the `home.faq` section; this array is the fallback shown
+ * before that section loads, and if it is empty or unreachable. `FAQSection` renders whichever
+ * source applies and generates the `FAQPage` markup from the same array it renders, so the markup
+ * always describes what a visitor can actually see — declaring FAQ markup for content that is not
+ * on the page violates search guidelines.
  *
  * Keep answers factual and precise. Avoid promotional language.
  */

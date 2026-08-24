@@ -531,7 +531,19 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
     description: "Expandable questions and answers.",
     icon: "CircleHelp",
     fields: [
-      { key: "heading", label: "Heading", type: "text" },
+      { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the heading." },
+      {
+        key: "heading",
+        label: "Heading",
+        type: "text",
+        help: "Style with **bold** and [[highlight]].",
+      },
+      {
+        key: "subheading",
+        label: "Supporting copy",
+        type: "textarea",
+        help: "Supports **bold** and [[highlight]].",
+      },
       {
         key: "items",
         label: "Questions",
@@ -539,7 +551,13 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
         max: 30,
         of: [
           { key: "question", label: "Question", type: "text", required: true },
-          { key: "answer", label: "Answer", type: "textarea", required: true },
+          {
+            key: "answer",
+            label: "Answer",
+            type: "textarea",
+            required: true,
+            help: "Plain text. These answers are also published as FAQ search markup, so keep them factual and avoid styling.",
+          },
         ],
       },
     ],
@@ -550,8 +568,19 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
     description: "Contact details alongside the enquiry form.",
     icon: "Mail",
     fields: [
-      { key: "heading", label: "Heading", type: "text" },
-      { key: "subheading", label: "Supporting copy", type: "textarea" },
+      { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the heading." },
+      {
+        key: "heading",
+        label: "Heading",
+        type: "text",
+        help: "Style with **bold** and [[highlight]].",
+      },
+      {
+        key: "subheading",
+        label: "Supporting copy",
+        type: "textarea",
+        help: "Supports **bold** and [[highlight]].",
+      },
       { key: "email", label: "Email address", type: "text" },
       { key: "showForm", label: "Show the enquiry form", type: "boolean" },
     ],
