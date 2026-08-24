@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { SHADOW_CARD } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
@@ -107,6 +109,9 @@ const FOR_WHO = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function EPulsePage() {
+  // Page header, editable through the `portfolio.epulse` section.
+  const header = useSectionFields("portfolio.epulse");
+
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
@@ -133,16 +138,18 @@ function EPulsePage() {
             </div>
 
             <h1 className="mx-auto max-w-3xl text-balance text-5xl font-semibold leading-[1.03] tracking-[-0.03em] text-foreground sm:text-6xl md:text-7xl">
-              e<span className="text-primary">Pulse</span>
+              <StyledText text={fieldText(header, "heading", "e[[Pulse]]")} />
             </h1>
 
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              ePulse is ENICE Group's upcoming global financial platform, built for people who{" "}
-              <strong className="font-semibold text-foreground">
-                earn, send, and spend money across borders
-              </strong>
-              . Designed for freelancers, remote workers, creators, and global businesses, ePulse
-              aims to make international finance <em>simple and accessible</em>.
+              <StyledText
+                text={fieldText(
+                  header,
+                  "subheading",
+                  "ePulse is ENICE Group's upcoming global financial platform, built for people who **earn, send, and spend money across borders**. Designed for freelancers, remote workers, creators, and global businesses, ePulse aims to make international finance *simple and accessible*.",
+                )}
+                boldClassName="font-semibold text-foreground"
+              />
             </p>
 
             {/* CTAs */}

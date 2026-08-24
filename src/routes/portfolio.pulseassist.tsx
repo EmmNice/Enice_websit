@@ -25,6 +25,8 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { SHADOW_CARD } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
@@ -113,6 +115,9 @@ const SECTORS = [
 ];
 
 function PulseAssistPage() {
+  // Page header, editable through the `portfolio.pulseassist` section.
+  const header = useSectionFields("portfolio.pulseassist");
+
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
@@ -124,15 +129,19 @@ function PulseAssistPage() {
             <div>
               <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
                 <BrainCircuit className="h-3.5 w-3.5" />
-                Enterprise Conversational SaaS
+                {fieldText(header, "eyebrow", "Enterprise Conversational SaaS")}
               </div>
               <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
-                PulseAssist
+                <StyledText text={fieldText(header, "heading", "PulseAssist")} />
               </h1>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                A multi-tenant AI operations platform for telecoms and financial networks. It
-                handles customer support routing, provides API-driven account management, and hands
-                calls to live agents in real time when needed.
+                <StyledText
+                  text={fieldText(
+                    header,
+                    "subheading",
+                    "A multi-tenant AI operations platform for telecoms and financial networks. It handles customer support routing, provides API-driven account management, and hands calls to live agents in real time when needed.",
+                  )}
+                />
               </p>
 
               {/* Status */}
