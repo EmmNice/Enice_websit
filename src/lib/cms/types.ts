@@ -317,6 +317,7 @@ export interface PageSection {
  */
 export const SECTION_TYPES = [
   "hero",
+  "prose",
   "richText",
   "featureGrid",
   "statistics",
@@ -387,6 +388,35 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
       { key: "secondaryCtaLabel", label: "Secondary button label", type: "text" },
       { key: "secondaryCtaUrl", label: "Secondary button URL", type: "url" },
       { key: "image", label: "Accompanying image", type: "image" },
+    ],
+  },
+  /**
+   * A heading with plain paragraphs.
+   *
+   * Distinct from `richText`, which uses the full block editor and its own article typography.
+   * These bands are body copy inside a page's existing layout, so they must inherit that layout's
+   * type styling exactly — a paragraph here is text, not a document. Editing is a single textarea,
+   * which is also less work than a block editor for what is only ever a few paragraphs.
+   */
+  prose: {
+    type: "prose",
+    label: "Text band",
+    description: "A heading with one or more paragraphs.",
+    icon: "AlignLeft",
+    fields: [
+      {
+        key: "heading",
+        label: "Heading",
+        type: "text",
+        help: "Style with **bold** and [[highlight]].",
+      },
+      {
+        key: "body",
+        label: "Paragraphs",
+        type: "textarea",
+        required: true,
+        help: "Leave a blank line between paragraphs. Supports **bold** and [[highlight]].",
+      },
     ],
   },
   richText: {

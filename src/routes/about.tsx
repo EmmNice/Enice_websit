@@ -112,6 +112,76 @@ const VERTICALS = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+/**
+ * One of the About page's numbered prose bands.
+ *
+ * The five bands are structurally identical — a number, a heading, and a few paragraphs — so they
+ * share this component rather than repeating the markup five times. The classes are exactly those
+ * the page already used, including the dark variant, so making these editable does not alter the
+ * typography.
+ *
+ * Paragraphs come from the section's `body`, separated by blank lines. The built-in copy is used
+ * until the section is edited, so the page is unchanged in the meantime.
+ */
+function ProseBand({
+  number,
+  sectionKey,
+  heading,
+  paragraphs,
+  dark = false,
+}: {
+  number: string;
+  sectionKey: string;
+  heading: string;
+  paragraphs: string[];
+  dark?: boolean;
+}) {
+  const fields = useSectionFields(sectionKey);
+  const body = fieldText(fields, "body", paragraphs.join("\n\n"));
+  const rendered = body
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  return (
+    <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
+      <div>
+        <span
+          className={`font-mono text-[11px] font-semibold uppercase tracking-[0.22em] ${
+            dark ? "text-blue-400/70" : "text-muted-foreground"
+          }`}
+        >
+          {number}
+        </span>
+        <h2
+          className={`mt-4 text-3xl font-bold leading-snug tracking-tight sm:text-4xl ${
+            dark ? "text-white" : "text-foreground"
+          }`}
+        >
+          <StyledText
+            text={fieldText(fields, "heading", heading)}
+            accentClassName={dark ? "text-blue-400" : "text-primary"}
+          />
+        </h2>
+      </div>
+      <div
+        className={`space-y-6 text-[16px] leading-relaxed ${
+          dark ? "text-white/60" : "text-muted-foreground"
+        }`}
+      >
+        {rendered.map((paragraph, i) => (
+          <p key={i}>
+            <StyledText
+              text={paragraph}
+              accentClassName={dark ? "text-blue-400" : "text-primary"}
+            />
+          </p>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AboutPage() {
   // Editable bands, each falling back to the copy below until the section is edited.
   const hero = useSectionFields("about.hero");
@@ -164,105 +234,48 @@ function AboutPage() {
         {/* ── 2. OUR STORY ────────────────────────────────────────────────── */}
         <section className="border-b border-border py-24 sm:py-32">
           <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
-              <div>
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  /02
-                </span>
-                <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
-                  Our Story
-                </h2>
-              </div>
-              <div className="space-y-6 text-[16px] leading-relaxed text-muted-foreground">
-                <p>
-                  ENICE Group started from one observation: the biggest problems facing African
-                  businesses aren't problems of ambition, they're problems of infrastructure. The
-                  software systems and financial rails that large organisations rely on elsewhere
-                  have historically been too expensive, too inaccessible, or simply missing for
-                  businesses in emerging markets.
-                </p>
-                <p>
-                  We're building more than one product on the same foundation. The same engineering
-                  standards and shared infrastructure can support multiple purpose-built platforms,
-                  each serving a distinct need and strengthening the system around it.
-                </p>
-                <p>
-                  This isn't a collection of separate experiments. It's a deliberate approach:
-                  shared infrastructure compounds in value, and the quality of one product raises
-                  the bar for whatever we build next.
-                </p>
-              </div>
-            </div>
+            <ProseBand
+              number="/02"
+              sectionKey="about.story"
+              heading={"Our Story"}
+              paragraphs={[
+                "ENICE Group started from one observation: the biggest problems facing African businesses aren't problems of ambition, they're problems of infrastructure. The software systems and financial rails that large organisations rely on elsewhere have historically been too expensive, too inaccessible, or simply missing for businesses in emerging markets.",
+                "We're building more than one product on the same foundation. The same engineering standards and shared infrastructure can support multiple purpose-built platforms, each serving a distinct need and strengthening the system around it.",
+                "This isn't a collection of separate experiments. It's a deliberate approach: shared infrastructure compounds in value, and the quality of one product raises the bar for whatever we build next.",
+              ]}
+            />
           </div>
         </section>
 
         {/* ── 3. OUR MISSION ──────────────────────────────────────────────── */}
         <section className="border-b border-border bg-secondary py-24 sm:py-32">
           <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
-              <div>
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  /03
-                </span>
-                <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
-                  Our Mission
-                </h2>
-              </div>
-              <div className="space-y-6 text-[16px] leading-relaxed text-muted-foreground">
-                <p>
-                  We want to build the technology layer that lets businesses, institutions, and
-                  developers across Africa, and eventually beyond, operate at real scale. Not
-                  software that works well enough, but software built with the reliability,
-                  security, and performance that institutional operations require.
-                </p>
-                <p>
-                  Our customers aren't test users. They're financial service providers, enterprise
-                  operations teams, and technology builders who need infrastructure they can stake
-                  their business on. We serve them with platforms that are secure by design and
-                  built to hold up under real commercial volume.
-                </p>
-                <p>
-                  We're aiming for structural impact, not just features. When payment infrastructure
-                  is reliable, commerce expands. When enterprise AI is trustworthy, teams get more
-                  done. When developer tools are solid, the next generation of companies gets built
-                  faster. That's the impact we're here for.
-                </p>
-              </div>
-            </div>
+            <ProseBand
+              number="/03"
+              sectionKey="about.mission"
+              heading={"Our Mission"}
+              paragraphs={[
+                "We want to build the technology layer that lets businesses, institutions, and developers across Africa, and eventually beyond, operate at real scale. Not software that works well enough, but software built with the reliability, security, and performance that institutional operations require.",
+                "Our customers aren't test users. They're financial service providers, enterprise operations teams, and technology builders who need infrastructure they can stake their business on. We serve them with platforms that are secure by design and built to hold up under real commercial volume.",
+                "We're aiming for structural impact, not just features. When payment infrastructure is reliable, commerce expands. When enterprise AI is trustworthy, teams get more done. When developer tools are solid, the next generation of companies gets built faster. That's the impact we're here for.",
+              ]}
+            />
           </div>
         </section>
 
         {/* ── 4. OUR VISION ───────────────────────────────────────────────── */}
         <section className="border-b border-border py-24 sm:py-32">
           <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
-              <div>
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  /04
-                </span>
-                <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
-                  Our Vision
-                </h2>
-              </div>
-              <div className="space-y-6 text-[16px] leading-relaxed text-muted-foreground">
-                <p>
-                  Over the next ten to twenty years, we want to build what Africa doesn't yet have:
-                  a home-grown technology infrastructure group that competes globally, not one that
-                  just follows trends.
-                </p>
-                <p>
-                  We're building toward a future where African-originated financial infrastructure
-                  is trusted across multiple continents, where enterprise AI built here sets the
-                  regional standard for reliability, and where developer tools from our ecosystem
-                  are chosen by builders worldwide because they're simply good.
-                </p>
-                <p>
-                  That's a ten-to-twenty-year project. It takes discipline and patience most
-                  organisations aren't built to sustain. We're structured for the long run, not the
-                  short cycle of a typical startup.
-                </p>
-              </div>
-            </div>
+            <ProseBand
+              number="/04"
+              sectionKey="about.vision"
+              heading={"Our Vision"}
+              paragraphs={[
+                "Over the next ten to twenty years, we want to build what Africa doesn't yet have: a home-grown technology infrastructure group that competes globally, not one that just follows trends.",
+                "We're building toward a future where African-originated financial infrastructure is trusted across multiple continents, where enterprise AI built here sets the regional standard for reliability, and where developer tools from our ecosystem are chosen by builders worldwide because they're simply good.",
+                "That's a ten-to-twenty-year project. It takes discipline and patience most organisations aren't built to sustain. We're structured for the long run, not the short cycle of a typical startup.",
+              ]}
+            />
           </div>
         </section>
 
@@ -440,78 +453,35 @@ function AboutPage() {
         {/* ── 7. OUR ECOSYSTEM ────────────────────────────────────────────── */}
         <section className="border-b border-border bg-secondary py-24 sm:py-32">
           <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
-              <div>
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  /07
-                </span>
-                <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
-                  Our Ecosystem
-                </h2>
-              </div>
-              <div className="space-y-6 text-[16px] leading-relaxed text-muted-foreground">
-                <p>
-                  The most important part of the ENICE Group model isn't any single product, it's
-                  the infrastructure they share. Every product we build runs on the same engineering
-                  foundation: the same security architecture, the same zero-trust access model, the
-                  same data isolation standards, and the same deployment pipeline.
-                </p>
-                <p>
-                  That shared foundation pays off twice. Each new product reaches production-grade
-                  reliability faster, because the hard infrastructure problems are already solved at
-                  the group level. And each existing product gets stronger as we add new ones,
-                  through shared investment and shared operational standards.
-                </p>
-                <p>
-                  The result is a set of products that gets more capable with each addition.
-                  Security improvements spread across the ecosystem. Infrastructure work lifts every
-                  product. Compliance work done once serves every regulated platform.
-                </p>
-                <p>
-                  That's why we call it an ecosystem rather than a collection of products. They're
-                  built to compound.
-                </p>
-              </div>
-            </div>
+            <ProseBand
+              number="/07"
+              sectionKey="about.ecosystem"
+              heading={"Our Ecosystem"}
+              paragraphs={[
+                "The most important part of the ENICE Group model isn't any single product, it's the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same zero-trust access model, the same data isolation standards, and the same deployment pipeline.",
+                "That shared foundation pays off twice. Each new product reaches production-grade reliability faster, because the hard infrastructure problems are already solved at the group level. And each existing product gets stronger as we add new ones, through shared investment and shared operational standards.",
+                "The result is a set of products that gets more capable with each addition. Security improvements spread across the ecosystem. Infrastructure work lifts every product. Compliance work done once serves every regulated platform.",
+                "That's why we call it an ecosystem rather than a collection of products. They're built to compound.",
+              ]}
+            />
           </div>
         </section>
 
         {/* ── 8. LOOKING AHEAD ────────────────────────────────────────────── */}
         <section className="border-b border-border bg-[#060912] py-24 sm:py-32">
           <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
-              <div>
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-400/70">
-                  /09
-                </span>
-                <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-white sm:text-4xl">
-                  Looking Ahead
-                </h2>
-              </div>
-              <div className="space-y-6 text-[16px] leading-relaxed text-white/60">
-                <p>
-                  The financial and technological infrastructure African businesses depend on is
-                  still largely being built. That's not a criticism, it's just where things stand,
-                  and it's the opportunity we're focused on.
-                </p>
-                <p>
-                  We want to build the systems businesses on this continent will run on for the next
-                  generation. This isn't charity. Demand for institutional-quality infrastructure is
-                  large, growing, and underserved, and we intend to supply it.
-                </p>
-                <p>
-                  We're also building for a global market. What we build will scale across regions,
-                  meet international compliance standards, and compete with any equivalent platform
-                  anywhere. We're not trying to be the best option in Nigeria or in Africa. We're
-                  trying to be the best option, period.
-                </p>
-                <p>
-                  To the businesses that use our products, and the engineers and operators who build
-                  with us: we're committed to building technology that matters, to a standard that
-                  matters, and taking the time it takes to do it properly.
-                </p>
-              </div>
-            </div>
+            <ProseBand
+              number="/09"
+              sectionKey="about.outlook"
+              heading={"Looking Ahead"}
+              paragraphs={[
+                "The financial and technological infrastructure African businesses depend on is still largely being built. That's not a criticism, it's just where things stand, and it's the opportunity we're focused on.",
+                "We want to build the systems businesses on this continent will run on for the next generation. This isn't charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it.",
+                "We're also building for a global market. What we build will scale across regions, meet international compliance standards, and compete with any equivalent platform anywhere. We're not trying to be the best option in Nigeria or in Africa. We're trying to be the best option, period.",
+                "To the businesses that use our products, and the engineers and operators who build with us: we're committed to building technology that matters, to a standard that matters, and taking the time it takes to do it properly.",
+              ]}
+              dark
+            />
 
             {/* Closing statement */}
             <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.03] p-7 sm:mt-20 sm:p-16 text-center">

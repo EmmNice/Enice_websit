@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { SHADOW_CARD } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
@@ -196,6 +198,9 @@ const HIGHLIGHTS = [
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function PulseXPage() {
+  // Page header, editable through the `portfolio.pulsex` section.
+  const header = useSectionFields("portfolio.pulsex");
+
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
@@ -237,17 +242,22 @@ function PulseXPage() {
                 </div>
 
                 <h1 className="text-balance text-5xl font-semibold leading-[1.03] tracking-[-0.03em] text-white sm:text-6xl">
-                  Pulse<span className="text-blue-400">X</span>
+                  <StyledText
+                    text={fieldText(header, "heading", "Pulse[[X]]")}
+                    accentClassName="text-blue-400"
+                  />
                 </h1>
 
                 <p className="mt-6 max-w-lg text-base leading-relaxed text-white/60 sm:text-lg">
-                  PulseX is ENICE Group's digital asset platform, designed to make cryptocurrency
-                  and digital finance{" "}
-                  <strong className="font-semibold text-white/80">
-                    simple, secure, and accessible
-                  </strong>
-                  . The platform will let users manage digital assets easily, while staying
-                  connected to the broader ENICE ecosystem.
+                  <StyledText
+                    text={fieldText(
+                      header,
+                      "subheading",
+                      "PulseX is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
+                    )}
+                    accentClassName="text-blue-400"
+                    boldClassName="font-semibold text-white/80"
+                  />
                 </p>
 
                 {/* Meta cards */}

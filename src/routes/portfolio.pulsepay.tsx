@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { SHADOW_CARD } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
@@ -95,6 +97,9 @@ const STATS = [
 ];
 
 function PulsePayPage() {
+  // Page header, editable through the `portfolio.pulsepay` section.
+  const header = useSectionFields("portfolio.pulsepay");
+
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
@@ -105,15 +110,19 @@ function PulsePayPage() {
             {/* Copy */}
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Fintech Infrastructure Platform
+                {fieldText(header, "eyebrow", "Fintech Infrastructure Platform")}
               </div>
               <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
-                PulsePay
+                <StyledText text={fieldText(header, "heading", "PulsePay")} />
               </h1>
               <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                A virtual payment platform that issues Naira and USD cards, handles KYC
-                verification, moves funds between users, and delivers value-added services with
-                speed and reliability.
+                <StyledText
+                  text={fieldText(
+                    header,
+                    "subheading",
+                    "A virtual payment platform that issues Naira and USD cards, handles KYC verification, moves funds between users, and delivers value-added services with speed and reliability.",
+                  )}
+                />
               </p>
 
               {/* Status + platform label */}

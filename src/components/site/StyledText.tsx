@@ -15,9 +15,14 @@
 
 import { Fragment, type ReactNode } from "react";
 
-/** Splits text into runs, honouring `**bold**` and `[[highlight]]` (non-nested). */
-function tokenize(text: string, accentClassName: string): ReactNode[] {
-  const pattern = /\*\*([^*]+)\*\*|\[\[([^\]]+)\]\]/g;
+/**
+ * Splits text into runs, honouring `**bold**`, `*italic*` and `[[highlight]]` (non-nested).
+ *
+ * `**` is listed before `*` in the pattern so bold wins over italic; otherwise `**x**` would match
+ * as an italic run containing an asterisk.
+ */
+function tokenize(text: string, accentClassName: string, boldClassName: string): ReactNode[] {
+  const pattern = /\*\*([^*]+)\*\*|\[\[([^\]]+)\]\]|\*([^*]+)\*/g;
   const nodes: ReactNode[] = [];
   let last = 0;
   let key = 0;
@@ -37,7 +42,7 @@ function tokenize(text: string, accentClassName: string): ReactNode[] {
     pushPlain(text.slice(last, match.index));
     if (match[1] !== undefined) {
       nodes.push(
-        <strong key={key++} className="font-bold">
+        <strong key={key++} className={boldClassName}>
           {match[1]}
         </strong>,
       );
@@ -47,6 +52,8 @@ function tokenize(text: string, accentClassName: string): ReactNode[] {
           {match[2]}
         </span>,
       );
+    } else if (match[3] !== undefined) {
+      nodes.push(<em key={key++}>{match[3]}</em>);
     }
     last = pattern.lastIndex;
   }
@@ -57,14 +64,24 @@ function tokenize(text: string, accentClassName: string): ReactNode[] {
 export function StyledText({
   text,
   accentClassName = "text-primary",
+  boldClassName = "font-bold",
 }: {
   text: string;
   accentClassName?: string;
+  /**
+   * How a `**bold**` run is styled. Overridable because the emphasis weight and colour vary by
+   * band — a dark product page uses a lighter weight against its own text colour — and a single
+   * hard-coded weight would visibly change those pages.
+   */
+  boldClassName?: string;
 }) {
-  return <>{tokenize(text, accentClassName)}</>;
+  return <>{tokenize(text, accentClassName, boldClassName)}</>;
 }
 
 /** Strips the styling markers, for places that need the plain string (SEO titles, alt text). */
 export function plainText(text: string): string {
-  return text.replace(/\*\*([^*]+)\*\*/g, "$1").replace(/\[\[([^\]]+)\]\]/g, "$1");
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, "$1")
+    .replace(/\[\[([^\]]+)\]\]/g, "$1")
+    .replace(/\*([^*]+)\*/g, "$1");
 }

@@ -655,6 +655,117 @@ WHERE key = 'contact.details'
   AND fields->>'heading' = 'Contact ENICE Group';
 `,
   },
+  {
+    id: 10,
+    name: "about_prose_bands",
+    sql: /* sql */ `
+-- The About page's five numbered prose bands now render from these sections. Create them with the
+-- copy those bands already show, so wiring changes nothing visible. ON CONFLICT DO NOTHING means a
+-- band an operator has already written is never overwritten, and re-running is a no-op.
+--
+-- Paragraphs are separated by a blank line inside 'body'. Note the doubled backslashes: this SQL
+-- lives in a JavaScript template literal, where a lone backslash-n would become a real newline and
+-- Postgres rejects an unescaped newline inside a JSON string.
+--
+-- 'about.intro' was seeded as an unused richText section with an empty body, rendering nowhere.
+-- Remove it (only while still empty) so the About group carries no dead section; 'about.story'
+-- replaces it, using a plain-paragraph type that inherits the page's own typography.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.story', 'Our Story', 'About', 'prose', true, 'published', '{
+  "heading": "Our Story",
+  "body": "ENICE Group started from one observation: the biggest problems facing African businesses aren''t problems of ambition, they''re problems of infrastructure. The software systems and financial rails that large organisations rely on elsewhere have historically been too expensive, too inaccessible, or simply missing for businesses in emerging markets.\\n\\nWe''re building more than one product on the same foundation. The same engineering standards and shared infrastructure can support multiple purpose-built platforms, each serving a distinct need and strengthening the system around it.\\n\\nThis isn''t a collection of separate experiments. It''s a deliberate approach: shared infrastructure compounds in value, and the quality of one product raises the bar for whatever we build next."
+}'::jsonb, 130)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.mission', 'Our Mission', 'About', 'prose', true, 'published', '{
+  "heading": "Our Mission",
+  "body": "We want to build the technology layer that lets businesses, institutions, and developers across Africa, and eventually beyond, operate at real scale. Not software that works well enough, but software built with the reliability, security, and performance that institutional operations require.\\n\\nOur customers aren''t test users. They''re financial service providers, enterprise operations teams, and technology builders who need infrastructure they can stake their business on. We serve them with platforms that are secure by design and built to hold up under real commercial volume.\\n\\nWe''re aiming for structural impact, not just features. When payment infrastructure is reliable, commerce expands. When enterprise AI is trustworthy, teams get more done. When developer tools are solid, the next generation of companies gets built faster. That''s the impact we''re here for."
+}'::jsonb, 140)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.vision', 'Our Vision', 'About', 'prose', true, 'published', '{
+  "heading": "Our Vision",
+  "body": "Over the next ten to twenty years, we want to build what Africa doesn''t yet have: a home-grown technology infrastructure group that competes globally, not one that just follows trends.\\n\\nWe''re building toward a future where African-originated financial infrastructure is trusted across multiple continents, where enterprise AI built here sets the regional standard for reliability, and where developer tools from our ecosystem are chosen by builders worldwide because they''re simply good.\\n\\nThat''s a ten-to-twenty-year project. It takes discipline and patience most organisations aren''t built to sustain. We''re structured for the long run, not the short cycle of a typical startup."
+}'::jsonb, 150)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.ecosystem', 'Our Ecosystem', 'About', 'prose', true, 'published', '{
+  "heading": "Our Ecosystem",
+  "body": "The most important part of the ENICE Group model isn''t any single product, it''s the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same zero-trust access model, the same data isolation standards, and the same deployment pipeline.\\n\\nThat shared foundation pays off twice. Each new product reaches production-grade reliability faster, because the hard infrastructure problems are already solved at the group level. And each existing product gets stronger as we add new ones, through shared investment and shared operational standards.\\n\\nThe result is a set of products that gets more capable with each addition. Security improvements spread across the ecosystem. Infrastructure work lifts every product. Compliance work done once serves every regulated platform.\\n\\nThat''s why we call it an ecosystem rather than a collection of products. They''re built to compound."
+}'::jsonb, 160)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.outlook', 'Looking Ahead', 'About', 'prose', true, 'published', '{
+  "heading": "Looking Ahead",
+  "body": "The financial and technological infrastructure African businesses depend on is still largely being built. That''s not a criticism, it''s just where things stand, and it''s the opportunity we''re focused on.\\n\\nWe want to build the systems businesses on this continent will run on for the next generation. This isn''t charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it.\\n\\nWe''re also building for a global market. What we build will scale across regions, meet international compliance standards, and compete with any equivalent platform anywhere. We''re not trying to be the best option in Nigeria or in Africa. We''re trying to be the best option, period.\\n\\nTo the businesses that use our products, and the engineers and operators who build with us: we''re committed to building technology that matters, to a standard that matters, and taking the time it takes to do it properly."
+}'::jsonb, 170)
+ON CONFLICT (key) DO NOTHING;
+
+DELETE FROM site_sections
+WHERE key = 'about.intro'
+  AND COALESCE(jsonb_array_length(fields->'body'->'blocks'), 0) = 0;
+`,
+  },
+  {
+    id: 11,
+    name: "portfolio_page_headers",
+    sql: /* sql */ `
+-- Each portfolio page's header (eyebrow, headline, supporting copy) now renders from its own
+-- section. Create them with the copy those pages already show, so wiring changes nothing visible.
+-- ON CONFLICT DO NOTHING leaves a header an operator has edited untouched and makes re-runs a no-op.
+--
+-- Two headings carry a [[…]] marker: the ePulse and PulseX wordmarks style part of the name in the
+-- accent colour, and that is expressed in the text rather than in markup so it stays editable.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.index', 'Products page', 'Portfolio', 'hero', true, 'published', '{
+  "eyebrow": "ENICE Products",
+  "heading": "Products built by ENICE Group",
+  "subheading": "Payments, financial services, business communication, and digital commerce. Each product runs on the same infrastructure and is built to operate at scale."
+}'::jsonb, 200)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulsepay', 'PulsePay page', 'Portfolio', 'hero', true, 'published', '{
+  "eyebrow": "Fintech Infrastructure Platform",
+  "heading": "PulsePay",
+  "subheading": "A virtual payment platform that issues Naira and USD cards, handles KYC verification, moves funds between users, and delivers value-added services with speed and reliability."
+}'::jsonb, 210)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist', 'PulseAssist page', 'Portfolio', 'hero', true, 'published', '{
+  "eyebrow": "Enterprise Conversational SaaS",
+  "heading": "PulseAssist",
+  "subheading": "A multi-tenant AI operations platform for telecoms and financial networks. It handles customer support routing, provides API-driven account management, and hands calls to live agents in real time when needed."
+}'::jsonb, 220)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.epulse', 'ePulse page', 'Portfolio', 'hero', true, 'published', '{
+  "heading": "e[[Pulse]]",
+  "subheading": "ePulse is ENICE Group''s upcoming global financial platform, built for people who **earn, send, and spend money across borders**. Designed for freelancers, remote workers, creators, and global businesses, ePulse aims to make international finance *simple and accessible*."
+}'::jsonb, 230)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulsex', 'PulseX page', 'Portfolio', 'hero', true, 'published', '{
+  "heading": "Pulse[[X]]",
+  "subheading": "PulseX is ENICE Group''s digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem."
+}'::jsonb, 240)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.payment-collection', 'Payment Collection page', 'Portfolio', 'hero', true, 'published', '{
+  "heading": "PulsePay Payment Collection",
+  "subheading": "Simple, reliable payment infrastructure for modern businesses. Accept and manage customer payments through a single, developer friendly integration."
+}'::jsonb, 250)
+ON CONFLICT (key) DO NOTHING;
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

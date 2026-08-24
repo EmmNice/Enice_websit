@@ -13,6 +13,8 @@ import {
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { SHADOW_CARD } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
@@ -73,6 +75,9 @@ const QUEUE_ROWS = [
 ];
 
 function PortfolioIndexPage() {
+  // Page header, editable through the `portfolio.index` section.
+  const header = useSectionFields("portfolio.index");
+
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
@@ -81,14 +86,19 @@ function PortfolioIndexPage() {
         <section className="border-b border-border bg-background py-12 sm:py-16">
           <div className="mx-auto max-w-5xl px-5 text-center sm:px-8">
             <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              ENICE Products
+              {fieldText(header, "eyebrow", "ENICE Products")}
             </div>
             <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
-              Products built by ENICE Group
+              <StyledText text={fieldText(header, "heading", "Products built by ENICE Group")} />
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Payments, financial services, business communication, and digital commerce. Each
-              product runs on the same infrastructure and is built to operate at scale.
+              <StyledText
+                text={fieldText(
+                  header,
+                  "subheading",
+                  "Payments, financial services, business communication, and digital commerce. Each product runs on the same infrastructure and is built to operate at scale.",
+                )}
+              />
             </p>
           </div>
         </section>

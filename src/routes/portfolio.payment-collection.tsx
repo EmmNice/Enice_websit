@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { SHADOW_CARD } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
@@ -164,6 +166,9 @@ function PaymentNotificationCard() {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function PaymentCollectionPage() {
+  // Page header, editable through the `portfolio.payment-collection` section.
+  const header = useSectionFields("portfolio.payment-collection");
+
   return (
     <div className="min-h-dvh bg-background text-foreground antialiased">
       <SiteHeader />
@@ -182,12 +187,17 @@ function PaymentCollectionPage() {
               </div>
 
               <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
-                PulsePay Payment Collection
+                <StyledText text={fieldText(header, "heading", "PulsePay Payment Collection")} />
               </h1>
 
               <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Simple, reliable payment infrastructure for modern businesses. Accept and manage
-                customer payments through a single, developer friendly integration.
+                <StyledText
+                  text={fieldText(
+                    header,
+                    "subheading",
+                    "Simple, reliable payment infrastructure for modern businesses. Accept and manage customer payments through a single, developer friendly integration.",
+                  )}
+                />
               </p>
 
               <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-muted-foreground">
