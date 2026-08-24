@@ -808,6 +808,46 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
+    key: "home.core",
+    label: "The ENICE Core",
+    group: "Home",
+    type: "featureGrid",
+    order: 25,
+    fields: {
+      eyebrow: "What powers our products",
+      heading: "The ENICE Core.",
+      subheading:
+        "Every product we operate runs on a shared infrastructure core, so the software customers use inherits scale, compliance, and reliability from the ground up.",
+      // `/01`-style numbering on these cards is derived from position, not stored.
+      items: [
+        {
+          icon: "Cpu",
+          title: "Unified AI and Automation Pipeline",
+          description:
+            "Centralized LLM orchestration and vector search routing that powers products like PulseAssist across every tenant.",
+        },
+        {
+          icon: "Database",
+          title: "High-Velocity Ledger and Payment Core",
+          description:
+            "A fast transaction engine and virtual account infrastructure that anchors PulsePay and the financial products we build next.",
+        },
+        {
+          icon: "FileCheck2",
+          title: "Automated Compliance and KYC Layer",
+          description:
+            "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
+        },
+        {
+          icon: "Globe",
+          title: "Global Cloud Grid",
+          description:
+            "Database clustering and serverless edge delivery that keep uptime at 99.99% and execution under 20ms across platforms.",
+        },
+      ],
+    },
+  },
+  {
     key: "home.products",
     label: "Product grid",
     group: "Home",
@@ -939,17 +979,21 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "home.cta",
-    label: "Closing call to action",
+    // The homepage's closing band is a contact band with a form, not a single-button CTA, so it is
+    // typed `contact` — the same type the /contact page header uses. An earlier `home.cta` section
+    // described a band the homepage never rendered; migration 12 removes it.
+    key: "home.contact",
+    label: "Homepage contact band",
     group: "Home",
-    type: "cta",
+    type: "contact",
     order: 60,
     fields: {
-      heading: "Talk to the ENICE Group team",
-      subheading: "Product access, platform integration, enterprise licensing, or partnerships.",
-      ctaLabel: "Contact us",
-      ctaUrl: "/contact",
-      style: "prominent",
+      eyebrow: "Get in touch",
+      heading: "Talk to the team building it.",
+      subheading:
+        "Whether you are looking at product access, an integration, a partnership, or just have a question — send us a message and it reaches us directly.",
+      email: "corporate@enicehq.com",
+      showForm: true,
     },
   },
   {
@@ -996,6 +1040,82 @@ const DEFAULT_SECTIONS: {
     fields: {
       heading: "Our Vision",
       body: "Over the next ten to twenty years, we want to build what Africa doesn't yet have: a home-grown technology infrastructure group that competes globally, not one that just follows trends.\n\nWe're building toward a future where African-originated financial infrastructure is trusted across multiple continents, where enterprise AI built here sets the regional standard for reliability, and where developer tools from our ecosystem are chosen by builders worldwide because they're simply good.\n\nThat's a ten-to-twenty-year project. It takes discipline and patience most organisations aren't built to sustain. We're structured for the long run, not the short cycle of a typical startup.",
+    },
+  },
+  {
+    key: "about.build",
+    label: "What We Build",
+    group: "About",
+    type: "proseGrid",
+    order: 152,
+    fields: {
+      heading: "What We Build",
+      // The product names are marked with **…** so they stay part of the editable text; the band
+      // renders emphasis in its own dark-background style.
+      body: "We find a real gap, design a product around what it takes to close it, build it to a high standard, launch it, and then operate it with the same discipline we used to build it. We don't hand products off. We own the full lifecycle.\n\nWe work across areas where technical complexity meets real-world consequence: financial infrastructure and digital banking, AI-powered enterprise communication and automation, developer tools and API infrastructure, digital commerce systems, cloud infrastructure, and longer-horizon research.\n\nOur two current products are the foundation of this. **PulsePay** is our financial infrastructure platform, a Naira-native payment processing and digital banking system built for Nigerian businesses, from high-frequency transactions to compliance. **PulseAssist** is our enterprise AI platform, a communication and automation layer that helps enterprise teams cut down on procedural overhead.\n\nThese are the first two products in a lineup we plan to grow the same way: deliberately, and to a high standard.",
+      items: [
+        {
+          label: "Financial Infrastructure",
+          description:
+            "Core transaction rails, digital banking architecture, and payment processing systems.",
+        },
+        {
+          label: "Enterprise AI",
+          description: "Automated communication and process automation for enterprise teams.",
+        },
+        {
+          label: "Developer Infrastructure",
+          description:
+            "APIs, SDKs, and tooling that give builders a reliable foundation to scale on.",
+        },
+        {
+          label: "Digital Commerce",
+          description:
+            "Commerce platforms built for high transaction volume and institutional standards.",
+        },
+        {
+          label: "Cloud Infrastructure",
+          description:
+            "Region-aware deployment systems with security and compliance built into the architecture.",
+        },
+        {
+          label: "Future Technology",
+          description:
+            "Long-horizon research programmes exploring what comes after our current products.",
+        },
+      ],
+    },
+  },
+  {
+    key: "about.team",
+    label: "The Founding Team",
+    group: "About",
+    type: "teamGrid",
+    order: 156,
+    fields: {
+      heading: "The Founding Team",
+      subheading:
+        "ENICE Group was founded by operators and engineers who spent years inside the problems they now build solutions for.",
+      items: [
+        {
+          initials: "CEO",
+          role: "Founder & Chief Executive Officer",
+          remit: "Corporate strategy, venture direction, and ecosystem growth.",
+        },
+        {
+          initials: "CTO",
+          role: "Chief Technology Officer",
+          remit: "Platform architecture, engineering standards, and infrastructure design.",
+        },
+        {
+          initials: "COO",
+          role: "Chief Operations Officer",
+          remit: "Product delivery, partner operations, and compliance execution.",
+        },
+      ],
+      // The address is a [label](mailto:…) link so it stays editable without hard-coded markup.
+      footnote:
+        "Our founding team prefers to let the work speak. Executive contact is available through [corporate@enicehq.com](mailto:corporate@enicehq.com) for qualified enterprise and partnership inquiries.",
     },
   },
   {

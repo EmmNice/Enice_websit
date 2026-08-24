@@ -24,7 +24,6 @@ import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Careers } from "@/components/site/Careers";
 import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
-import { FAQS } from "@/lib/faqs";
 import { ScrollProgress } from "@/components/site/ScrollProgress";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
@@ -98,28 +97,30 @@ const VERTICALS = [
   },
 ];
 
+/**
+ * The shared-infrastructure cards.
+ *
+ * Icons are named rather than imported directly so this list has the same shape as the CMS rows
+ * that replace it, and `/01`-style numbering is derived from position so nobody maintains it.
+ */
 const CORE_MODULES = [
   {
-    icon: Cpu,
-    index: "01",
+    icon: "Cpu",
     title: "Unified AI and Automation Pipeline",
     desc: "Centralized LLM orchestration and vector search routing that powers products like PulseAssist across every tenant.",
   },
   {
-    icon: Database,
-    index: "02",
+    icon: "Database",
     title: "High-Velocity Ledger and Payment Core",
     desc: "A fast transaction engine and virtual account infrastructure that anchors PulsePay and the financial products we build next.",
   },
   {
-    icon: FileCheck2,
-    index: "03",
+    icon: "FileCheck2",
     title: "Automated Compliance and KYC Layer",
     desc: "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
   },
   {
-    icon: Globe,
-    index: "04",
+    icon: "Globe",
     title: "Global Cloud Grid",
     desc: "Database clustering and serverless edge delivery that keep uptime at 99.99% and execution under 20ms across platforms.",
   },
@@ -168,6 +169,7 @@ function Landing() {
   const hero = useSectionFields("home.hero");
   const statistics = useSectionFields("home.statistics");
   const products = useSectionFields("home.products");
+  const core = useSectionFields("home.core");
 
   // The hero's stats strip. Rows missing a value are skipped rather than rendered blank.
   const stats = fieldItems(statistics, "items", HERO_STATS, (row) => {
@@ -193,6 +195,17 @@ function Landing() {
               .map((line) => line.trim())
               .filter(Boolean)
           : [],
+    };
+  });
+
+  // The shared-infrastructure cards. Numbering is positional here too.
+  const coreModules = fieldItems(core, "items", CORE_MODULES, (row) => {
+    const title = typeof row.title === "string" ? row.title.trim() : "";
+    if (!title) return null;
+    return {
+      icon: typeof row.icon === "string" ? row.icon.trim() : "",
+      title,
+      desc: typeof row.description === "string" ? row.description.trim() : "",
     };
   });
 
@@ -628,37 +641,57 @@ function Landing() {
             <Reveal>
               <div className="mb-16 max-w-3xl">
                 <div className="text-[11px] font-semibold uppercase tracking-[0.26em] text-blue-400">
-                  What powers our products
+                  {fieldText(core, "eyebrow", "What powers our products")}
                 </div>
                 <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl md:text-[3.25rem]">
-                  The ENICE Core.
+                  <StyledText
+                    text={fieldText(core, "heading", "The ENICE Core.")}
+                    accentClassName="text-blue-400"
+                    boldClassName="text-white font-bold"
+                  />
                 </h2>
                 <p className="mt-6 max-w-xl text-lg leading-relaxed text-white/50">
-                  Every product we operate runs on a shared infrastructure core, so the software
-                  customers use inherits scale, compliance, and reliability from the ground up.
+                  <StyledText
+                    text={fieldText(
+                      core,
+                      "subheading",
+                      "Every product we operate runs on a shared infrastructure core, so the software customers use inherits scale, compliance, and reliability from the ground up.",
+                    )}
+                    accentClassName="text-blue-400"
+                    boldClassName="text-white font-semibold"
+                  />
                 </p>
               </div>
             </Reveal>
 
             <div className="grid gap-px overflow-hidden rounded-2xl border border-white/8 bg-white/8 sm:grid-cols-2">
-              {CORE_MODULES.map((c, i) => (
-                <Reveal key={c.title} delay={i * 90} direction={i % 2 === 0 ? "left" : "right"}>
-                  <div className="group flex h-full flex-col bg-[#060912] p-10 transition-colors hover:bg-white/[0.03] xl:p-12">
-                    <div className="flex items-start justify-between">
-                      <div className="grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-white/5 text-blue-400">
-                        <c.icon className="h-6 w-6" strokeWidth={1.5} />
+              {coreModules.map((c, i) => {
+                const Icon = cardIcon(c.icon);
+                return (
+                  <Reveal key={c.title} delay={i * 90} direction={i % 2 === 0 ? "left" : "right"}>
+                    <div className="group flex h-full flex-col bg-[#060912] p-10 transition-colors hover:bg-white/[0.03] xl:p-12">
+                      <div className="flex items-start justify-between">
+                        <div className="grid h-12 w-12 place-items-center rounded-xl border border-white/10 bg-white/5 text-blue-400">
+                          <Icon className="h-6 w-6" strokeWidth={1.5} />
+                        </div>
+                        <span className="font-mono text-[11px] font-bold tracking-[0.22em] text-white/20">
+                          /{String(i + 1).padStart(2, "0")}
+                        </span>
                       </div>
-                      <span className="font-mono text-[11px] font-bold tracking-[0.22em] text-white/20">
-                        /{c.index}
-                      </span>
+                      <h3 className="mt-8 text-[1.2rem] font-bold leading-snug tracking-tight text-white">
+                        <StyledText text={c.title} accentClassName="text-blue-400" />
+                      </h3>
+                      <p className="mt-3 text-[14px] leading-relaxed text-white/45">
+                        <StyledText
+                          text={c.desc}
+                          accentClassName="text-blue-400"
+                          boldClassName="text-white font-semibold"
+                        />
+                      </p>
                     </div>
-                    <h3 className="mt-8 text-[1.2rem] font-bold leading-snug tracking-tight text-white">
-                      {c.title}
-                    </h3>
-                    <p className="mt-3 text-[14px] leading-relaxed text-white/45">{c.desc}</p>
-                  </div>
-                </Reveal>
-              ))}
+                  </Reveal>
+                );
+              })}
             </div>
           </div>
         </section>
