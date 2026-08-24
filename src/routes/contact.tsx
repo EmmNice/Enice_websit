@@ -4,6 +4,8 @@ import { useId, useRef, useState } from "react";
 import { AlertCircle, ArrowRight, Check, Loader2, Mail, MapPin } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { StyledText } from "@/components/site/StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { SHADOW_CARD } from "@/lib/design";
 import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
 import {
@@ -44,6 +46,9 @@ export const Route = createFileRoute("/contact")({
 });
 
 function ContactPage() {
+  // The page header, editable through the `contact.details` section.
+  const details = useSectionFields("contact.details");
+
   const id = useId();
   const formRef = useRef<HTMLFormElement>(null);
   // Captured on first render so the server can reject submissions completed impossibly fast.
@@ -122,14 +127,23 @@ function ContactPage() {
       <section className="border-b border-border bg-[#060912] py-12 sm:py-16">
         <div className="mx-auto max-w-5xl px-5 sm:px-8">
           <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-blue-400">
-            Corporate Engagement
+            {fieldText(details, "eyebrow", "Corporate Engagement")}
           </div>
           <h1 className="mt-4 max-w-3xl text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl md:text-6xl">
-            Get in Touch
+            <StyledText
+              text={fieldText(details, "heading", "Get in Touch")}
+              accentClassName="text-blue-400"
+            />
           </h1>
           <p className="mt-6 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg">
-            Reach the ENICE Group team about product access, platform integration, enterprise
-            licensing, or technology partnerships.
+            <StyledText
+              text={fieldText(
+                details,
+                "subheading",
+                "Reach the ENICE Group team about product access, platform integration, enterprise licensing, or technology partnerships.",
+              )}
+              accentClassName="text-blue-400"
+            />
           </p>
         </div>
       </section>

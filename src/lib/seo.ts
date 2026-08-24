@@ -357,11 +357,15 @@ export const ORGANIZATION_REF = { "@id": `${SITE_URL}/#organization` } as const;
  * it. The Organization and WebSite entities are the exception: they describe the brand itself,
  * so they are cheap insurance against any indexer that does not run scripts.
  */
-export function prerenderJsonLd(pathname: string, faqs: readonly { q: string; a: string }[] = []) {
-  if (pathname === "/") {
-    const entities: unknown[] = [organizationJsonLd(), webSiteJsonLd()];
-    if (faqs.length > 0) entities.push(faqJsonLd(faqs));
-    return entities;
-  }
+/**
+ * The structured data baked into a page's static HTML.
+ *
+ * FAQ markup is intentionally not included. The homepage FAQ is editable, so the only way to keep
+ * the markup and the visible answers in step is to generate it from the questions the component
+ * renders — which it does itself. Baking a copy here would describe the previous answers as soon
+ * as someone edited them, and mismatched FAQ markup breaches search guidelines.
+ */
+export function prerenderJsonLd(pathname: string) {
+  if (pathname === "/") return [organizationJsonLd(), webSiteJsonLd()];
   return [];
 }

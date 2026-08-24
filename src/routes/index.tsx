@@ -31,10 +31,12 @@ import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { StyledText } from "@/components/site/StyledText";
 import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
 import { ContactSection } from "@/components/site/ContactSection";
-import { faqJsonLd, organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
+import { organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
 
 export const Route = createFileRoute("/")({
-  head: () => pageHead("/", [organizationJsonLd(), webSiteJsonLd(), faqJsonLd(FAQS)]),
+  // FAQ markup is deliberately absent here: `FAQSection` emits it from the questions it actually
+  // renders, so an edited FAQ cannot end up described by stale markup. See that component.
+  head: () => pageHead("/", [organizationJsonLd(), webSiteJsonLd()]),
   component: Landing,
 });
 
