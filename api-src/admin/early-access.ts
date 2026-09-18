@@ -15,7 +15,7 @@ import {
   listRegistrations,
   updateRegistrationStatus,
 } from "../../src/lib/early-access-store.server";
-import { ResendConfigError } from "../../src/lib/resend.server";
+import { EmailProviderConfigError } from "../../src/lib/email/index.server";
 import {
   clientIp,
   createAttemptLimiter,
@@ -114,7 +114,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     res.status(405).json({ ok: false, error: "Method not allowed." });
   } catch (err) {
-    if (err instanceof ResendConfigError) {
+    if (err instanceof EmailProviderConfigError) {
       console.error(`[api/admin/early-access:${ref}] not configured:`, err.message);
       res.status(503).json({ ok: false, error: "Storage is not configured.", ref });
       return;

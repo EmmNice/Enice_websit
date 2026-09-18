@@ -1,34 +1,48 @@
 /**
- * PulseAssist early-access storage, backed by Resend.
+ * PulseAssist early-access storage, held in the active email provider's audience.
  *
- * SERVER ONLY — reads `RESEND_API_KEY`. Never import this from a route or component; it is
- * consumed exclusively by the handlers in `api-src/`.
+ * SERVER ONLY — never import this from a route or component; it is consumed exclusively by the
+ * handlers in `api-src/`.
  *
- * One Resend contact per applicant, added to a dedicated segment, with the application held
- * in custom Contact Properties. Contacts are global per email address, so property keys are
- * namespaced with `pulseassist_` and cannot collide with the product-updates list or
- * anything added later.
+ * One contact per applicant on a dedicated audience, with the application held in the contact's
+ * attributes. Contacts are global per email address with both providers, so attribute keys are
+ * namespaced with `pulseassist_` and cannot collide with the product-updates list or anything
+ * added later.
  *
- * The client, retry and provisioning helpers live in `resend.server.ts`, shared with the
- * updates list. See that module for the API constraints this design works around.
+ * ## Provider-agnostic by construction
+ *
+ * This module used to import the Resend SDK and speak in segments and contact properties. It now
+ * talks only to the port in `./email` — `upsertContact`, `findContact`, `listAudienceContacts`,
+ * `updateContactAttributes` — so the storage moves with `EMAIL_PROVIDER` and this file does not
+ * change. The awkward parts that were Resend's (custom-property keys must be provisioned before
+ * use or values are silently dropped; listing costs 1 + N requests because properties are omitted
+ * from the list response) now live in that adapter, where they belong.
+ *
+ * The attribute KEYS are deliberately unchanged from the Resend implementation, so a migration of
+ * existing applicants is a straight copy with no re-mapping.
  */
-import {
-  ensureProperties,
-  findContact,
-  joinName,
-  readProperty,
-  resendClient,
-  resolveSegmentId,
-  splitName,
-  withRetry,
-  type RawProperties,
-} from "./resend.server";
+import { emailProvider } from "./email/index.server";
+import type { AudienceRef } from "./email/types";
 import { EARLY_ACCESS_STATUSES, type EarlyAccessStatus } from "./early-access";
 
 export const SEGMENT_NAME = "PulseAssist Early Access";
 export const PRODUCT = "PulseAssist";
 export const SOURCE = "enice_website";
 export const INITIAL_STATUS: EarlyAccessStatus = "EARLY_ACCESS";
+
+/**
+ * The audience holding early-access applicants.
+ *
+ * `idEnvVars` keeps the original `RESEND_EARLY_ACCESS_SEGMENT_ID` working so switching back to
+ * Resend still pins the same segment, and adds a PulseAssist equivalent for the new list.
+ */
+export const EARLY_ACCESS_AUDIENCE: AudienceRef = {
+  name: SEGMENT_NAME,
+  idEnvVars: {
+    resend: "RESEND_EARLY_ACCESS_SEGMENT_ID",
+    pulseassist: "PULSEASSIST_EARLY_ACCESS_LIST_ID",
+  },
+};
 
 /** Keys must be alphanumeric + underscore, max 50 characters. */
 export const PROPERTY_KEYS = {
@@ -40,8 +54,6 @@ export const PROPERTY_KEYS = {
   registeredAt: "pulseassist_registered_at",
   updatedAt: "pulseassist_updated_at",
 } as const;
-
-const ALL_PROPERTY_KEYS = Object.values(PROPERTY_KEYS);
 
 export type Registration = {
   id: string;
@@ -63,6 +75,11 @@ function toStatus(raw: string): EarlyAccessStatus {
     : INITIAL_STATUS;
 }
 
+/** Missing attributes read as "" so a partially-populated contact never renders `undefined`. */
+function read(attributes: Record<string, string>, key: string): string {
+  return attributes[key] ?? "";
+}
+
 // ── Public API ──────────────────────────────────────────────────────────────
 
 export type RegisterResult = { outcome: "created" | "duplicate" };
@@ -74,143 +91,92 @@ export async function registerEarlyAccess(input: {
   businessType: string;
   businessNeed: string;
 }): Promise<RegisterResult> {
-  const resend = resendClient();
-  await ensureProperties(resend, ALL_PROPERTY_KEYS);
-  const segmentId = await resolveSegmentId(resend, SEGMENT_NAME, "RESEND_EARLY_ACCESS_SEGMENT_ID");
+  const provider = emailProvider();
 
-  const existing = await findContact(resend, input.email);
+  const existing = await provider.findContact(input.email);
 
-  // An existing contact is only a duplicate *registration* if it already carries a
-  // PulseAssist status. A contact that already exists for some other reason — an earlier
-  // mailing list, a different product — must still be able to apply.
-  if (existing && readProperty(existing.properties as RawProperties, PROPERTY_KEYS.status)) {
+  /*
+   * An existing contact is only a duplicate REGISTRATION if it already carries a PulseAssist
+   * status. A contact that exists for some other reason — the product-updates list, a different
+   * product — must still be able to apply, which is why this checks the status attribute rather
+   * than the mere existence of the contact.
+   */
+  if (existing && read(existing.attributes, PROPERTY_KEYS.status)) {
     return { outcome: "duplicate" };
   }
 
   const now = new Date().toISOString();
-  const { firstName, lastName } = splitName(input.fullName);
-  const properties = {
-    [PROPERTY_KEYS.status]: INITIAL_STATUS,
-    [PROPERTY_KEYS.businessName]: input.businessName,
-    [PROPERTY_KEYS.businessType]: input.businessType,
-    [PROPERTY_KEYS.businessNeed]: input.businessNeed,
-    [PROPERTY_KEYS.source]: SOURCE,
-    [PROPERTY_KEYS.registeredAt]: now,
-    [PROPERTY_KEYS.updatedAt]: now,
-  };
+  await provider.upsertContact({
+    email: input.email,
+    name: input.fullName,
+    audience: EARLY_ACCESS_AUDIENCE,
+    attributes: {
+      [PROPERTY_KEYS.status]: INITIAL_STATUS,
+      [PROPERTY_KEYS.businessName]: input.businessName,
+      [PROPERTY_KEYS.businessType]: input.businessType,
+      [PROPERTY_KEYS.businessNeed]: input.businessNeed,
+      [PROPERTY_KEYS.source]: SOURCE,
+      [PROPERTY_KEYS.registeredAt]: now,
+      [PROPERTY_KEYS.updatedAt]: now,
+    },
+  });
 
-  if (existing) {
-    const updated = await withRetry("contacts.update", () =>
-      resend.contacts.update({ email: input.email, firstName, lastName, properties }),
-    );
-    if (updated.error) {
-      throw new Error(`Could not update contact: ${updated.error.message}`);
-    }
-    const added = await withRetry("contacts.segments.add", () =>
-      resend.contacts.segments.add({ email: input.email, segmentId }),
-    );
-    // Already-a-member is a success for our purposes.
-    if (added.error && !/exist|already/i.test(added.error.message)) {
-      throw new Error(`Could not add contact to the segment: ${added.error.message}`);
-    }
-    return { outcome: "created" };
-  }
-
-  const created = await withRetry("contacts.create", () =>
-    resend.contacts.create({
-      email: input.email,
-      firstName,
-      // `create` accepts `string | undefined` while `update` accepts `string | null`.
-      lastName: lastName ?? undefined,
-      properties,
-      segments: [{ id: segmentId }],
-    }),
-  );
-  if (created.error) {
-    throw new Error(`Could not create contact: ${created.error.message}`);
-  }
+  // "created" covers both a new contact and an existing one that had never applied: from the
+  // applicant's point of view the registration is new either way.
   return { outcome: "created" };
 }
 
 /**
  * Lists registrations newest-first.
  *
- * Costs 1 + N requests because properties are not included in the list response. `limit`
- * is capped at the API maximum of 100, and concurrency is bounded so a large list cannot
- * exhaust the function's execution window.
+ * `limit` is capped at 100 by the adapters, which is the tighter of the two providers' page
+ * sizes. The request cost differs by provider — one call on PulseAssist, 1 + N on Resend — and
+ * that is deliberately the adapter's problem, not this module's.
  */
 export async function listRegistrations(limit = 100): Promise<{
   registrations: Registration[];
   truncated: boolean;
 }> {
-  const resend = resendClient();
-  const segmentId = await resolveSegmentId(resend, SEGMENT_NAME, "RESEND_EARLY_ACCESS_SEGMENT_ID");
-
-  const capped = Math.min(Math.max(limit, 1), 100);
-  const list = await withRetry("contacts.list", () =>
-    resend.contacts.list({ segmentId, limit: capped }),
+  const { contacts, hasMore } = await emailProvider().listAudienceContacts(
+    EARLY_ACCESS_AUDIENCE,
+    limit,
   );
-  if (list.error) throw new Error(`Could not list contacts: ${list.error.message}`);
 
-  const contacts = list.data?.data ?? [];
-  const registrations: Registration[] = [];
-
-  // Kept low so a page of reads cannot trip Resend's per-second limit.
-  const CONCURRENCY = 3;
-  for (let i = 0; i < contacts.length; i += CONCURRENCY) {
-    const batch = contacts.slice(i, i + CONCURRENCY);
-    const details = await Promise.all(
-      batch.map(async (c) => {
-        const full = await findContact(resend, c.email);
-        const properties = (full?.properties ?? {}) as RawProperties;
-        const registeredAt = readProperty(properties, PROPERTY_KEYS.registeredAt);
-        return {
-          id: c.id,
-          email: c.email,
-          fullName: joinName(c.first_name, c.last_name) || c.email,
-          product: PRODUCT,
-          businessName: readProperty(properties, PROPERTY_KEYS.businessName),
-          businessType: readProperty(properties, PROPERTY_KEYS.businessType),
-          businessNeed: readProperty(properties, PROPERTY_KEYS.businessNeed),
-          source: readProperty(properties, PROPERTY_KEYS.source) || SOURCE,
-          status: toStatus(readProperty(properties, PROPERTY_KEYS.status)),
-          createdAt: registeredAt || c.created_at,
-          updatedAt: readProperty(properties, PROPERTY_KEYS.updatedAt) || registeredAt,
-        } satisfies Registration;
-      }),
-    );
-    registrations.push(...details);
-  }
+  const registrations = contacts.map((c) => {
+    const registeredAt = read(c.attributes, PROPERTY_KEYS.registeredAt);
+    return {
+      id: c.id,
+      email: c.email,
+      fullName: c.name || c.email,
+      product: PRODUCT,
+      businessName: read(c.attributes, PROPERTY_KEYS.businessName),
+      businessType: read(c.attributes, PROPERTY_KEYS.businessType),
+      businessNeed: read(c.attributes, PROPERTY_KEYS.businessNeed),
+      source: read(c.attributes, PROPERTY_KEYS.source) || SOURCE,
+      status: toStatus(read(c.attributes, PROPERTY_KEYS.status)),
+      createdAt: registeredAt || c.createdAt,
+      updatedAt: read(c.attributes, PROPERTY_KEYS.updatedAt) || registeredAt || c.createdAt,
+    } satisfies Registration;
+  });
 
   registrations.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-  return { registrations, truncated: Boolean(list.data?.has_more) };
+  return { registrations, truncated: hasMore };
 }
 
 export type UpdateStatusResult = { outcome: "updated" | "not_found" };
 
 /**
- * Moves one registration to a new status. Only the status and its timestamp are written —
- * the applicant's submitted details are never modified here.
+ * Moves one registration to a new status. Only the status and its timestamp are written — the
+ * applicant's submitted details are never modified here, and the adapters merge rather than
+ * replace the attribute map so nothing else is lost.
  */
 export async function updateRegistrationStatus(
   email: string,
   status: EarlyAccessStatus,
 ): Promise<UpdateStatusResult> {
-  const resend = resendClient();
-  await ensureProperties(resend, ALL_PROPERTY_KEYS);
-
-  const existing = await findContact(resend, email);
-  if (!existing) return { outcome: "not_found" };
-
-  const res = await withRetry("contacts.update(status)", () =>
-    resend.contacts.update({
-      email,
-      properties: {
-        [PROPERTY_KEYS.status]: status,
-        [PROPERTY_KEYS.updatedAt]: new Date().toISOString(),
-      },
-    }),
-  );
-  if (res.error) throw new Error(`Could not update status: ${res.error.message}`);
-  return { outcome: "updated" };
+  const updated = await emailProvider().updateContactAttributes(email, {
+    [PROPERTY_KEYS.status]: status,
+    [PROPERTY_KEYS.updatedAt]: new Date().toISOString(),
+  });
+  return { outcome: updated ? "updated" : "not_found" };
 }
