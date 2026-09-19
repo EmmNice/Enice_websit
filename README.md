@@ -14,7 +14,7 @@ contact form, the AI assistant, and PulseAssist early-access registrations.
 | Build             | Vite 7                                                       |
 | Styling           | Tailwind CSS v4 — configured in CSS, no `tailwind.config.js` |
 | Content + CMS     | ENICE Website Manager — our own CMS, backed by Postgres      |
-| Email + form data | Resend                                                       |
+| Email + form data | Pluggable provider, PulseAssist Email by default             |
 | AI assistant      | Pluggable provider, AWS Bedrock by default                   |
 | Hosting           | Vercel (`dist/` + `api/`)                                    |
 
@@ -78,8 +78,10 @@ src/
     ai/          AI provider abstraction and the assistant's system prompt
     cms/         Website Manager model shared by client, server and build script
                  (types, permissions, block document + sanitiser, API clients)
+    email/       Email provider abstraction (port + PulseAssist/Resend adapters,
+                 sender identities). Server only; nothing else imports a provider SDK
     early-access.ts             Field contract shared by client and server
-    early-access-store.server.ts  Resend-backed storage (server only)
+    early-access-store.server.ts  Applicant storage via the email port (server only)
   routes/
     admin/       The Website Manager (private; wraps screens in <AdminShell>)
     ...          Public site routes; __root.tsx is the shell
@@ -134,10 +136,9 @@ to `API_ROUTES` in `vite.config.ts`. The build glob picks it up automatically; f
 Every early-access CTA renders `PulseAssistEarlyAccessButton`, which opens a modal in place —
 it never navigates. Submitting stores the application and sends a confirmation.
 
-Registrations are Resend contacts in a **PulseAssist Early Access** segment, with the
-application held in `pulseassist_*` [contact properties]. The segment and property keys are
-created automatically on first use, because Resend silently drops values for property keys
-that do not exist yet.
+Registrations are contacts on a **PulseAssist Early Access** audience, with the application
+held in `pulseassist_*` attributes. The audience is created automatically on first use, so
+deploying never depends on someone having clicked through a dashboard first.
 
 Review workflow — set from `/admin/early-access`, enforced server-side:
 
@@ -149,18 +150,41 @@ EARLY_ACCESS → UNDER_REVIEW → SELECTED_FOR_BETA → INVITATION_SENT → BETA
 Only `status` is writable; an applicant's submitted details are immutable, and submitting the
 form never grants product access.
 
-Two constraints inherited from Resend's contacts API:
+The admin table shows at most 100 registrations and says so when the list is truncated — 100
+is the page ceiling both providers share.
 
-- Custom properties are returned by `contacts.get` but **not** by `contacts.list`, so listing
-  registrations costs one request per row.
-- Pagination exposes `limit` (max 100) with no cursor, so the admin table shows at most 100
-  registrations and says so when the list is truncated. Use the Resend dashboard beyond that.
+If the write fails — most likely an API key without contact access, or a plan without API
+access — the applicant still succeeds and the internal notification email is sent with an
+`[ACTION REQUIRED — not saved]` subject, so a lead is never silently lost.
 
-If the write fails — most likely a `RESEND_API_KEY` scoped to sending only — the applicant
-still succeeds and the internal notification email is sent with an `[ACTION REQUIRED — not
-saved]` subject, so a lead is never silently lost.
+## Email provider
 
-[contact properties]: https://resend.com/docs/dashboard/audiences/properties
+All email — transactional sends and the contact/audience storage behind early access and the
+product-updates list — goes through one interface in `src/lib/email`. Call sites express intent
+(`send`, `upsertContact`); every provider-specific detail lives in an adapter.
+
+| Provider                    | `EMAIL_PROVIDER` | Needs                                      |
+| --------------------------- | ---------------- | ------------------------------------------ |
+| PulseAssist Email (default) | `pulseassist`    | `PULSEASSIST_API_KEY`, `EMAIL_FROM_DOMAIN` |
+| Resend                      | `resend`         | `RESEND_API_KEY`                           |
+
+Switching is that variable plus credentials, and a redeploy. No code changes.
+
+Two differences the abstraction absorbs, worth knowing when reading the adapters:
+
+- **From addresses.** PulseAssist accepts only the sender's _local part_ and appends the
+  account's verified sending domain, so a caller cannot send as a domain the account has not
+  proven it owns. Resend takes a full `Name <box@domain>`. Senders are therefore defined in
+  parts in `src/lib/email/senders.ts`, not as formatted strings.
+- **Custom fields.** PulseAssist attributes are free-form, and its contact list response
+  includes them — so listing an audience is one request. Resend requires every property key to
+  be provisioned before use (it silently drops values for unknown keys) and omits properties
+  from list responses, costing one extra request per row. Both quirks are handled in the Resend
+  adapter alone.
+
+Before PulseAssist will send anything, `EMAIL_FROM_DOMAIN` must be added under **Domains** in
+the PulseAssist Email console and its DKIM/SPF records published at the registrar, and the
+account needs an Email plan that includes API access.
 
 ## Environment
 
@@ -201,8 +225,9 @@ the value).
 
 ### Local testing without sending real email
 
-The Resend SDK reads `RESEND_BASE_URL`, so pointing it at a local stub exercises the real
-handlers without touching the live account or sending anything.
+Point the active provider at a local stub to exercise the real handlers without touching a live
+account or sending anything: `PULSEASSIST_API_URL` for PulseAssist, or `RESEND_BASE_URL` (read
+by the Resend SDK) with `EMAIL_PROVIDER=resend`.
 
 ## Routing
 

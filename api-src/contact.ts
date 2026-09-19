@@ -13,7 +13,6 @@
  * there is no ambient credential for a cross-site request to abuse. Abuse is handled by the
  * honeypot, the timing gate and the rate limiters below.
  */
-import { Resend } from "resend";
 import {
   clientIp,
   createRateLimiter,
@@ -25,10 +24,10 @@ import {
 } from "./lib/http";
 import { EMAIL_RE, FIELD_LIMITS } from "../src/lib/contact";
 import { subscribeToUpdates } from "../src/lib/updates-store.server";
+import { emailProvider, EmailProviderConfigError } from "../src/lib/email/index.server";
+import { contactFormSender, groupSender, INTERNAL_RECIPIENT } from "../src/lib/email/senders";
 
-const FROM = "ENICE Contact <noreply@enicehq.com>";
-const REPLY_FROM = "ENICE Group <noreply@enicehq.com>";
-const TO = "corporate@enicehq.com";
+const TO = INTERNAL_RECIPIENT;
 
 // Layered so that correcting a typo is never punished: a high ceiling guards against
 // hammering, while the strict per-IP and per-address limits apply only once a submission is
@@ -201,17 +200,6 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       return;
     }
 
-    const apiKey = process.env.RESEND_API_KEY;
-    if (!apiKey) {
-      console.error(`[api/contact:${ref}] RESEND_API_KEY is not configured.`);
-      res.status(503).json({
-        ok: false,
-        error: "Our contact form is temporarily unavailable. Please email corporate@enicehq.com.",
-        ref,
-      });
-      return;
-    }
-
     // Opt-in is handled before the notification is composed so its outcome can be reported
     // in the email. It is deliberately best-effort: failing to add someone to a mailing list
     // must never stop their message reaching the team.
@@ -230,23 +218,41 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       }
     }
 
-    const resend = new Resend(apiKey);
+    const provider = emailProvider();
     const subject = fields.company
       ? `Contact: ${fields.inquiry || "General"} — ${fields.name} (${fields.company})`
       : `Contact: ${fields.inquiry || "General"} — ${fields.name}`;
 
-    // The notification is the one delivery that matters; it is awaited and its failure is
-    // reported, because a message the team never receives must not look like a success.
-    const notification = await resend.emails.send({
-      from: FROM,
-      to: TO,
-      replyTo: fields.email,
-      subject,
-      html: notificationHtml(fields, updatesOutcome),
-    });
-
-    if (notification.error) {
-      console.error(`[api/contact:${ref}] Resend rejected the notification:`, notification.error);
+    /*
+     * The notification is the one delivery that matters; it is awaited and its failure is
+     * reported, because a message the team never receives must not look like a success.
+     *
+     * Two failure shapes, two answers. An unconfigured provider (missing key, or a plan without
+     * API access) is OUR fault and will not fix itself on a retry, so it answers 503 with the
+     * direct address — the same outcome the old missing-RESEND_API_KEY check produced. A refused
+     * message is 502.
+     */
+    try {
+      await provider.send({
+        from: contactFormSender(),
+        to: TO,
+        replyTo: fields.email,
+        subject,
+        html: notificationHtml(fields, updatesOutcome),
+        // Makes a retried submission safe on providers that honour it.
+        idempotencyKey: `contact-notification-${ref}`,
+      });
+    } catch (err) {
+      if (err instanceof EmailProviderConfigError) {
+        console.error(`[api/contact:${ref}] email provider is not configured:`, err.message);
+        res.status(503).json({
+          ok: false,
+          error: "Our contact form is temporarily unavailable. Please email corporate@enicehq.com.",
+          ref,
+        });
+        return;
+      }
+      console.error(`[api/contact:${ref}] the provider rejected the notification:`, err);
       res.status(502).json({
         ok: false,
         error: "We could not deliver your message. Please email corporate@enicehq.com directly.",
@@ -258,15 +264,13 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     // The sender's acknowledgement is best-effort: the team already has the message, so a
     // failure here must not be reported as a failed submission.
     try {
-      const ack = await resend.emails.send({
-        from: REPLY_FROM,
+      await provider.send({
+        from: groupSender(),
         to: fields.email,
         subject: "We received your message",
         html: acknowledgementHtml(fields.name),
+        idempotencyKey: `contact-ack-${ref}`,
       });
-      if (ack.error) {
-        console.error(`[api/contact:${ref}] acknowledgement rejected:`, ack.error);
-      }
     } catch (err) {
       console.error(`[api/contact:${ref}] acknowledgement failed:`, err);
     }

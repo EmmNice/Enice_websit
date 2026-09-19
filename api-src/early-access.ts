@@ -20,7 +20,8 @@ import {
   type FieldErrors,
 } from "../src/lib/early-access";
 import { PRODUCT, SOURCE, registerEarlyAccess } from "../src/lib/early-access-store.server";
-import { ResendConfigError } from "../src/lib/resend.server";
+import { emailProvider, EmailProviderConfigError } from "../src/lib/email/index.server";
+import { groupSender, INTERNAL_RECIPIENT } from "../src/lib/email/senders";
 import {
   clientIp,
   createRateLimiter,
@@ -30,9 +31,6 @@ import {
   type ApiRequest,
   type ApiResponse,
 } from "./lib/http";
-
-const FROM = "ENICE Group <noreply@enicehq.com>";
-const INTERNAL_RECIPIENT = "corporate@enicehq.com";
 
 // Three limits, deliberately layered so that correcting a typo is never punished:
 //
@@ -125,11 +123,12 @@ function notificationHtml(fields: EarlyAccessFields, storageFailure: unknown): s
       ? ""
       : `<div style="margin:0 0 20px;padding:12px 14px;border:1px solid #fca5a5;background:#fef2f2;border-radius:6px;">
            <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#991b1b;">
-             This registration was NOT saved to Resend.
+             This registration was NOT saved.
            </p>
            <p style="margin:0;font-size:12px;line-height:1.6;color:#7f1d1d;">
              It will not appear in the admin list, so keep this email as the record. Most
-             likely the RESEND_API_KEY lacks contacts/segments access. Reason:
+             likely the email provider's API key lacks contact access, or the plan does not
+             include API access. Reason:
              ${escapeHtml(storageFailure instanceof Error ? storageFailure.message : String(storageFailure))}
            </p>
          </div>`;
@@ -212,9 +211,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     // Storage is attempted first, but a failure here must not cost us the lead.
     //
-    // Writing a registration needs contacts/segments/contact-properties access, whereas
-    // sending needs only sending access — so a narrowly-scoped RESEND_API_KEY can send mail
-    // while being unable to store anything. Rather than turning that into a dead end for
+    // Writing a registration needs contact/audience access, whereas sending needs only send
+    // access — so a narrowly-scoped API key can send mail while being unable to store
+    // anything, with either provider. Rather than turning that into a dead end for
     // the applicant, the internal notification email doubles as the durable record: it is
     // always sent, and it is clearly flagged when the write failed so the team knows the
     // application is not in the admin list.
@@ -237,42 +236,43 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       console.error(`[api/early-access:${ref}] storage failed, falling back to email:`, err);
     }
 
-    const { Resend } = await import("resend");
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const provider = emailProvider();
+    const from = groupSender();
 
     const internalSubject = stored
       ? `PulseAssist Early Access — ${fields.businessName}`
       : `[ACTION REQUIRED — not saved] PulseAssist Early Access — ${fields.businessName}`;
 
+    /*
+     * Both sends are attempted regardless of either one's outcome, which is why this is
+     * `allSettled` rather than `all`. The port throws on refusal instead of returning an error
+     * object, so a rejected promise is now the single failure signal — there is no longer a
+     * second `{ error }` shape to remember to check, which is what the old code had to do.
+     */
     const sends = await Promise.allSettled([
-      resend.emails.send({
-        from: FROM,
+      provider.send({
+        from,
         to: fields.email,
         subject: "Your PulseAssist early-access request",
         html: confirmationHtml(fields.fullName),
+        idempotencyKey: `early-access-confirmation-${ref}`,
       }),
-      resend.emails.send({
-        from: FROM,
+      provider.send({
+        from,
         to: INTERNAL_RECIPIENT,
         replyTo: fields.email,
         subject: internalSubject,
         html: notificationHtml(fields, stored ? null : storageFailure),
+        idempotencyKey: `early-access-internal-${ref}`,
       }),
     ]);
 
     // The internal notification is the one that must land if storage did not.
-    const internal = sends[1];
-    const internalDelivered =
-      internal.status === "fulfilled" && !(internal.value as { error?: unknown }).error;
+    const internalDelivered = sends[1].status === "fulfilled";
 
     for (const outcome of sends) {
       if (outcome.status === "rejected") {
         console.error(`[api/early-access:${ref}] email send failed:`, outcome.reason);
-      } else if ((outcome.value as { error?: unknown }).error) {
-        console.error(
-          `[api/early-access:${ref}] email rejected:`,
-          JSON.stringify((outcome.value as { error?: unknown }).error),
-        );
       }
     }
 
@@ -289,7 +289,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
 
     res.status(200).json({ ok: true });
   } catch (err) {
-    if (err instanceof ResendConfigError) {
+    if (err instanceof EmailProviderConfigError) {
       // Misconfiguration, not the visitor's fault — log the detail, return a safe message.
       console.error(`[api/early-access:${ref}] not configured:`, err.message);
       res.status(503).json({

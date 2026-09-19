@@ -29,41 +29,6 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
-// node_modules/standardwebhooks/dist/timing_safe_equal.js
-var require_timing_safe_equal = __commonJS({
-  "node_modules/standardwebhooks/dist/timing_safe_equal.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.timingSafeEqual = void 0;
-    function assert(expr, msg = "") {
-      if (!expr) {
-        throw new Error(msg);
-      }
-    }
-    function timingSafeEqual2(a, b) {
-      if (a.byteLength !== b.byteLength) {
-        return false;
-      }
-      if (!(a instanceof DataView)) {
-        a = new DataView(ArrayBuffer.isView(a) ? a.buffer : a);
-      }
-      if (!(b instanceof DataView)) {
-        b = new DataView(ArrayBuffer.isView(b) ? b.buffer : b);
-      }
-      assert(a instanceof DataView);
-      assert(b instanceof DataView);
-      const length = a.byteLength;
-      let out = 0;
-      let i = -1;
-      while (++i < length) {
-        out |= a.getUint8(i) ^ b.getUint8(i);
-      }
-      return out === 0;
-    }
-    exports.timingSafeEqual = timingSafeEqual2;
-  }
-});
-
 // node_modules/@stablelib/base64/lib/base64.js
 var require_base64 = __commonJS({
   "node_modules/@stablelib/base64/lib/base64.js"(exports) {
@@ -701,15 +666,49 @@ var require_sha256 = __commonJS({
   }
 });
 
+// node_modules/standardwebhooks/dist/timing_safe_equal.js
+var require_timing_safe_equal = __commonJS({
+  "node_modules/standardwebhooks/dist/timing_safe_equal.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.timingSafeEqual = timingSafeEqual2;
+    function assert(expr, msg = "") {
+      if (!expr) {
+        throw new Error(msg);
+      }
+    }
+    function timingSafeEqual2(a, b) {
+      if (a.byteLength !== b.byteLength) {
+        return false;
+      }
+      if (!(a instanceof DataView)) {
+        a = new DataView(ArrayBuffer.isView(a) ? a.buffer : a);
+      }
+      if (!(b instanceof DataView)) {
+        b = new DataView(ArrayBuffer.isView(b) ? b.buffer : b);
+      }
+      assert(a instanceof DataView);
+      assert(b instanceof DataView);
+      const length = a.byteLength;
+      let out = 0;
+      let i = -1;
+      while (++i < length) {
+        out |= a.getUint8(i) ^ b.getUint8(i);
+      }
+      return out === 0;
+    }
+  }
+});
+
 // node_modules/standardwebhooks/dist/index.js
 var require_dist = __commonJS({
   "node_modules/standardwebhooks/dist/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Webhook = exports.WebhookVerificationError = void 0;
-    var timing_safe_equal_1 = require_timing_safe_equal();
     var base64 = require_base64();
     var sha256 = require_sha256();
+    var timing_safe_equal_1 = require_timing_safe_equal();
     var WEBHOOK_TOLERANCE_IN_SECONDS = 5 * 60;
     var ExtendableError = class _ExtendableError extends Error {
       constructor(message) {
@@ -729,9 +728,6 @@ var require_dist = __commonJS({
     exports.WebhookVerificationError = WebhookVerificationError;
     var Webhook2 = class _Webhook {
       constructor(secret, options) {
-        if (!secret) {
-          throw new Error("Secret can't be empty.");
-        }
         if ((options === null || options === void 0 ? void 0 : options.format) === "raw") {
           if (secret instanceof Uint8Array) {
             this.key = secret;
@@ -747,15 +743,20 @@ var require_dist = __commonJS({
           }
           this.key = base64.decode(secret);
         }
-      }
-      verify(payload, headers_) {
-        const headers = {};
-        for (const key of Object.keys(headers_)) {
-          headers[key.toLowerCase()] = headers_[key];
+        if (this.key.length === 0) {
+          throw new Error("Secret can't be empty.");
         }
-        const msgId = headers["webhook-id"];
-        const msgSignature = headers["webhook-signature"];
-        const msgTimestamp = headers["webhook-timestamp"];
+      }
+      verify(payload, headers, options) {
+        var _a;
+        const jsonParse = (_a = options === null || options === void 0 ? void 0 : options.jsonParse) !== null && _a !== void 0 ? _a : true;
+        const normalizedHeaders = {};
+        for (const key of Object.keys(headers)) {
+          normalizedHeaders[key.toLowerCase()] = headers[key];
+        }
+        const msgId = normalizedHeaders["webhook-id"];
+        const msgSignature = normalizedHeaders["webhook-signature"];
+        const msgTimestamp = normalizedHeaders["webhook-timestamp"];
         if (!msgSignature || !msgId || !msgTimestamp) {
           throw new WebhookVerificationError("Missing required headers");
         }
@@ -770,7 +771,15 @@ var require_dist = __commonJS({
             continue;
           }
           if ((0, timing_safe_equal_1.timingSafeEqual)(encoder.encode(signature), encoder.encode(expectedSignature))) {
-            return JSON.parse(payload.toString());
+            const payloadString = payload.toString();
+            if (payloadString === "") {
+              return void 0;
+            }
+            if (jsonParse) {
+              return JSON.parse(payloadString);
+            } else {
+              return void 0;
+            }
           }
         }
         throw new WebhookVerificationError("No matching signature found");
@@ -791,7 +800,7 @@ var require_dist = __commonJS({
       verifyTimestamp(timestampHeader) {
         const now = Math.floor(Date.now() / 1e3);
         const timestamp = parseInt(timestampHeader, 10);
-        if (isNaN(timestamp)) {
+        if (Number.isNaN(timestamp)) {
           throw new WebhookVerificationError("Invalid Signature Headers");
         }
         if (now - timestamp > WEBHOOK_TOLERANCE_IN_SECONDS) {
@@ -820,6 +829,350 @@ var EARLY_ACCESS_STATUSES = [
   "BETA_USER",
   "REJECTED"
 ];
+
+// src/lib/email/types.ts
+function formatAddress(sender) {
+  const address = `${sender.localPart}@${sender.domain}`;
+  return sender.name ? `${sender.name} <${address}>` : address;
+}
+var EmailProviderConfigError = class extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "EmailProviderConfigError";
+  }
+};
+var EmailSendError = class extends Error {
+  constructor(message, status = null, provider = null) {
+    super(message);
+    this.status = status;
+    this.provider = provider;
+    this.name = "EmailSendError";
+  }
+  status;
+  provider;
+};
+var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+function isTransientStatus(status) {
+  if (status === null) return false;
+  return status === 429 || status >= 500;
+}
+async function withRetry(label, call2, shouldRetry, attempts = 3) {
+  let last;
+  for (let i = 0; i < attempts; i++) {
+    last = await call2();
+    if (!shouldRetry(last)) return last;
+    if (i < attempts - 1) {
+      const backoff = 400 * 2 ** i;
+      console.warn(`[email] ${label} hit a transient error; retrying in ${backoff}ms`);
+      await sleep(backoff);
+    }
+  }
+  return last;
+}
+function splitName(fullName) {
+  const parts = fullName.trim().split(/\s+/);
+  return {
+    firstName: parts[0] ?? "",
+    lastName: parts.length > 1 ? parts.slice(1).join(" ") : null
+  };
+}
+function joinName(firstName, lastName) {
+  return [firstName, lastName].filter(Boolean).join(" ").trim();
+}
+function toRecipientArray(to) {
+  return Array.isArray(to) ? to : [to];
+}
+
+// src/lib/email/provider-pulseassist.server.ts
+var DEFAULT_BASE_URL = "https://api.getpulseassist.com";
+function config() {
+  const apiKey = process.env.PULSEASSIST_API_KEY;
+  if (!apiKey) {
+    throw new EmailProviderConfigError("PULSEASSIST_API_KEY is not configured.");
+  }
+  const fromDomain = process.env.EMAIL_FROM_DOMAIN;
+  if (!fromDomain) {
+    throw new EmailProviderConfigError(
+      "EMAIL_FROM_DOMAIN is not configured. It must be a domain verified in PulseAssist Email."
+    );
+  }
+  const baseUrl = (process.env.PULSEASSIST_API_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
+  return { apiKey, baseUrl, fromDomain };
+}
+async function call(path, init = {}) {
+  const { apiKey, baseUrl } = config();
+  const headers = {
+    Authorization: `Bearer ${apiKey}`,
+    Accept: "application/json"
+  };
+  if (init.body) headers["Content-Type"] = "application/json";
+  if (init.idempotencyKey) headers["Idempotency-Key"] = init.idempotencyKey;
+  let res;
+  try {
+    res = await fetch(`${baseUrl}/v1${path}`, {
+      method: init.method ?? "GET",
+      headers,
+      body: init.body ? JSON.stringify(init.body) : void 0
+    });
+  } catch (err) {
+    return {
+      ok: false,
+      status: 0,
+      data: null,
+      error: `Could not reach PulseAssist: ${String(err)}`,
+      code: null
+    };
+  }
+  const text = await res.text();
+  let parsed = null;
+  if (text) {
+    try {
+      parsed = JSON.parse(text);
+    } catch {
+      parsed = null;
+    }
+  }
+  if (!res.ok) {
+    const p = parsed ?? {};
+    const detail = typeof p.detail === "string" && p.detail || typeof p.title === "string" && p.title || typeof p.error === "string" && p.error || `PulseAssist returned ${res.status}`;
+    const code = typeof p.code === "string" ? p.code : null;
+    return { ok: false, status: res.status, data: null, error: detail, code };
+  }
+  return { ok: true, status: res.status, data: parsed ?? null, error: null, code: null };
+}
+async function callWithRetry(label, path, init = {}, attempts = 3) {
+  let last = {
+    ok: false,
+    status: 0,
+    data: null,
+    error: "not attempted",
+    code: null
+  };
+  for (let i = 0; i < attempts; i++) {
+    last = await call(path, init);
+    if (last.ok) return last;
+    const retryable = last.status === 0 || isTransientStatus(last.status);
+    if (!retryable) return last;
+    if (i < attempts - 1) {
+      const backoff = 400 * 2 ** i;
+      console.warn(`[pulseassist] ${label} failed (${last.status}); retrying in ${backoff}ms`);
+      await sleep(backoff);
+    }
+  }
+  return last;
+}
+function isConfigRefusal(res) {
+  if (res.status === 401) return true;
+  if (res.status !== 403) return false;
+  const code = res.code ?? "";
+  return /CAPABILITY|ENTITLEMENT|PLAN|SUBSCRIPTION|SCOPE/i.test(code);
+}
+var listIdCache = /* @__PURE__ */ new Map();
+async function resolveListId(audience) {
+  const pinEnvVar = audience.idEnvVars?.pulseassist;
+  const pinned = pinEnvVar ? process.env[pinEnvVar] : void 0;
+  if (pinned && /^\d+$/.test(pinned.trim())) return Number(pinned.trim());
+  const cached = listIdCache.get(audience.name);
+  if (cached) return cached;
+  const existing = await callWithRetry("lists.list", "/email/lists");
+  if (!existing.ok) {
+    if (isConfigRefusal(existing))
+      throw new EmailProviderConfigError(existing.error ?? "PulseAssist refused the API key.");
+    throw new EmailSendError(
+      `Could not list audiences: ${existing.error}`,
+      existing.status,
+      "pulseassist"
+    );
+  }
+  const found = (existing.data?.lists ?? []).find((l) => l.name === audience.name);
+  if (found) {
+    listIdCache.set(audience.name, found.id);
+    return found.id;
+  }
+  const created = await callWithRetry("lists.create", "/email/lists", {
+    method: "POST",
+    body: { name: audience.name, description: "Created automatically by the ENICE website." }
+  });
+  if (!created.ok || !created.data?.list?.id) {
+    const reread = await callWithRetry("lists.list(retry)", "/email/lists");
+    const raced = (reread.data?.lists ?? []).find((l) => l.name === audience.name);
+    if (raced) {
+      listIdCache.set(audience.name, raced.id);
+      return raced.id;
+    }
+    throw new EmailSendError(
+      `Could not create the "${audience.name}" audience: ${created.error}`,
+      created.status,
+      "pulseassist"
+    );
+  }
+  listIdCache.set(audience.name, created.data.list.id);
+  return created.data.list.id;
+}
+function toAudienceContact(c) {
+  return {
+    id: String(c.id),
+    email: c.email,
+    name: c.name ?? c.email,
+    attributes: c.attributes ?? {},
+    createdAt: c.createdAt
+  };
+}
+async function fetchContact(email) {
+  const target = email.trim().toLowerCase();
+  if (!target) return null;
+  const res = await callWithRetry(
+    "contacts.search",
+    `/email/contacts?limit=25&search=${encodeURIComponent(target)}`
+  );
+  if (!res.ok) {
+    if (isConfigRefusal(res))
+      throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
+    throw new EmailSendError(
+      `Could not look up the contact: ${res.error}`,
+      res.status,
+      "pulseassist"
+    );
+  }
+  return (res.data?.contacts ?? []).find((c) => c.email.trim().toLowerCase() === target) ?? null;
+}
+var pulseAssistProvider = {
+  name: "pulseassist",
+  async send(message) {
+    const { fromDomain } = config();
+    if (message.from.domain.toLowerCase() !== fromDomain.toLowerCase()) {
+      throw new EmailProviderConfigError(
+        `Refusing to send as "${message.from.localPart}@${message.from.domain}": PulseAssist sends from the account's verified domain, which is configured as "${fromDomain}". Verify the domain in PulseAssist Email and set EMAIL_FROM_DOMAIN to match.`
+      );
+    }
+    const recipients = toRecipientArray(message.to);
+    const res = await callWithRetry("email.send", "/email/send", {
+      method: "POST",
+      body: {
+        // A local part only — see the note above.
+        from: message.from.localPart,
+        to: recipients.length === 1 ? recipients[0] : recipients,
+        ...message.replyTo ? { replyTo: message.replyTo } : {},
+        subject: message.subject,
+        html: message.html,
+        ...message.text ? { text: message.text } : {}
+      },
+      idempotencyKey: message.idempotencyKey
+    });
+    if (!res.ok) {
+      if (isConfigRefusal(res)) {
+        throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
+      }
+      throw new EmailSendError(
+        res.error ?? "PulseAssist refused the message.",
+        res.status,
+        "pulseassist"
+      );
+    }
+    return { id: res.data?.id ?? res.data?.sendId ?? null, provider: "pulseassist" };
+  },
+  async findContact(email) {
+    const contact = await fetchContact(email);
+    return contact ? toAudienceContact(contact) : null;
+  },
+  async upsertContact(input) {
+    const email = input.email.trim().toLowerCase();
+    const listId = await resolveListId(input.audience);
+    const existing = await fetchContact(email);
+    if (existing) {
+      const merged = { ...existing.attributes ?? {}, ...input.attributes };
+      const updated = await callWithRetry(
+        "contacts.update",
+        `/email/contacts/${existing.id}`,
+        { method: "PATCH", body: { name: existing.name ?? input.name, attributes: merged } }
+      );
+      if (!updated.ok) {
+        throw new EmailSendError(
+          `Could not update the contact: ${updated.error}`,
+          updated.status,
+          "pulseassist"
+        );
+      }
+      await addToList(listId, existing.id);
+      return { outcome: "updated" };
+    }
+    const created = await callWithRetry(
+      "contacts.create",
+      "/email/contacts",
+      {
+        method: "POST",
+        body: {
+          email,
+          name: input.name,
+          attributes: input.attributes,
+          source: "enice_website"
+        }
+      }
+    );
+    if (!created.ok || !created.data?.contact?.id) {
+      if (isConfigRefusal(created)) {
+        throw new EmailProviderConfigError(created.error ?? "PulseAssist refused the API key.");
+      }
+      throw new EmailSendError(
+        `Could not create the contact: ${created.error}`,
+        created.status,
+        "pulseassist"
+      );
+    }
+    await addToList(listId, created.data.contact.id);
+    return { outcome: "created" };
+  },
+  async updateContactAttributes(email, attributes) {
+    const existing = await fetchContact(email);
+    if (!existing) return false;
+    const merged = { ...existing.attributes ?? {}, ...attributes };
+    const res = await callWithRetry(
+      "contacts.update(attributes)",
+      `/email/contacts/${existing.id}`,
+      { method: "PATCH", body: { attributes: merged } }
+    );
+    if (!res.ok) {
+      throw new EmailSendError(
+        `Could not update the contact: ${res.error}`,
+        res.status,
+        "pulseassist"
+      );
+    }
+    return true;
+  },
+  async listAudienceContacts(audience, limit) {
+    const listId = await resolveListId(audience);
+    const capped = Math.min(Math.max(limit, 1), 100);
+    const res = await callWithRetry(
+      "contacts.list",
+      `/email/contacts?limit=${capped}&listId=${listId}`
+    );
+    if (!res.ok) {
+      if (isConfigRefusal(res))
+        throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
+      throw new EmailSendError(
+        `Could not list the audience: ${res.error}`,
+        res.status,
+        "pulseassist"
+      );
+    }
+    const contacts = (res.data?.contacts ?? []).map(toAudienceContact);
+    return { contacts, hasMore: Boolean(res.data?.nextAfterId) };
+  }
+};
+async function addToList(listId, contactId) {
+  const res = await callWithRetry("lists.addMembers", `/email/lists/${listId}/members`, {
+    method: "POST",
+    body: { contactIds: [Number(contactId)] }
+  });
+  if (!res.ok && !/exist|already|duplicate/i.test(res.error ?? "")) {
+    throw new EmailSendError(
+      `Could not add the contact to the audience: ${res.error}`,
+      res.status,
+      "pulseassist"
+    );
+  }
+}
 
 // node_modules/postal-mime/src/decode-strings.js
 var textEncoder = new TextEncoder();
@@ -1232,6 +1585,7 @@ var MimeNode = class {
     }
     await this.finalizeChildNodes();
     this.content = this.contentDecoder ? await this.contentDecoder.finalize() : null;
+    this.contentDecoder = false;
     this.state = "finished";
   }
   async finalizeChildNodes() {
@@ -4224,20 +4578,41 @@ function base64ArrayBuffer(arrayBuffer) {
 // node_modules/postal-mime/src/postal-mime.js
 var MAX_NESTING_DEPTH = 256;
 var MAX_HEADERS_SIZE = 2 * 1024 * 1024;
+var MAX_RFC822_NESTING_DEPTH = 10;
 function toCamelCase(key) {
   return key.replace(/-(.)/g, (o, c) => c.toUpperCase());
 }
+function parseLimitOption(value, defaultValue, name) {
+  if (value === void 0 || value === null) {
+    return defaultValue;
+  }
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
+    throw new TypeError(`${name} must be a non-negative integer`);
+  }
+  return value;
+}
 var PostalMime = class _PostalMime {
-  static parse(buf, options) {
+  // async so that an invalid option rejects the returned promise instead of throwing
+  // synchronously, which would escape a `.catch()` chain
+  static async parse(buf, options) {
     const parser = new _PostalMime(options);
     return parser.parse(buf);
   }
-  constructor(options) {
+  // rfc822NestingDepth is internal state that nested parsers receive from their parent.
+  // It is deliberately a separate argument rather than an option, so that forwarding a
+  // caller supplied options object can not seed it and switch the recursion limit off.
+  constructor(options, rfc822NestingDepth = 0) {
     this.options = options || {};
     this.mimeOptions = {
-      maxNestingDepth: this.options.maxNestingDepth || MAX_NESTING_DEPTH,
-      maxHeadersSize: this.options.maxHeadersSize || MAX_HEADERS_SIZE
+      maxNestingDepth: parseLimitOption(this.options.maxNestingDepth, MAX_NESTING_DEPTH, "maxNestingDepth"),
+      maxHeadersSize: parseLimitOption(this.options.maxHeadersSize, MAX_HEADERS_SIZE, "maxHeadersSize")
     };
+    this.maxRfc822NestingDepth = parseLimitOption(
+      this.options.maxRfc822NestingDepth,
+      MAX_RFC822_NESTING_DEPTH,
+      "maxRfc822NestingDepth"
+    );
+    this.rfc822NestingDepth = rfc822NestingDepth;
     this.root = this.currentNode = new MimeNode({
       postalMime: this,
       ...this.mimeOptions
@@ -4337,8 +4712,20 @@ var PostalMime = class _PostalMime {
       alternative = alternative || false;
       related = related || false;
       if (!node.contentType.multipart) {
-        if (this.isInlineMessageRfc822(node) && !forceRfc822Attachments) {
-          const subParser = new _PostalMime();
+        const inlineRfc822 = this.isInlineMessageRfc822(node) && !forceRfc822Attachments;
+        const rfc822DepthExceeded = inlineRfc822 && this.rfc822NestingDepth >= this.maxRfc822NestingDepth;
+        if (inlineRfc822 && !rfc822DepthExceeded) {
+          const subParser = new _PostalMime(
+            {
+              // Only the limits are inherited. Options that decide how a part
+              // is classified stay with the parser that was configured.
+              ...this.mimeOptions,
+              maxRfc822NestingDepth: this.maxRfc822NestingDepth,
+              // attachments are encoded by the parent parser, keep raw buffers here
+              attachmentEncoding: "arraybuffer"
+            },
+            this.rfc822NestingDepth + 1
+          );
           node.subMessage = await subParser.parse(node.content);
           if (!textMap.has(node)) {
             textMap.set(node, {});
@@ -4379,8 +4766,11 @@ var PostalMime = class _PostalMime {
             mimeType: node.contentType.parsed.value,
             disposition: node.contentDisposition?.parsed?.value || null
           };
-          if (related && node.contentId) {
+          if (related && node.contentId && !rfc822DepthExceeded) {
             attachment.related = true;
+          }
+          if (rfc822DepthExceeded) {
+            attachment.rfc822DepthExceeded = true;
           }
           if (node.contentDescription) {
             attachment.description = node.contentDescription;
@@ -4655,7 +5045,7 @@ var PostalMime = class _PostalMime {
 
 // node_modules/resend/dist/index.mjs
 var import_standardwebhooks = __toESM(require_dist(), 1);
-var version = "6.20.0";
+var version = "6.28.1";
 function buildPaginationUrl(base, options) {
   const queryString = buildPaginationQuery(options);
   return queryString ? `${base}?${queryString}` : base;
@@ -4677,6 +5067,9 @@ var ApiKeys = class {
   async list(options = {}) {
     const url = buildPaginationUrl("/api-keys", options);
     return await this.resend.get(url);
+  }
+  async update(id, payload) {
+    return await this.resend.patch(`/api-keys/${id}`, payload);
   }
   async remove(id) {
     return await this.resend.delete(`/api-keys/${id}`);
@@ -4921,11 +5314,22 @@ var Broadcasts = class {
   async get(id) {
     return await this.resend.get(`/broadcasts/${id}`);
   }
+  async recipients(id, options) {
+    const url = `/broadcasts/${id}/recipients?${buildRecipientsQuery(options)}`;
+    return await this.resend.get(url);
+  }
+  async clickedLinks(id, options = {}) {
+    const url = buildPaginationUrl(`/broadcasts/${id}/clicked-links`, options);
+    return await this.resend.get(url);
+  }
   async remove(id) {
     return await this.resend.delete(`/broadcasts/${id}`);
   }
   async cancel(id) {
     return await this.resend.post(`/broadcasts/${id}/cancel`);
+  }
+  async duplicate(id) {
+    return await this.resend.post(`/broadcasts/${id}/duplicate`);
   }
   async update(id, payload) {
     const html = payload.react ? await render(payload.react) : payload.html;
@@ -4943,6 +5347,14 @@ var Broadcasts = class {
     });
   }
 };
+function buildRecipientsQuery(options) {
+  const { type, email, bounceType, ...pagination } = options;
+  const searchParams = new URLSearchParams(buildPaginationQuery(pagination));
+  searchParams.set("type", type);
+  if (email !== void 0) searchParams.set("email", email);
+  if (bounceType !== void 0) searchParams.set("bounce_type", bounceType);
+  return searchParams.toString();
+}
 function parseContactPropertyFromApi(contactProperty) {
   return {
     id: contactProperty.id,
@@ -5479,8 +5891,32 @@ var Emails = class {
   async cancel(id) {
     return await this.resend.post(`/emails/${id}/cancel`);
   }
+  async share(id, payload) {
+    return await this.resend.post(`/emails/${id}/share`, { expires_in: payload?.expiresIn });
+  }
+  async metrics(options = {}) {
+    const queryString = buildMetricsQuery(options);
+    const url = queryString ? `/emails/metrics?${queryString}` : "/emails/metrics";
+    return await this.resend.get(url);
+  }
 };
-var Events = class {
+function buildMetricsQuery(options) {
+  const params = {
+    start_date: options.startDate,
+    end_date: options.endDate,
+    timezone: options.timezone,
+    granularity: options.granularity,
+    metrics: options.metrics?.join(","),
+    dimensions: options.dimensions?.join(","),
+    domain_id: options.domainId?.join(","),
+    email_id: options.emailId?.join(","),
+    broadcast_id: options.broadcastId?.join(",")
+  };
+  const searchParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) if (value !== void 0 && value !== "") searchParams.set(key, value);
+  return searchParams.toString();
+}
+var Events$1 = class {
   constructor(resend) {
     this.resend = resend;
   }
@@ -5541,6 +5977,9 @@ var Segments = class {
   }
   async get(id) {
     return await this.resend.get(`/segments/${id}`);
+  }
+  async update(id, payload) {
+    return await this.resend.patch(`/segments/${id}`, payload);
   }
   async remove(id) {
     return await this.resend.delete(`/segments/${id}`);
@@ -5720,9 +6159,39 @@ var Topics = class {
     return await this.resend.delete(`/topics/${id}`);
   }
 };
+var Attempts = class {
+  constructor(resend) {
+    this.resend = resend;
+  }
+  async list(options) {
+    const { webhookId, eventId } = options;
+    const url = buildPaginationUrl(`/webhooks/${webhookId}/events/${eventId}/attempts`, options);
+    return await this.resend.get(url);
+  }
+};
+var Events = class {
+  constructor(resend) {
+    this.resend = resend;
+    this.attempts = new Attempts(resend);
+  }
+  async list(options) {
+    const { webhookId } = options;
+    const url = buildPaginationUrl(`/webhooks/${webhookId}/events`, options);
+    return await this.resend.get(url);
+  }
+  async get(options) {
+    const { webhookId, eventId } = options;
+    return await this.resend.get(`/webhooks/${webhookId}/events/${eventId}`);
+  }
+  async replay(options) {
+    const { webhookId, eventId } = options;
+    return await this.resend.post(`/webhooks/${webhookId}/events/${eventId}/replay`);
+  }
+};
 var Webhooks = class {
   constructor(resend) {
     this.resend = resend;
+    this.events = new Events(resend);
   }
   async create(payload, options = {}) {
     return await this.resend.post("/webhooks", payload, options);
@@ -5739,6 +6208,9 @@ var Webhooks = class {
   }
   async remove(id) {
     return await this.resend.delete(`/webhooks/${id}`);
+  }
+  async rotateSigningSecret(id) {
+    return await this.resend.post(`/webhooks/${id}/signing-secret/rotate`);
   }
   verify(payload) {
     return new import_standardwebhooks.Webhook(payload.webhookSecret).verify(payload.payload, {
@@ -5769,7 +6241,7 @@ var Resend = class {
     this.contacts = new Contacts(this);
     this.domains = new Domains(this);
     this.emails = new Emails(this);
-    this.events = new Events(this);
+    this.events = new Events$1(this);
     this.logs = new Logs(this);
     this.oauthGrants = new OAuthGrants(this);
     this.suppressions = new Suppressions(this);
@@ -5923,56 +6395,39 @@ var Resend = class {
   }
 };
 
-// src/lib/resend.server.ts
-var ResendConfigError = class extends Error {
-};
-function resendClient() {
+// src/lib/email/provider-resend.server.ts
+var THROTTLE_MS = 260;
+function client() {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) {
-    throw new ResendConfigError("RESEND_API_KEY is not configured.");
-  }
+  if (!apiKey) throw new EmailProviderConfigError("RESEND_API_KEY is not configured.");
   return new Resend(apiKey);
 }
-var sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-var THROTTLE_MS = 260;
 function isTransient(error) {
   if (!error) return false;
   const status = error.statusCode ?? 0;
   return status === 429 || status >= 500 || /rate.?limit|too many/i.test(error.message);
 }
-async function withRetry(label, call, attempts = 3) {
-  let last = { data: null, error: null };
-  for (let i = 0; i < attempts; i++) {
-    last = await call();
-    if (!isTransient(last.error)) return last;
-    if (i < attempts - 1) {
-      const backoff = 400 * 2 ** i;
-      console.warn(
-        `[resend] ${label} hit a transient error (${last.error?.statusCode}); retrying in ${backoff}ms`
-      );
-      await sleep(backoff);
-    }
-  }
-  return last;
+function retry(label, call2) {
+  return withRetry(label, call2, (r) => isTransient(r.error));
 }
 var propertyCache = /* @__PURE__ */ new Map();
 async function ensureProperties(resend, keys) {
+  if (keys.length === 0) return;
   const cacheKey = [...keys].sort().join(",");
   const cached = propertyCache.get(cacheKey);
   if (cached) return cached;
   const task = (async () => {
-    const existing = await withRetry(
+    const existing = await retry(
       "contactProperties.list",
       () => resend.contactProperties.list({ limit: 100 })
     );
-    if (existing.error) {
+    if (existing.error)
       throw new Error(`Could not list contact properties: ${existing.error.message}`);
-    }
     const have = new Set((existing.data?.data ?? []).map((p) => p.key));
     const missing = keys.filter((k) => !have.has(k));
     for (const [index, key] of missing.entries()) {
       if (index > 0) await sleep(THROTTLE_MS);
-      const created = await withRetry(
+      const created = await retry(
         `contactProperties.create(${key})`,
         () => resend.contactProperties.create({ key, type: "string", fallbackValue: null })
       );
@@ -5988,41 +6443,182 @@ async function ensureProperties(resend, keys) {
   return task;
 }
 var segmentCache = /* @__PURE__ */ new Map();
-async function resolveSegmentId(resend, name, overrideEnvVar) {
-  const override = overrideEnvVar ? process.env[overrideEnvVar] : void 0;
-  if (override) return override;
-  const cached = segmentCache.get(name);
+async function resolveSegmentId(resend, audience) {
+  const pinEnvVar = audience.idEnvVars?.resend;
+  const pinned = pinEnvVar ? process.env[pinEnvVar]?.trim() : void 0;
+  if (pinned) return pinned;
+  const cached = segmentCache.get(audience.name);
   if (cached) return cached;
-  const list = await withRetry("segments.list", () => resend.segments.list({ limit: 100 }));
+  const list = await retry(
+    "segments.list",
+    () => resend.segments.list({ limit: 100 })
+  );
   if (list.error) throw new Error(`Could not list segments: ${list.error.message}`);
-  const found = (list.data?.data ?? []).find((s) => s.name === name);
+  const found = (list.data?.data ?? []).find((s) => s.name === audience.name);
   if (found) {
-    segmentCache.set(name, found.id);
+    segmentCache.set(audience.name, found.id);
     return found.id;
   }
-  const created = await withRetry("segments.create", () => resend.segments.create({ name }));
+  const created = await retry(
+    "segments.create",
+    () => resend.segments.create({ name: audience.name })
+  );
   if (created.error || !created.data?.id) {
-    throw new Error(`Could not create the "${name}" segment: ${created.error?.message}`);
+    throw new Error(`Could not create the "${audience.name}" segment: ${created.error?.message}`);
   }
-  segmentCache.set(name, created.data.id);
+  segmentCache.set(audience.name, created.data.id);
   return created.data.id;
 }
-function readProperty(properties, key) {
-  const entry = properties?.[key];
-  if (!entry) return "";
-  return typeof entry.value === "string" ? entry.value : String(entry.value);
+function readProperties(raw) {
+  const out = {};
+  for (const [key, entry] of Object.entries(raw ?? {})) {
+    if (!entry) continue;
+    out[key] = typeof entry.value === "string" ? entry.value : String(entry.value);
+  }
+  return out;
 }
-async function findContact(resend, email) {
+async function getContact(resend, email) {
   try {
-    const res = await withRetry("contacts.get", () => resend.contacts.get({ email }));
+    const res = await retry(
+      "contacts.get",
+      () => resend.contacts.get({ email })
+    );
     if (res.error || !res.data) return null;
     return res.data;
   } catch {
     return null;
   }
 }
-function joinName(firstName, lastName) {
-  return [firstName, lastName].filter(Boolean).join(" ").trim();
+function toAudienceContact2(c) {
+  return {
+    id: c.id,
+    email: c.email,
+    name: joinName(c.first_name, c.last_name) || c.email,
+    attributes: readProperties(c.properties),
+    createdAt: c.created_at
+  };
+}
+var resendProvider = {
+  name: "resend",
+  async send(message) {
+    const resend = client();
+    const res = await retry(
+      "emails.send",
+      () => resend.emails.send({
+        from: formatAddress(message.from),
+        to: toRecipientArray(message.to),
+        ...message.replyTo ? { replyTo: message.replyTo } : {},
+        subject: message.subject,
+        html: message.html,
+        ...message.text ? { text: message.text } : {}
+      })
+    );
+    if (res.error) {
+      throw new EmailSendError(res.error.message, res.error.statusCode ?? null, "resend");
+    }
+    return { id: res.data?.id ?? null, provider: "resend" };
+  },
+  async findContact(email) {
+    const contact = await getContact(client(), email);
+    return contact ? toAudienceContact2(contact) : null;
+  },
+  async upsertContact(input) {
+    const resend = client();
+    const keys = Object.keys(input.attributes);
+    await ensureProperties(resend, keys);
+    const segmentId = await resolveSegmentId(resend, input.audience);
+    const email = input.email.trim().toLowerCase();
+    const existing = await getContact(resend, email);
+    const { firstName, lastName } = splitName(input.name);
+    if (existing) {
+      const updated = await retry(
+        "contacts.update",
+        () => resend.contacts.update({
+          email,
+          // Only fill in a name if Resend does not already hold one.
+          firstName: existing.first_name ?? firstName,
+          lastName: existing.last_name ?? lastName,
+          properties: input.attributes
+        })
+      );
+      if (updated.error) throw new Error(`Could not update contact: ${updated.error.message}`);
+      const added = await retry(
+        "contacts.segments.add",
+        () => resend.contacts.segments.add({ email, segmentId })
+      );
+      if (added.error && !/exist|already/i.test(added.error.message)) {
+        throw new Error(`Could not add contact to the segment: ${added.error.message}`);
+      }
+      return { outcome: "updated" };
+    }
+    const created = await retry(
+      "contacts.create",
+      () => resend.contacts.create({
+        email,
+        firstName,
+        // `create` accepts `string | undefined` while `update` accepts `string | null`.
+        lastName: lastName ?? void 0,
+        properties: input.attributes,
+        segments: [{ id: segmentId }]
+      })
+    );
+    if (created.error) throw new Error(`Could not create contact: ${created.error.message}`);
+    return { outcome: "created" };
+  },
+  async updateContactAttributes(email, attributes) {
+    const resend = client();
+    await ensureProperties(resend, Object.keys(attributes));
+    const existing = await getContact(resend, email);
+    if (!existing) return false;
+    const res = await retry(
+      "contacts.update(attributes)",
+      () => resend.contacts.update({ email, properties: attributes })
+    );
+    if (res.error) throw new Error(`Could not update status: ${res.error.message}`);
+    return true;
+  },
+  async listAudienceContacts(audience, limit) {
+    const resend = client();
+    const segmentId = await resolveSegmentId(resend, audience);
+    const capped = Math.min(Math.max(limit, 1), 100);
+    const list = await retry(
+      "contacts.list",
+      () => resend.contacts.list({ segmentId, limit: capped })
+    );
+    if (list.error) throw new Error(`Could not list contacts: ${list.error.message}`);
+    const rows = list.data?.data ?? [];
+    const contacts = [];
+    const CONCURRENCY = 3;
+    for (let i = 0; i < rows.length; i += CONCURRENCY) {
+      const batch = rows.slice(i, i + CONCURRENCY);
+      const details = await Promise.all(
+        batch.map(async (row) => {
+          const full = await getContact(resend, row.email);
+          return toAudienceContact2(full ?? row);
+        })
+      );
+      contacts.push(...details);
+    }
+    return { contacts, hasMore: Boolean(list.data?.has_more) };
+  }
+};
+
+// src/lib/email/index.server.ts
+var PROVIDERS = {
+  pulseassist: pulseAssistProvider,
+  resend: resendProvider
+};
+var DEFAULT_PROVIDER = "pulseassist";
+function configuredProviderName() {
+  const raw = process.env.EMAIL_PROVIDER?.trim().toLowerCase();
+  if (!raw) return DEFAULT_PROVIDER;
+  if (raw in PROVIDERS) return raw;
+  throw new EmailProviderConfigError(
+    `EMAIL_PROVIDER="${raw}" is not a known provider. Use one of: ${Object.keys(PROVIDERS).join(", ")}.`
+  );
+}
+function emailProvider() {
+  return PROVIDERS[configuredProviderName()];
 }
 
 // src/lib/early-access-store.server.ts
@@ -6030,6 +6626,13 @@ var SEGMENT_NAME = "PulseAssist Early Access";
 var PRODUCT = "PulseAssist";
 var SOURCE = "enice_website";
 var INITIAL_STATUS = "EARLY_ACCESS";
+var EARLY_ACCESS_AUDIENCE = {
+  name: SEGMENT_NAME,
+  idEnvVars: {
+    resend: "RESEND_EARLY_ACCESS_SEGMENT_ID",
+    pulseassist: "PULSEASSIST_EARLY_ACCESS_LIST_ID"
+  }
+};
 var PROPERTY_KEYS = {
   status: "pulseassist_status",
   businessName: "pulseassist_business_name",
@@ -6039,66 +6642,42 @@ var PROPERTY_KEYS = {
   registeredAt: "pulseassist_registered_at",
   updatedAt: "pulseassist_updated_at"
 };
-var ALL_PROPERTY_KEYS = Object.values(PROPERTY_KEYS);
 function toStatus(raw) {
   return EARLY_ACCESS_STATUSES.includes(raw) ? raw : INITIAL_STATUS;
 }
+function read(attributes, key) {
+  return attributes[key] ?? "";
+}
 async function listRegistrations(limit = 100) {
-  const resend = resendClient();
-  const segmentId = await resolveSegmentId(resend, SEGMENT_NAME, "RESEND_EARLY_ACCESS_SEGMENT_ID");
-  const capped = Math.min(Math.max(limit, 1), 100);
-  const list = await withRetry(
-    "contacts.list",
-    () => resend.contacts.list({ segmentId, limit: capped })
+  const { contacts, hasMore } = await emailProvider().listAudienceContacts(
+    EARLY_ACCESS_AUDIENCE,
+    limit
   );
-  if (list.error) throw new Error(`Could not list contacts: ${list.error.message}`);
-  const contacts = list.data?.data ?? [];
-  const registrations = [];
-  const CONCURRENCY = 3;
-  for (let i = 0; i < contacts.length; i += CONCURRENCY) {
-    const batch = contacts.slice(i, i + CONCURRENCY);
-    const details = await Promise.all(
-      batch.map(async (c) => {
-        const full = await findContact(resend, c.email);
-        const properties = full?.properties ?? {};
-        const registeredAt = readProperty(properties, PROPERTY_KEYS.registeredAt);
-        return {
-          id: c.id,
-          email: c.email,
-          fullName: joinName(c.first_name, c.last_name) || c.email,
-          product: PRODUCT,
-          businessName: readProperty(properties, PROPERTY_KEYS.businessName),
-          businessType: readProperty(properties, PROPERTY_KEYS.businessType),
-          businessNeed: readProperty(properties, PROPERTY_KEYS.businessNeed),
-          source: readProperty(properties, PROPERTY_KEYS.source) || SOURCE,
-          status: toStatus(readProperty(properties, PROPERTY_KEYS.status)),
-          createdAt: registeredAt || c.created_at,
-          updatedAt: readProperty(properties, PROPERTY_KEYS.updatedAt) || registeredAt
-        };
-      })
-    );
-    registrations.push(...details);
-  }
+  const registrations = contacts.map((c) => {
+    const registeredAt = read(c.attributes, PROPERTY_KEYS.registeredAt);
+    return {
+      id: c.id,
+      email: c.email,
+      fullName: c.name || c.email,
+      product: PRODUCT,
+      businessName: read(c.attributes, PROPERTY_KEYS.businessName),
+      businessType: read(c.attributes, PROPERTY_KEYS.businessType),
+      businessNeed: read(c.attributes, PROPERTY_KEYS.businessNeed),
+      source: read(c.attributes, PROPERTY_KEYS.source) || SOURCE,
+      status: toStatus(read(c.attributes, PROPERTY_KEYS.status)),
+      createdAt: registeredAt || c.createdAt,
+      updatedAt: read(c.attributes, PROPERTY_KEYS.updatedAt) || registeredAt || c.createdAt
+    };
+  });
   registrations.sort((a, b) => a.createdAt < b.createdAt ? 1 : -1);
-  return { registrations, truncated: Boolean(list.data?.has_more) };
+  return { registrations, truncated: hasMore };
 }
 async function updateRegistrationStatus(email, status) {
-  const resend = resendClient();
-  await ensureProperties(resend, ALL_PROPERTY_KEYS);
-  const existing = await findContact(resend, email);
-  if (!existing) return { outcome: "not_found" };
-  const res = await withRetry(
-    "contacts.update(status)",
-    () => resend.contacts.update({
-      email,
-      properties: {
-        [PROPERTY_KEYS.status]: status,
-        [PROPERTY_KEYS.updatedAt]: (/* @__PURE__ */ new Date()).toISOString()
-      }
-    })
-  );
-  if (res.error) throw new Error(`Could not update status: ${res.error.message}`);
-  return { outcome: "updated" };
+  const updated = await emailProvider().updateContactAttributes(email, {
+    [PROPERTY_KEYS.status]: status,
+    [PROPERTY_KEYS.updatedAt]: (/* @__PURE__ */ new Date()).toISOString()
+  });
+  return { outcome: updated ? "updated" : "not_found" };
 }
 
 // api-src/lib/http.ts
@@ -6218,7 +6797,7 @@ async function handler(req, res) {
     }
     res.status(405).json({ ok: false, error: "Method not allowed." });
   } catch (err) {
-    if (err instanceof ResendConfigError) {
+    if (err instanceof EmailProviderConfigError) {
       console.error(`[api/admin/early-access:${ref}] not configured:`, err.message);
       res.status(503).json({ ok: false, error: "Storage is not configured.", ref });
       return;
