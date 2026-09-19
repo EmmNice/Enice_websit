@@ -46,9 +46,42 @@ export type Sender = {
   domain: string;
 };
 
+/**
+ * Maximum display-name length. RFC 5322 allows far more; a name longer than this is a mistake or an
+ * attempt to push the address out of an inbox list.
+ */
+const MAX_DISPLAY_NAME = 120;
+
+/**
+ * Strip anything that could break out of the header, then quote if needed.
+ *
+ * `` `${sender.name} <${address}>` `` was fine while every name was a hardcoded constant, and stops
+ * being fine the moment one carries visitor input — which the contact-form notification now does, so
+ * that it shows WHO wrote in rather than a bare noreply address. A name containing CR or LF would
+ * otherwise let a visitor append their own headers to mail the site sends.
+ *
+ * The PulseAssist path sanitises server-side as well; this is the Resend path's equivalent, and
+ * belongs here regardless so no future caller has to remember.
+ */
+function displayName(raw: string): string {
+  const clean = raw
+    // eslint-disable-next-line no-control-regex
+    .replace(/[\u0000-\u001F\u007F-\u009F]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, MAX_DISPLAY_NAME)
+    .trim();
+  if (!clean) return "";
+  // Quote unless it is plainly safe unquoted; a comma alone would otherwise read as a second address.
+  return /^[A-Za-z0-9 !#$%&'*+\-/=?^_`{|}~.]+$/.test(clean)
+    ? clean
+    : `"${clean.replace(/([\\"])/g, "\\$1")}"`;
+}
+
 export function formatAddress(sender: Sender): string {
   const address = `${sender.localPart}@${sender.domain}`;
-  return sender.name ? `${sender.name} <${address}>` : address;
+  const name = sender.name ? displayName(sender.name) : "";
+  return name ? `${name} <${address}>` : address;
 }
 
 export type OutboundEmail = {
@@ -64,6 +97,45 @@ export type OutboundEmail = {
    * without the concept ignore it, which is why it is optional rather than assumed.
    */
   idempotencyKey?: string;
+  /**
+   * Extra MIME headers. Used for the RFC 3834 auto-reply markers — see `AUTO_REPLY_HEADERS`.
+   *
+   * Both providers forward these; PulseAssist refuses the headers a caller must not set (From, Bcc,
+   * DKIM-Signature and so on) with a 400 rather than dropping them silently.
+   */
+  headers?: Record<string, string>;
+};
+
+/**
+ * What marks an email as machine-generated, so other mail systems stop answering it.
+ *
+ * `Auto-Submitted` is RFC 3834 and is the standard signal; `X-Auto-Response-Suppress` is Microsoft's
+ * and is what Exchange and Outlook actually honour, so both are needed in practice.
+ *
+ * Why it matters here rather than being a nicety: the acknowledgement goes to an address a stranger
+ * typed into a form, from `noreply@`. If that address has an out-of-office or a ticketing
+ * autoresponder on it, an unmarked receipt invites a reply, which arrives at `noreply@` and — with
+ * any autoresponder of our own, now or later — answers back. Marking the message is how that loop
+ * is prevented at the standard rather than by hoping. It also stops "We received your message"
+ * generating a spurious ticket in the recipient's own helpdesk.
+ *
+ * `auto-replied` is the correct value for a message sent BECAUSE of a specific incoming request.
+ * `auto-generated` (below) is for mail nobody asked for individually.
+ */
+export const AUTO_REPLY_HEADERS: Record<string, string> = {
+  "Auto-Submitted": "auto-replied",
+  "X-Auto-Response-Suppress": "All",
+};
+
+/**
+ * For automated mail that is not a reply to the recipient — the internal notification.
+ *
+ * Marked too, so that a holiday responder on the team mailbox cannot answer the notification and so
+ * a helpdesk watching that mailbox does not treat it as a customer email.
+ */
+export const AUTO_GENERATED_HEADERS: Record<string, string> = {
+  "Auto-Submitted": "auto-generated",
+  "X-Auto-Response-Suppress": "All",
 };
 
 export type SendResult = {

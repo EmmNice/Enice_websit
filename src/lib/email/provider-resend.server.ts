@@ -212,6 +212,11 @@ export const resendProvider: EmailProvider = {
           subject: message.subject,
           html: message.html,
           ...(message.text ? { text: message.text } : {}),
+          // The RFC 3834 auto-reply markers travel here on this path. Kept in step with the
+          // PulseAssist adapter so switching provider does not quietly un-mark automated mail.
+          ...(message.headers && Object.keys(message.headers).length > 0
+            ? { headers: message.headers }
+            : {}),
         }) as Promise<ResendResult<{ id: string }>>,
     );
     if (res.error) {

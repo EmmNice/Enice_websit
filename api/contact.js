@@ -871,10 +871,25 @@ var FIELD_LIMITS = {
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // src/lib/email/types.ts
+var MAX_DISPLAY_NAME = 120;
+function displayName(raw) {
+  const clean = raw.replace(/[\u0000-\u001F\u007F-\u009F]/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_DISPLAY_NAME).trim();
+  if (!clean) return "";
+  return /^[A-Za-z0-9 !#$%&'*+\-/=?^_`{|}~.]+$/.test(clean) ? clean : `"${clean.replace(/([\\"])/g, "\\$1")}"`;
+}
 function formatAddress(sender) {
   const address = `${sender.localPart}@${sender.domain}`;
-  return sender.name ? `${sender.name} <${address}>` : address;
+  const name = sender.name ? displayName(sender.name) : "";
+  return name ? `${name} <${address}>` : address;
 }
+var AUTO_REPLY_HEADERS = {
+  "Auto-Submitted": "auto-replied",
+  "X-Auto-Response-Suppress": "All"
+};
+var AUTO_GENERATED_HEADERS = {
+  "Auto-Submitted": "auto-generated",
+  "X-Auto-Response-Suppress": "All"
+};
 var EmailProviderConfigError = class extends Error {
   constructor(message) {
     super(message);
@@ -1091,6 +1106,17 @@ var pulseAssistProvider = {
       body: {
         // A local part only — see the note above.
         from: message.from.localPart,
+        /*
+         * The display name, sent separately because `from` cannot carry it.
+         *
+         * Without this the API composes a bare `noreply@enicehq.com` and every message the site
+         * sends arrives showing a raw address — which the recipient's inbox lists as though it were
+         * machine-generated. ENICE's own team read contact-form enquiries that way: an automated
+         * notice rather than a person writing in. PulseAssist sanitises the value server-side, so a
+         * visitor's typed name cannot forge a header through it.
+         */
+        ...message.from.name ? { fromName: message.from.name } : {},
+        ...message.headers && Object.keys(message.headers).length > 0 ? { headers: message.headers } : {},
         to: recipients.length === 1 ? recipients[0] : recipients,
         ...message.replyTo ? { replyTo: message.replyTo } : {},
         subject: message.subject,
@@ -6550,7 +6576,10 @@ var resendProvider = {
         ...message.replyTo ? { replyTo: message.replyTo } : {},
         subject: message.subject,
         html: message.html,
-        ...message.text ? { text: message.text } : {}
+        ...message.text ? { text: message.text } : {},
+        // The RFC 3834 auto-reply markers travel here on this path. Kept in step with the
+        // PulseAssist adapter so switching provider does not quietly un-mark automated mail.
+        ...message.headers && Object.keys(message.headers).length > 0 ? { headers: message.headers } : {}
       })
     );
     if (res.error) {
@@ -6743,7 +6772,9 @@ function acknowledgementHtml(name) {
         you can expect a reply within one business day.
       </p>
       <p style="margin:0;font-size:14px;line-height:1.7;color:#374151;">
-        If you need to add anything, reply directly to this email.
+        This is an automated confirmation and replies to it are not received. If you need to add
+        anything, email
+        <a href="mailto:corporate@enicehq.com" style="color:#1e3a8a;">corporate@enicehq.com</a>.
       </p>
     </td></tr>
     <tr><td style="padding:24px 0 0;border-top:1px solid #e5e7eb;">
@@ -6858,11 +6889,24 @@ async function handler(req, res) {
     const subject = fields.company ? `Contact: ${fields.inquiry || "General"} \u2014 ${fields.name} (${fields.company})` : `Contact: ${fields.inquiry || "General"} \u2014 ${fields.name}`;
     try {
       await provider.send({
+        /*
+         * Sent from the fixed `noreply@enicehq.com`, deliberately unchanged.
+         *
+         * enicehq.com is the only domain ENICE has verified, so the enquiry cannot be sent as the
+         * visitor's own address — mail may only leave under a domain proven by DKIM/SPF. Putting the
+         * visitor's name in the From display name instead was tried and rejected: the form
+         * notification is an automated message and should read as one. Who wrote in is in the
+         * subject line and in the body, and `replyTo` below is their address, so replying from the
+         * team's inbox reaches them directly.
+         */
         from: contactFormSender(),
         to: TO,
         replyTo: fields.email,
         subject,
         html: notificationHtml(fields, updatesOutcome),
+        // Machine-generated, so a holiday responder on the team mailbox cannot answer it and a
+        // helpdesk watching that mailbox does not log it as a customer email.
+        headers: AUTO_GENERATED_HEADERS,
         // Makes a retried submission safe on providers that honour it.
         idempotencyKey: `contact-notification-${ref}`
       });
@@ -6888,8 +6932,33 @@ async function handler(req, res) {
       await provider.send({
         from: groupSender(),
         to: fields.email,
+        /*
+         * Deliberately NO Reply-To: this is a receipt, not a conversation.
+         *
+         * It used to say "reply directly to this email" while being sent from `noreply@` with no
+         * Reply-To, so a reply reached a mailbox nobody reads — the invitation was simply false.
+         *
+         * Of the two ways to make it true, ENICE chose to keep the email one-way: its whole job is
+         * to tell someone their message arrived, and the team answers from the notification copy
+         * instead, where Reply-To is already the sender's own address. So the copy now states that
+         * replies are not received and gives corporate@enicehq.com, rather than quietly routing a
+         * reply somewhere the sender did not choose.
+         *
+         * If a Reply-To is ever added here, the "replies are not received" line in
+         * `acknowledgementHtml` has to go in the same change.
+         */
         subject: "We received your message",
         html: acknowledgementHtml(fields.name),
+        /*
+         * The other half of "this mailbox is not monitored".
+         *
+         * Saying it in the body tells a human; these headers tell a machine. Without them a visitor
+         * whose address has an out-of-office or a ticketing autoresponder answers this receipt, the
+         * answer arrives at an unread `noreply@`, and the moment anything of ours ever replies
+         * automatically the two sides loop. It also stops "We received your message" opening a
+         * spurious ticket in the recipient's own helpdesk.
+         */
+        headers: AUTO_REPLY_HEADERS,
         idempotencyKey: `contact-ack-${ref}`
       });
     } catch (err) {

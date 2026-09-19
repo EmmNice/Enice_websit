@@ -332,6 +332,19 @@ export const pulseAssistProvider: EmailProvider = {
       body: {
         // A local part only — see the note above.
         from: message.from.localPart,
+        /*
+         * The display name, sent separately because `from` cannot carry it.
+         *
+         * Without this the API composes a bare `noreply@enicehq.com` and every message the site
+         * sends arrives showing a raw address — which the recipient's inbox lists as though it were
+         * machine-generated. ENICE's own team read contact-form enquiries that way: an automated
+         * notice rather than a person writing in. PulseAssist sanitises the value server-side, so a
+         * visitor's typed name cannot forge a header through it.
+         */
+        ...(message.from.name ? { fromName: message.from.name } : {}),
+        ...(message.headers && Object.keys(message.headers).length > 0
+          ? { headers: message.headers }
+          : {}),
         to: recipients.length === 1 ? recipients[0] : recipients,
         ...(message.replyTo ? { replyTo: message.replyTo } : {}),
         subject: message.subject,

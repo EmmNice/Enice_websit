@@ -25,6 +25,7 @@ import {
 import { EMAIL_RE, FIELD_LIMITS } from "../src/lib/contact";
 import { subscribeToUpdates } from "../src/lib/updates-store.server";
 import { emailProvider, EmailProviderConfigError } from "../src/lib/email/index.server";
+import { AUTO_GENERATED_HEADERS, AUTO_REPLY_HEADERS } from "../src/lib/email/types";
 import { contactFormSender, groupSender, INTERNAL_RECIPIENT } from "../src/lib/email/senders";
 
 const TO = INTERNAL_RECIPIENT;
@@ -83,7 +84,9 @@ function acknowledgementHtml(name: string): string {
         you can expect a reply within one business day.
       </p>
       <p style="margin:0;font-size:14px;line-height:1.7;color:#374151;">
-        If you need to add anything, reply directly to this email.
+        This is an automated confirmation and replies to it are not received. If you need to add
+        anything, email
+        <a href="mailto:corporate@enicehq.com" style="color:#1e3a8a;">corporate@enicehq.com</a>.
       </p>
     </td></tr>
     <tr><td style="padding:24px 0 0;border-top:1px solid #e5e7eb;">
@@ -234,11 +237,24 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
      */
     try {
       await provider.send({
+        /*
+         * Sent from the fixed `noreply@enicehq.com`, deliberately unchanged.
+         *
+         * enicehq.com is the only domain ENICE has verified, so the enquiry cannot be sent as the
+         * visitor's own address — mail may only leave under a domain proven by DKIM/SPF. Putting the
+         * visitor's name in the From display name instead was tried and rejected: the form
+         * notification is an automated message and should read as one. Who wrote in is in the
+         * subject line and in the body, and `replyTo` below is their address, so replying from the
+         * team's inbox reaches them directly.
+         */
         from: contactFormSender(),
         to: TO,
         replyTo: fields.email,
         subject,
         html: notificationHtml(fields, updatesOutcome),
+        // Machine-generated, so a holiday responder on the team mailbox cannot answer it and a
+        // helpdesk watching that mailbox does not log it as a customer email.
+        headers: AUTO_GENERATED_HEADERS,
         // Makes a retried submission safe on providers that honour it.
         idempotencyKey: `contact-notification-${ref}`,
       });
@@ -267,8 +283,33 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       await provider.send({
         from: groupSender(),
         to: fields.email,
+        /*
+         * Deliberately NO Reply-To: this is a receipt, not a conversation.
+         *
+         * It used to say "reply directly to this email" while being sent from `noreply@` with no
+         * Reply-To, so a reply reached a mailbox nobody reads — the invitation was simply false.
+         *
+         * Of the two ways to make it true, ENICE chose to keep the email one-way: its whole job is
+         * to tell someone their message arrived, and the team answers from the notification copy
+         * instead, where Reply-To is already the sender's own address. So the copy now states that
+         * replies are not received and gives corporate@enicehq.com, rather than quietly routing a
+         * reply somewhere the sender did not choose.
+         *
+         * If a Reply-To is ever added here, the "replies are not received" line in
+         * `acknowledgementHtml` has to go in the same change.
+         */
         subject: "We received your message",
         html: acknowledgementHtml(fields.name),
+        /*
+         * The other half of "this mailbox is not monitored".
+         *
+         * Saying it in the body tells a human; these headers tell a machine. Without them a visitor
+         * whose address has an out-of-office or a ticketing autoresponder answers this receipt, the
+         * answer arrives at an unread `noreply@`, and the moment anything of ours ever replies
+         * automatically the two sides loop. It also stops "We received your message" opening a
+         * spurious ticket in the recipient's own helpdesk.
+         */
+        headers: AUTO_REPLY_HEADERS,
         idempotencyKey: `contact-ack-${ref}`,
       });
     } catch (err) {
