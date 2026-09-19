@@ -83,7 +83,7 @@ function layout(kicker: string, heading: string, bodyHtml: string): string {
     <tr><td>${bodyHtml}</td></tr>
     <tr><td style="padding:24px 0 0;border-top:1px solid #e5e7eb;">
       <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7280;">
-        ENICE Group &middot; Abuja &amp; Kaduna, Nigeria &middot; corporate@enicehq.com
+        ENICE Group &middot; Abuja &amp; Kaduna, Nigeria
       </p>
     </td></tr>
   </table>
@@ -103,9 +103,8 @@ function confirmationHtml(fullName: string): string {
        eligible for early access. Submitting this form does not grant product access yet.
      </p>
      <p style="margin:0;font-size:14px;line-height:1.7;color:#374151;">
-       No action is needed from you in the meantime. This message is automated and replies to it
-       are not received — anything else, email
-       <a href="mailto:corporate@enicehq.com" style="color:#1e3a8a;">corporate@enicehq.com</a>.
+       No action is needed from you. This is an automated confirmation — please do not reply to
+       this message.
      </p>`,
   );
 }
@@ -260,8 +259,10 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
          * No Reply-To, matching the contact acknowledgement: both are automated receipts.
          *
          * Sent from `noreply@`, so an applicant who replied anyway was writing to a mailbox nobody
-         * reads. The copy now says so and names corporate@enicehq.com, which answers the same need
-         * without turning a receipt into a thread nobody is watching.
+         * reads. The copy says so plainly and offers no address instead — the mailbox that receives
+         * these applications is an internal notification address, and a receipt sent to everyone who
+         * fills in the form is the last place it should be published. ENICE contacts the applicant
+         * through its normal process when there is something to say.
          */
         subject: "Your PulseAssist early-access request",
         html: confirmationHtml(fields.fullName),

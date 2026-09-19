@@ -6768,18 +6768,16 @@ function acknowledgementHtml(name) {
     </td></tr>
     <tr><td>
       <p style="margin:0 0 16px;font-size:14px;line-height:1.7;color:#111827;">
-        Thanks for reaching out to ENICE Group. Your message has been routed to the right team and
-        you can expect a reply within one business day.
+        Thanks for reaching out to ENICE Group. Your message has been routed to the right team, and
+        someone will be in touch within one business day.
       </p>
       <p style="margin:0;font-size:14px;line-height:1.7;color:#374151;">
-        This is an automated confirmation and replies to it are not received. If you need to add
-        anything, email
-        <a href="mailto:corporate@enicehq.com" style="color:#1e3a8a;">corporate@enicehq.com</a>.
+        This is an automated confirmation. Please do not reply to this message.
       </p>
     </td></tr>
     <tr><td style="padding:24px 0 0;border-top:1px solid #e5e7eb;">
       <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7280;">
-        ENICE Group &middot; Abuja &amp; Kaduna, Nigeria &middot; corporate@enicehq.com
+        ENICE Group &middot; Abuja &amp; Kaduna, Nigeria
       </p>
     </td></tr>
   </table>
@@ -6939,13 +6937,20 @@ async function handler(req, res) {
          * Reply-To, so a reply reached a mailbox nobody reads — the invitation was simply false.
          *
          * Of the two ways to make it true, ENICE chose to keep the email one-way: its whole job is
-         * to tell someone their message arrived, and the team answers from the notification copy
-         * instead, where Reply-To is already the sender's own address. So the copy now states that
-         * replies are not received and gives corporate@enicehq.com, rather than quietly routing a
-         * reply somewhere the sender did not choose.
+         * to tell someone their message arrived. The team answers from the notification copy
+         * instead, where Reply-To is already the sender's own address — so the visitor gets a real
+         * reply from a real person, through the company's normal process, rather than a thread on
+         * an unwatched mailbox.
          *
-         * If a Reply-To is ever added here, the "replies are not received" line in
-         * `acknowledgementHtml` has to go in the same change.
+         * The body no longer offers an address either. A confirmation is not the place to publish
+         * the mailbox that receives the submissions: it is an internal notification address, and
+         * printing it in mail sent to anyone who fills in a form turns it into a spam target and
+         * teaches people to route enquiries around the form that records them.
+         *
+         * So the email says only: we received it, this is automated, do not reply.
+         *
+         * If a Reply-To is ever added here, the "do not reply" line in `acknowledgementHtml` has to
+         * go in the same change.
          */
         subject: "We received your message",
         html: acknowledgementHtml(fields.name),
