@@ -3105,6 +3105,102 @@ VALUES ('portfolio.payment-collection', 'Payment Collection page', 'Portfolio', 
 ON CONFLICT (key) DO NOTHING;
 `
     )
+  },
+  {
+    id: 12,
+    name: "core_team_and_homepage_contact",
+    sql: (
+      /* sql */
+      `
+-- The last hard-coded bands on the homepage and the About page. Each section is created with the
+-- copy that band already shows, so wiring changes nothing visible, and ON CONFLICT DO NOTHING
+-- leaves anything an operator has already written untouched and makes re-runs a no-op.
+--
+-- Note the doubled backslashes in 'body': this SQL lives in a JavaScript template literal, where a
+-- lone backslash-n would become a real newline, and Postgres rejects an unescaped newline inside a
+-- JSON string. Apostrophes are doubled for the same reason of living inside a SQL string.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.core', 'The ENICE Core', 'Home', 'featureGrid', true, 'published', '{
+  "eyebrow": "What powers our products",
+  "heading": "The ENICE Core.",
+  "subheading": "Every product we operate runs on a shared infrastructure core, so the software customers use inherits scale, compliance, and reliability from the ground up.",
+  "items": [
+    {
+      "icon": "Cpu",
+      "title": "Unified AI and Automation Pipeline",
+      "description": "Centralized LLM orchestration and vector search routing that powers products like PulseAssist across every tenant."
+    },
+    {
+      "icon": "Database",
+      "title": "High-Velocity Ledger and Payment Core",
+      "description": "A fast transaction engine and virtual account infrastructure that anchors PulsePay and the financial products we build next."
+    },
+    {
+      "icon": "FileCheck2",
+      "title": "Automated Compliance and KYC Layer",
+      "description": "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product."
+    },
+    {
+      "icon": "Globe",
+      "title": "Global Cloud Grid",
+      "description": "Database clustering and serverless edge delivery that keep uptime at 99.99% and execution under 20ms across platforms."
+    }
+  ]
+}'::jsonb, 25)
+ON CONFLICT (key) DO NOTHING;
+
+-- The homepage's closing band is a contact band with a form, so it is typed 'contact' \u2014 the same
+-- type the /contact page header already uses.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.contact', 'Homepage contact band', 'Home', 'contact', true, 'published', '{
+  "eyebrow": "Get in touch",
+  "heading": "Talk to the team building it.",
+  "subheading": "Whether you are looking at product access, an integration, a partnership, or just have a question \u2014 send us a message and it reaches us directly.",
+  "email": "corporate@enicehq.com",
+  "showForm": true
+}'::jsonb, 60)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.build', 'What We Build', 'About', 'proseGrid', true, 'published', '{
+  "heading": "What We Build",
+  "body": "We find a real gap, design a product around what it takes to close it, build it to a high standard, launch it, and then operate it with the same discipline we used to build it. We don''t hand products off. We own the full lifecycle.\\n\\nWe work across areas where technical complexity meets real-world consequence: financial infrastructure and digital banking, AI-powered enterprise communication and automation, developer tools and API infrastructure, digital commerce systems, cloud infrastructure, and longer-horizon research.\\n\\nOur two current products are the foundation of this. **PulsePay** is our financial infrastructure platform, a Naira-native payment processing and digital banking system built for Nigerian businesses, from high-frequency transactions to compliance. **PulseAssist** is our enterprise AI platform, a communication and automation layer that helps enterprise teams cut down on procedural overhead.\\n\\nThese are the first two products in a lineup we plan to grow the same way: deliberately, and to a high standard.",
+  "items": [
+    { "label": "Financial Infrastructure", "description": "Core transaction rails, digital banking architecture, and payment processing systems." },
+    { "label": "Enterprise AI", "description": "Automated communication and process automation for enterprise teams." },
+    { "label": "Developer Infrastructure", "description": "APIs, SDKs, and tooling that give builders a reliable foundation to scale on." },
+    { "label": "Digital Commerce", "description": "Commerce platforms built for high transaction volume and institutional standards." },
+    { "label": "Cloud Infrastructure", "description": "Region-aware deployment systems with security and compliance built into the architecture." },
+    { "label": "Future Technology", "description": "Long-horizon research programmes exploring what comes after our current products." }
+  ]
+}'::jsonb, 152)
+ON CONFLICT (key) DO NOTHING;
+
+-- The footnote carries its email as a [label](mailto:\u2026) link so the address stays editable rather
+-- than living in markup.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.team', 'The Founding Team', 'About', 'teamGrid', true, 'published', '{
+  "heading": "The Founding Team",
+  "subheading": "ENICE Group was founded by operators and engineers who spent years inside the problems they now build solutions for.",
+  "items": [
+    { "initials": "CEO", "role": "Founder & Chief Executive Officer", "remit": "Corporate strategy, venture direction, and ecosystem growth." },
+    { "initials": "CTO", "role": "Chief Technology Officer", "remit": "Platform architecture, engineering standards, and infrastructure design." },
+    { "initials": "COO", "role": "Chief Operations Officer", "remit": "Product delivery, partner operations, and compliance execution." }
+  ],
+  "footnote": "Our founding team prefers to let the work speak. Executive contact is available through [corporate@enicehq.com](mailto:corporate@enicehq.com) for qualified enterprise and partnership inquiries."
+}'::jsonb, 156)
+ON CONFLICT (key) DO NOTHING;
+
+-- 'home.cta' described a single-button band the homepage never rendered, so editing it changed
+-- nothing and it only cluttered the Home group. Remove it, but only while it still holds exactly
+-- the copy it was seeded with: if an operator has written into it, their words are kept rather than
+-- silently deleted.
+DELETE FROM site_sections
+WHERE key = 'home.cta'
+  AND fields->>'heading' = 'Talk to the ENICE Group team'
+  AND fields->>'ctaUrl' = '/contact';
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (

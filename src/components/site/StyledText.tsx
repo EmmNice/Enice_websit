@@ -1,11 +1,13 @@
 /**
  * Renders a tiny, safe inline-styling syntax used across editable site sections.
  *
- * Two markers, chosen so an administrator can style copy from a plain text field without any way
+ * Four markers, chosen so an administrator can style copy from a plain text field without any way
  * to inject markup (nothing here interprets HTML):
  *
- *   **bold**        →  bold text
- *   [[highlight]]   →  the section's accent colour (the brand blue)
+ *   **bold**            →  bold text
+ *   *italic*            →  italic text
+ *   [[highlight]]       →  the section's accent colour (the brand blue)
+ *   [label](url)        →  a link
  *
  * A newline in the text becomes a line break, so a headline can be split across lines exactly
  * where the editor puts the breaks. The accent colour is passed in per section rather than fixed,
@@ -16,13 +18,30 @@
 import { Fragment, type ReactNode } from "react";
 
 /**
- * Splits text into runs, honouring `**bold**`, `*italic*` and `[[highlight]]` (non-nested).
+ * Link targets a section is allowed to point at: absolute web URLs, email and phone links, and
+ * same-site paths or anchors.
+ *
+ * A deny-by-default check rather than a blocklist, so `javascript:` and `data:` URLs cannot be
+ * smuggled into an href through a content field. Anything that fails renders as plain text — the
+ * words still read correctly, they simply are not clickable.
+ */
+const SAFE_HREF = /^(?:https?:\/\/|mailto:|tel:|\/|#)/i;
+
+/**
+ * Splits text into runs, honouring `**bold**`, `*italic*`, `[[highlight]]` and `[label](url)`
+ * (non-nested).
  *
  * `**` is listed before `*` in the pattern so bold wins over italic; otherwise `**x**` would match
- * as an italic run containing an asterisk.
+ * as an italic run containing an asterisk. `[[…]]` is listed before `[…](…)` so a highlight is
+ * never mistaken for a link label.
  */
-function tokenize(text: string, accentClassName: string, boldClassName: string): ReactNode[] {
-  const pattern = /\*\*([^*]+)\*\*|\[\[([^\]]+)\]\]|\*([^*]+)\*/g;
+function tokenize(
+  text: string,
+  accentClassName: string,
+  boldClassName: string,
+  linkClassName: string,
+): ReactNode[] {
+  const pattern = /\*\*([^*]+)\*\*|\[\[([^\]]+)\]\]|\[([^\]]+)\]\(([^)\s]+)\)|\*([^*]+)\*/g;
   const nodes: ReactNode[] = [];
   let last = 0;
   let key = 0;
@@ -52,8 +71,28 @@ function tokenize(text: string, accentClassName: string, boldClassName: string):
           {match[2]}
         </span>,
       );
-    } else if (match[3] !== undefined) {
-      nodes.push(<em key={key++}>{match[3]}</em>);
+    } else if (match[3] !== undefined && match[4] !== undefined) {
+      const label = match[3];
+      const href = match[4];
+      if (SAFE_HREF.test(href)) {
+        // Only a link that leaves the site opens a new tab; mailto, tel and same-site paths keep
+        // the current one, which is what those are expected to do.
+        const external = /^https?:\/\//i.test(href);
+        nodes.push(
+          <a
+            key={key++}
+            href={href}
+            className={linkClassName}
+            {...(external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+          >
+            {label}
+          </a>,
+        );
+      } else {
+        pushPlain(label);
+      }
+    } else if (match[5] !== undefined) {
+      nodes.push(<em key={key++}>{match[5]}</em>);
     }
     last = pattern.lastIndex;
   }
@@ -65,6 +104,7 @@ export function StyledText({
   text,
   accentClassName = "text-primary",
   boldClassName = "font-bold",
+  linkClassName = "font-medium text-foreground underline-offset-2 hover:underline",
 }: {
   text: string;
   accentClassName?: string;
@@ -74,8 +114,10 @@ export function StyledText({
    * hard-coded weight would visibly change those pages.
    */
   boldClassName?: string;
+  /** How a `[label](url)` run is styled. Overridable for the same reason as `boldClassName`. */
+  linkClassName?: string;
 }) {
-  return <>{tokenize(text, accentClassName, boldClassName)}</>;
+  return <>{tokenize(text, accentClassName, boldClassName, linkClassName)}</>;
 }
 
 /** Strips the styling markers, for places that need the plain string (SEO titles, alt text). */
@@ -83,5 +125,6 @@ export function plainText(text: string): string {
   return text
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/\[\[([^\]]+)\]\]/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)\s]+\)/g, "$1")
     .replace(/\*([^*]+)\*/g, "$1");
 }
