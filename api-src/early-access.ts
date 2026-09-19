@@ -253,6 +253,15 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       provider.send({
         from,
         to: fields.email,
+        /*
+         * Reply-To, even though this email does not invite a reply.
+         *
+         * It is sent from `noreply@`, and an applicant who replies anyway — to ask when they will
+         * hear back, or to correct a detail — would otherwise be writing to a mailbox nobody reads.
+         * A customer-facing email that cannot be answered is a dead end regardless of whether the
+         * copy suggested answering it.
+         */
+        replyTo: INTERNAL_RECIPIENT,
         subject: "Your PulseAssist early-access request",
         html: confirmationHtml(fields.fullName),
         idempotencyKey: `early-access-confirmation-${ref}`,

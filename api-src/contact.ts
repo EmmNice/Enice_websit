@@ -267,6 +267,19 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       await provider.send({
         from: groupSender(),
         to: fields.email,
+        /*
+         * Reply-To is what makes this email's own promise true.
+         *
+         * The body says "If you need to add anything, reply directly to this email" — and it was
+         * sent from `noreply@` with no Reply-To, so a reply went to a mailbox nobody reads. The
+         * visitor has just been told their message reached the right team, so the one thing they are
+         * most likely to do next is exactly the thing that silently failed.
+         *
+         * Fixed by making the reply land rather than by deleting the invitation: a person adding a
+         * detail to their own enquiry should not have to find an address, and the team already
+         * receives everything at this mailbox.
+         */
+        replyTo: INTERNAL_RECIPIENT,
         subject: "We received your message",
         html: acknowledgementHtml(fields.name),
         idempotencyKey: `contact-ack-${ref}`,
