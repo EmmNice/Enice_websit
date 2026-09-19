@@ -893,7 +893,7 @@ function toRecipientArray(to) {
 }
 
 // src/lib/email/provider-pulseassist.server.ts
-var DEFAULT_BASE_URL = "https://api.getpulseassist.com";
+var DEFAULT_BASE_URL = "https://getpulseassist.com";
 function config() {
   const apiKey = process.env.PULSEASSIST_API_KEY;
   if (!apiKey) {
@@ -928,7 +928,7 @@ async function call(path, init = {}) {
       ok: false,
       status: 0,
       data: null,
-      error: `Could not reach PulseAssist: ${String(err)}`,
+      error: `Could not reach PulseAssist at ${baseUrl}: ${String(err)}`,
       code: null
     };
   }
