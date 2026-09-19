@@ -50,7 +50,19 @@ import {
   toRecipientArray,
 } from "./types";
 
-const DEFAULT_BASE_URL = "https://api.getpulseassist.com";
+/**
+ * The PulseAssist API base.
+ *
+ * `https://getpulseassist.com` — NOT `api.getpulseassist.com`, which does not exist. That
+ * subdomain was this module's original default and is an NXDOMAIN: it looks like the obvious
+ * hostname for an API, so it was written without being resolved. The failure it produced was
+ * quietly misleading rather than loud — `fetch` rejects, the adapter reports a transport failure
+ * with no HTTP status, and the site answered "we could not deliver your message" as though the
+ * provider had refused the mail. The API had never been contacted at all.
+ *
+ * `PULSEASSIST_API_URL` still overrides this for staging.
+ */
+const DEFAULT_BASE_URL = "https://getpulseassist.com";
 
 type Json = Record<string, unknown>;
 
@@ -100,12 +112,20 @@ async function call<T>(
       body: init.body ? JSON.stringify(init.body) : undefined,
     });
   } catch (err) {
-    // A transport failure has no status; reported as such so it is not mistaken for a refusal.
+    /*
+     * A transport failure has no HTTP status; reported as status 0 so it is never mistaken for a
+     * refusal by the provider.
+     *
+     * The URL is named in the message deliberately. When this module defaulted to a hostname that
+     * did not resolve, the log read "Could not reach PulseAssist: TypeError: fetch failed" — true,
+     * useless, and consistent with a dozen unrelated causes. Naming the host it actually tried makes
+     * a wrong base URL or an NXDOMAIN obvious at a glance instead of something to bisect.
+     */
     return {
       ok: false,
       status: 0,
       data: null,
-      error: `Could not reach PulseAssist: ${String(err)}`,
+      error: `Could not reach PulseAssist at ${baseUrl}: ${String(err)}`,
       code: null,
     };
   }
