@@ -91,9 +91,9 @@ const FEATURES = [
 
 const STATS = [
   { value: "< 5s", label: "Card issuance time" },
-  { value: "99.99%", label: "Network uptime SLA" },
+  { value: "Naira & USD", label: "Card currencies" },
   { value: "2", label: "Currency rails (NGN + USD)" },
-  { value: "24/7", label: "Monitoring coverage" },
+  { value: "Every account", label: "KYC screening" },
 ];
 
 function PulsePayPage() {
@@ -307,22 +307,25 @@ function PulsePayPage() {
                   Built for regulated markets from the ground up.
                 </h2>
                 <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                  PulsePay operates within Nigeria's regulatory framework, with SOC 2-aligned
-                  controls, row-level security, and audit-ready reporting. Every transaction is
-                  screened and logged in compliance with NDPC and relevant financial regulations.
+                  PulsePay operates within Nigeria's regulatory framework, with row-level security,
+                  KYC screening on every account, and audit logging of privileged actions. PulsePay
+                  holds no third-party security certification today, and we will tell you so
+                  directly rather than imply otherwise.
                 </p>
               </div>
               <div className="shrink-0">
                 <div className="flex flex-wrap gap-2">
-                  {["SOC 2 Aligned", "RLS Enforced", "Audit Ready", "NDPC"].map((b) => (
-                    <span
-                      key={b}
-                      className="flex items-center gap-1.5 rounded-md border border-border bg-secondary px-3 py-1.5 text-[11px] font-semibold text-foreground/70"
-                    >
-                      <Check className="h-3 w-3 text-primary" strokeWidth={2.5} />
-                      {b}
-                    </span>
-                  ))}
+                  {["Row-Level Security", "Tenant Isolation", "Audit Logging", "KYC Screening"].map(
+                    (b) => (
+                      <span
+                        key={b}
+                        className="flex items-center gap-1.5 rounded-md border border-border bg-secondary px-3 py-1.5 text-[11px] font-semibold text-foreground/70"
+                      >
+                        <Check className="h-3 w-3 text-primary" strokeWidth={2.5} />
+                        {b}
+                      </span>
+                    ),
+                  )}
                 </div>
               </div>
             </div>

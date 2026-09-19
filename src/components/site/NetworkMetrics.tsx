@@ -4,20 +4,25 @@ const items = [
   {
     icon: Gauge,
     label: "Global API Latency",
-    value: "14ms",
+    value: "Edge",
     sub: "p50, multi-region",
   },
+  /*
+   * "99.99% rolling 90 days" was the worst of these, because the `sub` made it sound measured.
+   * Nobody measured it. There is no uptime monitor behind that figure and no SLA behind the
+   * number — it is the kind of claim a customer quotes back during an outage.
+   */
   {
     icon: Activity,
-    label: "Cross-Platform Uptime",
-    value: "99.99%",
-    sub: "rolling 90 days",
+    label: "Tenant Isolation",
+    value: "Row-level",
+    sub: "enforced in the database",
   },
   {
     icon: ShieldCheck,
     label: "Data Encryption",
-    value: "AES-256",
-    sub: "in transit and at rest",
+    value: "TLS + at rest",
+    sub: "managed database and storage",
   },
   {
     icon: Zap,

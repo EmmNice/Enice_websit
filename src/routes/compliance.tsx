@@ -70,8 +70,9 @@ export const Route = createFileRoute("/compliance")({
           heading: "Security Architecture",
           body: (
             <p>
-              Our systems apply SOC 2 aligned controls, row-level security on every multi-tenant
-              database, encryption at rest, zero-trust access, and active-active disaster recovery.
+              Our systems apply row-level security on every multi-tenant database, encryption in
+              transit and at rest, and audit logging of privileged actions. We hold no third-party
+              security certification at this time and do not claim one.
             </p>
           ),
         },

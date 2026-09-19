@@ -50,7 +50,7 @@ const PRINCIPLES = [
   {
     index: "03",
     title: "Security by Design",
-    body: "Security isn't added after a product ships. It's built in from the start. Zero-trust architecture, per-tenant data isolation, end-to-end encryption, and continuous threat modelling are standard across every product we run. We treat our partners' data as our responsibility.",
+    body: "Security isn't added after a product ships. It's built in from the start. Per-tenant data isolation with row-level security, encryption in transit and at rest, and audit logging of privileged actions are standard across every product we run. We treat our partners' data as our responsibility.",
   },
   {
     index: "04",
@@ -458,7 +458,7 @@ function AboutPage() {
               sectionKey="about.ecosystem"
               heading={"Our Ecosystem"}
               paragraphs={[
-                "The most important part of the ENICE Group model isn't any single product, it's the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same zero-trust access model, the same data isolation standards, and the same deployment pipeline.",
+                "The most important part of the ENICE Group model isn't any single product, it's the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same data isolation standards, and the same deployment pipeline.",
                 "That shared foundation pays off twice. Each new product reaches production-grade reliability faster, because the hard infrastructure problems are already solved at the group level. And each existing product gets stronger as we add new ones, through shared investment and shared operational standards.",
                 "The result is a set of products that gets more capable with each addition. Security improvements spread across the ecosystem. Infrastructure work lifts every product. Compliance work done once serves every regulated platform.",
                 "That's why we call it an ecosystem rather than a collection of products. They're built to compound.",

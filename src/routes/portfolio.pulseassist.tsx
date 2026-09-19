@@ -99,8 +99,8 @@ const FEATURES = [
 ];
 
 const STATS = [
-  { value: "< 80ms", label: "Median response time" },
-  { value: "99.99%", label: "Engine uptime SLA" },
+  { value: "Email & Chat", label: "Channels" },
+  { value: "Multi-tenant", label: "Architecture" },
   { value: "∞", label: "Concurrent sessions" },
   { value: "100%", label: "Audit coverage" },
 ];
@@ -491,17 +491,20 @@ function PulseAssistPage() {
                   telecom in Africa and beyond.
                 </p>
                 <div className="mt-5 flex flex-wrap gap-2">
-                  {["Tenant Isolation", "Audit Logs", "Policy Versioning", "SOC 2 Aligned"].map(
-                    (b) => (
-                      <span
-                        key={b}
-                        className="flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-[11px] font-semibold text-foreground/70"
-                      >
-                        <Check className="h-3 w-3 text-primary" strokeWidth={2.5} />
-                        {b}
-                      </span>
-                    ),
-                  )}
+                  {[
+                    "Tenant Isolation",
+                    "Audit Logs",
+                    "Policy Versioning",
+                    "Row-Level Security",
+                  ].map((b) => (
+                    <span
+                      key={b}
+                      className="flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-[11px] font-semibold text-foreground/70"
+                    >
+                      <Check className="h-3 w-3 text-primary" strokeWidth={2.5} />
+                      {b}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
