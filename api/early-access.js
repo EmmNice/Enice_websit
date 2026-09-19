@@ -840,10 +840,25 @@ var FIELD_LIMITS = {
 var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 // src/lib/email/types.ts
+var MAX_DISPLAY_NAME = 120;
+function displayName(raw) {
+  const clean = raw.replace(/[\u0000-\u001F\u007F-\u009F]/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_DISPLAY_NAME).trim();
+  if (!clean) return "";
+  return /^[A-Za-z0-9 !#$%&'*+\-/=?^_`{|}~.]+$/.test(clean) ? clean : `"${clean.replace(/([\\"])/g, "\\$1")}"`;
+}
 function formatAddress(sender) {
   const address = `${sender.localPart}@${sender.domain}`;
-  return sender.name ? `${sender.name} <${address}>` : address;
+  const name = sender.name ? displayName(sender.name) : "";
+  return name ? `${name} <${address}>` : address;
 }
+var AUTO_REPLY_HEADERS = {
+  "Auto-Submitted": "auto-replied",
+  "X-Auto-Response-Suppress": "All"
+};
+var AUTO_GENERATED_HEADERS = {
+  "Auto-Submitted": "auto-generated",
+  "X-Auto-Response-Suppress": "All"
+};
 var EmailProviderConfigError = class extends Error {
   constructor(message) {
     super(message);
@@ -1060,6 +1075,17 @@ var pulseAssistProvider = {
       body: {
         // A local part only — see the note above.
         from: message.from.localPart,
+        /*
+         * The display name, sent separately because `from` cannot carry it.
+         *
+         * Without this the API composes a bare `noreply@enicehq.com` and every message the site
+         * sends arrives showing a raw address — which the recipient's inbox lists as though it were
+         * machine-generated. ENICE's own team read contact-form enquiries that way: an automated
+         * notice rather than a person writing in. PulseAssist sanitises the value server-side, so a
+         * visitor's typed name cannot forge a header through it.
+         */
+        ...message.from.name ? { fromName: message.from.name } : {},
+        ...message.headers && Object.keys(message.headers).length > 0 ? { headers: message.headers } : {},
         to: recipients.length === 1 ? recipients[0] : recipients,
         ...message.replyTo ? { replyTo: message.replyTo } : {},
         subject: message.subject,
@@ -6519,7 +6545,10 @@ var resendProvider = {
         ...message.replyTo ? { replyTo: message.replyTo } : {},
         subject: message.subject,
         html: message.html,
-        ...message.text ? { text: message.text } : {}
+        ...message.text ? { text: message.text } : {},
+        // The RFC 3834 auto-reply markers travel here on this path. Kept in step with the
+        // PulseAssist adapter so switching provider does not quietly un-mark automated mail.
+        ...message.headers && Object.keys(message.headers).length > 0 ? { headers: message.headers } : {}
       })
     );
     if (res.error) {
@@ -6783,7 +6812,9 @@ function confirmationHtml(fullName) {
        eligible for early access. Submitting this form does not grant product access yet.
      </p>
      <p style="margin:0;font-size:14px;line-height:1.7;color:#374151;">
-       No action is needed from you in the meantime.
+       No action is needed from you in the meantime. This message is automated and replies to it
+       are not received \u2014 anything else, email
+       <a href="mailto:corporate@enicehq.com" style="color:#1e3a8a;">corporate@enicehq.com</a>.
      </p>`
   );
 }
@@ -6889,16 +6920,17 @@ async function handler(req, res) {
         from,
         to: fields.email,
         /*
-         * Reply-To, even though this email does not invite a reply.
+         * No Reply-To, matching the contact acknowledgement: both are automated receipts.
          *
-         * It is sent from `noreply@`, and an applicant who replies anyway — to ask when they will
-         * hear back, or to correct a detail — would otherwise be writing to a mailbox nobody reads.
-         * A customer-facing email that cannot be answered is a dead end regardless of whether the
-         * copy suggested answering it.
+         * Sent from `noreply@`, so an applicant who replied anyway was writing to a mailbox nobody
+         * reads. The copy now says so and names corporate@enicehq.com, which answers the same need
+         * without turning a receipt into a thread nobody is watching.
          */
-        replyTo: INTERNAL_RECIPIENT,
         subject: "Your PulseAssist early-access request",
         html: confirmationHtml(fields.fullName),
+        // Marks the receipt machine-generated so an applicant's out-of-office or helpdesk
+        // autoresponder does not answer a mailbox nobody reads. See AUTO_REPLY_HEADERS.
+        headers: AUTO_REPLY_HEADERS,
         idempotencyKey: `early-access-confirmation-${ref}`
       }),
       provider.send({
@@ -6907,6 +6939,7 @@ async function handler(req, res) {
         replyTo: fields.email,
         subject: internalSubject,
         html: notificationHtml(fields, stored ? null : storageFailure),
+        headers: AUTO_GENERATED_HEADERS,
         idempotencyKey: `early-access-internal-${ref}`
       })
     ]);

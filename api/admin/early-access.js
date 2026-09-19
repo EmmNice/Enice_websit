@@ -831,9 +831,16 @@ var EARLY_ACCESS_STATUSES = [
 ];
 
 // src/lib/email/types.ts
+var MAX_DISPLAY_NAME = 120;
+function displayName(raw) {
+  const clean = raw.replace(/[\u0000-\u001F\u007F-\u009F]/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_DISPLAY_NAME).trim();
+  if (!clean) return "";
+  return /^[A-Za-z0-9 !#$%&'*+\-/=?^_`{|}~.]+$/.test(clean) ? clean : `"${clean.replace(/([\\"])/g, "\\$1")}"`;
+}
 function formatAddress(sender) {
   const address = `${sender.localPart}@${sender.domain}`;
-  return sender.name ? `${sender.name} <${address}>` : address;
+  const name = sender.name ? displayName(sender.name) : "";
+  return name ? `${name} <${address}>` : address;
 }
 var EmailProviderConfigError = class extends Error {
   constructor(message) {
@@ -1051,6 +1058,17 @@ var pulseAssistProvider = {
       body: {
         // A local part only — see the note above.
         from: message.from.localPart,
+        /*
+         * The display name, sent separately because `from` cannot carry it.
+         *
+         * Without this the API composes a bare `noreply@enicehq.com` and every message the site
+         * sends arrives showing a raw address — which the recipient's inbox lists as though it were
+         * machine-generated. ENICE's own team read contact-form enquiries that way: an automated
+         * notice rather than a person writing in. PulseAssist sanitises the value server-side, so a
+         * visitor's typed name cannot forge a header through it.
+         */
+        ...message.from.name ? { fromName: message.from.name } : {},
+        ...message.headers && Object.keys(message.headers).length > 0 ? { headers: message.headers } : {},
         to: recipients.length === 1 ? recipients[0] : recipients,
         ...message.replyTo ? { replyTo: message.replyTo } : {},
         subject: message.subject,
@@ -6510,7 +6528,10 @@ var resendProvider = {
         ...message.replyTo ? { replyTo: message.replyTo } : {},
         subject: message.subject,
         html: message.html,
-        ...message.text ? { text: message.text } : {}
+        ...message.text ? { text: message.text } : {},
+        // The RFC 3834 auto-reply markers travel here on this path. Kept in step with the
+        // PulseAssist adapter so switching provider does not quietly un-mark automated mail.
+        ...message.headers && Object.keys(message.headers).length > 0 ? { headers: message.headers } : {}
       })
     );
     if (res.error) {

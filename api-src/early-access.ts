@@ -21,6 +21,7 @@ import {
 } from "../src/lib/early-access";
 import { PRODUCT, SOURCE, registerEarlyAccess } from "../src/lib/early-access-store.server";
 import { emailProvider, EmailProviderConfigError } from "../src/lib/email/index.server";
+import { AUTO_GENERATED_HEADERS, AUTO_REPLY_HEADERS } from "../src/lib/email/types";
 import { groupSender, INTERNAL_RECIPIENT } from "../src/lib/email/senders";
 import {
   clientIp,
@@ -102,7 +103,9 @@ function confirmationHtml(fullName: string): string {
        eligible for early access. Submitting this form does not grant product access yet.
      </p>
      <p style="margin:0;font-size:14px;line-height:1.7;color:#374151;">
-       No action is needed from you in the meantime.
+       No action is needed from you in the meantime. This message is automated and replies to it
+       are not received — anything else, email
+       <a href="mailto:corporate@enicehq.com" style="color:#1e3a8a;">corporate@enicehq.com</a>.
      </p>`,
   );
 }
@@ -254,16 +257,17 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         from,
         to: fields.email,
         /*
-         * Reply-To, even though this email does not invite a reply.
+         * No Reply-To, matching the contact acknowledgement: both are automated receipts.
          *
-         * It is sent from `noreply@`, and an applicant who replies anyway — to ask when they will
-         * hear back, or to correct a detail — would otherwise be writing to a mailbox nobody reads.
-         * A customer-facing email that cannot be answered is a dead end regardless of whether the
-         * copy suggested answering it.
+         * Sent from `noreply@`, so an applicant who replied anyway was writing to a mailbox nobody
+         * reads. The copy now says so and names corporate@enicehq.com, which answers the same need
+         * without turning a receipt into a thread nobody is watching.
          */
-        replyTo: INTERNAL_RECIPIENT,
         subject: "Your PulseAssist early-access request",
         html: confirmationHtml(fields.fullName),
+        // Marks the receipt machine-generated so an applicant's out-of-office or helpdesk
+        // autoresponder does not answer a mailbox nobody reads. See AUTO_REPLY_HEADERS.
+        headers: AUTO_REPLY_HEADERS,
         idempotencyKey: `early-access-confirmation-${ref}`,
       }),
       provider.send({
@@ -272,6 +276,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         replyTo: fields.email,
         subject: internalSubject,
         html: notificationHtml(fields, stored ? null : storageFailure),
+        headers: AUTO_GENERATED_HEADERS,
         idempotencyKey: `early-access-internal-${ref}`,
       }),
     ]);
