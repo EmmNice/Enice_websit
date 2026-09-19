@@ -42,6 +42,20 @@ import { useEffect } from "react";
  * - The workspace's conversation mode must not be `human`, or every message is handed to a person
  *   instead of answered. That is the platform default for a new workspace, deliberately.
  */
+/**
+ * The loader's origin must be in `script-src` in vercel.json's Content-Security-Policy.
+ *
+ * This site sends `default-src 'self'; script-src 'self'` and Vercel serves it as a real response
+ * header, so the browser silently REFUSES any third-party script. When this component first
+ * shipped, the tag was appended, the CSP blocked it, and the only symptom was that no chat appeared
+ * anywhere on the site — nothing in the DOM, no network request, and nothing in the page's own
+ * logs. A strict CSP is a good default; adding a script tag to a site that has one is a two-file
+ * change, not one.
+ *
+ * `connect-src` already allows `https:`, which covers the widget's own XHR calls back to the API.
+ * If the CSP is ever tightened to enumerate connect origins, `https://getpulseassist.com` has to be
+ * added there too or the widget will render and then fail to send.
+ */
 const WIDGET_SRC = "https://getpulseassist.com/api/widget/33/widget.js";
 
 export function PulseAssistWidget() {
