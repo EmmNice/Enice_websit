@@ -106,13 +106,14 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 /**
- * The assistant is a floating widget that is never part of first paint, so it is code-split
- * and fetched after hydration. It lives here rather than on the homepage so a visitor reading
- * a product page can ask a question without navigating away — but it is kept off the admin
- * screens, where it would only be in the way.
+ * The assistant is PulseAssist — ENICE's own product — loaded from the platform rather than
+ * reimplemented here. See `PulseAssistWidget` for what it replaced and why.
+ *
+ * Still code-split and still off the admin screens: it is never part of first paint, and on
+ * /admin it would only be in the way.
  */
-const AIChatbot = lazy(() =>
-  import("@/components/site/AIChatbot").then((m) => ({ default: m.AIChatbot })),
+const PulseAssistWidget = lazy(() =>
+  import("@/components/site/PulseAssistWidget").then((m) => ({ default: m.PulseAssistWidget })),
 );
 
 /**
@@ -146,7 +147,7 @@ function RootComponent() {
       {showAssistant && (
         <Suspense fallback={null}>
           <BetaLaunchAnnouncement />
-          <AIChatbot />
+          <PulseAssistWidget />
         </Suspense>
       )}
     </>

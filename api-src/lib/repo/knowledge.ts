@@ -5,7 +5,7 @@
  * same table: a `note` typed by an administrator, and a `pdf` whose text was extracted from an
  * uploaded document (the bytes live in object storage; only the text is stored here).
  *
- * Retrieval — `retrieveForChat` — is native Postgres full-text search over `search_text`, the
+ * Search is native Postgres full-text search over `search_text`, the
  * same mechanism `content_items` and `media_assets` use. This is a deliberate choice over vector
  * embeddings: it needs no extension (managed Postgres may refuse `CREATE EXTENSION vector`), no
  * embedding API call on every write or query, and it is more than adequate for a curated set of
@@ -242,58 +242,4 @@ export async function deleteKnowledge(
   `;
   if (!rows[0]) throw notFound("That knowledge entry");
   return { entry: mapEntry(rows[0]), storageKey: rows[0].storage_key };
-}
-
-// ─── Retrieval for the public chatbot ────────────────────────────────────────
-
-/** Per-entry cap when assembling chat context, so one long PDF cannot crowd out the rest. */
-const CHAT_ENTRY_CHARS = 1_200;
-
-export interface KnowledgeContext {
-  title: string;
-  body: string;
-}
-
-/**
- * Selects the entries most relevant to a chat turn.
- *
- * Full-text ranked matches come first. When the turn has no lexical overlap with anything — a
- * bare "hello", or a question phrased in words the notes do not use — it falls back to the most
- * recently updated active entries, so the assistant is still working from curated facts rather
- * than the static prompt alone. Every returned body is trimmed to a budget.
- *
- * Never throws for a caller: retrieval failing must not take the chat widget down, so the chat
- * handler wraps this, but the query itself is written to degrade to an empty list.
- */
-export async function retrieveForChat(query: string, limit = 6): Promise<KnowledgeContext[]> {
-  const sql = db();
-  const q = query.trim().slice(0, 400);
-  const cap = Math.min(Math.max(limit, 1), 12);
-
-  const ranked = q
-    ? await sql<{ title: string; body: string }[]>`
-        SELECT title, body
-        FROM knowledge_entries
-        WHERE status = 'active'
-          AND to_tsvector('english', search_text) @@ websearch_to_tsquery('english', ${q})
-        ORDER BY ts_rank(to_tsvector('english', search_text), websearch_to_tsquery('english', ${q})) DESC,
-                 updated_at DESC
-        LIMIT ${cap}
-      `
-    : [];
-
-  const rows =
-    ranked.length > 0
-      ? ranked
-      : await sql<{ title: string; body: string }[]>`
-          SELECT title, body FROM knowledge_entries
-          WHERE status = 'active'
-          ORDER BY updated_at DESC
-          LIMIT ${cap}
-        `;
-
-  return rows.map((row) => ({
-    title: row.title,
-    body: row.body.length > CHAT_ENTRY_CHARS ? `${row.body.slice(0, CHAT_ENTRY_CHARS)}…` : row.body,
-  }));
 }
