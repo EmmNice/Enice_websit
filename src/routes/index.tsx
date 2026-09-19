@@ -42,11 +42,20 @@ export const Route = createFileRoute("/")({
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Only figures that can be checked.
+ *
+ * This was `4 Products · 99.99% Infrastructure SLA · < 14ms API Latency P50 · AES-256 Encryption
+ * Standard`. Three of those four were invented: there is no uptime SLA, no published latency
+ * benchmark, and naming an encryption standard as a headline metric says nothing a visitor can
+ * act on. The fourth was simply wrong — there are five products, not four.
+ *
+ * An SLA on a homepage is not decoration. It is the number a customer quotes back during an
+ * outage, and the one a procurement team puts in a contract.
+ */
 const HERO_STATS = [
-  { value: "4", label: "Products in Ecosystem" },
-  { value: "99.99%", label: "Infrastructure SLA" },
-  { value: "< 14ms", label: "API Latency P50" },
-  { value: "AES-256", label: "Encryption Standard" },
+  { value: "5", label: "Products in Ecosystem" },
+  { value: "2", label: "Offices in Nigeria" },
 ];
 
 /**
@@ -121,7 +130,7 @@ const CORE_MODULES = [
     icon: Globe,
     index: "04",
     title: "Global Cloud Grid",
-    desc: "Database clustering and serverless edge delivery that keep uptime at 99.99% and execution under 20ms across platforms.",
+    desc: "Managed database clustering and serverless edge delivery, so the same infrastructure serves every product without each one reinventing it.",
   },
 ];
 
@@ -130,16 +139,16 @@ const PORTFOLIO_PREVIEW = [
     tag: "Venture · Fintech Infrastructure",
     name: "PulsePay",
     desc: "A virtual payment platform for modern commerce: instant Naira card issuance, programmable wallets, embedded KYC, and peer-to-peer transfers built for Nigerian institutions.",
-    stat1: { label: "Card Issuance", value: "< 5s" },
-    stat2: { label: "Uptime SLA", value: "99.99%" },
+    stat1: { label: "Cards", value: "Naira & USD" },
+    stat2: { label: "Market", value: "Nigeria" },
     to: "/portfolio/pulsepay" as const,
   },
   {
     tag: "Venture · Enterprise AI",
     name: "PulseAssist",
     desc: "An AI operations platform for banking, fintech, and telecoms, with automated queue handling, live agent handoff, and policy-bound workflow automation.",
-    stat1: { label: "Response Latency", value: "< 80ms" },
-    stat2: { label: "Concurrent Tenants", value: "∞" },
+    stat1: { label: "Channels", value: "Email & Chat" },
+    stat2: { label: "Tenancy", value: "Multi-tenant" },
     to: "/portfolio/pulseassist" as const,
   },
   {
@@ -152,11 +161,18 @@ const PORTFOLIO_PREVIEW = [
   },
 ];
 
+/**
+ * Mechanisms that exist, not certifications that do not.
+ *
+ * Was `SOC 2 Aligned · RLS Enforced · Active-Active · Audit Ready`. ENICE holds no SOC 2 audit,
+ * does not run active-active infrastructure, and "Audit Ready" asserts nothing checkable. Each of
+ * the four below is a thing the code actually does, which is why they can stay.
+ */
 const COMPLIANCE_BADGES = [
-  { icon: Lock, label: "SOC 2 Aligned" },
-  { icon: ShieldCheck, label: "RLS Enforced" },
-  { icon: Wifi, label: "Active-Active" },
-  { icon: Check, label: "Audit Ready" },
+  { icon: ShieldCheck, label: "Row-Level Security" },
+  { icon: Lock, label: "Per-Tenant Isolation" },
+  { icon: Check, label: "Audit Logging" },
+  { icon: Wifi, label: "Encrypted In Transit & At Rest" },
 ];
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -318,7 +334,7 @@ function Landing() {
                     className="animate-hero-fade mt-10 flex flex-wrap items-center gap-x-6 gap-y-3"
                     style={{ animationDelay: "450ms" }}
                   >
-                    {["SOC 2 Aligned", "RLS Enforced", "NDPC Compliant", "99.99% SLA"].map((t) => (
+                    {["Row-level security", "Per-tenant isolation", "Audit logging"].map((t) => (
                       <span
                         key={t}
                         className="flex items-center gap-1.5 text-[11px] font-medium text-white/40"
@@ -383,7 +399,7 @@ function Landing() {
                             iconEl: CreditCard,
                             iconBg: "bg-blue-500/15",
                             iconColor: "text-blue-400",
-                            metric: "99.99% SLA",
+                            metric: "Live",
                           },
                           {
                             name: "PulseAssist",
@@ -391,7 +407,7 @@ function Landing() {
                             iconEl: BrainCircuit,
                             iconBg: "bg-violet-500/15",
                             iconColor: "text-violet-400",
-                            metric: "< 80ms P50",
+                            metric: "Live",
                           },
                         ].map((v) => (
                           <div
@@ -421,12 +437,17 @@ function Landing() {
                           </div>
                         ))}
 
-                        {/* Core metrics */}
+                        {/*
+                          Capabilities, not benchmarks.
+                          Was `14ms API Latency · 99.99% Uptime · AES-256 Encryption`. Nobody
+                          measured the first two, and a figure nobody measured is a figure a
+                          customer will eventually hold us to.
+                        */}
                         <div className="grid grid-cols-3 gap-2.5">
                           {[
-                            { label: "API Latency", value: "14ms" },
-                            { label: "Uptime", value: "99.99%" },
-                            { label: "Encryption", value: "AES-256" },
+                            { label: "Isolation", value: "Per-tenant" },
+                            { label: "Database", value: "Row-level" },
+                            { label: "Transport", value: "TLS" },
                           ].map((m) => (
                             <div
                               key={m.label}
@@ -454,7 +475,7 @@ function Landing() {
                             <span className="text-blue-300">["PulsePay", "PulseAssist"]</span>,
                           </div>
                           <div className="pl-4 text-white/55">
-                            "uptime_sla": <span className="text-yellow-300/80">"99.99%"</span>
+                            "region": <span className="text-yellow-300/80">"nigeria"</span>
                           </div>
                           <div className="text-white/20">{"}"}</div>
                         </div>

@@ -72,8 +72,8 @@ export const Route = createFileRoute("/privacy")({
           body: (
             <p>
               We use industry-standard administrative, technical, and physical security measures,
-              including zero-trust architecture and row-level security, to protect your data.
-              Because we operate platforms for global commerce, your data may be transferred to and
+              including per-tenant isolation and row-level security, to protect your data. Because
+              we operate platforms for global commerce, your data may be transferred to and
               maintained on servers outside your country. We make sure every transfer complies with
               applicable data protection laws.
             </p>

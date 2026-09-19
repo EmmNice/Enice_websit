@@ -24,7 +24,7 @@ export const FAQS: readonly { q: string; a: string }[] = [
   },
   {
     q: "How does ENICE Group approach security and compliance?",
-    a: "We run a zero-trust architecture with per-tenant database isolation, row-level security, audit logging, and continuous monitoring. Every system is built for regulatory readiness from day one and aligned with SOC 2 control objectives.",
+    a: "Every platform uses per-tenant database isolation with row-level security enforced at the database layer, encryption in transit and at rest, and audit logging of privileged actions. We hold no security certification today and do not claim one — if you need a compliance review for a procurement process, contact us and we will tell you exactly where we stand.",
   },
   {
     q: "How can businesses access ENICE products?",

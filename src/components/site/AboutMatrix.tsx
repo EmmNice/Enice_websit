@@ -14,7 +14,7 @@ const TERMINAL_LINES = [
   { text: '    "cloud_grid": "global-edge"', color: "text-slate-300" },
   { text: "  },", color: "text-slate-300" },
   { text: '  "ventures": ["PulsePay", "PulseAssist"],', color: "text-slate-300" },
-  { text: '  "uptime_sla": "99.99%"', color: "text-slate-300" },
+  { text: '  "region": "nigeria"', color: "text-slate-300" },
   { text: "}", color: "text-slate-300" },
 ];
 
