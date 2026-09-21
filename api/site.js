@@ -88,6 +88,10 @@ var PAGE_SEO = {
     title: "PulseAssist | Enterprise AI Operations Platform by ENICE Group",
     description: "PulseAssist by ENICE Group answers customers across WhatsApp, web chat, email, SMS and voice from one shared inbox, hands off to a human when it matters, and keeps compliance-ready audit trails."
   },
+  "/portfolio/pulseassist-email": {
+    title: "PulseAssist Email | Transactional and Marketing Email by ENICE Group",
+    description: "PulseAssist Email sends and receives mail on your own verified domain: inbound routing, templates, automations, suppression handling and delivery analytics, from a console and a REST API."
+  },
   "/portfolio/epulse": {
     title: "ePulse | Global Financial Platform by ENICE Group",
     description: "ePulse is ENICE Group's upcoming global financial platform built for freelancers, remote workers, creators, and global businesses. Multi-currency accounts, international transfers, gift cards, and lifestyle services."
@@ -3677,6 +3681,7 @@ SET value = value || '{
     {"id":"nav-products","label":"Products","url":"/portfolio","visible":true,"children":[
       {"id":"nav-pulsepay","label":"PulsePay","url":"/portfolio/pulsepay","visible":true},
       {"id":"nav-pulseassist","label":"PulseAssist","url":"/portfolio/pulseassist","visible":true},
+      {"id":"nav-pulseassist-email","label":"PulseAssist Email","url":"/portfolio/pulseassist-email","visible":true},
       {"id":"nav-collection","label":"Payment Collection","url":"/portfolio/payment-collection","visible":true},
       {"id":"nav-epulse","label":"ePulse","url":"/portfolio/epulse","visible":true},
       {"id":"nav-pulsex","label":"PulseX","url":"/portfolio/pulsex","visible":true}
@@ -3705,6 +3710,7 @@ SET value = value || '{
     {"id":"col-products","heading":"Products","links":[
       {"id":"f-pulsepay","label":"PulsePay","url":"/portfolio/pulsepay","visible":true},
       {"id":"f-pulseassist","label":"PulseAssist","url":"/portfolio/pulseassist","visible":true},
+      {"id":"f-pulseassist-email","label":"PulseAssist Email","url":"/portfolio/pulseassist-email","visible":true},
       {"id":"f-collection","label":"Payment Collection","url":"/portfolio/payment-collection","visible":true},
       {"id":"f-epulse","label":"ePulse","url":"/portfolio/epulse","visible":true},
       {"id":"f-pulsex","label":"PulseX","url":"/portfolio/pulsex","visible":true},
@@ -3734,6 +3740,208 @@ WHERE key = 'footer'
   AND jsonb_typeof(value->'columns') = 'array'
   AND jsonb_array_length(value->'columns') = 3
   AND value->'columns' @> '[{"heading":"Updates"}]'::jsonb;
+`
+    )
+  },
+  {
+    id: 16,
+    name: "pulseassist_email_product_page",
+    sql: (
+      /* sql */
+      `
+-- PulseAssist Email is a shipping ENICE product that had no page on the company's own website,
+-- while this site's own transactional mail -- contact replies, early-access confirmations -- has
+-- been sent through it since #31. A product ENICE runs, sells and depends on, missing from its own
+-- portfolio, is an omission rather than a decision.
+--
+-- It is framed as a PulseAssist product, the same way Payment Collection is a PulsePay product:
+-- the product's own page presents it as part of the PulseAssist platform. The copy below is
+-- condensed from that page (getpulseassist.com/email) and is identical to the in-code fallback in
+-- DEFAULT_SECTIONS, verified string-for-string whenever either side is edited.
+--
+-- ON CONFLICT DO NOTHING throughout: safe to re-run, and it never overwrites an edit.
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist-email', 'PulseAssist Email page', 'Portfolio', 'hero', true, 'published', '{
+  "eyebrow": "PulseAssist Email",
+  "heading": "Professional email, on your own domain.",
+  "subheading": "Send and receive email from the domain your customers already know. Mailboxes, templates, campaigns and automations in one console, with a REST API, signed webhooks and delivery analytics when you would rather run it from your own systems."
+}'::jsonb, 225)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist-email.facts', 'PulseAssist Email facts strip', 'Portfolio', 'statistics', true, 'published', '{
+  "heading": "PulseAssist Email at a glance",
+  "items": [
+    {
+      "value": "Your domain",
+      "label": "Verified in live DNS"
+    },
+    {
+      "value": "Send + receive",
+      "label": "Inbound routing included"
+    },
+    {
+      "value": "REST API",
+      "label": "Scoped, rotatable keys"
+    },
+    {
+      "value": "Webhooks",
+      "label": "Signed delivery events"
+    }
+  ]
+}'::jsonb, 226)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist-email.capabilities', 'PulseAssist Email capabilities', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "What you get",
+  "heading": "Everything the product actually does.",
+  "subheading": "This is the implementation rather than a roadmap. If something is missing from the list, it is because it has not been built yet.",
+  "items": [
+    {
+      "icon": "Globe2",
+      "title": "Your own sending domain",
+      "description": "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS \u2014 a domain is only marked connected once those records genuinely resolve."
+    },
+    {
+      "icon": "Send",
+      "title": "Transactional and bulk sending",
+      "description": "A single message and a campaign run through the same pipeline, each with its own delivery status. Sends are recorded with the idempotency key you supplied, so a retried request cannot become a duplicate email."
+    },
+    {
+      "icon": "Inbox",
+      "title": "Inbound email and routing",
+      "description": "Receive mail on your own domain and route it by recipient, sender or subject \u2014 to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround."
+    },
+    {
+      "icon": "AtSign",
+      "title": "Mailboxes and sending addresses",
+      "description": "Mailboxes that receive and addresses that send, each tied to a verified domain. An address is claimed once across the platform, so two workspaces cannot share an identity."
+    },
+    {
+      "icon": "Layers",
+      "title": "Templates with version history",
+      "description": "Write a template once and use it from the console or the API. Versions are append-only, so a campaign keeps sending the wording it was reviewed with even after the template moves on."
+    },
+    {
+      "icon": "Sparkles",
+      "title": "Automations and sequences",
+      "description": "Multi-step sequences with delays between steps. Consent is re-checked when each step sends rather than when someone was enrolled, so an unsubscribe takes effect mid-sequence."
+    },
+    {
+      "icon": "BarChart3",
+      "title": "Delivery analytics",
+      "description": "Delivered, bounced and complained totals with the rates behind them, measured against what the provider accepted rather than what was attempted. Rates are withheld until the sample is large enough to mean anything."
+    },
+    {
+      "icon": "ShieldCheck",
+      "title": "Suppression and deliverability protection",
+      "description": "Hard bounces and complaints are suppressed automatically and permanently, and a suppressed address is refused before it costs another bounce. The list is yours to inspect, search and export."
+    },
+    {
+      "icon": "KeyRound",
+      "title": "REST API with scoped keys",
+      "description": "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes \u2014 a key that reads analytics cannot send mail \u2014 and any key can be rotated or revoked without downtime."
+    },
+    {
+      "icon": "Webhook",
+      "title": "Signed delivery webhooks",
+      "description": "Register endpoints and receive delivery, bounce and complaint events as they happen, signed and deduplicated. Failed deliveries are retried and visible, so a broken endpoint does not fail quietly."
+    },
+    {
+      "icon": "BrainCircuit",
+      "title": "AI drafting and classification",
+      "description": "Draft, rewrite, summarise and classify mail using the same AI that answers support in PulseAssist. It draws on its own credit pool, so ordinary sending never consumes it."
+    },
+    {
+      "icon": "Code2",
+      "title": "Usage you can see coming",
+      "description": "Live usage against your plan''s allowances \u2014 sent this month, addresses, domains, endpoints \u2014 read from your entitlements rather than estimated, so a limit is visible while there is still time to act."
+    }
+  ]
+}'::jsonb, 227)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist-email.setup', 'PulseAssist Email setup steps', 'Portfolio', 'steps', true, 'published', '{
+  "heading": "Four steps, and the hard one is checked for you.",
+  "subheading": "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong \u2014 the ones that never fix themselves while you wait.",
+  "items": [
+    {
+      "title": "Add your domain",
+      "description": "Enter the domain you want to send from. It is registered with the sending provider and the exact records it needs are generated for you."
+    },
+    {
+      "title": "Publish the records",
+      "description": "Add the DKIM, SPF and MAIL FROM records at your DNS provider. Each is shown with its host and value, and the console tells you which are still outstanding."
+    },
+    {
+      "title": "Verification against real DNS",
+      "description": "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong \u2014 a stale value, a proxied CNAME, a second SPF line \u2014 is reported as exactly that."
+    },
+    {
+      "title": "Send, receive and watch it",
+      "description": "Once the records agree, sending is live. Add mailboxes and routing rules for inbound, then follow delivery, bounces and complaints from the first message onward."
+    }
+  ]
+}'::jsonb, 228)
+ON CONFLICT (key) DO NOTHING;
+
+-- Register the route as a system page so its SEO is manageable like every other built-in route.
+INSERT INTO cms_pages (id, path, title, summary, status, sections, seo, system_route, published_at)
+SELECT md5(random()::text || clock_timestamp()::text)::uuid, '/portfolio/pulseassist-email',
+       'PulseAssist Email', 'Transactional and marketing email on a verified domain.',
+       'published', '[]'::jsonb, '{}'::jsonb, true, now()
+ON CONFLICT (path) DO NOTHING;
+
+-- Add the product to the header's Products menu and the footer's Products column, but only where
+-- they still hold the shipped structure and do not already list it -- so a navigation an operator
+-- has customised is left alone, and a database that arrived via migration 15 (whose payload already
+-- includes the link) is a no-op here.
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN item->>'id' = 'nav-products'
+                 THEN jsonb_set(item, '{children}',
+                        COALESCE(item->'children', '[]'::jsonb)
+                        || '[{"id":"nav-pulseassist-email","label":"PulseAssist Email","url":"/portfolio/pulseassist-email","visible":true}]'::jsonb)
+                 ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND value->'items' @> '[{"id":"nav-products"}]'::jsonb
+  AND position('nav-pulseassist-email' in value::text) = 0;
+
+UPDATE site_settings
+SET value = jsonb_set(value, '{columns}', (
+      SELECT jsonb_agg(
+               CASE WHEN col->>'id' = 'col-products'
+                 THEN jsonb_set(col, '{links}',
+                        COALESCE(col->'links', '[]'::jsonb)
+                        || '[{"id":"f-pulseassist-email","label":"PulseAssist Email","url":"/portfolio/pulseassist-email","visible":true}]'::jsonb)
+                 ELSE col END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'columns') WITH ORDINALITY AS t(col, ord)
+    )),
+    updated_at = now()
+WHERE key = 'footer'
+  AND value->'columns' @> '[{"id":"col-products"}]'::jsonb
+  AND position('f-pulseassist-email' in value::text) = 0;
+
+-- The ecosystem is six products now. Corrected only where the strip still reads the seeded five,
+-- so an edited band is untouched. The code derives this figure from the product registry; the
+-- section only has to agree with it.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[
+    {"value": "6", "label": "Products in the ecosystem"},
+    {"value": "2", "label": "Offices in Nigeria"}
+  ]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.statistics'
+  AND fields->'items' @> '[{"value":"5","label":"Products in the ecosystem"}]'::jsonb;
 `
     )
   }
@@ -4221,6 +4429,12 @@ function defaultSettings() {
               visible: true
             },
             {
+              id: "nav-pulseassist-email",
+              label: "PulseAssist Email",
+              url: "/portfolio/pulseassist-email",
+              visible: true
+            },
+            {
               id: "nav-collection",
               label: "Payment Collection",
               url: "/portfolio/payment-collection",
@@ -4261,6 +4475,12 @@ function defaultSettings() {
               id: "f-pulseassist",
               label: "PulseAssist",
               url: "/portfolio/pulseassist",
+              visible: true
+            },
+            {
+              id: "f-pulseassist-email",
+              label: "PulseAssist Email",
+              url: "/portfolio/pulseassist-email",
               visible: true
             },
             {

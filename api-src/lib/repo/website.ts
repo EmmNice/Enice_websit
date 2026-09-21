@@ -710,6 +710,12 @@ export function defaultSettings(): SiteSettings {
               visible: true,
             },
             {
+              id: "nav-pulseassist-email",
+              label: "PulseAssist Email",
+              url: "/portfolio/pulseassist-email",
+              visible: true,
+            },
+            {
               id: "nav-collection",
               label: "Payment Collection",
               url: "/portfolio/payment-collection",
@@ -750,6 +756,12 @@ export function defaultSettings(): SiteSettings {
               id: "f-pulseassist",
               label: "PulseAssist",
               url: "/portfolio/pulseassist",
+              visible: true,
+            },
+            {
+              id: "f-pulseassist-email",
+              label: "PulseAssist Email",
+              url: "/portfolio/pulseassist-email",
               visible: true,
             },
             {
@@ -878,7 +890,7 @@ const DEFAULT_SECTIONS: {
        * rather than storing it.
        */
       items: [
-        { value: "5", label: "Products in the ecosystem" },
+        { value: "6", label: "Products in the ecosystem" },
         { value: "2", label: "Offices in Nigeria" },
       ],
     },
@@ -1172,6 +1184,164 @@ const DEFAULT_SECTIONS: {
       ctaLabel: "Meet the team",
       ctaUrl: "/contact",
       style: "standard",
+    },
+  },
+  /*
+   * PulseAssist Email.
+   *
+   * A shipping ENICE product that had no page on the company's own site, while this site's
+   * transactional mail has been sent through it since #31. Copy is condensed from the product's own
+   * page at getpulseassist.com/email; it is framed as a PulseAssist product because that page
+   * presents it as part of the PulseAssist platform.
+   */
+  {
+    key: "portfolio.pulseassist-email",
+    label: "PulseAssist Email page",
+    group: "Portfolio",
+    type: "hero",
+    order: 225,
+    fields: {
+      eyebrow: "PulseAssist Email",
+      heading: "Professional email, on your own domain.",
+      subheading:
+        "Send and receive email from the domain your customers already know. Mailboxes, templates, campaigns and automations in one console, with a REST API, signed webhooks and delivery analytics when you would rather run it from your own systems.",
+    },
+  },
+  {
+    key: "portfolio.pulseassist-email.facts",
+    label: "PulseAssist Email facts strip",
+    group: "Portfolio",
+    type: "statistics",
+    order: 226,
+    fields: {
+      heading: "PulseAssist Email at a glance",
+      items: [
+        { value: "Your domain", label: "Verified in live DNS" },
+        { value: "Send + receive", label: "Inbound routing included" },
+        { value: "REST API", label: "Scoped, rotatable keys" },
+        { value: "Webhooks", label: "Signed delivery events" },
+      ],
+    },
+  },
+  {
+    key: "portfolio.pulseassist-email.capabilities",
+    label: "PulseAssist Email capabilities",
+    group: "Portfolio",
+    type: "featureGrid",
+    order: 227,
+    fields: {
+      eyebrow: "What you get",
+      heading: "Everything the product actually does.",
+      subheading:
+        "This is the implementation rather than a roadmap. If something is missing from the list, it is because it has not been built yet.",
+      items: [
+        {
+          icon: "Globe2",
+          title: "Your own sending domain",
+          description:
+            "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS — a domain is only marked connected once those records genuinely resolve.",
+        },
+        {
+          icon: "Send",
+          title: "Transactional and bulk sending",
+          description:
+            "A single message and a campaign run through the same pipeline, each with its own delivery status. Sends are recorded with the idempotency key you supplied, so a retried request cannot become a duplicate email.",
+        },
+        {
+          icon: "Inbox",
+          title: "Inbound email and routing",
+          description:
+            "Receive mail on your own domain and route it by recipient, sender or subject — to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround.",
+        },
+        {
+          icon: "AtSign",
+          title: "Mailboxes and sending addresses",
+          description:
+            "Mailboxes that receive and addresses that send, each tied to a verified domain. An address is claimed once across the platform, so two workspaces cannot share an identity.",
+        },
+        {
+          icon: "Layers",
+          title: "Templates with version history",
+          description:
+            "Write a template once and use it from the console or the API. Versions are append-only, so a campaign keeps sending the wording it was reviewed with even after the template moves on.",
+        },
+        {
+          icon: "Sparkles",
+          title: "Automations and sequences",
+          description:
+            "Multi-step sequences with delays between steps. Consent is re-checked when each step sends rather than when someone was enrolled, so an unsubscribe takes effect mid-sequence.",
+        },
+        {
+          icon: "BarChart3",
+          title: "Delivery analytics",
+          description:
+            "Delivered, bounced and complained totals with the rates behind them, measured against what the provider accepted rather than what was attempted. Rates are withheld until the sample is large enough to mean anything.",
+        },
+        {
+          icon: "ShieldCheck",
+          title: "Suppression and deliverability protection",
+          description:
+            "Hard bounces and complaints are suppressed automatically and permanently, and a suppressed address is refused before it costs another bounce. The list is yours to inspect, search and export.",
+        },
+        {
+          icon: "KeyRound",
+          title: "REST API with scoped keys",
+          description:
+            "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes — a key that reads analytics cannot send mail — and any key can be rotated or revoked without downtime.",
+        },
+        {
+          icon: "Webhook",
+          title: "Signed delivery webhooks",
+          description:
+            "Register endpoints and receive delivery, bounce and complaint events as they happen, signed and deduplicated. Failed deliveries are retried and visible, so a broken endpoint does not fail quietly.",
+        },
+        {
+          icon: "BrainCircuit",
+          title: "AI drafting and classification",
+          description:
+            "Draft, rewrite, summarise and classify mail using the same AI that answers support in PulseAssist. It draws on its own credit pool, so ordinary sending never consumes it.",
+        },
+        {
+          icon: "Code2",
+          title: "Usage you can see coming",
+          description:
+            "Live usage against your plan's allowances — sent this month, addresses, domains, endpoints — read from your entitlements rather than estimated, so a limit is visible while there is still time to act.",
+        },
+      ],
+    },
+  },
+  {
+    key: "portfolio.pulseassist-email.setup",
+    label: "PulseAssist Email setup steps",
+    group: "Portfolio",
+    type: "steps",
+    order: 228,
+    fields: {
+      heading: "Four steps, and the hard one is checked for you.",
+      subheading:
+        "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong — the ones that never fix themselves while you wait.",
+      items: [
+        {
+          title: "Add your domain",
+          description:
+            "Enter the domain you want to send from. It is registered with the sending provider and the exact records it needs are generated for you.",
+        },
+        {
+          title: "Publish the records",
+          description:
+            "Add the DKIM, SPF and MAIL FROM records at your DNS provider. Each is shown with its host and value, and the console tells you which are still outstanding.",
+        },
+        {
+          title: "Verification against real DNS",
+          description:
+            "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong — a stale value, a proxied CNAME, a second SPF line — is reported as exactly that.",
+        },
+        {
+          title: "Send, receive and watch it",
+          description:
+            "Once the records agree, sending is live. Add mailboxes and routing rules for inbound, then follow delivery, bounces and complaints from the first message onward.",
+        },
+      ],
     },
   },
   {
@@ -2244,6 +2414,11 @@ const SYSTEM_PAGES: { path: string; title: string; summary: string }[] = [
     path: "/portfolio/pulseassist",
     title: "PulseAssist",
     summary: "Enterprise AI operations platform.",
+  },
+  {
+    path: "/portfolio/pulseassist-email",
+    title: "PulseAssist Email",
+    summary: "Transactional and marketing email on a verified domain.",
   },
   { path: "/portfolio/epulse", title: "ePulse", summary: "Global financial platform." },
   { path: "/portfolio/pulsex", title: "PulseX", summary: "Digital asset platform." },

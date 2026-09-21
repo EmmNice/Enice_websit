@@ -38,6 +38,7 @@ import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
 import { Route as PortfolioEpulseRouteImport } from './routes/portfolio.epulse'
 import { Route as PortfolioPaymentCollectionRouteImport } from './routes/portfolio.payment-collection'
 import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pulseassist'
+import { Route as PortfolioPulseassistEmailRouteImport } from './routes/portfolio.pulseassist-email'
 import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
 import { Route as PortfolioPulsexRouteImport } from './routes/portfolio.pulsex'
 import { Route as AdminAdministrationActivityRouteImport } from './routes/admin/administration.activity'
@@ -204,6 +205,12 @@ const PortfolioPulseassistRoute = PortfolioPulseassistRouteImport.update({
   path: '/pulseassist',
   getParentRoute: () => PortfolioRoute,
 } as any)
+const PortfolioPulseassistEmailRoute =
+  PortfolioPulseassistEmailRouteImport.update({
+    id: '/pulseassist-email',
+    path: '/pulseassist-email',
+    getParentRoute: () => PortfolioRoute,
+  } as any)
 const PortfolioPulsepayRoute = PortfolioPulsepayRouteImport.update({
   id: '/pulsepay',
   path: '/pulsepay',
@@ -331,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/portfolio/epulse': typeof PortfolioEpulseRoute
   '/portfolio/payment-collection': typeof PortfolioPaymentCollectionRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
+  '/portfolio/pulseassist-email': typeof PortfolioPulseassistEmailRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/admin/': typeof AdminIndexRoute
@@ -379,6 +387,7 @@ export interface FileRoutesByTo {
   '/portfolio/epulse': typeof PortfolioEpulseRoute
   '/portfolio/payment-collection': typeof PortfolioPaymentCollectionRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
+  '/portfolio/pulseassist-email': typeof PortfolioPulseassistEmailRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/admin': typeof AdminIndexRoute
@@ -430,6 +439,7 @@ export interface FileRoutesById {
   '/portfolio/epulse': typeof PortfolioEpulseRoute
   '/portfolio/payment-collection': typeof PortfolioPaymentCollectionRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
+  '/portfolio/pulseassist-email': typeof PortfolioPulseassistEmailRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/portfolio/pulsex': typeof PortfolioPulsexRoute
   '/admin/': typeof AdminIndexRoute
@@ -482,6 +492,7 @@ export interface FileRouteTypes {
     | '/portfolio/epulse'
     | '/portfolio/payment-collection'
     | '/portfolio/pulseassist'
+    | '/portfolio/pulseassist-email'
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
     | '/admin/'
@@ -530,6 +541,7 @@ export interface FileRouteTypes {
     | '/portfolio/epulse'
     | '/portfolio/payment-collection'
     | '/portfolio/pulseassist'
+    | '/portfolio/pulseassist-email'
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
     | '/admin'
@@ -580,6 +592,7 @@ export interface FileRouteTypes {
     | '/portfolio/epulse'
     | '/portfolio/payment-collection'
     | '/portfolio/pulseassist'
+    | '/portfolio/pulseassist-email'
     | '/portfolio/pulsepay'
     | '/portfolio/pulsex'
     | '/admin/'
@@ -833,6 +846,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioPulseassistRouteImport
       parentRoute: typeof PortfolioRoute
     }
+    '/portfolio/pulseassist-email': {
+      id: '/portfolio/pulseassist-email'
+      path: '/pulseassist-email'
+      fullPath: '/portfolio/pulseassist-email'
+      preLoaderRoute: typeof PortfolioPulseassistEmailRouteImport
+      parentRoute: typeof PortfolioRoute
+    }
     '/portfolio/pulsepay': {
       id: '/portfolio/pulsepay'
       path: '/pulsepay'
@@ -1027,6 +1047,7 @@ interface PortfolioRouteChildren {
   PortfolioEpulseRoute: typeof PortfolioEpulseRoute
   PortfolioPaymentCollectionRoute: typeof PortfolioPaymentCollectionRoute
   PortfolioPulseassistRoute: typeof PortfolioPulseassistRoute
+  PortfolioPulseassistEmailRoute: typeof PortfolioPulseassistEmailRoute
   PortfolioPulsepayRoute: typeof PortfolioPulsepayRoute
   PortfolioPulsexRoute: typeof PortfolioPulsexRoute
   PortfolioIndexRoute: typeof PortfolioIndexRoute
@@ -1036,6 +1057,7 @@ const PortfolioRouteChildren: PortfolioRouteChildren = {
   PortfolioEpulseRoute: PortfolioEpulseRoute,
   PortfolioPaymentCollectionRoute: PortfolioPaymentCollectionRoute,
   PortfolioPulseassistRoute: PortfolioPulseassistRoute,
+  PortfolioPulseassistEmailRoute: PortfolioPulseassistEmailRoute,
   PortfolioPulsepayRoute: PortfolioPulsepayRoute,
   PortfolioPulsexRoute: PortfolioPulsexRoute,
   PortfolioIndexRoute: PortfolioIndexRoute,

@@ -87,6 +87,12 @@ export function organizationJsonLd() {
           "AI customer support across WhatsApp, web chat, email, SMS and voice, from one shared inbox.",
       },
       {
+        "@type": "Organization",
+        name: "PulseAssist Email",
+        description:
+          "Transactional and marketing email on a verified sending domain, with inbound routing and a REST API.",
+      },
+      {
         "@type": "FinancialProduct",
         name: "ePulse",
         description: "Digital banking infrastructure.",
@@ -172,6 +178,11 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     title: "PulseAssist | Enterprise AI Operations Platform by ENICE Group",
     description:
       "PulseAssist by ENICE Group answers customers across WhatsApp, web chat, email, SMS and voice from one shared inbox, hands off to a human when it matters, and keeps compliance-ready audit trails.",
+  },
+  "/portfolio/pulseassist-email": {
+    title: "PulseAssist Email | Transactional and Marketing Email by ENICE Group",
+    description:
+      "PulseAssist Email sends and receives mail on your own verified domain: inbound routing, templates, automations, suppression handling and delivery analytics, from a console and a REST API.",
   },
   "/portfolio/epulse": {
     title: "ePulse | Global Financial Platform by ENICE Group",

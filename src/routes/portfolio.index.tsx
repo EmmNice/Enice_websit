@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { SITE_URL } from "@/lib/site";
-import { Wifi, CreditCard, BrainCircuit, Wallet, Bitcoin, CheckCircle2 } from "lucide-react";
+import { Wifi, CreditCard, BrainCircuit, Wallet, Bitcoin, CheckCircle2, Mail } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { Cta, Eyebrow, Panel, Section, SectionIntro, Tag } from "@/components/site/primitives";
@@ -198,7 +198,7 @@ function PortfolioIndexPage() {
           lead="Products currently being built and operated by ENICE Group."
         />
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-2">
+        <div className="mt-14 grid gap-6 lg:grid-cols-3">
           {/* ── PulsePay ── */}
           <ProductCard
             visual={
@@ -342,6 +342,77 @@ function PortfolioIndexPage() {
                 aria-label="View PulseAssist platform details"
               >
                 Learn More
+              </Cta>
+            </div>
+          </ProductCard>
+
+          {/* ── PulseAssist Email ── */}
+          <ProductCard
+            visual={
+              <CardVisual className="h-56 sm:h-64">
+                <div className="tech-grid tech-grid-flat" />
+                <div className="absolute inset-0 flex items-center justify-center p-8">
+                  <div className="panel w-full max-w-sm" style={{ boxShadow: SHADOW_CARD }}>
+                    <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+                      <span className="flex items-center gap-2">
+                        <Mail className="h-3.5 w-3.5 text-gold" strokeWidth={1.75} />
+                        <span className="text-[11px] font-semibold text-bone-strong">
+                          Sending domain
+                        </span>
+                      </span>
+                      <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-positive">
+                        Verified
+                      </span>
+                    </div>
+                    <ul className="divide-y divide-border">
+                      {["DKIM", "SPF", "MAIL FROM"].map((record) => (
+                        <li
+                          key={record}
+                          className="flex items-center justify-between px-4 py-2 text-[10px]"
+                        >
+                          <span className="font-mono font-semibold tracking-[0.12em] text-bone-strong">
+                            {record}
+                          </span>
+                          <span className="font-semibold uppercase tracking-[0.14em] text-positive">
+                            Resolving
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </CardVisual>
+            }
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              <Eyebrow>
+                <Mail aria-hidden className="h-3.5 w-3.5" />
+                Email Infrastructure
+              </Eyebrow>
+              <LifecycleTag to="/portfolio/pulseassist-email" />
+            </div>
+            <h3 className="type-h3 mt-4 text-foreground">PulseAssist Email</h3>
+            <p className="type-body mt-4">
+              Transactional and marketing email on your own verified domain, with inbound routing,
+              templates, automations, suppression handling and delivery analytics — from a console
+              or a REST API. Part of the PulseAssist platform.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Cta
+                to="/portfolio/pulseassist-email"
+                size="sm"
+                icon="arrow"
+                aria-label="View PulseAssist Email platform details"
+              >
+                View Platform
+              </Cta>
+              <Cta
+                to="mailto:corporate@enicehq.com?subject=PulseAssist%20Email%20Access%20Request"
+                variant="secondary"
+                size="sm"
+                icon="external"
+              >
+                Request Access
               </Cta>
             </div>
           </ProductCard>

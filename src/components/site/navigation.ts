@@ -63,6 +63,15 @@ export const PRODUCTS: NavItem[] = [
     stage: "available",
   },
   {
+    // A PulseAssist product, the same way Payment Collection is a PulsePay product — its own page
+    // presents it as part of the PulseAssist platform. Shipping today: this site's own
+    // transactional mail goes through it.
+    label: "PulseAssist Email",
+    to: "/portfolio/pulseassist-email",
+    description: "Transactional and marketing email on your own verified domain.",
+    stage: "available",
+  },
+  {
     label: "Payment Collection",
     to: "/portfolio/payment-collection",
     description: "One developer-friendly API for accepting and reconciling payments.",
