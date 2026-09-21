@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" role="img" aria-label="ENICE">
+  <title>ENICE</title>
+  <rect width="1000" height="1000" fill="#080c0e"/>
+  <g transform="translate(30.0 164.6) scale(0.94)">
+    <path fill="#0048ED" d="M0 0L444.2 0L576.8 151.6L0 149.5ZM0 271.6L372.6 271.6L471.6 372.6L471.6 410.5L145.3 410.5L145.3 541.1L168.4 564.2L473.7 564.2L616.8 713.7L124.2 713.7L0 591.6Z"/>
+    <path fill="#FFFFFF" d="M854.7 2.1L1000 2.1L1000 713.7L863.2 713.7L372.6 151.6L578.9 151.6L854.7 465.3Z"/>
+  </g>
+</svg>
