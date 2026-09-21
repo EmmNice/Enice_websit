@@ -20,7 +20,6 @@ import { SiteShell } from "@/components/site/SiteShell";
 import { AboutMatrix } from "@/components/site/AboutMatrix";
 import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Careers } from "@/components/site/Careers";
-import { InfraStack } from "@/components/site/InfraStack";
 import { FAQSection } from "@/components/site/FAQSection";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
@@ -228,15 +227,15 @@ const FOUNDERS_LETTER = [
  */
 const BUILD_PRINCIPLES = [
   {
-    title: "Built around real problems",
+    title: "Problems before products",
     desc: "We start with problems people and businesses actually face.",
   },
   {
-    title: "Built to grow",
+    title: "Room to grow",
     desc: "Our products are designed to support users as their needs grow.",
   },
   {
-    title: "Built in Africa",
+    title: "Grounded in African markets",
     desc: "We understand the realities of African markets and build with those realities in mind.",
   },
 ];
@@ -496,11 +495,7 @@ function Landing() {
           <SectionIntro
             id="verticals-heading"
             eyebrow={fieldText(products, "eyebrow", "What we're building")}
-            heading={fieldText(
-              products,
-              "heading",
-              "Products and platforms.\nBuilt to one standard.",
-            )}
+            heading={fieldText(products, "heading", "Three areas we build in.")}
             lead={fieldText(
               products,
               "subheading",
@@ -569,11 +564,7 @@ function Landing() {
             <SectionIntro
               id="products-heading"
               eyebrow={fieldText(portfolio, "eyebrow", "Built and operated by ENICE")}
-              heading={fieldText(
-                portfolio,
-                "heading",
-                "The products we run.\nNot a services menu.",
-              )}
+              heading={fieldText(portfolio, "heading", "The products we build and run.")}
               lead={fieldText(
                 portfolio,
                 "subheading",
@@ -692,7 +683,6 @@ function Landing() {
       </Section>
 
       <NetworkMetrics />
-      <InfraStack />
       <AboutMatrix />
 
       {/* ═══ FROM THE FOUNDERS ══════════════════════════════════════════════ */}

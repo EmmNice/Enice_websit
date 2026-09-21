@@ -40,7 +40,7 @@ const PILLARS = [
   {
     icon: Shuffle,
     title: "We operate what we ship",
-    body: "We own the products end to end — engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it.",
+    body: "We own the products end to end: engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it.",
   },
   {
     icon: Telescope,

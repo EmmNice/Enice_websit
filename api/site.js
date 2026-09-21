@@ -4018,6 +4018,70 @@ WHERE key = 'about.build'
   AND position('{liveProducts}' in COALESCE(fields->>'body', '')) > 0;
 `
     )
+  },
+  {
+    id: 18,
+    name: "partners_strip_current_providers",
+    sql: (
+      /* sql */
+      `
+-- The partners strip lists the providers the platform actually runs on: AWS, Google Cloud,
+-- Supabase, Vercel and Railway.
+--
+-- Removed: Resend, which PulseAssist Email replaced in #31, and AWS Activate, because a startup
+-- credits programme is not infrastructure and listing it beside AWS itself read as two
+-- partnerships where there is one. PulseAssist is deliberately not added: it is ENICE's own
+-- product, and a company does not belong in its own partners strip.
+--
+-- This is needed because migrations 3 and 4 seed the retired set, so a database that ran those
+-- would keep publishing Resend and AWS Activate over the new defaults. Guarded on one of the
+-- retired entries still being present, which leaves a curated list alone and makes a re-run a
+-- no-op.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[
+    {"name":"Amazon Web Services","tagline":"Cloud Infrastructure","logo":"/partners/aws.svg","url":"https://aws.amazon.com"},
+    {"name":"Google Cloud","tagline":"AI & Compute","logo":"/partners/googlecloud.svg","url":"https://cloud.google.com"},
+    {"name":"Supabase","tagline":"Database & Auth","logo":"/partners/supabase.svg","url":"https://supabase.com"},
+    {"name":"Vercel","tagline":"Edge Delivery","logo":"/partners/vercel.svg","url":"https://vercel.com"},
+    {"name":"Railway","tagline":"Application & Database Hosting","logo":"/partners/railway.svg","url":"https://railway.com"}
+  ]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.partners'
+  AND (fields->'items' @> '[{"name":"AWS Activate"}]'::jsonb
+       OR fields->'items' @> '[{"name":"Resend"}]'::jsonb);
+
+-- The homepage's "The stack underneath" band is gone: it restated the partners strip in longer
+-- form, so the page named the same providers twice. Its section has no renderer left, and an admin
+-- screen that edits copy nothing displays is a trap, so the row goes with the band.
+DELETE FROM site_sections WHERE key = 'home.infrastructure';
+
+-- Copy that read as machine-written: a "Built X / Built Y / Built Z" run of headings, two
+-- sentence-fragment headlines, and em-dashed asides. Each is corrected only where the original
+-- string is still in place, so an edited band is untouched.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"Three areas we build in."'::jsonb), updated_at = now()
+WHERE key = 'home.products' AND fields->>'heading' LIKE 'Products and platforms.%';
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"The products we build and run."'::jsonb), updated_at = now()
+WHERE key = 'home.portfolio' AND fields->>'heading' LIKE 'The products we run.%';
+
+UPDATE site_sections
+SET fields = replace(replace(replace(fields::text,
+      '"Built around real problems"', '"Problems before products"'),
+      '"Built to grow"', '"Room to grow"'),
+      '"Built in Africa"', '"Grounded in African markets"')::jsonb,
+    updated_at = now()
+WHERE key = 'home.principles' AND fields::text LIKE '%Built around real problems%';
+
+UPDATE site_sections
+SET fields = replace(fields::text,
+      'We own the products end to end \u2014 engineering, launch, and the day-to-day running of them.',
+      'We own the products end to end: engineering, launch, and the day-to-day running of them.')::jsonb,
+    updated_at = now()
+WHERE key = 'home.company' AND position('end to end \u2014' in fields::text) > 0;
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (

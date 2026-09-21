@@ -903,7 +903,7 @@ const DEFAULT_SECTIONS: {
     order: 30,
     fields: {
       eyebrow: "What we're building",
-      heading: "Products and platforms.\nBuilt to one standard.",
+      heading: "Three areas we build in.",
       subheading:
         "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on.",
       // The three cards the homepage product band renders. `index` numbering is derived from
@@ -973,16 +973,10 @@ const DEFAULT_SECTIONS: {
           url: "https://vercel.com",
         },
         {
-          name: "AWS Activate",
-          tagline: "Startup Program",
-          logo: "/partners/aws-activate.svg",
-          url: "https://aws.amazon.com/activate/",
-        },
-        {
-          name: "Resend",
-          tagline: "Transactional Email",
-          logo: "/partners/resend.svg",
-          url: "https://resend.com",
+          name: "Railway",
+          tagline: "Application & Database Hosting",
+          logo: "/partners/railway.svg",
+          url: "https://railway.com",
         },
       ],
     },
@@ -1009,7 +1003,7 @@ const DEFAULT_SECTIONS: {
     order: 32,
     fields: {
       eyebrow: "Built and operated by ENICE",
-      heading: "The products we run.\nNot a services menu.",
+      heading: "The products we build and run.",
       subheading:
         "Each one began as a problem we hit ourselves, and each one is a platform we operate day to day rather than hand over.",
       // `bullets` carries the product's checkable facts, one `Label: Value` pair per line, and
@@ -1085,44 +1079,6 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "home.infrastructure",
-    label: "Technology stack",
-    group: "Home",
-    type: "featureGrid",
-    order: 36,
-    fields: {
-      eyebrow: "Technology foundation",
-      heading: "The stack underneath.",
-      subheading:
-        "Every ENICE Group product runs on the same backbone. We chose it for reliability, compliance, and scale, not because it was the easy option.",
-      // `kicker` is the short abbreviation shown above the provider; the first line of `bullets`
-      // is the "what it is used for" label.
-      items: [
-        {
-          kicker: "AWS",
-          title: "Amazon Web Services",
-          description:
-            "Our main cloud backbone. It handles compute, storage, and edge delivery across every ENICE Group platform.",
-          bullets: "Cloud infrastructure and security",
-        },
-        {
-          kicker: "GCP",
-          title: "Google Cloud",
-          description:
-            "Runs PulseAssist's AI pipeline: LLM orchestration and workflow automation across tenants, with Gemini as the model layer.",
-          bullets: "Core AI engine and computational intelligence",
-        },
-        {
-          kicker: "PG",
-          title: "Supabase",
-          description:
-            "Row-level security, real-time data streams, and managed Postgres for PulsePay's transaction systems.",
-          bullets: "Database infrastructure and auth",
-        },
-      ],
-    },
-  },
-  {
     key: "home.company",
     label: "Company band",
     group: "Home",
@@ -1147,7 +1103,7 @@ const DEFAULT_SECTIONS: {
         {
           title: "We operate what we ship",
           description:
-            "We own the products end to end — engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it.",
+            "We own the products end to end: engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it.",
         },
         {
           title: "Built to still be here",
@@ -1239,7 +1195,7 @@ const DEFAULT_SECTIONS: {
           icon: "Globe2",
           title: "Your own sending domain",
           description:
-            "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS — a domain is only marked connected once those records genuinely resolve.",
+            "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS. A domain is only marked connected once those records genuinely resolve.",
         },
         {
           icon: "Send",
@@ -1251,7 +1207,7 @@ const DEFAULT_SECTIONS: {
           icon: "Inbox",
           title: "Inbound email and routing",
           description:
-            "Receive mail on your own domain and route it by recipient, sender or subject — to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround.",
+            "Receive mail on your own domain and route it by recipient, sender or subject: to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround.",
         },
         {
           icon: "AtSign",
@@ -1287,7 +1243,7 @@ const DEFAULT_SECTIONS: {
           icon: "KeyRound",
           title: "REST API with scoped keys",
           description:
-            "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes — a key that reads analytics cannot send mail — and any key can be rotated or revoked without downtime.",
+            "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes, so a key that reads analytics cannot send mail, and any key can be rotated or revoked without downtime.",
         },
         {
           icon: "Webhook",
@@ -1305,7 +1261,7 @@ const DEFAULT_SECTIONS: {
           icon: "Code2",
           title: "Usage you can see coming",
           description:
-            "Live usage against your plan's allowances — sent this month, addresses, domains, endpoints — read from your entitlements rather than estimated, so a limit is visible while there is still time to act.",
+            "Live usage against your plan's allowances (sent this month, addresses, domains, endpoints), read from your entitlements rather than estimated, so a limit is visible while there is still time to act.",
         },
       ],
     },
@@ -1319,7 +1275,7 @@ const DEFAULT_SECTIONS: {
     fields: {
       heading: "Four steps, and the hard one is checked for you.",
       subheading:
-        "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong — the ones that never fix themselves while you wait.",
+        "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong, which never fix themselves while you wait.",
       items: [
         {
           title: "Add your domain",
@@ -1334,7 +1290,7 @@ const DEFAULT_SECTIONS: {
         {
           title: "Verification against real DNS",
           description:
-            "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong — a stale value, a proxied CNAME, a second SPF line — is reported as exactly that.",
+            "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong, whether a stale value, a proxied CNAME or a second SPF line, is reported as exactly that.",
         },
         {
           title: "Send, receive and watch it",
@@ -1552,15 +1508,15 @@ const DEFAULT_SECTIONS: {
       // `title` is the card heading, `description` the line beneath it.
       items: [
         {
-          title: "Built around real problems",
+          title: "Problems before products",
           description: "We start with problems people and businesses actually face.",
         },
         {
-          title: "Built to grow",
+          title: "Room to grow",
           description: "Our products are designed to support users as their needs grow.",
         },
         {
-          title: "Built in Africa",
+          title: "Grounded in African markets",
           description:
             "We understand the realities of African markets and build with those realities in mind.",
         },

@@ -107,7 +107,7 @@ function AboutPulseAssistBetaPage() {
           align="center"
           id="beta-cta-heading"
           eyebrow="This is the beginning of the next phase."
-          heading="September 2026 — PulseAssist Beta"
+          heading="September 2026 · PulseAssist Beta"
           lead="Be among the first to experience what we're building."
         >
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

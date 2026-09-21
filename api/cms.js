@@ -4390,6 +4390,70 @@ WHERE key = 'about.build'
   AND position('{liveProducts}' in COALESCE(fields->>'body', '')) > 0;
 `
         )
+      },
+      {
+        id: 18,
+        name: "partners_strip_current_providers",
+        sql: (
+          /* sql */
+          `
+-- The partners strip lists the providers the platform actually runs on: AWS, Google Cloud,
+-- Supabase, Vercel and Railway.
+--
+-- Removed: Resend, which PulseAssist Email replaced in #31, and AWS Activate, because a startup
+-- credits programme is not infrastructure and listing it beside AWS itself read as two
+-- partnerships where there is one. PulseAssist is deliberately not added: it is ENICE's own
+-- product, and a company does not belong in its own partners strip.
+--
+-- This is needed because migrations 3 and 4 seed the retired set, so a database that ran those
+-- would keep publishing Resend and AWS Activate over the new defaults. Guarded on one of the
+-- retired entries still being present, which leaves a curated list alone and makes a re-run a
+-- no-op.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[
+    {"name":"Amazon Web Services","tagline":"Cloud Infrastructure","logo":"/partners/aws.svg","url":"https://aws.amazon.com"},
+    {"name":"Google Cloud","tagline":"AI & Compute","logo":"/partners/googlecloud.svg","url":"https://cloud.google.com"},
+    {"name":"Supabase","tagline":"Database & Auth","logo":"/partners/supabase.svg","url":"https://supabase.com"},
+    {"name":"Vercel","tagline":"Edge Delivery","logo":"/partners/vercel.svg","url":"https://vercel.com"},
+    {"name":"Railway","tagline":"Application & Database Hosting","logo":"/partners/railway.svg","url":"https://railway.com"}
+  ]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.partners'
+  AND (fields->'items' @> '[{"name":"AWS Activate"}]'::jsonb
+       OR fields->'items' @> '[{"name":"Resend"}]'::jsonb);
+
+-- The homepage's "The stack underneath" band is gone: it restated the partners strip in longer
+-- form, so the page named the same providers twice. Its section has no renderer left, and an admin
+-- screen that edits copy nothing displays is a trap, so the row goes with the band.
+DELETE FROM site_sections WHERE key = 'home.infrastructure';
+
+-- Copy that read as machine-written: a "Built X / Built Y / Built Z" run of headings, two
+-- sentence-fragment headlines, and em-dashed asides. Each is corrected only where the original
+-- string is still in place, so an edited band is untouched.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"Three areas we build in."'::jsonb), updated_at = now()
+WHERE key = 'home.products' AND fields->>'heading' LIKE 'Products and platforms.%';
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"The products we build and run."'::jsonb), updated_at = now()
+WHERE key = 'home.portfolio' AND fields->>'heading' LIKE 'The products we run.%';
+
+UPDATE site_sections
+SET fields = replace(replace(replace(fields::text,
+      '"Built around real problems"', '"Problems before products"'),
+      '"Built to grow"', '"Room to grow"'),
+      '"Built in Africa"', '"Grounded in African markets"')::jsonb,
+    updated_at = now()
+WHERE key = 'home.principles' AND fields::text LIKE '%Built around real problems%';
+
+UPDATE site_sections
+SET fields = replace(fields::text,
+      'We own the products end to end \u2014 engineering, launch, and the day-to-day running of them.',
+      'We own the products end to end: engineering, launch, and the day-to-day running of them.')::jsonb,
+    updated_at = now()
+WHERE key = 'home.company' AND position('end to end \u2014' in fields::text) > 0;
+`
+        )
       }
     ];
     MIGRATIONS_TABLE_SQL = /* sql */
@@ -74930,7 +74994,7 @@ var init_website = __esm({
         order: 30,
         fields: {
           eyebrow: "What we're building",
-          heading: "Products and platforms.\nBuilt to one standard.",
+          heading: "Three areas we build in.",
           subheading: "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on.",
           // The three cards the homepage product band renders. `index` numbering is derived from
           // position, and bullets are one per line.
@@ -74996,16 +75060,10 @@ var init_website = __esm({
               url: "https://vercel.com"
             },
             {
-              name: "AWS Activate",
-              tagline: "Startup Program",
-              logo: "/partners/aws-activate.svg",
-              url: "https://aws.amazon.com/activate/"
-            },
-            {
-              name: "Resend",
-              tagline: "Transactional Email",
-              logo: "/partners/resend.svg",
-              url: "https://resend.com"
+              name: "Railway",
+              tagline: "Application & Database Hosting",
+              logo: "/partners/railway.svg",
+              url: "https://railway.com"
             }
           ]
         }
@@ -75032,7 +75090,7 @@ var init_website = __esm({
         order: 32,
         fields: {
           eyebrow: "Built and operated by ENICE",
-          heading: "The products we run.\nNot a services menu.",
+          heading: "The products we build and run.",
           subheading: "Each one began as a problem we hit ourselves, and each one is a platform we operate day to day rather than hand over.",
           // `bullets` carries the product's checkable facts, one `Label: Value` pair per line, and
           // `url` is the product page. See `parseFacts` in src/routes/index.tsx.
@@ -75099,40 +75157,6 @@ var init_website = __esm({
         }
       },
       {
-        key: "home.infrastructure",
-        label: "Technology stack",
-        group: "Home",
-        type: "featureGrid",
-        order: 36,
-        fields: {
-          eyebrow: "Technology foundation",
-          heading: "The stack underneath.",
-          subheading: "Every ENICE Group product runs on the same backbone. We chose it for reliability, compliance, and scale, not because it was the easy option.",
-          // `kicker` is the short abbreviation shown above the provider; the first line of `bullets`
-          // is the "what it is used for" label.
-          items: [
-            {
-              kicker: "AWS",
-              title: "Amazon Web Services",
-              description: "Our main cloud backbone. It handles compute, storage, and edge delivery across every ENICE Group platform.",
-              bullets: "Cloud infrastructure and security"
-            },
-            {
-              kicker: "GCP",
-              title: "Google Cloud",
-              description: "Runs PulseAssist's AI pipeline: LLM orchestration and workflow automation across tenants, with Gemini as the model layer.",
-              bullets: "Core AI engine and computational intelligence"
-            },
-            {
-              kicker: "PG",
-              title: "Supabase",
-              description: "Row-level security, real-time data streams, and managed Postgres for PulsePay's transaction systems.",
-              bullets: "Database infrastructure and auth"
-            }
-          ]
-        }
-      },
-      {
         key: "home.company",
         label: "Company band",
         group: "Home",
@@ -75153,7 +75177,7 @@ var init_website = __esm({
             },
             {
               title: "We operate what we ship",
-              description: "We own the products end to end \u2014 engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it."
+              description: "We own the products end to end: engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it."
             },
             {
               title: "Built to still be here",
@@ -75240,7 +75264,7 @@ var init_website = __esm({
             {
               icon: "Globe2",
               title: "Your own sending domain",
-              description: "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS \u2014 a domain is only marked connected once those records genuinely resolve."
+              description: "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS. A domain is only marked connected once those records genuinely resolve."
             },
             {
               icon: "Send",
@@ -75250,7 +75274,7 @@ var init_website = __esm({
             {
               icon: "Inbox",
               title: "Inbound email and routing",
-              description: "Receive mail on your own domain and route it by recipient, sender or subject \u2014 to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround."
+              description: "Receive mail on your own domain and route it by recipient, sender or subject: to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround."
             },
             {
               icon: "AtSign",
@@ -75280,7 +75304,7 @@ var init_website = __esm({
             {
               icon: "KeyRound",
               title: "REST API with scoped keys",
-              description: "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes \u2014 a key that reads analytics cannot send mail \u2014 and any key can be rotated or revoked without downtime."
+              description: "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes, so a key that reads analytics cannot send mail, and any key can be rotated or revoked without downtime."
             },
             {
               icon: "Webhook",
@@ -75295,7 +75319,7 @@ var init_website = __esm({
             {
               icon: "Code2",
               title: "Usage you can see coming",
-              description: "Live usage against your plan's allowances \u2014 sent this month, addresses, domains, endpoints \u2014 read from your entitlements rather than estimated, so a limit is visible while there is still time to act."
+              description: "Live usage against your plan's allowances (sent this month, addresses, domains, endpoints), read from your entitlements rather than estimated, so a limit is visible while there is still time to act."
             }
           ]
         }
@@ -75308,7 +75332,7 @@ var init_website = __esm({
         order: 228,
         fields: {
           heading: "Four steps, and the hard one is checked for you.",
-          subheading: "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong \u2014 the ones that never fix themselves while you wait.",
+          subheading: "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong, which never fix themselves while you wait.",
           items: [
             {
               title: "Add your domain",
@@ -75320,7 +75344,7 @@ var init_website = __esm({
             },
             {
               title: "Verification against real DNS",
-              description: "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong \u2014 a stale value, a proxied CNAME, a second SPF line \u2014 is reported as exactly that."
+              description: "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong, whether a stale value, a proxied CNAME or a second SPF line, is reported as exactly that."
             },
             {
               title: "Send, receive and watch it",
@@ -75521,15 +75545,15 @@ var init_website = __esm({
           // `title` is the card heading, `description` the line beneath it.
           items: [
             {
-              title: "Built around real problems",
+              title: "Problems before products",
               description: "We start with problems people and businesses actually face."
             },
             {
-              title: "Built to grow",
+              title: "Room to grow",
               description: "Our products are designed to support users as their needs grow."
             },
             {
-              title: "Built in Africa",
+              title: "Grounded in African markets",
               description: "We understand the realities of African markets and build with those realities in mind."
             }
           ]

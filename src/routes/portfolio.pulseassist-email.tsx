@@ -133,7 +133,7 @@ const CAPABILITIES = [
   {
     icon: Globe2,
     title: "Your own sending domain",
-    desc: "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS — a domain is only marked connected once those records genuinely resolve.",
+    desc: "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS. A domain is only marked connected once those records genuinely resolve.",
   },
   {
     icon: Send,
@@ -143,7 +143,7 @@ const CAPABILITIES = [
   {
     icon: Inbox,
     title: "Inbound email and routing",
-    desc: "Receive mail on your own domain and route it by recipient, sender or subject — to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround.",
+    desc: "Receive mail on your own domain and route it by recipient, sender or subject: to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround.",
   },
   {
     icon: AtSign,
@@ -173,7 +173,7 @@ const CAPABILITIES = [
   {
     icon: KeyRound,
     title: "REST API with scoped keys",
-    desc: "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes — a key that reads analytics cannot send mail — and any key can be rotated or revoked without downtime.",
+    desc: "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes, so a key that reads analytics cannot send mail, and any key can be rotated or revoked without downtime.",
   },
   {
     icon: Webhook,
@@ -188,7 +188,7 @@ const CAPABILITIES = [
   {
     icon: Code2,
     title: "Usage you can see coming",
-    desc: "Live usage against your plan's allowances — sent this month, addresses, domains, endpoints — read from your entitlements rather than estimated, so a limit is visible while there is still time to act.",
+    desc: "Live usage against your plan's allowances (sent this month, addresses, domains, endpoints), read from your entitlements rather than estimated, so a limit is visible while there is still time to act.",
   },
 ];
 
@@ -210,7 +210,7 @@ const SETUP = [
   },
   {
     title: "Verification against real DNS",
-    desc: "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong — a stale value, a proxied CNAME, a second SPF line — is reported as exactly that.",
+    desc: "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong, whether a stale value, a proxied CNAME or a second SPF line, is reported as exactly that.",
   },
   {
     title: "Send, receive and watch it",
@@ -379,7 +379,7 @@ function PulseAssistEmailPage() {
             lead={fieldText(
               setup,
               "subheading",
-              "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong — the ones that never fix themselves while you wait.",
+              "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong, which never fix themselves while you wait.",
             )}
           />
         </Reveal>
