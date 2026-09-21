@@ -973,6 +973,12 @@ const DEFAULT_SECTIONS: {
           url: "https://vercel.com",
         },
         {
+          name: "PulseAssist",
+          tagline: "Support & Email Infrastructure",
+          logo: "/partners/pulseassist.svg",
+          url: "https://getpulseassist.com",
+        },
+        {
           name: "Railway",
           tagline: "Application & Database Hosting",
           logo: "/partners/railway.svg",

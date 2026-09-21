@@ -33,8 +33,10 @@ interface Partner {
  * #31) and so is AWS Activate: a startup credits programme is not infrastructure, and listing it
  * beside AWS itself read as two partnerships where there is one.
  *
- * PulseAssist is deliberately absent. It is ENICE's own product, so putting it in a *partners*
- * strip would present the company as its own third-party vendor; it has a product page instead.
+ * PulseAssist is in the list because this site genuinely runs on it: its transactional email goes
+ * out through PulseAssist Email (`EMAIL_PROVIDER=pulseassist`, see #31) and the site assistant is
+ * the PulseAssist widget. It being an ENICE product does not make it less of a dependency — the
+ * strip is about what the platform is built on, and this is part of that.
  */
 const DEFAULT_PARTNERS: Partner[] = [
   {
@@ -60,6 +62,12 @@ const DEFAULT_PARTNERS: Partner[] = [
     tagline: "Edge Delivery",
     logo: "/partners/vercel.svg",
     url: "https://vercel.com",
+  },
+  {
+    name: "PulseAssist",
+    tagline: "Support & Email Infrastructure",
+    logo: "/partners/pulseassist.svg",
+    url: "https://getpulseassist.com",
   },
   {
     name: "Railway",

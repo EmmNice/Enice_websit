@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="400" height="400"
+     role="img" aria-label="PulseAssist">
+  <!--
+    PulseAssist monogram — official mark.
+
+    Geometric "PA" monogram built from three beveled slabs with a forward lean,
+    reading as motion. Gradient runs cyan (top of the bowl) through blue into
+    violet (base of the stem), matching the official brand artwork.
+
+    Transparent background on purpose: the mark sits on both the light marketing
+    site and the dark product surfaces, so the container supplies the backdrop.
+    Anything that needs an opaque app-icon tile should use icon-tile.svg.
+  -->
+  <defs>
+    <!-- Primary brand gradient: cyan -> blue -> violet, on the diagonal -->
+    <linearGradient id="pa-mark" x1="18%" y1="4%" x2="72%" y2="100%">
+      <stop offset="0%"   stop-color="#22D3EE"/>
+      <stop offset="30%"  stop-color="#2563EB"/>
+      <stop offset="68%"  stop-color="#6D28D9"/>
+      <stop offset="100%" stop-color="#7E22CE"/>
+    </linearGradient>
+
+    <!-- Deeper pass for the underside slab, so the forms read as layered -->
+    <linearGradient id="pa-mark-deep" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#4F46E5"/>
+      <stop offset="55%"  stop-color="#6D28D9"/>
+      <stop offset="100%" stop-color="#8B1FC9"/>
+    </linearGradient>
+
+    <!-- Bright inner edge highlight along the top-left cut -->
+    <linearGradient id="pa-mark-edge" x1="0%" y1="0%" x2="100%" y2="60%">
+      <stop offset="0%"   stop-color="#67E8F9" stop-opacity="0.95"/>
+      <stop offset="55%"  stop-color="#38BDF8" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#818CF8" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ── Bowl of the "P": thick angular chevron, leaning forward ────────────
+       Outer contour runs from the top-left shoulder across to the right
+       shoulder, folds down and returns, leaving a counter (the hole).      -->
+  <path
+    d="M 66 30
+       L 140 30
+       L 168 58
+       L 168 84
+       L 140 112
+       L 96 112
+       L 96 86
+       L 132 86
+       L 140 78
+       L 140 64
+       L 132 56
+       L 66 56
+       Z"
+    fill="url(#pa-mark)"/>
+
+  <!-- ── Stem of the "P" / spine of the "A": vertical slab with a sheared foot -->
+  <path
+    d="M 66 30
+       L 96 56
+       L 96 170
+       L 66 170
+       Z"
+    fill="url(#pa-mark)"/>
+
+  <!-- ── Lower-left slab: the "A" crossbar, sheared to carry the lean ─────── -->
+  <path
+    d="M 62 92
+       L 92 118
+       L 46 170
+       L 16 170
+       Z"
+    fill="url(#pa-mark-deep)"/>
+
+  <!-- ── Leg of the "A": small solid triangle balancing the mark bottom-right -->
+  <path
+    d="M 118 132
+       L 150 132
+       L 150 170
+       Z"
+    fill="url(#pa-mark-deep)"/>
+
+  <!-- ── Edge highlight: thin bright cut along the top-left, adds dimension -->
+  <path
+    d="M 66 30 L 140 30 L 146 36 L 72 36 Z"
+    fill="url(#pa-mark-edge)"/>
+</svg>
