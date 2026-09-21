@@ -11,37 +11,41 @@
  */
 
 import { Link } from "@tanstack/react-router";
-import { ArrowUpRight } from "lucide-react";
-import { SiteHeader } from "./SiteHeader";
-import { SiteFooter } from "./SiteFooter";
+import { SiteShell } from "./SiteShell";
 import { ArticleView } from "./ArticleView";
+import { Cta, Panel, Section } from "./primitives";
 import type { ContentCta } from "@/lib/cms/types";
 import {
   categoryBadgeClasses,
   formatPublishedDate,
   type PublicArticle,
 } from "@/lib/cms/public-client";
+import { cn } from "@/lib/utils";
 
 /**
  * The announcement call to action.
  *
- * Rendered as a real anchor rather than a styled button so it works before hydration and behaves
- * like a link — right-click, middle-click, keyboard. The URL was protocol-checked on write.
+ * `Cta` resolves its own element, so an in-app path gets client-side routing and an external URL
+ * gets an anchor with the right `rel` — and either way it is a real link rather than a styled
+ * button, so it works before hydration and behaves like a link for right-click, middle-click and
+ * the keyboard. The URL was protocol-checked on write.
  */
 function CallToAction({ cta }: { cta: ContentCta }) {
   return (
-    <div className="mt-10 rounded-2xl border border-blue-500/20 bg-blue-500/[0.06] px-6 py-6 text-center">
-      <a
-        href={cta.url}
-        className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-blue-500"
-      >
+    <Panel tone="quiet" className="mt-10 px-6 py-6 text-center">
+      <Cta to={cta.url} icon="external">
         {cta.label}
-        <ArrowUpRight className="h-4 w-4" />
-      </a>
-    </div>
+      </Cta>
+    </Panel>
   );
 }
 
+/**
+ * The related list.
+ *
+ * One link per entry with nothing interactive inside it, and the headings continue the article's
+ * outline: `h2` for the list under the article's `h1`, `h3` per entry.
+ */
 function Related({
   related,
   basePath,
@@ -52,8 +56,8 @@ function Related({
   if (related.length === 0) return null;
 
   return (
-    <section className="mt-16 border-t border-white/[0.07] pt-10">
-      <h2 className="mb-6 text-[11px] font-bold tracking-[0.22em] text-zinc-500 uppercase">
+    <section className="mt-16 border-t border-border pt-10" aria-labelledby="related-heading">
+      <h2 id="related-heading" className="eyebrow mb-6">
         Related
       </h2>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -62,22 +66,24 @@ function Related({
             key={entry.id}
             to={basePath}
             params={{ slug: entry.slug }}
-            className="group rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 transition-colors hover:border-blue-500/30 hover:bg-white/[0.04]"
+            className="panel panel-interactive group flex flex-col p-5"
           >
             {entry.category && (
               <span
-                className={`mb-2 inline-flex w-fit items-center rounded-full border px-2 py-0.5 text-[9px] font-bold tracking-[0.16em] ${categoryBadgeClasses(entry.category)}`}
+                className={cn(
+                  "mb-2 inline-flex w-fit items-center rounded-full border px-2 py-0.5",
+                  "text-[10px] font-semibold tracking-[0.16em]",
+                  categoryBadgeClasses(entry.category),
+                )}
               >
                 {entry.category.toUpperCase()}
               </span>
             )}
-            <h3 className="mb-1.5 text-sm leading-snug font-bold text-white transition-colors group-hover:text-blue-400">
+            <h3 className="text-sm leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-gold">
               {entry.title}
             </h3>
-            <p className="mb-2 text-[11px] text-zinc-500">
-              {formatPublishedDate(entry.publishedAt)}
-            </p>
-            <p className="line-clamp-2 text-[13px] leading-relaxed text-zinc-400">
+            <p className="type-meta tnum mt-1.5 mb-2">{formatPublishedDate(entry.publishedAt)}</p>
+            <p className="line-clamp-2 text-[13px] leading-relaxed text-bone-soft">
               {entry.excerpt}
             </p>
           </Link>
@@ -107,35 +113,30 @@ export function ContentArticlePage({
   const cta = showCta ? (item.extras.cta ?? null) : null;
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
-      <SiteHeader />
-
-      <main className="px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-2xl">
-          <ArticleView
-            article={{
-              title: item.title,
-              excerpt: item.excerpt,
-              category: item.category,
-              tags: item.tags,
-              coverImageUrl: item.coverImageUrl,
-              author: item.author,
-              publishedAt: item.publishedAt,
-              body: item.body,
-            }}
-            theme="dark"
-            backLink={{ label: backLabel, href: backHref }}
-            footerSlot={
-              <>
-                {cta && <CallToAction cta={cta} />}
-                <Related related={related} basePath={relatedBasePath} />
-              </>
-            }
-          />
-        </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+    <SiteShell>
+      {/* `prose` is the 46rem measure: the reading column, not the page width. */}
+      <Section spacing="loose" container="prose">
+        <ArticleView
+          article={{
+            title: item.title,
+            excerpt: item.excerpt,
+            category: item.category,
+            tags: item.tags,
+            coverImageUrl: item.coverImageUrl,
+            author: item.author,
+            publishedAt: item.publishedAt,
+            body: item.body,
+          }}
+          theme="dark"
+          backLink={{ label: backLabel, href: backHref }}
+          footerSlot={
+            <>
+              {cta && <CallToAction cta={cta} />}
+              <Related related={related} basePath={relatedBasePath} />
+            </>
+          }
+        />
+      </Section>
+    </SiteShell>
   );
 }

@@ -404,6 +404,10 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
     description: "A heading with one or more paragraphs.",
     icon: "AlignLeft",
     fields: [
+      // `hero`, `featureGrid` and `faq` all carry an eyebrow; `prose` and `cta` did not, which
+      // meant the small label above a text or hiring band was the one string on those sections an
+      // editor could not change. Optional, so an existing section without one is unaffected.
+      { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the heading." },
       {
         key: "heading",
         label: "Heading",
@@ -542,6 +546,7 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
     description: "A closing band that drives one action.",
     icon: "MousePointerClick",
     fields: [
+      { key: "eyebrow", label: "Eyebrow", type: "text", help: "Small label above the heading." },
       { key: "heading", label: "Heading", type: "text", required: true },
       { key: "subheading", label: "Supporting copy", type: "textarea" },
       { key: "ctaLabel", label: "Button label", type: "text", required: true },
@@ -666,8 +671,11 @@ export const SECTION_SCHEMAS: Record<SectionType, SectionSchema> = {
       {
         key: "items",
         label: "Steps",
+        // Raised from 8. The roadmap is a `steps` section and already has nine milestones, so the
+        // old ceiling silently dropped the last one on a fresh-install seed and would have dropped
+        // it again on the first admin save of that section — `sanitizeSectionFields` trims to `max`.
         type: "repeater",
-        max: 8,
+        max: 16,
         of: [
           { key: "title", label: "Title", type: "text", required: true },
           { key: "description", label: "Description", type: "textarea" },

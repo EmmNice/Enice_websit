@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Rss } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteShell } from "@/components/site/SiteShell";
+import { Reveal } from "@/components/site/Reveal";
+import { Container, Panel, Section, SectionIntro } from "@/components/site/primitives";
 import { pageHead } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import {
@@ -11,6 +12,7 @@ import {
   formatPublishedDate,
   type PublicSummary,
 } from "@/lib/cms/public-client";
+import { cn } from "@/lib/utils";
 
 /**
  * The blog index.
@@ -19,38 +21,54 @@ import {
  * from an external CMS. Same-origin, so it needs no CSP allowance, and edge-cached, so the common
  * case never reaches the database.
  */
+
+/**
+ * One post card.
+ *
+ * The whole card is a single link, and nothing inside it is interactive: a card with a nested
+ * "Read article" anchor gives a keyboard user two stops for one destination and makes the hit area
+ * ambiguous for everyone else. The read affordance is therefore a `span` that the card's own hover
+ * lights up.
+ */
 function PostCard({ post }: { post: PublicSummary }) {
   return (
     <Link
       to="/blog/$slug"
       params={{ slug: post.slug }}
-      className="group flex flex-col rounded-xl border border-white/[0.07] bg-white/[0.03] p-6 transition-all duration-200 hover:border-blue-500/30 hover:bg-white/[0.05]"
+      className="panel panel-interactive group flex h-full w-full flex-col p-6"
     >
       {post.coverImageUrl && (
-        <div className="mb-5 overflow-hidden rounded-lg">
+        <div className="mb-5 overflow-hidden rounded-lg border border-border">
+          {/* A fixed ratio, because the content model stores no dimensions: without one, every
+              card resizes as its cover arrives and the whole grid reflows under the pointer. */}
           <img
             src={post.coverImageUrl}
             alt={post.title}
             loading="lazy"
             decoding="async"
-            className="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            className="aspect-[16/9] w-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </div>
       )}
 
       {post.category && (
         <span
-          className={`mb-3 inline-flex w-fit items-center rounded-full border px-2.5 py-0.5 text-[10px] font-bold tracking-[0.18em] ${categoryBadgeClasses(post.category)}`}
+          className={cn(
+            "mb-3 inline-flex w-fit items-center rounded-full border px-2.5 py-0.5",
+            "text-[10px] font-semibold tracking-[0.18em]",
+            categoryBadgeClasses(post.category),
+          )}
         >
           {post.category.toUpperCase()}
         </span>
       )}
 
-      <h2 className="mb-2 text-base leading-snug font-bold text-white transition-colors group-hover:text-blue-400">
+      {/* `h2`, one level below the page title — the card grid is the page's only content level. */}
+      <h2 className="text-base leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-gold">
         {post.title}
       </h2>
 
-      <p className="mb-3 flex items-center gap-2 text-[11px] font-medium tracking-wide text-zinc-500">
+      <p className="type-meta tnum mt-2 mb-3 flex items-center gap-2">
         <span>{formatPublishedDate(post.publishedAt)}</span>
         {post.readingMinutes > 0 && (
           <>
@@ -60,25 +78,56 @@ function PostCard({ post }: { post: PublicSummary }) {
         )}
       </p>
 
-      <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-zinc-400">{post.excerpt}</p>
+      <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-bone-soft">{post.excerpt}</p>
 
-      <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-blue-400 opacity-0 transition-opacity group-hover:opacity-100">
-        Read article <ArrowUpRight className="h-3.5 w-3.5" />
-      </div>
+      <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-bone-faint transition-colors group-hover:text-gold">
+        Read article
+        <ArrowUpRight
+          aria-hidden
+          className="h-3.5 w-3.5 transition-transform duration-200 group-hover:-translate-y-px group-hover:translate-x-px"
+        />
+      </span>
     </Link>
   );
 }
 
+/**
+ * The empty state.
+ *
+ * Deliberate rather than broken: the same panel treatment as a post card, so a blog with nothing
+ * in it yet still looks like a finished page.
+ */
 function EmptyState() {
   return (
-    <div className="col-span-3 flex flex-col items-center justify-center py-32 text-center">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/[0.07] bg-white/[0.03]">
-        <Rss className="h-7 w-7 text-zinc-500" />
-      </div>
-      <h3 className="mb-2 text-lg font-bold text-white">No posts yet</h3>
-      <p className="max-w-xs text-sm text-zinc-500">
+    <Panel tone="quiet" className="flex flex-col items-center px-8 py-20 text-center">
+      <span
+        aria-hidden
+        className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-gold/20 bg-gold/[0.07] text-gold"
+      >
+        <Rss className="h-6 w-6" strokeWidth={1.75} />
+      </span>
+      <h2 className="type-h3 text-foreground">No posts yet</h2>
+      <p className="mt-3 max-w-xs text-sm leading-relaxed text-bone-soft">
         Content is on the way. Check back soon for the first update.
       </p>
+    </Panel>
+  );
+}
+
+/**
+ * The loading grid. Same card footprint, so the page does not jump when the posts arrive.
+ *
+ * The placeholders are decorative, but the wait itself is information: the status role announces it
+ * once instead of leaving a screen-reader user on a page that reads as permanently empty.
+ */
+function LoadingGrid() {
+  return (
+    <div role="status" aria-label="Loading posts">
+      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" aria-hidden>
+        {[1, 2, 3].map((index) => (
+          <div key={index} className="panel-quiet h-72 animate-pulse" />
+        ))}
+      </div>
     </div>
   );
 }
@@ -109,72 +158,70 @@ function BlogPage() {
     activeCategory === "ALL" ? posts : posts.filter((post) => post.category === activeCategory);
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
-      <SiteHeader />
+    <SiteShell>
+      <Section spacing="loose" grid glow="spread" aria-labelledby="blog-heading">
+        <SectionIntro
+          level={1}
+          id="blog-heading"
+          eyebrow="ENICE Group Dispatch"
+          heading="Blog and Changelog"
+          lead="Updates on our products, infrastructure changes, and platform launches, and everything happening inside ENICE Group."
+        />
+      </Section>
 
-      <section className="border-b border-white/[0.06] bg-gradient-to-b from-[#0f172a] to-[#09090b] px-5 pt-28 pb-16 sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          <p className="mb-3 text-[11px] font-bold tracking-[0.22em] text-blue-400 uppercase">
-            ENICE Group Dispatch
-          </p>
-          <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Blog and Changelog
-          </h1>
-          <p className="max-w-xl text-base leading-relaxed text-zinc-400">
-            Updates on our products, infrastructure changes, and platform launches, and everything
-            happening inside ENICE Group.
-          </p>
-        </div>
-      </section>
-
-      {/* The filter bar is only worth showing once there is more than one category to pick. */}
+      {/* The filter bar is only worth showing once there is more than one category to pick.
+          It is a toolbar rather than a band — hence a plain sticky strip around `Container`, not a
+          `Section`: it sits under the 4rem header and separates with a hairline and the canvas
+          behind it rather than a colour of its own. */}
       {!loading && categories.length > 1 && (
-        <section className="sticky top-0 z-30 border-b border-white/[0.06] bg-[#09090b]/90 px-5 backdrop-blur-xl sm:px-8">
-          <div className="mx-auto flex max-w-7xl gap-1 overflow-x-auto py-3">
-            {["ALL", ...categories].map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`shrink-0 rounded-full px-4 py-1.5 text-xs font-semibold tracking-wide transition-all ${
-                  activeCategory === category
-                    ? "bg-blue-600 text-white"
-                    : "text-zinc-500 hover:text-white"
-                }`}
-              >
-                {category === "ALL" ? "ALL" : category.toUpperCase()}
-              </button>
-            ))}
-          </div>
-        </section>
+        <div className="sticky top-16 z-30 border-y border-border bg-background/85 backdrop-blur-xl">
+          <Container>
+            <div
+              role="group"
+              aria-label="Filter posts by category"
+              className="flex gap-1 overflow-x-auto py-3"
+            >
+              {["ALL", ...categories].map((category) => {
+                const active = activeCategory === category;
+                return (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => setActiveCategory(category)}
+                    aria-pressed={active}
+                    className={cn(
+                      "shrink-0 rounded-full border px-4 py-1.5",
+                      "text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors",
+                      active
+                        ? "border-gold/25 bg-gold/[0.08] text-gold"
+                        : "border-transparent text-bone-soft hover:text-foreground",
+                    )}
+                  >
+                    {category === "ALL" ? "ALL" : category.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          </Container>
+        </div>
       )}
 
-      <section className="px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          {loading ? (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((index) => (
-                <div
-                  key={index}
-                  className="h-72 animate-pulse rounded-xl border border-white/[0.07] bg-white/[0.03]"
-                />
-              ))}
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3">
-              <EmptyState />
-            </div>
-          ) : (
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((post) => (
-                <PostCard key={post.id} post={post} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      <SiteFooter />
-    </div>
+      <Section>
+        {loading ? (
+          <LoadingGrid />
+        ) : filtered.length === 0 ? (
+          <EmptyState />
+        ) : (
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {filtered.map((post, index) => (
+              <Reveal key={post.id} delay={Math.min(index, 5) * 50} className="flex">
+                <PostCard post={post} />
+              </Reveal>
+            ))}
+          </div>
+        )}
+      </Section>
+    </SiteShell>
   );
 }
 

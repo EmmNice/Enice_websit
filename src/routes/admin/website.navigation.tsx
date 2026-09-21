@@ -23,8 +23,10 @@ import {
  * Header navigation editor.
  *
  * The primary menu plus the header call-to-action. Items reorder, toggle visibility, and edit in
- * place. One level of nesting is supported because that is what the header design accommodates —
- * the model allows children, the UI here keeps it to the flat primary menu for clarity.
+ * place, and each top-level item carries its own sub-links — the shipped header groups Products and
+ * Resources into dropdowns, so an editor who could only see the top level could only manage half of
+ * it. Exactly one level deep: `sanitizeNavItems` caps nesting at one and silently drops anything
+ * deeper, so offering a third level would let an editor type a link the API throws away.
  */
 function NavigationScreen() {
   const { can } = useAdmin();
@@ -99,13 +101,14 @@ function NavigationScreen() {
           <CardHeader
             title="Menu items"
             icon={Menu}
-            description="Shown in the header, left to right."
+            description="Shown in the header, left to right. An item with sub-links opens them as a dropdown."
           />
           <div className="p-4">
             <NavItemList
               items={header.items}
               onChange={(items) => patch({ items })}
               canWrite={canWrite}
+              allowChildren
             />
           </div>
         </Card>
@@ -158,15 +161,26 @@ function NavigationScreen() {
   );
 }
 
-/** A reorderable list of navigation items. Reused by the footer editor's columns. */
+/**
+ * A reorderable list of navigation items. Reused by the footer editor's columns.
+ *
+ * `allowChildren` renders one nested list per item, for the header's dropdowns. It is off by
+ * default and the nested list never passes it on, so the tree can never go deeper than the single
+ * level `sanitizeNavItems` accepts — the footer, whose columns are already one level down, gets the
+ * flat list it had before.
+ */
 export function NavItemList({
   items,
   onChange,
   canWrite,
+  allowChildren = false,
+  addLabel = "Add link",
 }: {
   items: NavItem[];
   onChange: (items: NavItem[]) => void;
   canWrite: boolean;
+  allowChildren?: boolean;
+  addLabel?: string;
 }) {
   const patch = (id: string, changes: Partial<NavItem>) =>
     onChange(items.map((item) => (item.id === id ? { ...item, ...changes } : item)));
@@ -250,12 +264,35 @@ export function NavItemList({
               Visible — click to hide
             </button>
           )}
+
+          {/*
+           * The item's dropdown. Indented and rule-marked so it reads as subordinate to the row
+           * above rather than as a sibling, and hidden entirely for a read-only viewer when the
+           * item has no sub-links, so the panel does not show an empty heading.
+           */}
+          {allowChildren && (canWrite || (item.children?.length ?? 0) > 0) && (
+            <div
+              role="group"
+              aria-label={`Sub-links for ${item.label || "this menu item"}`}
+              className="border-border mt-2.5 ml-6 space-y-2 border-l pl-3"
+            >
+              <p className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">
+                Sub-links
+              </p>
+              <NavItemList
+                items={item.children ?? []}
+                onChange={(children) => patch(item.id, { children })}
+                canWrite={canWrite}
+                addLabel="Add sub-link"
+              />
+            </div>
+          )}
         </div>
       ))}
 
       {canWrite && (
         <Button variant="outline" icon={Plus} size="sm" onClick={add}>
-          Add link
+          {addLabel}
         </Button>
       )}
     </div>

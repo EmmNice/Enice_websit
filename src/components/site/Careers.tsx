@@ -1,30 +1,54 @@
-import { ArrowUpRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Cta, Eyebrow, Section } from "./primitives";
+import { StyledText } from "./StyledText";
+import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
+/**
+ * The closing hiring band, editable through the `home.careers` section.
+ *
+ * Centred and deliberately sparse — it is the one place on the page that asks for nothing but
+ * attention, and the ambient light is what separates it from the contact form beneath rather than
+ * a background colour change.
+ */
 export function Careers() {
+  const careers = useSectionFields("home.careers");
+
   return (
-    <section id="careers" className="border-t border-border bg-secondary/60 py-20 sm:py-24">
-      <div className="mx-auto max-w-5xl px-5 text-center sm:px-8">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-          Join the builders
-        </div>
-        <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl">
-          Build products that matter.
+    <Section
+      id="careers"
+      glow="center"
+      divider
+      container="narrow"
+      aria-labelledby="careers-heading"
+    >
+      <div className="mx-auto max-w-2xl text-center">
+        <Eyebrow className="justify-center">
+          {fieldText(careers, "eyebrow", "Join the builders")}
+        </Eyebrow>
+        <h2 id="careers-heading" className="type-h2 mt-5 text-foreground">
+          <StyledText
+            text={fieldText(careers, "heading", "Build products that matter.")}
+            accentClassName="text-gold"
+          />
         </h2>
-        <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground">
-          We work with people who care about product quality, solid engineering, and technology that
-          holds up at real scale. If that sounds like you, we want to hear from you.
+        <p className="type-lead mx-auto mt-5">
+          <StyledText
+            text={fieldText(
+              careers,
+              "subheading",
+              "We work with people who care about product quality, solid engineering, and technology that holds up at real scale. If that sounds like you, we want to hear from you.",
+            )}
+            accentClassName="text-gold"
+          />
         </p>
-        <Link
-          to="/contact"
-          className="group mt-8 inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+        <Cta
+          to={fieldText(careers, "ctaUrl", "/contact")}
+          icon="external"
+          className="mt-9"
+          data-cta="careers"
         >
-          Meet the team
-          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-        </Link>
+          {fieldText(careers, "ctaLabel", "Meet the team")}
+        </Cta>
       </div>
-    </section>
+    </Section>
   );
 }

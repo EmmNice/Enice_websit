@@ -83,7 +83,14 @@ export function organizationJsonLd() {
       {
         "@type": "Organization",
         name: "PulseAssist",
-        description: "Multi-tenant AI conversational SaaS for banking and telecom.",
+        description:
+          "AI customer support across WhatsApp, web chat, email, SMS and voice, from one shared inbox.",
+      },
+      {
+        "@type": "Organization",
+        name: "PulseAssist Email",
+        description:
+          "Transactional and marketing email on a verified sending domain, with inbound routing and a REST API.",
       },
       {
         "@type": "FinancialProduct",
@@ -97,7 +104,7 @@ export function organizationJsonLd() {
       },
       {
         "@type": "FinancialProduct",
-        name: "PulsePay Payment Collection",
+        name: "DevaPay",
         description:
           "Payment infrastructure for businesses to accept and manage customer payments.",
       },
@@ -160,7 +167,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/portfolio": {
     title: "Products | ENICE Group",
     description:
-      "PulsePay, PulseAssist, PulsePay Payment Collection, ePulse, and PulseX: the products built and operated by ENICE Group.",
+      "PulsePay, PulseAssist, DevaPay, ePulse, and PulseX: the products built and operated by ENICE Group.",
   },
   "/portfolio/pulsepay": {
     title: "PulsePay | Virtual Payment Platform by ENICE Group",
@@ -170,7 +177,12 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/portfolio/pulseassist": {
     title: "PulseAssist | Enterprise AI Operations Platform by ENICE Group",
     description:
-      "PulseAssist by ENICE Group is a multi-tenant AI operations platform for banking, fintech, and telecom. It handles customer support, runs policy-bound agents, hands off to live agents in real time, and keeps compliance-ready audit trails.",
+      "PulseAssist by ENICE Group answers customers across WhatsApp, web chat, email, SMS and voice from one shared inbox, hands off to a human when it matters, and keeps compliance-ready audit trails.",
+  },
+  "/portfolio/pulseassist-email": {
+    title: "PulseAssist Email | Transactional and Marketing Email by ENICE Group",
+    description:
+      "PulseAssist Email sends and receives mail on your own verified domain: inbound routing, templates, automations, suppression handling and delivery analytics, from a console and a REST API.",
   },
   "/portfolio/epulse": {
     title: "ePulse | Global Financial Platform by ENICE Group",
@@ -182,10 +194,10 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     description:
       "PulseX is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem.",
   },
-  "/portfolio/payment-collection": {
-    title: "PulsePay Payment Collection | ENICE Group",
+  "/portfolio/devapay": {
+    title: "DevaPay | ENICE Group",
     description:
-      "PulsePay Payment Collection is ENICE Group's upcoming payment infrastructure for businesses, launching Q1 2027. Accept and manage customer payments through a single, developer friendly API.",
+      "DevaPay is ENICE Group's upcoming payment infrastructure for businesses, launching Q1 2027. Accept and manage customer payments through a single, developer friendly API.",
   },
   "/about-pulseassist-beta": {
     title: "About the PulseAssist Beta | ENICE Group",

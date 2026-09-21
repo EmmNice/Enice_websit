@@ -11,11 +11,25 @@
  * classes (e.g. --color-primary -> bg-primary, text-primary).
  *
  * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
+ *
+ * ## Two themes, one token vocabulary
+ *
+ * There are two surfaces in this repo with opposite needs: the public marketing site is dark,
+ * and the Website Manager at /admin is a light document-editing tool. Rather than fork the
+ * vocabulary, `:root` holds the light values and the `.site` block below *re-points the same
+ * semantic tokens* at the dark ENICE palette. `SiteShell` puts `.site` on the public tree, so
+ * every `bg-background` / `text-muted-foreground` / `border-border` inside it resolves dark
+ * while /admin keeps resolving light. One set of utilities, no `dark:` duplication, and no way
+ * for a section to be styled for the wrong theme.
  *
  * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 1. Add the variable to :root (light value) and .site (dark value)
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ *
+ * Note that every mapping below is `inline`, which is what makes the scoping work: Tailwind
+ * substitutes `var(--foo)` into the generated rule instead of snapshotting its value, so the
+ * variable is resolved at the element and `.site` can override it. The radius scale relies on
+ * the same property, which is why `.site` can run a different radius ramp from /admin.
  */
 
 @theme inline {
@@ -59,14 +73,33 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Public-site surfaces and accents. Defined on `.site`; see that block for values. */
+  --color-surface-1: var(--surface-1);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-bone: var(--bone);
+  --color-bone-strong: var(--bone-strong);
+  --color-bone-soft: var(--bone-soft);
+  --color-bone-faint: var(--bone-faint);
+  --color-gold: var(--gold);
+  --color-gold-deep: var(--gold-deep);
+  --color-gold-shadow: var(--gold-shadow);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-positive: var(--positive);
+
+  --container-page: var(--page-width);
 }
 
 :root {
   --radius: 0.375rem;
   --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-body: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono:
+    ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-  /* Enterprise Light — navy + charcoal */
+  /* Enterprise Light — navy + charcoal. Used by the Website Manager at /admin. */
   --background: oklch(1 0 0); /* #FFFFFF */
   --foreground: oklch(0.21 0.02 264); /* #111827 charcoal */
   --card: oklch(1 0 0);
@@ -99,6 +132,98 @@
   --sidebar-accent-foreground: oklch(0.21 0.02 264);
   --sidebar-border: oklch(0.92 0.005 250);
   --sidebar-ring: oklch(0.32 0.13 264);
+
+  /* ── ENICE brand canon ──────────────────────────────────────────────────
+   * These five values are the brand itself and are written as the brand
+   * specifies them, not converted, so the spec is checkable against this file.
+   * Everything warm in the design system is derived from them.
+   */
+  --enice-canvas: #080c0e;
+  --enice-bone: #f4f1eb;
+  --enice-mesh-amber: rgb(255 149 41 / 0.05);
+  --enice-mesh-ember: rgb(255 92 20 / 0.035);
+
+  /* The ENICE mark gradient. Reserved for the wordmark — see `.enice-mark`. */
+  --mark-1: #f4f1eb;
+  --mark-2: #d8a45c;
+  --mark-3: #a8702f;
+  --mark-4: #5c3a18;
+
+  /* ── Layout scale ───────────────────────────────────────────────────────
+   * Section rhythm and gutters are fluid rather than a pile of responsive
+   * variants, which is what stops one band being py-28 and the next py-36.
+   */
+  --page-width: 80rem; /* 1280px — the central content grid */
+  --page-gutter: clamp(1.25rem, 4vw, 2rem);
+  --section-y: clamp(4.5rem, 8vw, 8rem); /* standard band */
+  --section-y-tight: clamp(3rem, 5vw, 4.5rem); /* ribbons, strips */
+  --section-y-loose: clamp(5.5rem, 10vw, 10rem); /* the one or two hero-adjacent bands */
+  --measure: 46rem; /* comfortable reading width for prose */
+}
+
+/*
+ * The public marketing site: dark, near-black canvas with bone type.
+ *
+ * Warm tones are accents only — the dominant surfaces stay canvas and the dominant type stays
+ * bone. `--primary` is bone on purpose: it makes every existing `bg-primary` button render as
+ * the bone-on-near-black primary CTA the brand calls for, with no per-button changes.
+ */
+.site {
+  color-scheme: dark;
+
+  /* Radius ramp: sm 6 · md 8 · lg 10 · xl 14 · 2xl 18 · 3xl 22 — tighter than a
+     consumer app, which is what keeps large panels reading as editorial rather than bubbly. */
+  --radius: 0.625rem;
+
+  /* Bone ramp — the same hue stepped toward the canvas, so text tiers never shift temperature. */
+  /* Every tier clears 4.5:1 against both the canvas and the `--surface-2` cards, measured
+     rather than eyeballed: the first pass put `--bone-faint` at #727371, which failed on
+     metadata labels (4.12:1 on canvas, 3.68:1 on a card) — and metadata is exactly the text
+     that is already small. */
+  --bone: #f4f1eb; /* 17.4:1 on canvas */
+  --bone-strong: #c5c3bf; /* 10.8:1 */
+  --bone-soft: #a1a09e; /*  8.0:1 */
+  --bone-faint: #8a8886; /*  5.6:1 on canvas, 5.0:1 on a card */
+
+  /* Warm accents, drawn from the mark. Restrained by design: labels, icons, fine borders. */
+  --gold: #d8a45c;
+  --gold-deep: #a8702f;
+  --gold-shadow: #5c3a18;
+
+  /* Surfaces, each a small lift of the canvas toward bone. */
+  --surface-1: #0f1315; /* recessed bands, inputs at rest */
+  --surface-2: #161a1b; /* cards and panels */
+  --surface-3: #1e2324; /* hover, active, raised detail */
+
+  --hairline: rgb(244 241 235 / 0.1);
+  --hairline-strong: rgb(244 241 235 / 0.16);
+  --positive: #5fb98c; /* operational / success, the one non-warm accent */
+
+  --background: var(--enice-canvas);
+  --foreground: var(--bone);
+  --card: var(--surface-2);
+  --card-foreground: var(--bone);
+  --popover: var(--surface-2);
+  --popover-foreground: var(--bone);
+
+  /* Primary CTA: bone surface, near-black text. */
+  --primary: var(--bone);
+  --primary-foreground: var(--enice-canvas);
+
+  --secondary: var(--surface-1);
+  --secondary-foreground: var(--bone);
+  --muted: var(--surface-1);
+  --muted-foreground: var(--bone-soft); /* 8.0:1 on canvas */
+  --accent: var(--gold);
+  --accent-foreground: var(--enice-canvas);
+  --destructive: #e2725b;
+  --destructive-foreground: var(--enice-canvas);
+  --border: var(--hairline);
+  --input: var(--hairline-strong);
+  --ring: var(--gold);
+
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .dark {
@@ -144,6 +269,7 @@
 
   html {
     overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
   }
 
   body {
@@ -182,6 +308,550 @@
   h6 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
+    text-wrap: pretty;
+  }
+
+  /*
+   * One visible focus state for the whole site.
+   *
+   * Keyboard focus was previously only as visible as each component's own styling made it,
+   * which on a near-black canvas meant several controls had no perceptible focus at all.
+   * `:focus-visible` keeps it off mouse clicks, so this costs the pointer experience nothing.
+   */
+  :focus-visible {
+    outline: 2px solid var(--color-ring);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  .site ::selection {
+    background-color: rgb(216 164 92 / 0.28);
+    color: var(--bone);
+  }
+}
+
+@layer components {
+  /* ── Layout ───────────────────────────────────────────────────────────────
+   * `.page-shell` is the central content grid: one max width, one gutter pair,
+   * everywhere. `.section` owns vertical rhythm so bands cannot drift apart.
+   */
+  .page-shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--page-width);
+    padding-inline: var(--page-gutter);
+  }
+
+  .page-shell-narrow {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 64rem;
+    padding-inline: var(--page-gutter);
+  }
+
+  .page-shell-prose {
+    margin-inline: auto;
+    width: 100%;
+    max-width: var(--measure);
+    padding-inline: var(--page-gutter);
+  }
+
+  .section {
+    padding-block: var(--section-y);
+  }
+
+  .section-tight {
+    padding-block: var(--section-y-tight);
+  }
+
+  .section-loose {
+    padding-block: var(--section-y-loose);
+  }
+
+  /* ── Typography ───────────────────────────────────────────────────────────
+   * A fixed set of roles. Sizes are fluid so there is one definition per role
+   * instead of a different sm:/lg:/xl: chain per section.
+   */
+  /*
+   * The display role tops out at 3.5rem. The first pass allowed 4.75rem, which pushed the hero
+   * headline to five lines at 1440px and drove the CTAs to the fold — the opposite of the
+   * confidence a large headline is supposed to convey. Hierarchy here comes from the gap between
+   * the roles and the whitespace around them, not from absolute size.
+   */
+  .type-display {
+    font-size: clamp(2.125rem, 4.4vw, 3.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.032em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .type-h2 {
+    font-size: clamp(1.75rem, 2.9vw, 2.5rem);
+    line-height: 1.12;
+    letter-spacing: -0.028em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  .type-h3 {
+    font-size: clamp(1.25rem, 1.7vw, 1.5rem);
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  .type-lead {
+    font-size: clamp(1rem, 1.25vw, 1.1875rem);
+    line-height: 1.65;
+    color: var(--color-muted-foreground);
+    text-wrap: pretty;
+  }
+
+  .type-body {
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--color-muted-foreground);
+    text-wrap: pretty;
+  }
+
+  /* Small uppercase label. Warm, because this is exactly the "small highlight"
+     the accent is for — and it is the one place gold appears on every page. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .eyebrow-muted {
+    color: var(--color-muted-foreground);
+  }
+
+  /* Restrained metadata: timestamps, counters, captions. */
+  .type-meta {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
+    color: var(--bone-faint);
+  }
+
+  /* Figures read as data, not prose. */
+  .tnum {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+  }
+
+  /* ── Surfaces ─────────────────────────────────────────────────────────────
+   * One card treatment. The inset top highlight is what reads as "premium" on a
+   * near-black canvas, where a drop shadow does almost nothing.
+   */
+  .panel {
+    position: relative;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    background-color: var(--surface-2);
+  }
+
+  .panel-quiet {
+    position: relative;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    background-color: var(--surface-1);
+  }
+
+  .panel-raised {
+    position: relative;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    background-color: var(--surface-2);
+    box-shadow:
+      inset 0 1px 0 0 rgb(244 241 235 / 0.05),
+      0 24px 48px -28px rgb(0 0 0 / 0.75);
+  }
+
+  /* Hover affordance for interactive cards. Colour and border only — no lift, so
+     a grid of cards does not bounce as the pointer crosses it. */
+  .panel-interactive {
+    transition:
+      background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .panel-interactive:hover {
+    background-color: var(--surface-3);
+    border-color: var(--hairline-strong);
+  }
+
+  /* Hairline-divided grid: children sit on the border colour and paint their own
+     background, which is how the 1px rules between cards stay exactly 1px. */
+  .grid-hairline {
+    display: grid;
+    gap: 1px;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-border);
+  }
+
+  .grid-hairline > * {
+    background-color: var(--color-background);
+  }
+
+  /* ── Buttons ──────────────────────────────────────────────────────────────
+   * Three treatments, deliberately few. Hover is a small tonal shift; no scale,
+   * no shadow bloom, no icon gymnastics beyond a 2px nudge.
+   */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 2.75rem;
+    padding-inline: 1.375rem;
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.005em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease,
+      opacity 200ms ease;
+  }
+
+  .btn-sm {
+    height: 2.375rem;
+    padding-inline: 1rem;
+    font-size: 0.75rem;
+  }
+
+  .btn-lg {
+    height: 3rem;
+    padding-inline: 1.75rem;
+    font-size: 0.875rem;
+  }
+
+  .btn-primary {
+    background-color: var(--bone);
+    border-color: var(--bone);
+    color: var(--enice-canvas);
+  }
+
+  .btn-primary:hover {
+    background-color: var(--bone-strong);
+    border-color: var(--bone-strong);
+  }
+
+  .btn-secondary {
+    background-color: rgb(244 241 235 / 0.04);
+    border-color: var(--hairline-strong);
+    color: var(--bone);
+  }
+
+  .btn-secondary:hover {
+    background-color: rgb(244 241 235 / 0.08);
+    border-color: rgb(216 164 92 / 0.45);
+  }
+
+  .btn-ghost {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--bone-strong);
+  }
+
+  .btn-ghost:hover {
+    background-color: rgb(244 241 235 / 0.06);
+    color: var(--bone);
+  }
+
+  .btn[aria-disabled="true"],
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* ── Atmosphere ───────────────────────────────────────────────────────────
+   * Ambient warm lighting, the only large-area use of the accent. Both stops are
+   * under 5% alpha, so the surface stays near-black and never reads as an orange
+   * panel. Purely decorative: always paired with aria-hidden.
+   */
+  .mesh-glow {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(60rem 32rem at 18% -10%, var(--enice-mesh-amber), transparent 70%),
+      radial-gradient(48rem 28rem at 88% 4%, var(--enice-mesh-ember), transparent 72%);
+  }
+
+  .mesh-glow-center {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(52rem 26rem at 50% 0%, var(--enice-mesh-amber), transparent 72%);
+  }
+
+  /* The technical grid backdrop. Replaces nine hand-tuned inline copies that had
+     drifted to four different line colours and three different cell sizes. */
+  .tech-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    --grid-cell: 72px;
+    background-image:
+      linear-gradient(to right, rgb(244 241 235 / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(244 241 235 / 0.035) 1px, transparent 1px);
+    background-size: var(--grid-cell) var(--grid-cell);
+    mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, black 35%, transparent 80%);
+    -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, black 35%, transparent 80%);
+  }
+
+  .tech-grid-flat {
+    mask-image: none;
+    -webkit-mask-image: none;
+    opacity: 0.5;
+  }
+
+  /* Hairline that fades at both ends — used to close sections without a hard rule. */
+  .rule-fade {
+    height: 1px;
+    border: 0;
+    background: linear-gradient(
+      to right,
+      transparent,
+      var(--hairline-strong) 20%,
+      var(--hairline-strong) 80%,
+      transparent
+    );
+  }
+
+  /* ── The ENICE mark ───────────────────────────────────────────────────────
+   * The only place the four-stop brand gradient appears. Falls back to bone where
+   * background-clip: text is unsupported.
+   */
+  .enice-mark {
+    color: var(--mark-1);
+    background-image: linear-gradient(
+      108deg,
+      var(--mark-1) 0%,
+      var(--mark-2) 42%,
+      var(--mark-3) 74%,
+      var(--mark-4) 100%
+    );
+  }
+
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .enice-mark {
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+  }
+
+  /* ── Third-party logos ────────────────────────────────────────────────────
+   * Renders any partner mark as a flat bone silhouette, then returns its real
+   * colours on hover.
+   *
+   * Two problems, one treatment. Legibility: Vercel's and Resend's marks are
+   * `#000000`, so they were invisible on the canvas — and they are upstream brand
+   * assets, so recolouring the files is both wrong and impossible to do safely for
+   * logos an administrator uploads later. Composition: six full-colour marks
+   * (orange, blue, green) in a restrained near-black and bone palette read as
+   * clip art and fight everything around them.
+   *
+   * The filter chain flattens any input — colour, black, white — to a single
+   * value, which is why it also covers whatever gets uploaded next. Shape is
+   * preserved, which is what brand guidelines actually care about, and hover
+   * restores the mark in full.
+   */
+  .logo-mono {
+    filter: grayscale(1) brightness(0) invert(0.95);
+    opacity: 0.7;
+    transition:
+      filter 260ms ease,
+      opacity 260ms ease;
+  }
+
+  .group:hover .logo-mono,
+  a:hover .logo-mono {
+    filter: none;
+    opacity: 1;
+  }
+
+  /* Edge-fade mask for horizontally scrolling / marquee rows. */
+  .edge-fade {
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  /* ── Mobile card rows ─────────────────────────────────────────────────────
+   * Cards stack on a phone and become a grid from `sm` up. Deliberately NOT a
+   * horizontal scroller.
+   *
+   * An earlier version made each row a `scroll-snap-type: x mandatory` scroller
+   * so a four-card row could be swiped instead of stacking. It broke vertical
+   * scrolling: the rows are tall, so they covered most of the screen, and any
+   * slightly diagonal swipe was captured as a horizontal gesture — the page
+   * simply would not move under your thumb. Reported from a real device, and
+   * reproducible.
+   *
+   * There is no partial fix worth having. `touch-action: pan-y` gives the page
+   * its vertical gesture back but kills the horizontal swipe the row existed
+   * for, and mandatory snap is a known source of scroll trapping on Android
+   * regardless. A page that scrolls is worth more than a row that swipes, and
+   * stacked cards are what most large product sites do on mobile anyway.
+   */
+  .card-row {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  /*
+   * Expands a small control's touch area to 44px without moving anything.
+   *
+   * An audit at 390px found 26–31 controls per page under the 44px minimum —
+   * footer links at 16px tall, the social icons at 36px, inline text links at
+   * 15px. Adding padding would have reflowed every one of those layouts, so the
+   * hit area is an invisible pseudo-element centred on the control instead.
+   */
+  .tap {
+    position: relative;
+  }
+
+  .tap::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    height: 100%;
+    min-height: 2.75rem;
+    width: 100%;
+    min-width: 2.75rem;
+  }
+}
+
+/* ── Touch and small-screen refinements ─────────────────────────────────────
+ * Keyed on `pointer: coarse` rather than a width breakpoint: the constraint is
+ * the finger, not the viewport, so this correctly covers a large tablet and
+ * correctly leaves a small desktop window alone.
+ */
+@media (pointer: coarse) {
+  .site {
+    /* A touch UI needs more room between adjacent targets than a cursor does. */
+    --section-y: clamp(4rem, 12vw, 6rem);
+    --section-y-tight: clamp(2.5rem, 8vw, 3.5rem);
+    --section-y-loose: clamp(4.5rem, 14vw, 7rem);
+  }
+
+  /* Every button clears the 44px minimum, whatever size variant it carries. */
+  .btn,
+  .btn-sm,
+  .btn-lg {
+    min-height: 2.75rem;
+  }
+
+  /* So does every form control. The contact form's inputs measured 41–42px — close enough to look
+     fine and still under the threshold, which is exactly the kind of miss that only shows up when
+     someone tries to tap one on a moving train. */
+  .site input:not([type="checkbox"]):not([type="radio"]),
+  .site select,
+  .site textarea {
+    min-height: 2.75rem;
+  }
+
+  /* The grey flash on tap is a browser default that looks like a bug on a dark
+     site; `:active` states below replace it with something intentional. */
+  a,
+  button,
+  [role="button"],
+  summary {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Touch has no hover, so pressed feedback is the only affordance there is. */
+  .btn:active {
+    scale: 0.985;
+  }
+
+  .panel-interactive:active {
+    background-color: var(--surface-3);
+  }
+}
+
+@media (width < 40rem) {
+  .site {
+    /* 34px display type turned the homepage headline into six lines on a 390px
+       screen and pushed the CTAs under the fold. */
+    --page-gutter: 1.25rem;
+  }
+
+  /*
+   * Smaller and tighter than the first attempt, which ran the hero headline to six lines on a
+   * 390px screen. Six lines of 32px type is not a confident headline, it is a wall — and the
+   * giveaway that a layout was scaled down rather than designed for the width.
+   */
+  .type-display {
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    line-height: 1.12;
+    letter-spacing: -0.022em;
+  }
+
+  .type-h2 {
+    font-size: clamp(1.375rem, 5.8vw, 1.75rem);
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+  }
+
+  /* Wide display tracking is a desktop luxury; at phone sizes it just costs characters per line
+     and pushes labels onto a second row. */
+  .eyebrow {
+    letter-spacing: 0.14em;
+  }
+
+  /* The technical grid is drawn at 72px cells, which at 390px wide is five
+     visible columns — coarse enough to read as a pattern rather than texture. */
+  .tech-grid {
+    --grid-cell: 40px;
+  }
+
+  /* A row of actions is a stack of full-width targets on a phone. Buttons sized
+     to their label left the primary and secondary CTAs at different widths,
+     which reads as an accident rather than a hierarchy. */
+  .btn-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.625rem;
+  }
+
+  .btn-stack > .btn {
+    width: 100%;
+  }
+}
+
+/* ── Safe areas ─────────────────────────────────────────────────────────────
+ * Respect the iOS home indicator and any notch in landscape. Without the bottom
+ * inset, the footer's last row and the assistant launcher sit under the home bar
+ * on every modern iPhone.
+ */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: calc(var(--safe-pad, 0px) + env(safe-area-inset-bottom));
+  }
+
+  .safe-inline {
+    padding-left: max(var(--page-gutter), env(safe-area-inset-left));
+    padding-right: max(var(--page-gutter), env(safe-area-inset-right));
   }
 }
 
@@ -189,45 +859,39 @@
 @keyframes heroUp {
   from {
     opacity: 0;
-    transform: translateY(48px) scale(0.97);
-    filter: blur(10px);
+    transform: translateY(28px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
-    filter: blur(0px);
+    transform: translateY(0);
   }
 }
 @keyframes heroRight {
   from {
     opacity: 0;
-    transform: translateX(64px) scale(0.95);
-    filter: blur(10px);
+    transform: translateX(32px);
   }
   to {
     opacity: 1;
-    transform: translateX(0) scale(1);
-    filter: blur(0px);
+    transform: translateX(0);
   }
 }
 @keyframes heroFadeIn {
   from {
     opacity: 0;
-    filter: blur(6px);
   }
   to {
     opacity: 1;
-    filter: blur(0px);
   }
 }
 .animate-hero-up {
-  animation: heroUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: heroUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .animate-hero-right {
-  animation: heroRight 1.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: heroRight 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 .animate-hero-fade {
-  animation: heroFadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: heroFadeIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* ── Infinite marquee ────────────────────────────────────────────────────── */
@@ -248,10 +912,10 @@
   }
 }
 .animate-marquee {
-  animation: marquee 38s linear infinite;
+  animation: marquee 52s linear infinite;
 }
 .animate-marquee-reverse {
-  animation: marquee-reverse 38s linear infinite;
+  animation: marquee-reverse 52s linear infinite;
 }
 .animate-marquee:hover,
 .animate-marquee-reverse:hover {

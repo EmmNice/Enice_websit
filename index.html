@@ -1,19 +1,33 @@
 <!doctype html>
-<html lang="en">
+<!--
+  `class="site"` puts the public site's dark theme on the document element itself rather than on a
+  wrapper inside #root. That is what makes the near-black canvas cover the viewport before React
+  boots, behind a rubber-band overscroll, and in the prerendered HTML crawlers receive — a wrapper
+  would have flashed white on every first paint. `__root.tsx` removes the class under /admin, which
+  is a light-theme tool.
+-->
+<html lang="en" class="site">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Only the weights the design system actually uses (300 for the wordmark, 400/500 for body and
+      labels, 600 for headings and buttons, 700 for the mark). 800 was requested and never used,
+      and every unused weight is a font file the browser may fetch on a slow connection.
+    -->
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
     />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="256x256" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
-    <meta name="theme-color" content="#111827" />
+    <!-- The canvas, so the browser chrome matches the page instead of framing it in navy. -->
+    <meta name="theme-color" content="#080c0e" />
+    <meta name="color-scheme" content="dark" />
 
     <!--
       Only site-wide constants belong here. Page-specific title, description, canonical,

@@ -1,8 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
+import type { LucideIcon } from "lucide-react";
 import {
-  ArrowUpRight,
   Wifi,
+  Boxes,
   CreditCard,
   Check,
   ShieldCheck,
@@ -12,11 +13,20 @@ import {
   BarChart3,
   Lock,
 } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { StyledText } from "@/components/site/StyledText";
-import { useSectionFields, fieldText } from "@/lib/cms/use-section";
-import { SHADOW_CARD } from "@/lib/design";
+import { SiteShell } from "@/components/site/SiteShell";
+import {
+  Cta,
+  Eyebrow,
+  IconTile,
+  Metric,
+  Panel,
+  Section,
+  SectionIntro,
+  Tag,
+} from "@/components/site/primitives";
+import { PRODUCTS } from "@/components/site/navigation";
+import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
+import { SHADOW_CARD, SHADOW_FLOAT, SURFACE_1, SURFACE_2, SURFACE_3 } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/pulsepay")({
@@ -54,7 +64,48 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
   component: PulsePayPage,
 });
 
-const SHADOW_LIFT = "0 4px 6px -1px rgba(17,24,39,0.06), 0 10px 24px -8px rgba(17,24,39,0.08)";
+/**
+ * The payment-card mock, retoned onto the surface ramp.
+ *
+ * Was `linear-gradient(135deg, #1a2e6b …)` plus a grey `#c5cad4` card behind it — the old navy
+ * brand colour and a light-theme grey. Both are built from the shared surface constants now, so
+ * the card reads as the same material as the panels around it and cannot drift from them.
+ */
+const CARD_FACE = `linear-gradient(135deg, ${SURFACE_3} 0%, ${SURFACE_2} 55%, ${SURFACE_1} 100%)`;
+const CARD_BEHIND = `linear-gradient(135deg, ${SURFACE_2} 0%, ${SURFACE_1} 100%)`;
+
+// ─── Fallback content ─────────────────────────────────────────────────────────
+//
+// The three blocks below are the *fallbacks* for the page's CMS sections, not its only source of
+// content. Each band reads `portfolio.pulsepay.*` and overlays whatever an administrator has
+// published, so the copy here is what paints before the CMS answers and what survives an outage —
+// `useSectionFields` treats a degraded bootstrap as "not loaded" on purpose. See
+// `src/lib/cms/use-section.ts`.
+
+/**
+ * Icons an editor may name on a CMS-managed capability card.
+ *
+ * A curated map rather than importing all of lucide, which would add a large amount of JavaScript
+ * to the public bundle for the sake of a handful of names. Anything unrecognised falls back to a
+ * neutral icon, so a typo degrades instead of leaving an empty tile. Same approach as
+ * `CARD_ICONS` in src/routes/index.tsx.
+ */
+const CARD_ICONS: Record<string, LucideIcon> = {
+  BarChart3,
+  Boxes,
+  Check,
+  CreditCard,
+  Globe,
+  Lock,
+  ShieldCheck,
+  Users,
+  Wifi,
+  Zap,
+};
+
+function cardIcon(name: string): LucideIcon {
+  return CARD_ICONS[name] ?? Boxes;
+}
 
 const FEATURES = [
   {
@@ -89,281 +140,274 @@ const FEATURES = [
   },
 ];
 
+/**
+ * Only figures that can be checked.
+ *
+ * `< 5s — Card issuance time` was removed: it is a measured-sounding performance figure with no
+ * published benchmark behind it, exactly the kind of claim the homepage stats strip was cleaned
+ * up for. What the product does is still described in the capabilities below.
+ */
 const STATS = [
-  { value: "< 5s", label: "Card issuance time" },
   { value: "Naira & USD", label: "Card currencies" },
   { value: "2", label: "Currency rails (NGN + USD)" },
   { value: "Every account", label: "KYC screening" },
 ];
 
+const COMPLIANCE_MECHANISMS = [
+  "Row-Level Security",
+  "Tenant Isolation",
+  "Audit Logging",
+  "KYC Screening",
+];
+
+/** Product lifecycle, from the shared registry — never a hand-written status string. */
+const STAGE_LABEL = { available: "Available", building: "In development" } as const;
+const STAGE = PRODUCTS.find((p) => p.to === "/portfolio/pulsepay")?.stage ?? "building";
+
 function PulsePayPage() {
   // Page header, editable through the `portfolio.pulsepay` section.
   const header = useSectionFields("portfolio.pulsepay");
+  const factsSection = useSectionFields("portfolio.pulsepay.stats");
+  const featuresSection = useSectionFields("portfolio.pulsepay.features");
+  const complianceSection = useSectionFields("portfolio.pulsepay.compliance");
+
+  // The facts strip. Rows without a value are skipped rather than rendered blank.
+  const stats = fieldItems(factsSection, "items", STATS, (row) => {
+    const value = typeof row.value === "string" ? row.value.trim() : "";
+    const label = typeof row.label === "string" ? row.label.trim() : "";
+    return value ? { value, label } : null;
+  });
+
+  // The capability cards. `icon` is a lucide name resolved through the curated map above.
+  const features = fieldItems(featuresSection, "items", FEATURES, (row) => {
+    const title = typeof row.title === "string" ? row.title.trim() : "";
+    if (!title) return null;
+    return {
+      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
+      title,
+      desc: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
+  // The compliance pills are a plain list of mechanism names, so only each row's title is read.
+  const complianceMechanisms = fieldItems<string>(
+    complianceSection,
+    "items",
+    COMPLIANCE_MECHANISMS,
+    (row) => (typeof row.title === "string" && row.title.trim() ? row.title.trim() : null),
+  );
 
   return (
-    <div className="min-h-dvh bg-background text-foreground antialiased">
-      <SiteHeader />
-      <main id="main">
-        {/* ── Hero ── */}
-        <section className="border-b border-border bg-secondary py-20 sm:py-28">
-          <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center">
-            {/* Copy */}
-            <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                {fieldText(header, "eyebrow", "Fintech Infrastructure Platform")}
-              </div>
-              <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
-                <StyledText text={fieldText(header, "heading", "PulsePay")} />
-              </h1>
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                <StyledText
-                  text={fieldText(
-                    header,
-                    "subheading",
-                    "A virtual payment platform that issues Naira and USD cards, handles KYC verification, moves funds between users, and delivers value-added services with speed and reliability.",
-                  )}
-                />
-              </p>
+    <SiteShell>
+      {/* ═══ HERO ═══════════════════════════════════════════════════════════ */}
+      <Section spacing="loose" grid glow="spread" aria-labelledby="pulsepay-heading">
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+          {/* ── Copy ── */}
+          <div>
+            <SectionIntro
+              id="pulsepay-heading"
+              level={1}
+              eyebrow={fieldText(header, "eyebrow", "Fintech Infrastructure Platform")}
+              heading={fieldText(header, "heading", "PulsePay")}
+              lead={fieldText(
+                header,
+                "subheading",
+                "A virtual payment platform that issues Naira and USD cards, handles KYC verification, moves funds between users, and delivers value-added services with speed and reliability.",
+              )}
+            />
 
-              {/* Status + platform label */}
-              <div className="mt-6 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-600">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  Operational
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-medium text-muted-foreground">
-                  <Globe className="h-3 w-3" />
-                  Nigeria
-                </span>
-              </div>
+            {/* Lifecycle + market.
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="mailto:corporate@enicehq.com?subject=PulsePay%20Access%20Request"
-                  className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-                >
-                  Request Access
-                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-                </a>
-                <Link
-                  to="/portfolio"
-                  className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
-                >
-                  All Products
-                </Link>
-              </div>
+                The first pill read "Operational" with a pinging green dot. Nothing on this page
+                measures whether PulsePay is up, and /status is the only surface that does — so the
+                pill now states the product's lifecycle stage, read from the product registry,
+                which is a fact with a source. */}
+            <div className="mt-8 flex flex-wrap gap-2">
+              <Tag tone={STAGE === "available" ? "positive" : "warm"}>{STAGE_LABEL[STAGE]}</Tag>
+              <Tag>
+                <Globe aria-hidden className="h-3 w-3 shrink-0" />
+                Nigeria
+              </Tag>
             </div>
 
-            {/* Card visual */}
-            <div
-              className="relative rounded-xl border border-border bg-background"
-              style={{ boxShadow: SHADOW_CARD, minHeight: "300px" }}
-            >
-              {/* Dot grid background */}
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Cta
+                to="mailto:corporate@enicehq.com?subject=PulsePay%20Access%20Request"
+                icon="external"
+              >
+                Request Access
+              </Cta>
+              <Cta to="/portfolio" variant="secondary">
+                All Products
+              </Cta>
+            </div>
+          </div>
+
+          {/* ── Card visual ──
+              Decorative: `aria-hidden`, with nothing focusable inside it. */}
+          <Panel
+            aria-hidden
+            className="relative overflow-hidden"
+            style={{ boxShadow: SHADOW_CARD, minHeight: "300px" }}
+          >
+            <div className="tech-grid tech-grid-flat" />
+
+            {/* Card stack — fixed pixel size so it never grows too large on mobile */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              {/* Card peeking from the upper-right */}
               <div
-                aria-hidden
-                className="pointer-events-none absolute inset-0"
+                className="absolute rounded-2xl border border-border"
                 style={{
-                  backgroundImage:
-                    "linear-gradient(to right, rgba(17,24,39,0.05) 1px, transparent 1px), linear-gradient(to bottom, rgba(17,24,39,0.05) 1px, transparent 1px)",
-                  backgroundSize: "28px 28px",
-                  opacity: 0.6,
+                  width: "200px",
+                  aspectRatio: "1.586/1",
+                  background: CARD_BEHIND,
+                  transform: "rotate(7deg) translate(22px, -18px)",
+                  boxShadow: SHADOW_CARD,
                 }}
               />
 
-              {/* Card stack — fixed pixel size so it never grows too large on mobile */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                {/* Shadow card — peeking from upper-right */}
-                <div
-                  aria-hidden
-                  className="absolute rounded-2xl"
-                  style={{
-                    width: "200px",
-                    aspectRatio: "1.586/1",
-                    background: "linear-gradient(135deg, #c5cad4 0%, #9aa0ad 100%)",
-                    opacity: 0.6,
-                    transform: "rotate(7deg) translate(22px, -18px)",
-                    boxShadow: SHADOW_LIFT,
-                  }}
-                />
-
-                {/* Main blue card */}
-                <div
-                  className="relative flex flex-col justify-between rounded-2xl p-4 text-white"
-                  style={{
-                    width: "200px",
-                    aspectRatio: "1.586/1",
-                    background: "linear-gradient(135deg, #1a2e6b 0%, #0f1f52 55%, #162560 100%)",
-                    transform: "rotate(-4deg)",
-                    boxShadow: "0 16px 40px rgba(17,24,39,0.30)",
-                  }}
-                >
-                  {/* Top: brand + NFC */}
-                  <div className="flex items-start justify-between">
-                    <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-white/90">
-                      PulsePay
-                    </span>
-                    <Wifi className="h-3.5 w-3.5 rotate-90 text-white/70" aria-hidden />
-                  </div>
-                  {/* Chip */}
-                  <div className="h-6 w-9 rounded-md bg-gradient-to-br from-yellow-100 to-amber-400" />
-                  {/* Card number */}
-                  <div className="font-mono text-[9px] tracking-[0.2em] text-white/80">
-                    •••• •••• •••• ••••
-                  </div>
-                  {/* Bottom: cardholder + icon */}
-                  <div className="flex items-end justify-between">
-                    <div>
-                      <div className="text-[6px] uppercase tracking-[0.2em] text-white/50">
-                        Cardholder
-                      </div>
-                      <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/95">
-                        ENICE GROUP
-                      </div>
-                    </div>
-                    <CreditCard
-                      className="h-4 w-4 text-white/60"
-                      strokeWidth={1.5}
-                      aria-label="Virtual payment card"
-                    />
-                  </div>
+              {/* Main card */}
+              <div
+                className="relative flex flex-col justify-between rounded-2xl border border-border p-4"
+                style={{
+                  width: "200px",
+                  aspectRatio: "1.586/1",
+                  background: CARD_FACE,
+                  transform: "rotate(-4deg)",
+                  boxShadow: SHADOW_FLOAT,
+                }}
+              >
+                {/* Top: brand + NFC */}
+                <div className="flex items-start justify-between">
+                  <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-bone-strong">
+                    PulsePay
+                  </span>
+                  <Wifi className="h-3.5 w-3.5 rotate-90 text-bone-faint" />
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Stats strip ── */}
-        <section className="border-b border-border bg-background">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid grid-cols-2 divide-x divide-y divide-border md:grid-cols-4 md:divide-y-0">
-              {STATS.map((s) => (
-                <div key={s.label} className="p-8 text-center">
-                  <div className="text-3xl font-semibold tracking-tight text-foreground">
-                    {s.value}
-                  </div>
-                  <div className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                    {s.label}
-                  </div>
+                {/* Chip — the one place a small gold fill is right */}
+                <div className="h-6 w-9 rounded-md bg-gradient-to-br from-gold to-gold-deep" />
+                {/* Card number */}
+                <div className="tnum font-mono text-[9px] tracking-[0.2em] text-bone-soft">
+                  •••• •••• •••• ••••
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Platform capabilities ── */}
-        <section className="bg-secondary py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Platform Capabilities
-              </div>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Everything a modern payments stack should be.
-              </h2>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                PulsePay covers the full payments stack: issuance, compliance, transfers, and
-                spending controls, in one integrated platform.
-              </p>
-            </div>
-
-            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {FEATURES.map((f) => (
-                <div
-                  key={f.title}
-                  className="flex gap-4 rounded-xl border border-border bg-background p-6"
-                  style={{ boxShadow: SHADOW_CARD }}
-                >
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-primary/8 text-primary ring-1 ring-primary/15">
-                    <f.icon className="h-5 w-5" strokeWidth={1.75} />
-                  </div>
+                {/* Bottom: cardholder + icon */}
+                <div className="flex items-end justify-between">
                   <div>
-                    <h3 className="text-[15px] font-semibold text-foreground">{f.title}</h3>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
-                      {f.desc}
-                    </p>
+                    <div className="text-[6px] uppercase tracking-[0.2em] text-bone-faint">
+                      Cardholder
+                    </div>
+                    <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-foreground">
+                      ENICE GROUP
+                    </div>
                   </div>
+                  <CreditCard className="h-4 w-4 text-bone-faint" strokeWidth={1.5} />
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Compliance callout ── */}
-        <section className="border-y border-border bg-background py-16">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
-              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl border border-border bg-secondary">
-                <ShieldCheck className="h-6 w-6 text-primary" strokeWidth={1.75} />
               </div>
+            </div>
+          </Panel>
+        </div>
+      </Section>
+
+      {/* ═══ FACTS STRIP ════════════════════════════════════════════════════ */}
+      {/* A wrapping row rather than a fixed four-column grid: the grid was sized for four figures
+          and there are three, which left a quarter of the band empty. */}
+      <Section spacing="tight" container="narrow" divider>
+        <div className="flex flex-wrap justify-center gap-x-16 gap-y-8 sm:gap-x-24">
+          {stats.map((s, i) => (
+            <Metric key={`${s.label}-${i}`} value={s.value} label={s.label} align="center" />
+          ))}
+        </div>
+      </Section>
+
+      {/* ═══ PLATFORM CAPABILITIES ══════════════════════════════════════════ */}
+      <Section divider glow="center" aria-labelledby="capabilities-heading">
+        <SectionIntro
+          id="capabilities-heading"
+          align="center"
+          eyebrow={fieldText(featuresSection, "eyebrow", "Platform Capabilities")}
+          heading={fieldText(
+            featuresSection,
+            "heading",
+            "Everything a modern payments stack should be.",
+          )}
+          lead={fieldText(
+            featuresSection,
+            "subheading",
+            "PulsePay covers the full payments stack: issuance, compliance, transfers, and spending controls, in one integrated platform.",
+          )}
+        />
+
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <Panel key={f.title} interactive className="flex gap-4 p-6">
+              <IconTile icon={f.icon} size="sm" className="h-11 w-11" />
               <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  Compliance & Regulation
-                </div>
-                <h2 className="mt-1 text-xl font-semibold tracking-tight text-foreground">
-                  Built for regulated markets from the ground up.
-                </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                  PulsePay operates within Nigeria's regulatory framework, with row-level security,
-                  KYC screening on every account, and audit logging of privileged actions. PulsePay
-                  holds no third-party security certification today, and we will tell you so
-                  directly rather than imply otherwise.
-                </p>
+                <h3 className="text-[15px] font-semibold text-foreground">{f.title}</h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-bone-soft">{f.desc}</p>
               </div>
-              <div className="shrink-0">
-                <div className="flex flex-wrap gap-2">
-                  {["Row-Level Security", "Tenant Isolation", "Audit Logging", "KYC Screening"].map(
-                    (b) => (
-                      <span
-                        key={b}
-                        className="flex items-center gap-1.5 rounded-md border border-border bg-secondary px-3 py-1.5 text-[11px] font-semibold text-foreground/70"
-                      >
-                        <Check className="h-3 w-3 text-primary" strokeWidth={2.5} />
-                        {b}
-                      </span>
-                    ),
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+            </Panel>
+          ))}
+        </div>
+      </Section>
 
-        {/* ── CTA ── */}
-        <section className="bg-secondary py-20">
-          <div className="mx-auto max-w-2xl px-5 text-center sm:px-8">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              Get Started
-            </div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Ready to integrate PulsePay?
+      {/* ═══ COMPLIANCE ═════════════════════════════════════════════════════ */}
+      <Section container="narrow" tone="recessed" divider aria-labelledby="compliance-heading">
+        <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center">
+          <IconTile icon={ShieldCheck} className="h-14 w-14" />
+          <div>
+            <Eyebrow muted>
+              {fieldText(complianceSection, "eyebrow", "Compliance & Regulation")}
+            </Eyebrow>
+            <h2 id="compliance-heading" className="type-h3 mt-2 text-foreground">
+              {fieldText(
+                complianceSection,
+                "heading",
+                "Built for regulated markets from the ground up.",
+              )}
             </h2>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-muted-foreground">
-              Contact our enterprise team to discuss integration options, pricing, and access to the
-              PulsePay platform.
+            <p data-allow-select className="type-body mt-2 max-w-2xl">
+              {fieldText(
+                complianceSection,
+                "subheading",
+                "PulsePay operates within Nigeria's regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions. PulsePay holds no third-party security certification today, and we will tell you so directly rather than imply otherwise.",
+              )}
             </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href="mailto:corporate@enicehq.com?subject=PulsePay%20Access%20Request"
-                className="group inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-              >
-                Request Access
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-              </a>
-              <Link
-                to="/portfolio"
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-7 py-3.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
-              >
-                View All Products
-              </Link>
-            </div>
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </div>
+          <ul className="flex shrink-0 flex-wrap gap-2">
+            {complianceMechanisms.map((b) => (
+              <li key={b}>
+                <Tag>
+                  <Check aria-hidden className="h-3 w-3 shrink-0 text-gold" strokeWidth={2.5} />
+                  {b}
+                </Tag>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </Section>
+
+      {/* ═══ CTA ════════════════════════════════════════════════════════════ */}
+      <Section container="prose" divider glow="center" aria-labelledby="cta-heading">
+        <SectionIntro
+          id="cta-heading"
+          align="center"
+          eyebrow="Get Started"
+          heading="Ready to integrate PulsePay?"
+          lead="Contact our enterprise team to discuss integration options, pricing, and access to the PulsePay platform."
+        />
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Cta
+            to="mailto:corporate@enicehq.com?subject=PulsePay%20Access%20Request"
+            size="lg"
+            icon="external"
+          >
+            Request Access
+          </Cta>
+          <Cta to="/portfolio" variant="secondary" size="lg">
+            View All Products
+          </Cta>
+        </div>
+      </Section>
+    </SiteShell>
   );
 }

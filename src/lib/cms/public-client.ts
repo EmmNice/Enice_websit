@@ -261,24 +261,37 @@ export function formatRelativeTime(iso: string | null | undefined): string {
   return formatShortDate(iso);
 }
 
-/** Tailwind classes per content category, matching the badges already used on the blog. */
+/**
+ * Tailwind classes per content category.
+ *
+ * These were eleven different hues — blue, violet, emerald, amber, cyan, fuchsia, sky, teal,
+ * indigo, orange — which on the dark ENICE canvas read as a bag of highlighter pens and put more
+ * colour on a listing page than the rest of the site uses in total. The palette has three
+ * registers, so the categories map onto those three instead of inventing a twelfth: neutral for a
+ * label that is simply a label, warm for something newly announced, and the one non-warm accent
+ * for availability. Distinction now comes from the word, which is what a reader actually reads.
+ *
+ * Keys and the function signature are unchanged, so every existing call site keeps working.
+ */
+const BADGE_NEUTRAL = "border-border bg-surface-1 text-bone-strong";
+const BADGE_WARM = "border-gold/25 bg-gold/[0.08] text-gold";
+const BADGE_POSITIVE = "border-positive/25 bg-positive/[0.08] text-positive";
+
 export const CATEGORY_BADGE: Record<string, string> = {
-  BLOG: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-  ANNOUNCEMENT: "bg-violet-500/10 text-violet-400 border-violet-500/20",
-  NEW: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-  UPDATE: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-  PARTNERSHIP: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  MILESTONE: "bg-fuchsia-500/10 text-fuchsia-400 border-fuchsia-500/20",
-  NEWS: "bg-sky-500/10 text-sky-400 border-sky-500/20",
-  PRODUCT: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
-  SERVICE: "bg-teal-500/10 text-teal-400 border-teal-500/20",
-  COMPANY: "bg-indigo-500/10 text-indigo-400 border-indigo-500/20",
-  LAUNCH: "bg-orange-500/10 text-orange-400 border-orange-500/20",
+  BLOG: BADGE_NEUTRAL,
+  ANNOUNCEMENT: BADGE_WARM,
+  NEW: BADGE_POSITIVE,
+  UPDATE: BADGE_WARM,
+  PARTNERSHIP: BADGE_NEUTRAL,
+  MILESTONE: BADGE_NEUTRAL,
+  NEWS: BADGE_NEUTRAL,
+  PRODUCT: BADGE_NEUTRAL,
+  SERVICE: BADGE_NEUTRAL,
+  COMPANY: BADGE_NEUTRAL,
+  LAUNCH: BADGE_WARM,
 };
 
 export function categoryBadgeClasses(category: string | null | undefined): string {
-  if (!category) return "bg-zinc-500/10 text-zinc-400 border-zinc-500/20";
-  return (
-    CATEGORY_BADGE[category.toUpperCase()] ?? "bg-zinc-500/10 text-zinc-400 border-zinc-500/20"
-  );
+  if (!category) return BADGE_NEUTRAL;
+  return CATEGORY_BADGE[category.toUpperCase()] ?? BADGE_NEUTRAL;
 }

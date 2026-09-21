@@ -1,8 +1,15 @@
 import type { ReactNode } from "react";
-import { SiteHeader } from "./SiteHeader";
-import { SiteFooter } from "./SiteFooter";
-import { SHADOW_CARD } from "@/lib/design";
+import { SiteShell } from "./SiteShell";
+import { Container, Eyebrow, Section } from "./primitives";
 
+/**
+ * The shared layout for the privacy, terms and compliance pages.
+ *
+ * Legal copy is read, not skimmed, so the body runs at the prose measure (~46rem) rather than the
+ * full page grid, and the section bodies are marked `data-allow-select` — the site disables text
+ * selection globally, which for a policy page means a visitor cannot copy the clause they want to
+ * ask a question about.
+ */
 export function LegalPage({
   kicker,
   title,
@@ -18,54 +25,41 @@ export function LegalPage({
   sections: { heading: string; body: ReactNode }[];
 }) {
   return (
-    <div className="min-h-dvh bg-background text-foreground antialiased">
-      <SiteHeader />
-      <main id="main">
-        <section className="border-b border-border py-20 sm:py-28">
-          <div className="mx-auto max-w-4xl px-5 sm:px-8">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              {kicker}
-            </div>
-            <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
-              {title}
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              {intro}
-            </p>
-            <div className="mt-6 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Last updated · {lastUpdated}
-            </div>
-          </div>
-        </section>
+    <SiteShell>
+      <Section spacing="tight" container={null} glow="center">
+        <Container width="prose">
+          <Eyebrow>{kicker}</Eyebrow>
+          <h1 className="type-display mt-5 text-foreground">{title}</h1>
+          <p className="type-lead mt-6">{intro}</p>
+          <p className="type-meta mt-7 uppercase tracking-[0.18em]">Last updated · {lastUpdated}</p>
+        </Container>
+      </Section>
 
-        <section className="bg-secondary py-20 sm:py-24">
-          <div className="mx-auto max-w-4xl px-5 sm:px-8">
-            <div
-              className="rounded-xl border border-border bg-background p-8 sm:p-12"
-              style={{ boxShadow: SHADOW_CARD }}
-            >
-              <div className="space-y-10">
-                {sections.map((s, i) => (
-                  <div key={s.heading}>
-                    <div className="flex items-baseline gap-3">
-                      <span className="text-[10px] font-mono font-semibold tracking-[0.18em] text-muted-foreground">
-                        /{String(i + 1).padStart(2, "0")}
-                      </span>
-                      <h2 className="text-xl font-semibold tracking-tight text-foreground sm:text-2xl">
-                        {s.heading}
-                      </h2>
-                    </div>
-                    <div className="mt-4 space-y-4 text-[15px] leading-relaxed text-muted-foreground">
-                      {s.body}
-                    </div>
-                  </div>
-                ))}
+      <Section spacing="tight" container="prose" divider>
+        <ol className="space-y-12">
+          {sections.map((s, i) => (
+            <li key={s.heading}>
+              <div className="flex items-baseline gap-3">
+                <span
+                  aria-hidden
+                  className="font-mono text-[11px] font-semibold tracking-[0.18em] text-gold"
+                >
+                  /{String(i + 1).padStart(2, "0")}
+                </span>
+                <h2 className="text-xl font-semibold tracking-[-0.02em] text-foreground">
+                  {s.heading}
+                </h2>
               </div>
-            </div>
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </div>
+              <div
+                data-allow-select
+                className="mt-4 space-y-4 text-[15px] leading-[1.75] text-bone-strong [&_a]:text-gold [&_a]:underline [&_a]:underline-offset-2 [&_li]:mt-1.5 [&_strong]:text-foreground [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5"
+              >
+                {s.body}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </Section>
+    </SiteShell>
   );
 }

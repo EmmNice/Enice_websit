@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
+import type { LucideIcon } from "lucide-react";
 import {
-  ArrowUpRight,
+  Boxes,
   BrainCircuit,
   Check,
   ShieldCheck,
@@ -22,11 +23,20 @@ import {
   UserCircle,
   Ticket,
 } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
+import { SiteShell } from "@/components/site/SiteShell";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { StyledText } from "@/components/site/StyledText";
-import { useSectionFields, fieldText } from "@/lib/cms/use-section";
+import {
+  Cta,
+  Eyebrow,
+  IconTile,
+  Metric,
+  Panel,
+  Section,
+  SectionIntro,
+  Tag,
+} from "@/components/site/primitives";
+import { PRODUCTS } from "@/components/site/navigation";
+import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
 import { SHADOW_CARD } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
@@ -65,7 +75,49 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
   component: PulseAssistPage,
 });
 
+// ─── Fallback content ─────────────────────────────────────────────────────────
+//
+// The four blocks below are the *fallbacks* for the page's CMS sections, not its only source of
+// content. Each band reads `portfolio.pulseassist.*` and overlays whatever an administrator has
+// published, so the copy here is what paints before the CMS answers and what survives an outage —
+// `useSectionFields` treats a degraded bootstrap as "not loaded" on purpose. See
+// `src/lib/cms/use-section.ts`.
+
+/**
+ * Icons an editor may name on a CMS-managed capability or sector card.
+ *
+ * A curated map rather than importing all of lucide, which would add a large amount of JavaScript
+ * to the public bundle for the sake of a handful of names. Anything unrecognised falls back to a
+ * neutral icon, so a typo degrades instead of leaving an empty tile. Same approach as
+ * `CARD_ICONS` in src/routes/index.tsx.
+ */
+const CARD_ICONS: Record<string, LucideIcon> = {
+  BarChart3,
+  Boxes,
+  BrainCircuit,
+  FileCheck2,
+  Globe,
+  Inbox,
+  MessageSquare,
+  Network,
+  ShieldCheck,
+  Users,
+  Zap,
+};
+
+function cardIcon(name: string): LucideIcon {
+  return CARD_ICONS[name] ?? Boxes;
+}
+
 const FEATURES = [
+  {
+    // The platform answers on five channels from a single inbox
+    // (getpulseassist.com/channels). That is the product's headline capability and the page did
+    // not state it anywhere, which left the most concrete thing about PulseAssist off its own page.
+    icon: Inbox,
+    title: "Five channels, one inbox",
+    desc: "WhatsApp, web chat, email, SMS and voice answered from a single shared inbox, so support is consistent wherever people reach you.",
+  },
   {
     icon: MessageSquare,
     title: "Autonomous support routing",
@@ -98,11 +150,17 @@ const FEATURES = [
   },
 ];
 
+/**
+ * Only figures that can be checked.
+ *
+ * Two of the four were removed. `∞ — Concurrent sessions` is an invented capacity claim, and
+ * `100% — Audit coverage` states a measured coverage figure nothing on this page measures. What
+ * the platform actually does about audit trails is still described in the compliance band below,
+ * where it belongs.
+ */
 const STATS = [
-  { value: "Email & Chat", label: "Channels" },
+  { value: "WhatsApp · Web · Email · SMS · Voice", label: "Channels" },
   { value: "Multi-tenant", label: "Architecture" },
-  { value: "∞", label: "Concurrent sessions" },
-  { value: "100%", label: "Audit coverage" },
 ];
 
 // ─── Sectors served ────────────────────────────────────────────────────────────
@@ -114,430 +172,392 @@ const SECTORS = [
   { icon: ShieldCheck, label: "Compliance-heavy Enterprises" },
 ];
 
+const COMPLIANCE_MECHANISMS = [
+  "Tenant Isolation",
+  "Audit Logs",
+  "Policy Versioning",
+  "Row-Level Security",
+];
+
+/** Product lifecycle, from the shared registry — never a hand-written status string. */
+const STAGE_LABEL = { available: "Available", building: "In development" } as const;
+const STAGE = PRODUCTS.find((p) => p.to === "/portfolio/pulseassist")?.stage ?? "building";
+
+// ─── Dashboard mock ───────────────────────────────────────────────────────────
+//
+// A product illustration, not a reading. It is `aria-hidden` and contains nothing focusable —
+// the "Create AI Agent" control used to be a real `<button>`, which put a dead tab stop inside a
+// decorative image. Every tile is warm-toned: the mock previously ran violet, blue, emerald and
+// amber icons at once, which read as clip art against a near-black and bone page.
+
+const NAV_SECONDARY = [
+  { label: "Tickets", Icon: Ticket },
+  { label: "Contacts", Icon: UserCircle },
+  { label: "Live Inbox", Icon: Inbox },
+  { label: "Team", Icon: Users },
+  { label: "Canned", Icon: BookOpen },
+];
+
+const MOCK_STATS_PRIMARY = [
+  { label: "Active AI Agents", value: "12", sub: "+3 WEEK", Icon: BrainCircuit },
+  { label: "Total Interactions", value: "4.2K", sub: "91% AI", Icon: MessageSquare },
+  { label: "Human Handoffs", value: "9", sub: "↓ 62%", Icon: Users },
+];
+
+const MOCK_STATS_SECONDARY = [
+  { label: "Cost Saved", value: "₦4.2M", Icon: TrendingUp },
+  { label: "Hrs Delegated", value: "1,240", Icon: Clock },
+  { label: "Knowledge Base", value: "48", Icon: Database },
+];
+
+const MOCK_TILE =
+  "grid h-3.5 w-3.5 shrink-0 place-items-center rounded bg-gold/[0.1] sm:h-4 sm:w-4";
+const MOCK_LABEL =
+  "text-[5.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-bone-faint sm:text-[6px]";
+const MOCK_VALUE = "tnum text-[15px] font-bold leading-none text-foreground sm:text-[18px]";
+const MOCK_CARD = "rounded-lg border border-border bg-surface-2 p-1.5 sm:p-2";
+
+function DashboardMock() {
+  return (
+    <Panel tone="quiet" aria-hidden className="overflow-hidden" style={{ boxShadow: SHADOW_CARD }}>
+      <div className="flex" style={{ minHeight: "clamp(260px, 45vw, 340px)" }}>
+        {/* ── Sidebar ── */}
+        {/* Mobile: icon-only narrow strip · Desktop: icons + labels */}
+        <div className="flex w-9 shrink-0 flex-col border-r border-border bg-background py-3 sm:w-[130px] sm:p-3">
+          {/* Logo */}
+          <div className="mb-3 flex items-center justify-center sm:mb-4 sm:justify-start sm:gap-1.5 sm:px-1">
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md border border-gold/25 bg-gold/[0.08] text-gold">
+              <BrainCircuit className="h-3 w-3" />
+            </span>
+            <span className="hidden text-[9px] font-bold tracking-tight text-foreground sm:block">
+              PulseAssist
+            </span>
+          </div>
+
+          {/* Nav */}
+          <nav className="flex flex-1 flex-col items-center gap-0.5 sm:items-stretch sm:space-y-0.5">
+            {/* section label desktop only */}
+            <p className="mb-1 hidden px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-bone-faint sm:block">
+              Overview
+            </p>
+
+            {/* Dashboard — active */}
+            <div className="flex w-full items-center justify-center rounded-md bg-surface-3 py-1.5 sm:justify-start sm:gap-1.5 sm:px-2">
+              <BarChart3 className="h-3 w-3 text-foreground sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+              <span className="hidden text-[8px] font-semibold text-foreground sm:block">
+                Dashboard
+              </span>
+              <span className="ml-auto hidden h-1 w-1 rounded-full bg-gold sm:block" />
+            </div>
+
+            <div className="flex w-full items-center justify-center py-1.5 sm:justify-start sm:gap-1.5 sm:px-2">
+              <TrendingUp className="h-3 w-3 text-bone-faint sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+              <span className="hidden text-[8px] text-bone-faint sm:block">Analytics</span>
+            </div>
+
+            <p className="mb-1 mt-1 hidden px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-bone-faint sm:block">
+              Helpdesk
+            </p>
+
+            {NAV_SECONDARY.map(({ label, Icon }) => (
+              <div
+                key={label}
+                className="flex w-full items-center justify-center py-1.5 sm:justify-start sm:gap-1.5 sm:px-2"
+              >
+                <Icon className="h-3 w-3 text-bone-faint sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+                <span className="hidden text-[8px] text-bone-faint sm:block">{label}</span>
+              </div>
+            ))}
+          </nav>
+
+          <div className="border-t border-border pt-2 sm:pt-3">
+            <p className="hidden px-1 text-[6px] text-bone-faint sm:block">by ENICE Group</p>
+          </div>
+        </div>
+
+        {/* ── Main content ── */}
+        <div className="flex-1 overflow-hidden p-2.5 sm:p-4">
+          {/* Header */}
+          <div className="mb-2 flex items-center justify-between gap-2 sm:mb-3">
+            <div>
+              <p className="text-[11px] font-bold leading-tight text-foreground sm:text-[13px]">
+                Welcome back
+              </p>
+              <p className="mt-0.5 hidden text-[8px] text-bone-soft sm:block">
+                Here's what's happening with your AI agents today.
+              </p>
+            </div>
+            {/* A span, not a button: this is a picture of a control, so it must not be a tab stop. */}
+            <span className="inline-flex shrink-0 items-center gap-1 rounded-md bg-primary px-2 py-1 text-[7px] font-semibold text-primary-foreground sm:px-2.5 sm:py-1.5 sm:text-[8px]">
+              <Plus className="h-2 w-2 sm:h-2.5 sm:w-2.5" strokeWidth={2.5} />
+              <span className="hidden sm:inline">Create AI Agent</span>
+              <span className="sm:hidden">New Agent</span>
+            </span>
+          </div>
+
+          {/* Agent config banner */}
+          <div className="mb-2 flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-2 py-1.5 sm:mb-3 sm:gap-2 sm:px-2.5 sm:py-2">
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md border border-gold/25 bg-gold/[0.08] text-gold sm:h-6 sm:w-6">
+              <BrainCircuit className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+            </span>
+            <p className="min-w-0 flex-1 truncate text-[7px] text-bone-soft sm:text-[8px]">
+              Configured for: <span className="font-semibold text-gold">General Commercial</span>
+            </p>
+            <div className="flex shrink-0 items-center gap-1 rounded-md border border-border px-1.5 py-0.5 text-[6px] text-bone-faint sm:px-2 sm:py-1 sm:text-[7px]">
+              <Settings className="h-2 w-2 sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+              <span className="hidden sm:inline">Configure</span>
+            </div>
+          </div>
+
+          {/* Stats row 1 */}
+          <div className="mb-1.5 grid grid-cols-3 gap-1.5">
+            {MOCK_STATS_PRIMARY.map(({ label, value, sub, Icon }) => (
+              <div key={label} className={MOCK_CARD}>
+                <div className="mb-1 flex items-start justify-between gap-1">
+                  <span className={MOCK_LABEL}>{label}</span>
+                  <span className={MOCK_TILE}>
+                    <Icon className="h-2 w-2 text-gold sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+                  </span>
+                </div>
+                <p className={MOCK_VALUE}>{value}</p>
+                <p className="mt-0.5 text-[5.5px] font-semibold text-positive sm:mt-1 sm:text-[6px]">
+                  ↗ {sub}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          {/* Stats row 2 */}
+          <div className="grid grid-cols-3 gap-1.5">
+            {MOCK_STATS_SECONDARY.map(({ label, value, Icon }) => (
+              <div key={label} className={MOCK_CARD}>
+                <div className="mb-1 flex items-start justify-between gap-1">
+                  <span className={MOCK_LABEL}>{label}</span>
+                  <span className={MOCK_TILE}>
+                    <Icon className="h-2 w-2 text-gold sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+                  </span>
+                </div>
+                <p className={MOCK_VALUE}>{value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 function PulseAssistPage() {
   // Page header, editable through the `portfolio.pulseassist` section.
   const header = useSectionFields("portfolio.pulseassist");
+  const factsSection = useSectionFields("portfolio.pulseassist.stats");
+  const featuresSection = useSectionFields("portfolio.pulseassist.features");
+  const sectorsSection = useSectionFields("portfolio.pulseassist.sectors");
+  const complianceSection = useSectionFields("portfolio.pulseassist.compliance");
+
+  // The facts strip. Rows without a value are skipped rather than rendered blank.
+  const stats = fieldItems(factsSection, "items", STATS, (row) => {
+    const value = typeof row.value === "string" ? row.value.trim() : "";
+    const label = typeof row.label === "string" ? row.label.trim() : "";
+    return value ? { value, label } : null;
+  });
+
+  // The capability cards. `icon` is a lucide name resolved through the curated map above.
+  const features = fieldItems(featuresSection, "items", FEATURES, (row) => {
+    const title = typeof row.title === "string" ? row.title.trim() : "";
+    if (!title) return null;
+    return {
+      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
+      title,
+      desc: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
+  // Sector tiles carry an icon and a name only, so a row's `title` is its label.
+  const sectors = fieldItems(sectorsSection, "items", SECTORS, (row) => {
+    const label = typeof row.title === "string" ? row.title.trim() : "";
+    if (!label) return null;
+    return { icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""), label };
+  });
+
+  // The compliance pills are a plain list of mechanism names, so only each row's title is read.
+  const complianceMechanisms = fieldItems<string>(
+    complianceSection,
+    "items",
+    COMPLIANCE_MECHANISMS,
+    (row) => (typeof row.title === "string" && row.title.trim() ? row.title.trim() : null),
+  );
 
   return (
-    <div className="min-h-dvh bg-background text-foreground antialiased">
-      <SiteHeader />
-      <main id="main">
-        {/* ── Hero ── */}
-        <section className="border-b border-border bg-secondary py-20 sm:py-28">
-          <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center">
-            {/* Copy */}
-            <div>
-              <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                <BrainCircuit className="h-3.5 w-3.5" />
-                {fieldText(header, "eyebrow", "Enterprise Conversational SaaS")}
-              </div>
-              <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
-                <StyledText text={fieldText(header, "heading", "PulseAssist")} />
-              </h1>
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                <StyledText
-                  text={fieldText(
-                    header,
-                    "subheading",
-                    "A multi-tenant AI operations platform for telecoms and financial networks. It handles customer support routing, provides API-driven account management, and hands calls to live agents in real time when needed.",
-                  )}
-                />
-              </p>
+    <SiteShell>
+      {/* ═══ HERO ═══════════════════════════════════════════════════════════ */}
+      <Section spacing="loose" grid glow="spread" aria-labelledby="pulseassist-heading">
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+          {/* ── Copy ── */}
+          <div>
+            <SectionIntro
+              id="pulseassist-heading"
+              level={1}
+              eyebrow={fieldText(header, "eyebrow", "Enterprise Conversational SaaS")}
+              heading={fieldText(header, "heading", "PulseAssist")}
+              lead={fieldText(
+                header,
+                "subheading",
+                "A multi-tenant AI operations platform for telecoms and financial networks. It handles customer support routing, provides API-driven account management, and hands calls to live agents in real time when needed.",
+              )}
+            />
 
-              {/* Status */}
-              <div className="mt-6 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-600">
-                  <span className="relative flex h-1.5 w-1.5">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
-                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  Operational
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-medium text-muted-foreground">
-                  <BrainCircuit className="h-3 w-3" />
-                  Multi-tenant · API-native
-                </span>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-[11px] font-medium text-muted-foreground">
-                  <Globe className="h-3 w-3" />
-                  Global
-                </span>
-              </div>
+            {/* Lifecycle + shape of the platform.
 
-              <div className="mt-8 flex flex-wrap gap-3">
-                <PulseAssistEarlyAccessButton className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90" />
-                <a
-                  href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
-                  className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-5 py-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
-                >
-                  Request Integration
-                  <ArrowUpRight className="h-4 w-4" />
-                </a>
-              </div>
+                The first pill read "Operational" with a pinging green dot. Nothing here measures
+                whether PulseAssist is up, and /status is the only surface that does — so the pill
+                now states the product's lifecycle stage, read from the product registry, which is
+                a fact with a source. */}
+            <div className="mt-8 flex flex-wrap gap-2">
+              <Tag tone={STAGE === "available" ? "positive" : "warm"}>{STAGE_LABEL[STAGE]}</Tag>
+              <Tag>
+                <BrainCircuit aria-hidden className="h-3 w-3 shrink-0" />
+                Multi-tenant · API-native
+              </Tag>
+              <Tag>
+                <Globe aria-hidden className="h-3 w-3 shrink-0" />
+                Global
+              </Tag>
             </div>
 
-            {/* Dashboard mockup */}
-            <div
-              className="relative overflow-hidden rounded-xl border border-white/10"
-              style={{ boxShadow: SHADOW_CARD, background: "#0b0f1a" }}
-            >
-              <div className="flex" style={{ minHeight: "clamp(260px, 45vw, 340px)" }}>
-                {/* ── Sidebar ── */}
-                {/* Mobile: icon-only narrow strip · Desktop: icons + labels */}
-                <div className="flex w-9 shrink-0 flex-col border-r border-white/8 bg-[#080c15] py-3 sm:w-[130px] sm:p-3">
-                  {/* Logo */}
-                  <div className="mb-3 flex items-center justify-center sm:mb-4 sm:justify-start sm:gap-1.5 sm:px-1">
-                    <div className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-violet-500/25">
-                      <BrainCircuit className="h-3 w-3 text-violet-400" />
-                    </div>
-                    <span className="hidden text-[9px] font-bold tracking-tight text-white sm:block">
-                      PulseAssist
-                    </span>
-                  </div>
-
-                  {/* Nav */}
-                  <nav className="flex flex-1 flex-col items-center gap-0.5 sm:items-stretch sm:space-y-0.5">
-                    {/* section label desktop only */}
-                    <p className="mb-1 hidden px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/30 sm:block">
-                      Overview
-                    </p>
-
-                    {/* Dashboard — active */}
-                    <div className="flex w-full items-center justify-center rounded-md bg-white/8 py-1.5 sm:justify-start sm:gap-1.5 sm:px-2">
-                      <BarChart3 className="h-3 w-3 text-white sm:h-2.5 sm:w-2.5" strokeWidth={2} />
-                      <span className="hidden text-[8px] font-semibold text-white sm:block">
-                        Dashboard
-                      </span>
-                      <span className="ml-auto hidden h-1 w-1 rounded-full bg-violet-400 sm:block" />
-                    </div>
-
-                    <div className="flex w-full items-center justify-center py-1.5 sm:justify-start sm:gap-1.5 sm:px-2">
-                      <TrendingUp
-                        className="h-3 w-3 text-white/35 sm:h-2.5 sm:w-2.5"
-                        strokeWidth={2}
-                      />
-                      <span className="hidden text-[8px] text-white/40 sm:block">Analytics</span>
-                    </div>
-
-                    <p className="mb-1 mt-1 hidden px-2 text-[7px] font-semibold uppercase tracking-[0.18em] text-white/30 sm:block">
-                      Helpdesk
-                    </p>
-
-                    {[
-                      { label: "Tickets", Icon: Ticket },
-                      { label: "Contacts", Icon: UserCircle },
-                      { label: "Live Inbox", Icon: Inbox },
-                      { label: "Team", Icon: Users },
-                      { label: "Canned", Icon: BookOpen },
-                    ].map(({ label, Icon }) => (
-                      <div
-                        key={label}
-                        className="flex w-full items-center justify-center py-1.5 sm:justify-start sm:gap-1.5 sm:px-2"
-                      >
-                        <Icon className="h-3 w-3 text-white/35 sm:h-2.5 sm:w-2.5" strokeWidth={2} />
-                        <span className="hidden text-[8px] text-white/40 sm:block">{label}</span>
-                      </div>
-                    ))}
-                  </nav>
-
-                  <div className="border-t border-white/8 pt-2 sm:pt-3">
-                    <p className="hidden px-1 text-[6px] text-white/20 sm:block">by ENICE Group</p>
-                  </div>
-                </div>
-
-                {/* ── Main content ── */}
-                <div className="flex-1 overflow-hidden p-2.5 sm:p-4">
-                  {/* Header */}
-                  <div className="mb-2 flex items-center justify-between gap-2 sm:mb-3">
-                    <div>
-                      <h3 className="text-[11px] font-bold leading-tight text-white sm:text-[13px]">
-                        Welcome back
-                      </h3>
-                      <p className="mt-0.5 hidden text-[8px] text-white/45 sm:block">
-                        Here's what's happening with your AI agents today.
-                      </p>
-                    </div>
-                    <button className="inline-flex shrink-0 items-center gap-1 rounded-md bg-primary px-2 py-1 text-[7px] font-semibold text-white sm:px-2.5 sm:py-1.5 sm:text-[8px]">
-                      <Plus className="h-2 w-2 sm:h-2.5 sm:w-2.5" strokeWidth={2.5} />
-                      <span className="hidden sm:inline">Create AI Agent</span>
-                      <span className="sm:hidden">New Agent</span>
-                    </button>
-                  </div>
-
-                  {/* Agent config banner */}
-                  <div className="mb-2 flex items-center gap-1.5 rounded-lg border border-white/8 bg-white/[0.04] px-2 py-1.5 sm:mb-3 sm:gap-2 sm:px-2.5 sm:py-2">
-                    <div className="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-violet-500/20 sm:h-6 sm:w-6">
-                      <BrainCircuit className="h-3 w-3 text-violet-400 sm:h-3.5 sm:w-3.5" />
-                    </div>
-                    <p className="min-w-0 flex-1 truncate text-[7px] text-white/55 sm:text-[8px]">
-                      Configured for:{" "}
-                      <span className="font-semibold text-violet-400">General Commercial</span>
-                    </p>
-                    <div className="flex shrink-0 items-center gap-1 rounded-md border border-white/10 px-1.5 py-0.5 text-[6px] text-white/45 sm:px-2 sm:py-1 sm:text-[7px]">
-                      <Settings className="h-2 w-2 sm:h-2.5 sm:w-2.5" strokeWidth={2} />
-                      <span className="hidden sm:inline">Configure</span>
-                    </div>
-                  </div>
-
-                  {/* Stats row 1 */}
-                  <div className="mb-1.5 grid grid-cols-3 gap-1.5">
-                    {[
-                      {
-                        label: "Active AI Agents",
-                        value: "12",
-                        sub: "+3 WEEK",
-                        subOk: true,
-                        Icon: BrainCircuit,
-                        ic: "text-violet-400",
-                        ib: "bg-violet-500/15",
-                      },
-                      {
-                        label: "Total Interactions",
-                        value: "4.2K",
-                        sub: "91% AI",
-                        subOk: true,
-                        Icon: MessageSquare,
-                        ic: "text-blue-400",
-                        ib: "bg-blue-500/15",
-                      },
-                      {
-                        label: "Human Handoffs",
-                        value: "9",
-                        sub: "↓ 62%",
-                        subOk: true,
-                        Icon: Users,
-                        ic: "text-emerald-400",
-                        ib: "bg-emerald-500/15",
-                      },
-                    ].map(({ label, value, sub, subOk, Icon, ic, ib }) => (
-                      <div
-                        key={label}
-                        className="rounded-lg border border-white/8 bg-white/[0.04] p-1.5 sm:p-2"
-                      >
-                        <div className="mb-1 flex items-start justify-between gap-1">
-                          <span className="text-[5.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-white/35 sm:text-[6px]">
-                            {label}
-                          </span>
-                          <div
-                            className={`grid h-3.5 w-3.5 shrink-0 place-items-center rounded sm:h-4 sm:w-4 ${ib}`}
-                          >
-                            <Icon className={`h-2 w-2 sm:h-2.5 sm:w-2.5 ${ic}`} strokeWidth={2} />
-                          </div>
-                        </div>
-                        <p className="text-[15px] font-bold leading-none text-white sm:text-[18px]">
-                          {value}
-                        </p>
-                        <p
-                          className={`mt-0.5 text-[5.5px] font-semibold sm:mt-1 sm:text-[6px] ${subOk ? "text-emerald-400" : "text-red-400"}`}
-                        >
-                          ↗ {sub}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {/* Stats row 2 */}
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {[
-                      {
-                        label: "Cost Saved",
-                        value: "₦4.2M",
-                        Icon: TrendingUp,
-                        ic: "text-emerald-400",
-                        ib: "bg-emerald-500/15",
-                      },
-                      {
-                        label: "Hrs Delegated",
-                        value: "1,240",
-                        Icon: Clock,
-                        ic: "text-blue-400",
-                        ib: "bg-blue-500/15",
-                      },
-                      {
-                        label: "Knowledge Base",
-                        value: "48",
-                        Icon: Database,
-                        ic: "text-amber-400",
-                        ib: "bg-amber-500/15",
-                      },
-                    ].map(({ label, value, Icon, ic, ib }) => (
-                      <div
-                        key={label}
-                        className="rounded-lg border border-white/8 bg-white/[0.04] p-1.5 sm:p-2"
-                      >
-                        <div className="mb-1 flex items-start justify-between gap-1">
-                          <span className="text-[5.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-white/35 sm:text-[6px]">
-                            {label}
-                          </span>
-                          <div
-                            className={`grid h-3.5 w-3.5 shrink-0 place-items-center rounded sm:h-4 sm:w-4 ${ib}`}
-                          >
-                            <Icon className={`h-2 w-2 sm:h-2.5 sm:w-2.5 ${ic}`} strokeWidth={2} />
-                          </div>
-                        </div>
-                        <p className="text-[15px] font-bold leading-none text-white sm:text-[18px]">
-                          {value}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── Stats strip ── */}
-        <section className="border-b border-border bg-background">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid grid-cols-2 divide-x divide-y divide-border md:grid-cols-4 md:divide-y-0">
-              {STATS.map((s) => (
-                <div key={s.label} className="p-8 text-center">
-                  <div className="text-3xl font-semibold tracking-tight text-foreground">
-                    {s.value}
-                  </div>
-                  <div className="mt-1.5 text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                    {s.label}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Platform capabilities ── */}
-        <section className="bg-secondary py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Platform Capabilities
-              </div>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Operations that run themselves.
-              </h2>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                PulseAssist covers the full customer operations lifecycle, from first contact to
-                resolution, without needing a human for every interaction.
-              </p>
-            </div>
-
-            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {FEATURES.map((f) => (
-                <div
-                  key={f.title}
-                  className="flex gap-4 rounded-xl border border-border bg-background p-6"
-                  style={{ boxShadow: SHADOW_CARD }}
-                >
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-primary/8 text-primary ring-1 ring-primary/15">
-                    <f.icon className="h-5 w-5" strokeWidth={1.75} />
-                  </div>
-                  <div>
-                    <h3 className="text-[15px] font-semibold text-foreground">{f.title}</h3>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
-                      {f.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Sectors served ── */}
-        <section className="border-y border-border bg-background py-16">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="mb-10 text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Sectors Served
-              </div>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground">
-                Built for compliance-heavy industries.
-              </h2>
-            </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {SECTORS.map((s) => (
-                <div
-                  key={s.label}
-                  className="flex flex-col items-center gap-3 rounded-xl border border-border bg-background p-6 text-center"
-                  style={{ boxShadow: SHADOW_CARD }}
-                >
-                  <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/15">
-                    <s.icon className="h-6 w-6" strokeWidth={1.5} />
-                  </div>
-                  <span className="text-[13px] font-semibold text-foreground">{s.label}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── Compliance callout ── */}
-        <section className="bg-secondary py-16">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
-              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl border border-border bg-background">
-                <ShieldCheck className="h-6 w-6 text-primary" strokeWidth={1.75} />
-              </div>
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                  Enterprise Compliance
-                </div>
-                <h2 className="mt-1 text-xl font-semibold tracking-tight text-foreground">
-                  Every interaction is compliant by design.
-                </h2>
-                <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-                  PulseAssist maintains comprehensive audit trails of every agent interaction.
-                  Policy configurations are version-controlled, every model decision is logged, and
-                  all data is tenant-isolated, meeting the regulatory requirements of banking and
-                  telecom in Africa and beyond.
-                </p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {[
-                    "Tenant Isolation",
-                    "Audit Logs",
-                    "Policy Versioning",
-                    "Row-Level Security",
-                  ].map((b) => (
-                    <span
-                      key={b}
-                      className="flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-[11px] font-semibold text-foreground/70"
-                    >
-                      <Check className="h-3 w-3 text-primary" strokeWidth={2.5} />
-                      {b}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── CTA ── */}
-        <section className="border-t border-border bg-background py-20">
-          <div className="mx-auto max-w-2xl px-5 text-center sm:px-8">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              Get Started
-            </div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Ready to integrate PulseAssist?
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-muted-foreground">
-              Contact our enterprise team to discuss integration requirements, multi-tenant
-              configuration, and SLA options.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <PulseAssistEarlyAccessButton className="group inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90" />
-              <a
-                href="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-7 py-3.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
+            <div className="mt-8 flex flex-wrap gap-3">
+              {/* Opens the early-access modal in place, so it stays a button rather than a Cta. */}
+              <PulseAssistEarlyAccessButton className="btn btn-primary group" />
+              <Cta
+                to="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
+                variant="secondary"
+                icon="external"
               >
                 Request Integration
-                <ArrowUpRight className="h-4 w-4" />
-              </a>
+              </Cta>
             </div>
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </div>
+
+          {/* ── Dashboard mockup ── */}
+          <DashboardMock />
+        </div>
+      </Section>
+
+      {/* ═══ FACTS STRIP ════════════════════════════════════════════════════ */}
+      {/* A wrapping row rather than a fixed four-column grid, which left half the band empty once
+          the two unverifiable figures came out. */}
+      <Section spacing="tight" container="narrow" divider>
+        <div className="flex flex-wrap justify-center gap-x-16 gap-y-8 sm:gap-x-24">
+          {stats.map((s, i) => (
+            <Metric key={`${s.label}-${i}`} value={s.value} label={s.label} align="center" />
+          ))}
+        </div>
+      </Section>
+
+      {/* ═══ PLATFORM CAPABILITIES ══════════════════════════════════════════ */}
+      <Section divider glow="center" aria-labelledby="capabilities-heading">
+        <SectionIntro
+          id="capabilities-heading"
+          align="center"
+          eyebrow={fieldText(featuresSection, "eyebrow", "Platform Capabilities")}
+          heading={fieldText(featuresSection, "heading", "Operations that run themselves.")}
+          lead={fieldText(
+            featuresSection,
+            "subheading",
+            "PulseAssist covers the full customer operations lifecycle, from first contact to resolution, without needing a human for every interaction.",
+          )}
+        />
+
+        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {features.map((f) => (
+            <Panel key={f.title} interactive className="flex gap-4 p-6">
+              <IconTile icon={f.icon} size="sm" className="h-11 w-11" />
+              <div>
+                <h3 className="text-[15px] font-semibold text-foreground">{f.title}</h3>
+                <p className="mt-1.5 text-[13px] leading-relaxed text-bone-soft">{f.desc}</p>
+              </div>
+            </Panel>
+          ))}
+        </div>
+      </Section>
+
+      {/* ═══ SECTORS SERVED ═════════════════════════════════════════════════ */}
+      <Section container="narrow" divider aria-labelledby="sectors-heading">
+        <SectionIntro
+          id="sectors-heading"
+          align="center"
+          eyebrow={fieldText(sectorsSection, "eyebrow", "Sectors Served")}
+          heading={fieldText(sectorsSection, "heading", "Built for compliance-heavy industries.")}
+        />
+        <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {sectors.map((s) => (
+            <Panel
+              key={s.label}
+              interactive
+              className="flex flex-col items-center gap-3 p-6 text-center"
+            >
+              <IconTile icon={s.icon} className="h-12 w-12" />
+              <span className="text-[13px] font-semibold text-foreground">{s.label}</span>
+            </Panel>
+          ))}
+        </div>
+      </Section>
+
+      {/* ═══ COMPLIANCE ═════════════════════════════════════════════════════ */}
+      <Section container="narrow" tone="recessed" divider aria-labelledby="compliance-heading">
+        <div className="flex flex-col gap-6 sm:flex-row sm:items-start">
+          <IconTile icon={ShieldCheck} className="h-14 w-14" />
+          <div>
+            <Eyebrow muted>
+              {fieldText(complianceSection, "eyebrow", "Enterprise Compliance")}
+            </Eyebrow>
+            <h2 id="compliance-heading" className="type-h3 mt-2 text-foreground">
+              {fieldText(complianceSection, "heading", "Every interaction is compliant by design.")}
+            </h2>
+            <p data-allow-select className="type-body mt-2 max-w-2xl">
+              {fieldText(
+                complianceSection,
+                "subheading",
+                "PulseAssist maintains comprehensive audit trails of every agent interaction. Policy configurations are version-controlled, every model decision is logged, and all data is tenant-isolated, meeting the regulatory requirements of banking and telecom in Africa and beyond.",
+              )}
+            </p>
+            <ul className="mt-5 flex flex-wrap gap-2">
+              {complianceMechanisms.map((b) => (
+                <li key={b}>
+                  <Tag>
+                    <Check aria-hidden className="h-3 w-3 shrink-0 text-gold" strokeWidth={2.5} />
+                    {b}
+                  </Tag>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </Section>
+
+      {/* ═══ CTA ════════════════════════════════════════════════════════════ */}
+      <Section container="prose" divider glow="center" aria-labelledby="cta-heading">
+        <SectionIntro
+          id="cta-heading"
+          align="center"
+          eyebrow="Get Started"
+          heading="Ready to integrate PulseAssist?"
+          lead="Contact our enterprise team to discuss integration requirements, multi-tenant configuration, and SLA options."
+        />
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <PulseAssistEarlyAccessButton className="btn btn-primary btn-lg group" />
+          <Cta
+            to="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
+            variant="secondary"
+            size="lg"
+            icon="external"
+          >
+            Request Integration
+          </Cta>
+        </div>
+      </Section>
+    </SiteShell>
   );
 }

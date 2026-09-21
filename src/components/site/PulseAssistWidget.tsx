@@ -1,7 +1,9 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
+import { MessageSquare, X } from "lucide-react";
 
 /**
- * The PulseAssist chat widget, loaded from the platform.
+ * The PulseAssist chat widget, loaded from the platform, with a visible fallback launcher.
  *
  * ═══ What this replaced ═════════════════════════════════════════════════════
  *
@@ -34,50 +36,173 @@ import { useEffect } from "react";
  * that automatically. A server-side proxy would have to forge it, and forging an origin check is
  * not a thing to build on purpose.
  *
+ * ═══ Why there is a fallback launcher ════════════════════════════════════════
+ *
+ * Because the assistant was once absent from the site with nothing anywhere saying so.
+ *
+ * The embed previously pointed at chatbot 33, which answers **404** with a body of
+ * `console.error("Widget: chatbot not found or inactive")`. The route was fine and the CSP already
+ * allowed the origin — that id simply was not live. But the component returned `null` on failure,
+ * so the only symptom was the complete absence of an assistant: no launcher, no error, nothing in
+ * the page's own logs. A visitor looking for help found nothing, and nobody operating the site had
+ * any signal it was down.
+ *
+ * The id is now 36, which resolves. The fallback stays anyway, because "the assistant is missing
+ * and no one notices" is a failure mode worth designing out permanently rather than once: a
+ * chatbot can be deactivated, recreated or renumbered at any time, and none of those are deploys.
+ * When the loader fails the component renders a plain launcher of its own pointing at /contact. It
+ * does not imitate a chat and answers nothing — pretending to be an AI that is not there would be
+ * worse than the silence it replaces. When the loader succeeds, `status` becomes `"ready"` and the
+ * fallback removes itself, so two launchers never appear at once.
+ *
  * ═══ Notes for whoever changes this next ════════════════════════════════════
  *
- * - Chatbot 33 is ENICE's, in workspace 63. `enicehq.com` must stay in the widget deployment's
- *   allowlist or the chat endpoint answers 403 — the launcher will open and then fail to send.
+ * - Chatbot 36 is ENICE's, in the `enice-technology-limited` workspace. The domain the site is
+ *   served from must be in that widget deployment's allowlist or `POST /api/widget/36/chat` answers
+ *   403 — the launcher opens and then fails to send. That includes Vercel preview domains, which
+ *   are not `enicehq.com`, so an unlisted preview will show the launcher and refuse to reply.
  * - Answers come from the FAQs and knowledge attached to that workspace, editable in the console.
  * - The workspace's conversation mode must not be `human`, or every message is handed to a person
  *   instead of answered. That is the platform default for a new workspace, deliberately.
+ * - The loader's origin must stay in `script-src` in vercel.json's Content-Security-Policy. This
+ *   site sends a real `default-src 'self'` header, so a third-party script is refused silently
+ *   unless its origin is listed. `connect-src` currently allows `https:`, which covers the
+ *   widget's own calls home; if that is ever tightened to an enumerated list,
+ *   `https://getpulseassist.com` has to be added there too.
  */
+
 /**
- * The loader's origin must be in `script-src` in vercel.json's Content-Security-Policy.
+ * The chatbot this site embeds.
  *
- * This site sends `default-src 'self'; script-src 'self'` and Vercel serves it as a real response
- * header, so the browser silently REFUSES any third-party script. When this component first
- * shipped, the tag was appended, the CSP blocked it, and the only symptom was that no chat appeared
- * anywhere on the site — nothing in the DOM, no network request, and nothing in the page's own
- * logs. A strict CSP is a good default; adding a script tag to a site that has one is a two-file
- * change, not one.
- *
- * `connect-src` already allows `https:`, which covers the widget's own XHR calls back to the API.
- * If the CSP is ever tightened to enumerate connect origins, `https://getpulseassist.com` has to be
- * added there too or the widget will render and then fail to send.
+ * Overridable without a deploy, because the id is deployment configuration rather than source: it
+ * changes when the chatbot is recreated, when a staging workspace is pointed at, or — as happened
+ * with the previous id — when the live one goes inactive. There is nothing secret in a public
+ * widget id; it appears in the script URL every visitor loads, so it is safe in the client bundle.
  */
-const WIDGET_SRC = "https://getpulseassist.com/api/widget/33/widget.js";
+const WIDGET_ID = import.meta.env.VITE_PULSEASSIST_WIDGET_ID?.trim() || "36";
+const WIDGET_SRC = `https://getpulseassist.com/api/widget/${WIDGET_ID}/widget.js`;
+
+/** How long to wait for the loader before deciding it is not coming. */
+const LOAD_TIMEOUT_MS = 8000;
+
+type Status = "loading" | "ready" | "unavailable";
 
 export function PulseAssistWidget() {
+  const [status, setStatus] = useState<Status>("loading");
+
   useEffect(() => {
-    // Guard against a double mount in development's strict mode. The loader has its own
-    // `window.__PA_WIDGET_33` guard, so this is belt-and-braces rather than load-bearing.
-    if (document.querySelector(`script[src="${WIDGET_SRC}"]`)) return;
+    // The loader has its own `window.__PA_WIDGET_<id>` guard, so this is belt-and-braces against
+    // a double mount in development's strict mode rather than load-bearing.
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${WIDGET_SRC}"]`);
+    if (existing) {
+      setStatus(existing.dataset.paLoaded === "true" ? "ready" : "unavailable");
+      return;
+    }
 
     const script = document.createElement("script");
     script.src = WIDGET_SRC;
     script.async = true;
+
+    // A 4xx/5xx on a script fires `error`, which is exactly the 404 case above.
+    const onLoad = () => {
+      script.dataset.paLoaded = "true";
+      setStatus("ready");
+    };
+    const onError = () => setStatus("unavailable");
+
+    script.addEventListener("load", onLoad);
+    script.addEventListener("error", onError);
     document.body.appendChild(script);
 
-    /*
-     * Deliberately not removed on unmount.
-     *
-     * This component mounts once per page load and lives for the session. Removing the tag would
-     * not unload the widget anyway — the loader has already attached its shadow host and its
-     * listeners to the document — so a cleanup here would only guarantee a second copy if the
-     * component ever remounted.
-     */
+    // Belt for the case where neither event fires — a hung request, or a proxy holding the
+    // connection open. Without this the launcher would stay hidden forever on a slow failure.
+    const timer = window.setTimeout(() => {
+      setStatus((current) => (current === "loading" ? "unavailable" : current));
+    }, LOAD_TIMEOUT_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+      script.removeEventListener("load", onLoad);
+      script.removeEventListener("error", onError);
+      /*
+       * The tag itself is deliberately left in place.
+       *
+       * This component mounts once per page load and lives for the session. Removing the tag would
+       * not unload the widget anyway — the loader has already attached its shadow host and its
+       * listeners to the document — so removing it here would only guarantee a second copy if the
+       * component ever remounted.
+       */
+    };
   }, []);
 
-  return null;
+  if (status !== "unavailable") return null;
+  return <AssistFallback />;
+}
+
+/**
+ * The launcher shown when the platform widget is unavailable.
+ *
+ * Deliberately modest. It opens a small card that says what it is and sends the visitor to the
+ * places that can actually help — the contact form and the FAQ — rather than presenting an input
+ * box that would take a question nothing is listening for.
+ *
+ * Positioned to match where the real widget sits, so the page's reserved space (the footer's extra
+ * bottom-right padding) is correct either way, and inset for the iOS home indicator.
+ */
+function AssistFallback() {
+  const [open, setOpen] = useState(false);
+
+  // Escape closes the card, matching every other dismissible surface on the site.
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  return (
+    <div
+      className="safe-bottom fixed right-4 bottom-4 z-40 flex flex-col items-end gap-3 sm:right-6 sm:bottom-6"
+      style={{ ["--safe-pad" as string]: "0px" }}
+    >
+      {open && (
+        <div
+          role="dialog"
+          aria-label="Contact ENICE Group"
+          className="panel-raised animate-hero-up w-[min(20rem,calc(100vw-2rem))] p-5"
+          style={{ animationDuration: "200ms" }}
+        >
+          <p className="eyebrow">Need a hand?</p>
+          <p className="type-body mt-3">
+            Our assistant is offline at the moment. Send us a message and a person will reply within
+            one business day.
+          </p>
+          <div className="mt-5 flex flex-col gap-2">
+            <Link to="/contact" onClick={() => setOpen(false)} className="btn btn-primary btn-sm">
+              Contact the team
+            </Link>
+            <Link to="/" hash="faq" onClick={() => setOpen(false)} className="btn btn-ghost btn-sm">
+              Read the FAQ
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-label={open ? "Close contact options" : "Open contact options"}
+        className="grid h-14 w-14 place-items-center rounded-full border border-gold/25 bg-surface-2 text-gold shadow-[0_18px_40px_-16px_rgb(0_0_0/0.8)] transition-colors hover:border-gold/45 hover:bg-surface-3"
+      >
+        {open ? (
+          <X aria-hidden className="h-5 w-5" />
+        ) : (
+          <MessageSquare aria-hidden className="h-5 w-5" strokeWidth={1.75} />
+        )}
+      </button>
+    </div>
+  );
 }

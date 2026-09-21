@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteShell } from "@/components/site/SiteShell";
 import { Roadmap } from "@/components/site/Roadmap";
+import { Section, SectionIntro } from "@/components/site/primitives";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/roadmap")({
@@ -24,28 +24,24 @@ export const Route = createFileRoute("/roadmap")({
 
 function RoadmapPage() {
   return (
-    <div className="min-h-dvh bg-background text-foreground antialiased">
-      <SiteHeader />
-      <main id="main">
-        {/* Page header */}
-        <div className="border-b border-border bg-secondary/40 py-14 sm:py-20">
-          <div className="mx-auto max-w-7xl px-5 sm:px-8">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              Execution · Product Timeline
-            </div>
-            <h1 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-foreground sm:text-4xl md:text-5xl">
-              Roadmap
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-              Milestones completed, products in progress, and what we're building next. We publish
-              this openly so partners can plan ahead.
-            </p>
-          </div>
-        </div>
+    <SiteShell>
+      {/*
+        The page opening. It was a `bg-secondary/40` band with a hard bottom rule — the one
+        pattern the dark system deliberately drops, because a tinted strip at the top of every
+        page is what made the site read as a stack of separately-designed blocks. Rhythm and the
+        ambient warm light carry the break instead.
+      */}
+      <Section spacing="tight" glow="center" aria-labelledby="roadmap-heading">
+        <SectionIntro
+          level={1}
+          id="roadmap-heading"
+          eyebrow="Execution · Product Timeline"
+          heading="Roadmap"
+          lead="Milestones completed, products in progress, and what we're building next. We publish this openly so partners can plan ahead."
+        />
+      </Section>
 
-        <Roadmap />
-      </main>
-      <SiteFooter />
-    </div>
+      <Roadmap />
+    </SiteShell>
   );
 }

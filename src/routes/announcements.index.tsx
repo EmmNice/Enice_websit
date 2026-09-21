@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Megaphone } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteShell } from "@/components/site/SiteShell";
+import { Reveal } from "@/components/site/Reveal";
+import { IconTile, Panel, Section, SectionIntro, TextLink } from "@/components/site/primitives";
 import { pageHead } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import {
@@ -11,6 +12,7 @@ import {
   formatPublishedDate,
   type PublicSummary,
 } from "@/lib/cms/public-client";
+import { cn } from "@/lib/utils";
 
 /**
  * The announcements archive.
@@ -23,31 +25,35 @@ function AnnouncementCard({ item }: { item: PublicSummary }) {
     <Link
       to="/announcements/$slug"
       params={{ slug: item.slug }}
-      className="group flex gap-5 rounded-xl border border-white/[0.07] bg-white/[0.02] p-6 transition-all duration-200 hover:border-blue-500/30 hover:bg-white/[0.04]"
+      className="panel panel-interactive group flex gap-5 p-6"
     >
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
-        <Megaphone className="h-4.5 w-4.5 text-blue-400" />
-      </span>
+      <IconTile icon={Megaphone} size="sm" />
 
       <div className="min-w-0 flex-1">
         <div className="mb-2 flex flex-wrap items-center gap-2.5">
           {item.category && (
             <span
-              className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[9px] font-bold tracking-[0.16em] ${categoryBadgeClasses(item.category)}`}
+              className={cn(
+                "inline-flex items-center rounded-full border px-2.5 py-0.5",
+                "text-[9px] font-semibold tracking-[0.16em]",
+                categoryBadgeClasses(item.category),
+              )}
             >
               {item.category.toUpperCase()}
             </span>
           )}
-          <span className="text-[11px] text-zinc-500">{formatPublishedDate(item.publishedAt)}</span>
+          <span className="type-meta tnum">{formatPublishedDate(item.publishedAt)}</span>
         </div>
 
-        <h2 className="mb-1.5 text-base leading-snug font-bold text-white transition-colors group-hover:text-blue-400">
+        <h2 className="mb-1.5 text-base leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-gold">
           {item.title}
         </h2>
-        <p className="line-clamp-2 text-sm leading-relaxed text-zinc-400">{item.excerpt}</p>
+        <p className="line-clamp-2 text-sm leading-relaxed text-bone-soft">{item.excerpt}</p>
 
-        <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-blue-400 opacity-0 transition-opacity group-hover:opacity-100">
-          Read the announcement <ArrowUpRight className="h-3 w-3" />
+        {/* Visible rather than hover-revealed: the card is one link, and a touch user never
+            produces the hover state the affordance used to depend on. */}
+        <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-bone-faint transition-colors group-hover:text-gold">
+          Read the announcement <ArrowUpRight aria-hidden className="h-3 w-3" />
         </span>
       </div>
 
@@ -55,9 +61,11 @@ function AnnouncementCard({ item }: { item: PublicSummary }) {
         <img
           src={item.coverImageUrl}
           alt={item.title}
+          width={128}
+          height={80}
           loading="lazy"
           decoding="async"
-          className="hidden h-20 w-32 shrink-0 rounded-lg object-cover sm:block"
+          className="hidden h-20 w-32 shrink-0 rounded-lg border border-border object-cover sm:block"
         />
       )}
     </Link>
@@ -81,62 +89,62 @@ function AnnouncementsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
-      <SiteHeader />
+    <SiteShell>
+      <Section
+        spacing="loose"
+        container="narrow"
+        grid
+        glow="spread"
+        aria-labelledby="announcements-heading"
+      >
+        <SectionIntro
+          level={1}
+          id="announcements-heading"
+          eyebrow="ENICE Group"
+          heading="Announcements"
+          lead="Company announcements, product launches, new services, partnerships and events."
+        />
+      </Section>
 
-      <section className="border-b border-white/[0.06] bg-gradient-to-b from-[#0f172a] to-[#09090b] px-5 pt-28 pb-16 sm:px-8">
-        <div className="mx-auto max-w-4xl">
-          <p className="mb-3 text-[11px] font-bold tracking-[0.22em] text-blue-400 uppercase">
-            ENICE Group
-          </p>
-          <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Announcements
-          </h1>
-          <p className="max-w-xl text-base leading-relaxed text-zinc-400">
-            Company announcements, product launches, new services, partnerships and events.
-          </p>
-        </div>
-      </section>
-
-      <section className="px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-4xl">
-          {loading ? (
-            <div className="space-y-4">
+      <Section container="narrow" divider>
+        {loading ? (
+          // The placeholders are decorative; the wait is not, so it is announced once.
+          <div role="status" aria-label="Loading announcements">
+            <div className="space-y-4" aria-hidden>
               {[1, 2, 3].map((index) => (
-                <div
-                  key={index}
-                  className="h-32 animate-pulse rounded-xl border border-white/[0.07] bg-white/[0.03]"
-                />
+                <div key={index} className="panel-quiet h-32 animate-pulse" />
               ))}
             </div>
-          ) : items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-28 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/[0.07] bg-white/[0.03]">
-                <Megaphone className="h-7 w-7 text-zinc-500" />
-              </div>
-              <h2 className="mb-2 text-lg font-bold text-white">No announcements yet</h2>
-              <p className="max-w-xs text-sm text-zinc-500">
-                Company and product announcements will appear here.
-              </p>
-              <Link
-                to="/news/"
-                className="mt-6 text-sm font-semibold text-blue-400 hover:underline"
-              >
-                See all ENICE news
-              </Link>
+          </div>
+        ) : items.length === 0 ? (
+          // Deliberate, not broken: the same panel the cards use, plus the one onward route that
+          // is useful when there is nothing here yet.
+          <Panel tone="quiet" className="flex flex-col items-center px-8 py-20 text-center">
+            <span
+              aria-hidden
+              className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-gold/20 bg-gold/[0.07] text-gold"
+            >
+              <Megaphone className="h-6 w-6" strokeWidth={1.75} />
+            </span>
+            <h2 className="type-h3 text-foreground">No announcements yet</h2>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-bone-soft">
+              Company and product announcements will appear here.
+            </p>
+            <div className="mt-7">
+              <TextLink to="/news/">See all ENICE news</TextLink>
             </div>
-          ) : (
-            <div className="space-y-4">
-              {items.map((item) => (
-                <AnnouncementCard key={item.id} item={item} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      <SiteFooter />
-    </div>
+          </Panel>
+        ) : (
+          <div className="space-y-4">
+            {items.map((item, index) => (
+              <Reveal key={item.id} delay={Math.min(index, 5) * 50}>
+                <AnnouncementCard item={item} />
+              </Reveal>
+            ))}
+          </div>
+        )}
+      </Section>
+    </SiteShell>
   );
 }
 
