@@ -38,30 +38,29 @@ import { MessageSquare, X } from "lucide-react";
  *
  * ═══ Why there is a fallback launcher ════════════════════════════════════════
  *
- * Because the widget silently did not exist on the site, and nothing said so.
+ * Because the assistant was once absent from the site with nothing anywhere saying so.
  *
- * `GET /api/widget/33/widget.js` answers **404** with a body of
- * `console.error("Widget: chatbot not found or inactive")` — the platform's way of saying that
- * chatbot 33 is not currently active in its workspace. The route itself is fine (a wrong path
- * answers with a JSON `NOT_FOUND` envelope instead), and the CSP already allows the origin, so
- * this is a configuration state on the platform rather than a bug here.
+ * The embed previously pointed at chatbot 33, which answers **404** with a body of
+ * `console.error("Widget: chatbot not found or inactive")`. The route was fine and the CSP already
+ * allowed the origin — that id simply was not live. But the component returned `null` on failure,
+ * so the only symptom was the complete absence of an assistant: no launcher, no error, nothing in
+ * the page's own logs. A visitor looking for help found nothing, and nobody operating the site had
+ * any signal it was down.
  *
- * The old failure mode was the problem: the component returned `null`, the script 404'd, and the
- * only symptom anywhere was the complete absence of an assistant. No launcher, no error, nothing
- * in the page's own logs. A visitor looking for help found nothing, and nobody operating the site
- * had any signal that the assistant was down.
- *
- * So the component now tracks whether the loader actually loaded, and if it did not, renders a
- * plain launcher of our own that routes to /contact. It does not imitate a chat and it does not
- * answer anything — pretending to be an AI that is not there would be worse than the silence it
- * replaces. As soon as the chatbot is activated (or `VITE_PULSEASSIST_WIDGET_ID` points at a live
- * one) the real widget loads, `status` becomes `"ready"`, and this fallback removes itself so the
- * two launchers never both appear.
+ * The id is now 36, which resolves. The fallback stays anyway, because "the assistant is missing
+ * and no one notices" is a failure mode worth designing out permanently rather than once: a
+ * chatbot can be deactivated, recreated or renumbered at any time, and none of those are deploys.
+ * When the loader fails the component renders a plain launcher of its own pointing at /contact. It
+ * does not imitate a chat and answers nothing — pretending to be an AI that is not there would be
+ * worse than the silence it replaces. When the loader succeeds, `status` becomes `"ready"` and the
+ * fallback removes itself, so two launchers never appear at once.
  *
  * ═══ Notes for whoever changes this next ════════════════════════════════════
  *
- * - Chatbot 33 is ENICE's, in workspace 63. `enicehq.com` must stay in the widget deployment's
- *   allowlist or the chat endpoint answers 403 — the launcher will open and then fail to send.
+ * - Chatbot 36 is ENICE's, in the `enice-technology-limited` workspace. The domain the site is
+ *   served from must be in that widget deployment's allowlist or `POST /api/widget/36/chat` answers
+ *   403 — the launcher opens and then fails to send. That includes Vercel preview domains, which
+ *   are not `enicehq.com`, so an unlisted preview will show the launcher and refuse to reply.
  * - Answers come from the FAQs and knowledge attached to that workspace, editable in the console.
  * - The workspace's conversation mode must not be `human`, or every message is handed to a person
  *   instead of answered. That is the platform default for a new workspace, deliberately.
@@ -76,11 +75,11 @@ import { MessageSquare, X } from "lucide-react";
  * The chatbot this site embeds.
  *
  * Overridable without a deploy, because the id is deployment configuration rather than source: it
- * changes when the chatbot is recreated, when a staging workspace is pointed at, or — as now —
- * when the live one needs replacing because the hardcoded one went inactive. There is nothing
- * secret in a public widget id, so it is safe in the client bundle.
+ * changes when the chatbot is recreated, when a staging workspace is pointed at, or — as happened
+ * with the previous id — when the live one goes inactive. There is nothing secret in a public
+ * widget id; it appears in the script URL every visitor loads, so it is safe in the client bundle.
  */
-const WIDGET_ID = import.meta.env.VITE_PULSEASSIST_WIDGET_ID?.trim() || "33";
+const WIDGET_ID = import.meta.env.VITE_PULSEASSIST_WIDGET_ID?.trim() || "36";
 const WIDGET_SRC = `https://getpulseassist.com/api/widget/${WIDGET_ID}/widget.js`;
 
 /** How long to wait for the loader before deciding it is not coming. */
