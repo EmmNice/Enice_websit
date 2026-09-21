@@ -18,22 +18,34 @@
 
 import { useEffect, useState } from "react";
 import { loadSharedBootstrap } from "./use-section";
-import type { FooterSettings, HeaderSettings, NavItem } from "./types";
+import type { DesignSettings, FooterSettings, HeaderSettings, NavItem } from "./types";
 
 export interface SiteChrome {
   header: HeaderSettings | null;
   footer: FooterSettings | null;
+  /**
+   * `design` has been in the bootstrap payload — and editable under Website → Design — since the
+   * CMS shipped, and nothing on the site read it, so uploading a logo in the admin had no effect.
+   * `Logo` now consumes `logoUrl`/`logoDarkUrl` from here. Note that an uploaded logo is an
+   * *override*: the committed mark in `public/brand/` is what renders by default, because a
+   * database outage must not take the logo with it.
+   */
+  design: DesignSettings | null;
 }
 
 export function useSiteChrome(): SiteChrome {
-  const [chrome, setChrome] = useState<SiteChrome>({ header: null, footer: null });
+  const [chrome, setChrome] = useState<SiteChrome>({ header: null, footer: null, design: null });
 
   useEffect(() => {
     let active = true;
     loadSharedBootstrap()
       .then((bootstrap) => {
         if (!active || bootstrap.degraded) return;
-        setChrome({ header: bootstrap.header, footer: bootstrap.footer });
+        setChrome({
+          header: bootstrap.header,
+          footer: bootstrap.footer,
+          design: bootstrap.design,
+        });
       })
       .catch(() => {
         /* keep nulls → the caller's built-in chrome stands */

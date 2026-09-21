@@ -21,8 +21,14 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
     />
+    <!--
+      Three icons, narrowest-support first, because browsers take the last one they understand:
+      `.ico` for legacy and for crawlers that probe /favicon.ico regardless of markup, then the PNG,
+      then the SVG that current browsers prefer and that stays sharp on any display.
+    -->
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon.png" type="image/png" sizes="256x256" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <!-- The canvas, so the browser chrome matches the page instead of framing it in navy. -->
