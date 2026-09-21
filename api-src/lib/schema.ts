@@ -1662,7 +1662,11 @@ WHERE key = 'about.build'
     name: "partners_strip_current_providers",
     sql: /* sql */ `
 -- The partners strip lists the providers the platform actually runs on: AWS, Google Cloud,
--- Supabase, Vercel and Railway.
+-- Supabase, Vercel, PulseAssist and Railway.
+--
+-- PulseAssist is in the list because the site genuinely runs on it: transactional email goes out
+-- through PulseAssist Email (#31) and the assistant is the PulseAssist widget. It being an ENICE
+-- product does not make it less of a dependency.
 --
 -- Removed: Resend, which PulseAssist Email replaced in #31, and AWS Activate, because a startup
 -- credits programme is not infrastructure and listing it beside AWS itself read as two
@@ -1679,12 +1683,14 @@ SET fields = jsonb_set(fields, '{items}', '[
     {"name":"Google Cloud","tagline":"AI & Compute","logo":"/partners/googlecloud.svg","url":"https://cloud.google.com"},
     {"name":"Supabase","tagline":"Database & Auth","logo":"/partners/supabase.svg","url":"https://supabase.com"},
     {"name":"Vercel","tagline":"Edge Delivery","logo":"/partners/vercel.svg","url":"https://vercel.com"},
+    {"name":"PulseAssist","tagline":"Support & Email Infrastructure","logo":"/partners/pulseassist.svg","url":"https://getpulseassist.com"},
     {"name":"Railway","tagline":"Application & Database Hosting","logo":"/partners/railway.svg","url":"https://railway.com"}
   ]'::jsonb),
     updated_at = now()
 WHERE key = 'home.partners'
   AND (fields->'items' @> '[{"name":"AWS Activate"}]'::jsonb
-       OR fields->'items' @> '[{"name":"Resend"}]'::jsonb);
+       OR fields->'items' @> '[{"name":"Resend"}]'::jsonb
+       OR NOT fields->'items' @> '[{"name":"PulseAssist"}]'::jsonb);
 
 -- The homepage's "The stack underneath" band is gone: it restated the partners strip in longer
 -- form, so the page named the same providers twice. Its section has no renderer left, and an admin
