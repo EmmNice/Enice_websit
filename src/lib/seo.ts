@@ -83,7 +83,8 @@ export function organizationJsonLd() {
       {
         "@type": "Organization",
         name: "PulseAssist",
-        description: "Multi-tenant AI conversational SaaS for banking and telecom.",
+        description:
+          "AI customer support across WhatsApp, web chat, email, SMS and voice, from one shared inbox.",
       },
       {
         "@type": "FinancialProduct",
@@ -170,7 +171,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/portfolio/pulseassist": {
     title: "PulseAssist | Enterprise AI Operations Platform by ENICE Group",
     description:
-      "PulseAssist by ENICE Group is a multi-tenant AI operations platform for banking, fintech, and telecom. It handles customer support, runs policy-bound agents, hands off to live agents in real time, and keeps compliance-ready audit trails.",
+      "PulseAssist by ENICE Group answers customers across WhatsApp, web chat, email, SMS and voice from one shared inbox, hands off to a human when it matters, and keeps compliance-ready audit trails.",
   },
   "/portfolio/epulse": {
     title: "ePulse | Global Financial Platform by ENICE Group",

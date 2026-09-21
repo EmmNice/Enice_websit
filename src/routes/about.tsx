@@ -1,9 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteShell } from "@/components/site/SiteShell";
 import { StyledText } from "@/components/site/StyledText";
-import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
+import { Reveal } from "@/components/site/Reveal";
+import { PRODUCTS } from "@/components/site/navigation";
+import {
+  CardIndex,
+  Eyebrow,
+  HairlineGrid,
+  Panel,
+  Section,
+  SectionIntro,
+} from "@/components/site/primitives";
+import { useSectionFields, fieldText, fieldItems, fieldParagraphs } from "@/lib/cms/use-section";
 import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
@@ -79,6 +88,13 @@ const PRINCIPLES = [
   },
 ];
 
+/**
+ * The sector tiles under "What We Build".
+ *
+ * Mapped onto the `featureGrid` row shape: `title` is the small uppercase label, `description` the
+ * line beneath it. The grid renders no heading of its own, so `about.verticals` seeds one for the
+ * admin list only — nothing on the page reads it.
+ */
 const VERTICALS = [
   {
     label: "Financial Infrastructure",
@@ -110,31 +126,111 @@ const VERTICALS = [
   },
 ];
 
+/**
+ * The founding team cards.
+ *
+ * Mapped onto the `featureGrid` row shape: `title` is the role, `description` the scope, and
+ * `kicker` the three letters in the avatar tile.
+ */
+const LEADERSHIP = [
+  {
+    role: "Founder & Chief Executive Officer",
+    scope: "Corporate strategy, venture direction, and ecosystem growth.",
+    initial: "CEO",
+  },
+  {
+    role: "Chief Technology Officer",
+    scope: "Platform architecture, engineering standards, and infrastructure design.",
+    initial: "CTO",
+  },
+  {
+    role: "Chief Operations Officer",
+    scope: "Product delivery, partner operations, and compliance execution.",
+    initial: "COO",
+  },
+];
+
+/** Where executive contact goes. The address is code, not copy — the link has to keep working. */
+const CORPORATE_EMAIL = "corporate@enicehq.com";
+
+/**
+ * The note under the founding team cards, carried on `about.leadership`'s `subheading`.
+ *
+ * It contains a link, and no CMS text field can carry markup — `StyledText` deliberately
+ * interprets no HTML. So the anchor stays in code: the sentence is editable, and whichever part of
+ * it happens to be the email address is rendered as the `mailto:` link. An edit that drops the
+ * address simply renders as plain text rather than breaking.
+ */
+const LEADERSHIP_NOTE = `Our founding team prefers to let the work speak. Executive contact is available through ${CORPORATE_EMAIL} for qualified enterprise and partnership inquiries.`;
+
+/**
+ * The "What We Build" band's paragraphs.
+ *
+ * Two things this copy has to keep doing, now that it lives in the CMS:
+ *
+ *   * `{liveProducts}` is replaced at render with the number of products whose stage is
+ *     `available`, read from the shared registry in `navigation.ts`. The figure used to be written
+ *     by hand, which is exactly how it goes stale the day a product ships.
+ *   * `**PulsePay**` and `**PulseAssist**` are `StyledText`'s bold marker. A plain text field
+ *     cannot carry a `<strong>`, and it should not be able to; the marker renders one with the
+ *     same classes the band has always used.
+ */
+const PRODUCT_COUNT_TOKEN = "{liveProducts}";
+
+const BUILD_COPY = [
+  "We find a real gap, design a product around what it takes to close it, build it to a high standard, launch it, and then operate it with the same discipline we used to build it. We don't hand products off. We own the full lifecycle.",
+  "We work across areas where technical complexity meets real-world consequence: financial infrastructure and digital banking, AI-powered enterprise communication and automation, developer tools and API infrastructure, digital commerce systems, cloud infrastructure, and longer-horizon research.",
+  `Our ${PRODUCT_COUNT_TOKEN} current products are the foundation of this. **PulsePay** is our financial infrastructure platform, a Naira-native payment processing and digital banking system built for Nigerian businesses, from high-frequency transactions to compliance. **PulseAssist** is our enterprise AI platform, a communication and automation layer that helps enterprise teams cut down on procedural overhead.`,
+  "These are the first two products in a lineup we plan to grow the same way: deliberately, and to a high standard.",
+];
+
+/** How the band's `<strong>` runs have always been styled. Passed to `StyledText` explicitly. */
+const BUILD_BOLD_CLASS = "font-semibold text-foreground";
+
+/**
+ * The closing statement and its attribution.
+ *
+ * A `prose` section carries a heading and a body and nothing else, so the quote is the body and
+ * the attribution is the heading — it is the one remaining string in the band, and leaving it in
+ * code would mean the sentence is editable and the signature under it is not.
+ */
+const CLOSING_QUOTE = `"The infrastructure a society depends on is the most durable thing it can build. That's what we're here to build."`;
+const CLOSING_ATTRIBUTION = "— The Founders, ENICE Group";
+
+/** The band number, at the one size and weight every band uses. */
+function BandNumber({ children }: { children: string }) {
+  return (
+    <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-bone-faint">
+      {children}
+    </span>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 /**
  * One of the About page's numbered prose bands.
  *
- * The five bands are structurally identical — a number, a heading, and a few paragraphs — so they
- * share this component rather than repeating the markup five times. The classes are exactly those
- * the page already used, including the dark variant, so making these editable does not alter the
- * typography.
+ * The bands are structurally identical — a number, a heading, and a few paragraphs — so they
+ * share this component rather than repeating the markup. The `dark` variant this used to carry is
+ * gone: the site is one continuous near-black environment, so there is no longer a light band for
+ * a dark band to contrast with, and every copy of the component now renders identically.
  *
  * Paragraphs come from the section's `body`, separated by blank lines. The built-in copy is used
- * until the section is edited, so the page is unchanged in the meantime.
+ * until the section is edited.
  */
 function ProseBand({
   number,
   sectionKey,
   heading,
+  headingId,
   paragraphs,
-  dark = false,
 }: {
   number: string;
   sectionKey: string;
   heading: string;
+  headingId: string;
   paragraphs: string[];
-  dark?: boolean;
 }) {
   const fields = useSectionFields(sectionKey);
   const body = fieldText(fields, "body", paragraphs.join("\n\n"));
@@ -144,37 +240,18 @@ function ProseBand({
     .filter(Boolean);
 
   return (
-    <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
+    <div className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
       <div>
-        <span
-          className={`font-mono text-[11px] font-semibold uppercase tracking-[0.22em] ${
-            dark ? "text-blue-400/70" : "text-muted-foreground"
-          }`}
-        >
-          {number}
-        </span>
-        <h2
-          className={`mt-4 text-3xl font-bold leading-snug tracking-tight sm:text-4xl ${
-            dark ? "text-white" : "text-foreground"
-          }`}
-        >
-          <StyledText
-            text={fieldText(fields, "heading", heading)}
-            accentClassName={dark ? "text-blue-400" : "text-primary"}
-          />
+        <BandNumber>{number}</BandNumber>
+        <h2 id={headingId} className="type-h2 mt-4 text-foreground">
+          <StyledText text={fieldText(fields, "heading", heading)} accentClassName="text-gold" />
         </h2>
       </div>
-      <div
-        className={`space-y-6 text-[16px] leading-relaxed ${
-          dark ? "text-white/60" : "text-muted-foreground"
-        }`}
-      >
+      {/* Long-form copy stays selectable — selection is disabled globally on the site. */}
+      <div data-allow-select className="space-y-6">
         {rendered.map((paragraph, i) => (
-          <p key={i}>
-            <StyledText
-              text={paragraph}
-              accentClassName={dark ? "text-blue-400" : "text-primary"}
-            />
+          <p key={i} className="type-body">
+            <StyledText text={paragraph} accentClassName="text-gold" />
           </p>
         ))}
       </div>
@@ -186,6 +263,10 @@ function AboutPage() {
   // Editable bands, each falling back to the copy below until the section is edited.
   const hero = useSectionFields("about.hero");
   const values = useSectionFields("about.values");
+  const build = useSectionFields("about.build");
+  const verticalsSection = useSectionFields("about.verticals");
+  const leadership = useSectionFields("about.leadership");
+  const closing = useSectionFields("about.closing");
 
   // The principles cards. Numbering is positional, so nobody maintains /01, /02 by hand.
   const principles = fieldItems(values, "items", PRINCIPLES, (row) => {
@@ -197,306 +278,347 @@ function AboutPage() {
     };
   });
 
+  /**
+   * How many products are actually live, read from the shared product registry.
+   *
+   * The prose below used to say "our two current products" with the count written by hand, which
+   * is the same failure the homepage hit: the registry in `navigation.ts` is the only thing that
+   * knows what has shipped, and a hardcoded count silently goes stale the day one does. The named
+   * products stay in the copy — only the figure is derived.
+   */
+  const liveProducts = PRODUCTS.filter((p) => p.stage === "available").length;
+
+  // "What We Build". The count is substituted into whichever paragraph names it, so the figure
+  // stays derived whether the copy comes from the CMS or from `BUILD_COPY`.
+  const buildParagraphs = fieldParagraphs(build, "body", BUILD_COPY).map((paragraph) =>
+    paragraph.split(PRODUCT_COUNT_TOKEN).join(String(liveProducts)),
+  );
+
+  // The sector tiles. `title` is the label; rows without one are skipped.
+  const verticals = fieldItems(verticalsSection, "items", VERTICALS, (row) => {
+    const label = typeof row.title === "string" ? row.title.trim() : "";
+    if (!label) return null;
+    return {
+      label,
+      description: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
+  // The founding team cards: role, scope, and the three letters in the avatar tile.
+  const team = fieldItems(leadership, "items", LEADERSHIP, (row) => {
+    const role = typeof row.title === "string" ? row.title.trim() : "";
+    if (!role) return null;
+    return {
+      role,
+      scope: typeof row.description === "string" ? row.description.trim() : "",
+      initial: typeof row.kicker === "string" ? row.kicker.trim() : "",
+    };
+  });
+
+  // The executive-contact note, with the anchor rebuilt around the address. See `LEADERSHIP_NOTE`.
+  const note = fieldText(leadership, "subheading", LEADERSHIP_NOTE);
+  const noteEmailAt = note.indexOf(CORPORATE_EMAIL);
+
   return (
-    <div className="min-h-dvh bg-background text-foreground antialiased">
-      <SiteHeader />
-      <main id="main">
-        {/* ── 1. HERO ─────────────────────────────────────────────────────── */}
-        <section className="border-b border-border bg-[#060912] pb-16 pt-16 sm:pb-36 sm:pt-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
-              {fieldText(hero, "eyebrow", "About ENICE Group")}
+    <SiteShell>
+      {/* ── 1. HERO ───────────────────────────────────────────────────────── */}
+      <Section
+        spacing="loose"
+        container="narrow"
+        grid
+        glow="spread"
+        aria-labelledby="about-heading"
+      >
+        {/*
+          No [[highlight]] in the default heading.
+
+          The highlight put a full line of ~56px gold at the top of the page. Gold is the small
+          accent — at display size it stops reading as an accent and starts reading as a gold
+          website. The capability is still there for an editor emphasising a short phrase.
+        */}
+        <SectionIntro
+          level={1}
+          id="about-heading"
+          eyebrow={fieldText(hero, "eyebrow", "About ENICE Group")}
+          heading={fieldText(
+            hero,
+            "heading",
+            "We build technology products. Then we operate them.",
+          )}
+          lead={fieldText(
+            hero,
+            "subheading",
+            "ENICE Group is the parent company behind a growing set of software products. We find real problems in financial services, commerce, and business communication, then build and run the platforms that solve them.",
+          )}
+        />
+      </Section>
+
+      {/* ── 2. OUR STORY ──────────────────────────────────────────────────── */}
+      <Section container="narrow" divider aria-labelledby="about-story-heading">
+        <Reveal>
+          <ProseBand
+            number="/02"
+            sectionKey="about.story"
+            heading="Our Story"
+            headingId="about-story-heading"
+            paragraphs={[
+              "ENICE Group started from one observation: the biggest problems facing African businesses aren't problems of ambition, they're problems of infrastructure. The software systems and financial rails that large organisations rely on elsewhere have historically been too expensive, too inaccessible, or simply missing for businesses in emerging markets.",
+              "We're building more than one product on the same foundation. The same engineering standards and shared infrastructure can support multiple purpose-built platforms, each serving a distinct need and strengthening the system around it.",
+              "This isn't a collection of separate experiments. It's a deliberate approach: shared infrastructure compounds in value, and the quality of one product raises the bar for whatever we build next.",
+            ]}
+          />
+        </Reveal>
+      </Section>
+
+      {/* ── 3. OUR MISSION ────────────────────────────────────────────────── */}
+      <Section container="narrow" divider aria-labelledby="about-mission-heading">
+        <Reveal>
+          <ProseBand
+            number="/03"
+            sectionKey="about.mission"
+            heading="Our Mission"
+            headingId="about-mission-heading"
+            paragraphs={[
+              "We want to build the technology layer that lets businesses, institutions, and developers across Africa, and eventually beyond, operate at real scale. Not software that works well enough, but software built with the reliability, security, and performance that institutional operations require.",
+              "Our customers aren't test users. They're financial service providers, enterprise operations teams, and technology builders who need infrastructure they can stake their business on. We serve them with platforms that are secure by design and built to hold up under real commercial volume.",
+              "We're aiming for structural impact, not just features. When payment infrastructure is reliable, commerce expands. When enterprise AI is trustworthy, teams get more done. When developer tools are solid, the next generation of companies gets built faster. That's the impact we're here for.",
+            ]}
+          />
+        </Reveal>
+      </Section>
+
+      {/* ── 4. OUR VISION ─────────────────────────────────────────────────── */}
+      <Section container="narrow" divider glow="center" aria-labelledby="about-vision-heading">
+        <Reveal>
+          <ProseBand
+            number="/04"
+            sectionKey="about.vision"
+            heading="Our Vision"
+            headingId="about-vision-heading"
+            paragraphs={[
+              "Over the next ten to twenty years, we want to build what Africa doesn't yet have: a home-grown technology infrastructure group that competes globally, not one that just follows trends.",
+              "We're building toward a future where African-originated financial infrastructure is trusted across multiple continents, where enterprise AI built here sets the regional standard for reliability, and where developer tools from our ecosystem are chosen by builders worldwide because they're simply good.",
+              "That's a ten-to-twenty-year project. It takes discipline and patience most organisations aren't built to sustain. We're structured for the long run, not the short cycle of a typical startup.",
+            ]}
+          />
+        </Reveal>
+      </Section>
+
+      {/* ── 5. WHAT WE BUILD ──────────────────────────────────────────────── */}
+      <Section
+        container="narrow"
+        tone="recessed"
+        divider
+        aria-labelledby="about-what-we-build-heading"
+      >
+        <Reveal>
+          <div className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
+            <div>
+              <BandNumber>/05</BandNumber>
+              <h2 id="about-what-we-build-heading" className="type-h2 mt-4 text-foreground">
+                <StyledText
+                  text={fieldText(build, "heading", "What We Build")}
+                  accentClassName="text-gold"
+                />
+              </h2>
             </div>
-            <h1 className="mt-6 max-w-4xl text-[2rem] font-bold leading-[1.04] tracking-[-0.035em] text-white sm:text-6xl md:text-7xl">
+            <div data-allow-select className="space-y-6">
+              {buildParagraphs.map((paragraph, i) => (
+                <p key={i} className="type-body">
+                  <StyledText
+                    text={paragraph}
+                    accentClassName="text-gold"
+                    boldClassName={BUILD_BOLD_CLASS}
+                  />
+                </p>
+              ))}
+            </div>
+          </div>
+        </Reveal>
+
+        {/* Verticals grid */}
+        <HairlineGrid columns={3} className="mt-14">
+          {verticals.map((v, i) => (
+            <Reveal key={v.label} delay={i * 50} className="flex">
+              {/* Cells keep the grid's default `bg-background`, so inside this one recessed band
+                  they read as wells cut into the surface rather than as another colour block. */}
+              <div className="flex h-full flex-col p-8">
+                <Eyebrow className="text-[10px] tracking-[0.2em]">{v.label}</Eyebrow>
+                <p className="type-body mt-3">{v.description}</p>
+              </div>
+            </Reveal>
+          ))}
+        </HairlineGrid>
+      </Section>
+
+      {/* ── LEADERSHIP ────────────────────────────────────────────────────── */}
+      <Section container="narrow" divider aria-labelledby="about-team-heading">
+        <Reveal>
+          <div className="max-w-2xl">
+            <BandNumber>/05b</BandNumber>
+            <h2 id="about-team-heading" className="type-h2 mt-4 text-foreground">
               <StyledText
-                text={fieldText(
-                  hero,
-                  "heading",
-                  "We build technology products. [[Then we operate them.]]",
-                )}
-                accentClassName="text-blue-400"
+                text={fieldText(leadership, "heading", "The Founding Team")}
+                accentClassName="text-gold"
               />
-            </h1>
-            <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/60 sm:mt-8 sm:text-xl">
+            </h2>
+            {/* This lead stays in code. `featureGrid` carries one `subheading`, and the note under
+                the cards claimed it because that sentence is the one an editor actually changes —
+                it carries the contact address. A second prose field would mean editing the shared
+                schema, which is a wider change than this band deserves. */}
+            <p className="type-lead mt-5">
+              ENICE Group was founded by operators and engineers who spent years inside the problems
+              they now build solutions for.
+            </p>
+          </div>
+        </Reveal>
+
+        <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {team.map((m, i) => (
+            <Reveal key={m.role} delay={i * 60} className="flex">
+              <Panel className="flex h-full flex-col gap-5 p-7">
+                {/* Avatar placeholder */}
+                <span
+                  aria-hidden
+                  className="grid h-14 w-14 place-items-center rounded-xl border border-gold/20 bg-gold/[0.07]"
+                >
+                  <span className="font-mono text-[11px] font-bold tracking-[0.18em] text-gold">
+                    {m.initial}
+                  </span>
+                </span>
+                <div>
+                  <h3 className="text-[11px] font-semibold uppercase tracking-[0.2em] text-bone-strong">
+                    {m.role}
+                  </h3>
+                  <p className="type-body mt-2">{m.scope}</p>
+                </div>
+              </Panel>
+            </Reveal>
+          ))}
+        </div>
+
+        <Reveal>
+          <Panel tone="quiet" className="mt-8 px-6 py-5">
+            <p className="type-body">
+              {noteEmailAt === -1 ? (
+                note
+              ) : (
+                <>
+                  {note.slice(0, noteEmailAt)}
+                  <a
+                    href={`mailto:${CORPORATE_EMAIL}`}
+                    className="tap font-medium text-foreground underline-offset-2 transition-colors hover:text-gold hover:underline"
+                  >
+                    {CORPORATE_EMAIL}
+                  </a>
+                  {note.slice(noteEmailAt + CORPORATE_EMAIL.length)}
+                </>
+              )}
+            </p>
+          </Panel>
+        </Reveal>
+      </Section>
+
+      {/* ── 6. OUR PRINCIPLES ─────────────────────────────────────────────── */}
+      <Section container="narrow" divider aria-labelledby="about-principles-heading">
+        <Reveal>
+          <div className="max-w-2xl">
+            <BandNumber>/06</BandNumber>
+            <h2 id="about-principles-heading" className="type-h2 mt-4 text-foreground">
+              <StyledText
+                text={fieldText(values, "heading", "Our Principles")}
+                accentClassName="text-gold"
+              />
+            </h2>
+            <p className="type-lead mt-5">
               <StyledText
                 text={fieldText(
-                  hero,
+                  values,
                   "subheading",
-                  "ENICE Group is the parent company behind a growing set of software products. We find real problems in financial services, commerce, and business communication, then build and run the platforms that solve them.",
+                  "These aren't aspirational values written for a careers page. They're the standards we hold every decision, every system, and every person on the team to.",
                 )}
-                accentClassName="text-blue-400"
+                accentClassName="text-gold"
               />
             </p>
           </div>
-        </section>
+        </Reveal>
 
-        {/* ── 2. OUR STORY ────────────────────────────────────────────────── */}
-        <section className="border-b border-border py-24 sm:py-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <ProseBand
-              number="/02"
-              sectionKey="about.story"
-              heading={"Our Story"}
-              paragraphs={[
-                "ENICE Group started from one observation: the biggest problems facing African businesses aren't problems of ambition, they're problems of infrastructure. The software systems and financial rails that large organisations rely on elsewhere have historically been too expensive, too inaccessible, or simply missing for businesses in emerging markets.",
-                "We're building more than one product on the same foundation. The same engineering standards and shared infrastructure can support multiple purpose-built platforms, each serving a distinct need and strengthening the system around it.",
-                "This isn't a collection of separate experiments. It's a deliberate approach: shared infrastructure compounds in value, and the quality of one product raises the bar for whatever we build next.",
-              ]}
-            />
-          </div>
-        </section>
-
-        {/* ── 3. OUR MISSION ──────────────────────────────────────────────── */}
-        <section className="border-b border-border bg-secondary py-24 sm:py-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <ProseBand
-              number="/03"
-              sectionKey="about.mission"
-              heading={"Our Mission"}
-              paragraphs={[
-                "We want to build the technology layer that lets businesses, institutions, and developers across Africa, and eventually beyond, operate at real scale. Not software that works well enough, but software built with the reliability, security, and performance that institutional operations require.",
-                "Our customers aren't test users. They're financial service providers, enterprise operations teams, and technology builders who need infrastructure they can stake their business on. We serve them with platforms that are secure by design and built to hold up under real commercial volume.",
-                "We're aiming for structural impact, not just features. When payment infrastructure is reliable, commerce expands. When enterprise AI is trustworthy, teams get more done. When developer tools are solid, the next generation of companies gets built faster. That's the impact we're here for.",
-              ]}
-            />
-          </div>
-        </section>
-
-        {/* ── 4. OUR VISION ───────────────────────────────────────────────── */}
-        <section className="border-b border-border py-24 sm:py-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <ProseBand
-              number="/04"
-              sectionKey="about.vision"
-              heading={"Our Vision"}
-              paragraphs={[
-                "Over the next ten to twenty years, we want to build what Africa doesn't yet have: a home-grown technology infrastructure group that competes globally, not one that just follows trends.",
-                "We're building toward a future where African-originated financial infrastructure is trusted across multiple continents, where enterprise AI built here sets the regional standard for reliability, and where developer tools from our ecosystem are chosen by builders worldwide because they're simply good.",
-                "That's a ten-to-twenty-year project. It takes discipline and patience most organisations aren't built to sustain. We're structured for the long run, not the short cycle of a typical startup.",
-              ]}
-            />
-          </div>
-        </section>
-
-        {/* ── 5. WHAT WE BUILD ────────────────────────────────────────────── */}
-        <section className="border-b border-border bg-[#060912] py-24 sm:py-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid gap-16 lg:grid-cols-[1fr_2fr]">
-              <div>
-                <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-blue-400/70">
-                  /05
-                </span>
-                <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-white sm:text-4xl">
-                  What We Build
-                </h2>
-              </div>
-              <div className="space-y-6 text-[16px] leading-relaxed text-white/60">
-                <p>
-                  We find a real gap, design a product around what it takes to close it, build it to
-                  a high standard, launch it, and then operate it with the same discipline we used
-                  to build it. We don't hand products off. We own the full lifecycle.
-                </p>
-                <p>
-                  We work across areas where technical complexity meets real-world consequence:
-                  financial infrastructure and digital banking, AI-powered enterprise communication
-                  and automation, developer tools and API infrastructure, digital commerce systems,
-                  cloud infrastructure, and longer-horizon research.
-                </p>
-                <p>
-                  Our two current products are the foundation of this.{" "}
-                  <strong className="text-white font-semibold">PulsePay</strong> is our financial
-                  infrastructure platform, a Naira-native payment processing and digital banking
-                  system built for Nigerian businesses, from high-frequency transactions to
-                  compliance. <strong className="text-white font-semibold">PulseAssist</strong> is
-                  our enterprise AI platform, a communication and automation layer that helps
-                  enterprise teams cut down on procedural overhead.
-                </p>
-                <p>
-                  These are the first two products in a lineup we plan to grow the same way:
-                  deliberately, and to a high standard.
-                </p>
-              </div>
-            </div>
-
-            {/* Verticals grid */}
-            <div className="mt-16 grid gap-px border border-white/8 bg-white/8 sm:grid-cols-2 lg:grid-cols-3 rounded-xl overflow-hidden">
-              {VERTICALS.map((v) => (
-                <div key={v.label} className="bg-[#060912] p-8">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-blue-400">
-                    {v.label}
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-white/50">{v.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── LEADERSHIP ──────────────────────────────────────────────────── */}
-        <section className="border-b border-border py-24 sm:py-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="mb-12">
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                /05b
-              </span>
-              <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
-                The Founding Team
-              </h2>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-                ENICE Group was founded by operators and engineers who spent years inside the
-                problems they now build solutions for.
-              </p>
-            </div>
-
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                {
-                  role: "Founder & Chief Executive Officer",
-                  scope: "Corporate strategy, venture direction, and ecosystem growth.",
-                  initial: "CEO",
-                },
-                {
-                  role: "Chief Technology Officer",
-                  scope: "Platform architecture, engineering standards, and infrastructure design.",
-                  initial: "CTO",
-                },
-                {
-                  role: "Chief Operations Officer",
-                  scope: "Product delivery, partner operations, and compliance execution.",
-                  initial: "COO",
-                },
-              ].map((m) => (
-                <div
-                  key={m.role}
-                  className="flex flex-col gap-5 rounded-xl border border-border bg-background p-7"
-                  style={{
-                    boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)",
-                  }}
-                >
-                  {/* Avatar placeholder */}
-                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/8 ring-1 ring-primary/15">
-                    <span className="font-mono text-[11px] font-bold tracking-[0.18em] text-primary">
-                      {m.initial}
-                    </span>
-                  </div>
+        <div className="mt-12 grid gap-5 sm:grid-cols-2">
+          {principles.map((p, i) => (
+            <Reveal key={p.title} delay={i * 50} className="flex">
+              <Panel as="article" className="h-full p-8">
+                <div className="flex items-start gap-4">
+                  <span className="mt-1 shrink-0">
+                    <CardIndex value={i + 1} />
+                  </span>
                   <div>
-                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
-                      {m.role}
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{m.scope}</p>
+                    <h3 className="type-h3 text-foreground">{p.title}</h3>
+                    <p className="type-body mt-3">{p.body}</p>
                   </div>
                 </div>
-              ))}
-            </div>
+              </Panel>
+            </Reveal>
+          ))}
+        </div>
+      </Section>
 
-            <div className="mt-8 rounded-xl border border-border bg-secondary/60 px-6 py-5">
-              <p className="text-sm leading-relaxed text-muted-foreground">
-                Our founding team prefers to let the work speak. Executive contact is available
-                through{" "}
-                <a
-                  href="mailto:corporate@enicehq.com"
-                  className="font-medium text-foreground underline-offset-2 hover:underline"
-                >
-                  corporate@enicehq.com
-                </a>{" "}
-                for qualified enterprise and partnership inquiries.
+      {/* ── 7. OUR ECOSYSTEM ──────────────────────────────────────────────── */}
+      <Section container="narrow" divider aria-labelledby="about-ecosystem-heading">
+        <Reveal>
+          <ProseBand
+            number="/07"
+            sectionKey="about.ecosystem"
+            heading="Our Ecosystem"
+            headingId="about-ecosystem-heading"
+            paragraphs={[
+              "The most important part of the ENICE Group model isn't any single product, it's the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same data isolation standards, and the same deployment pipeline.",
+              "That shared foundation pays off twice. Each new product reaches production-grade reliability faster, because the hard infrastructure problems are already solved at the group level. And each existing product gets stronger as we add new ones, through shared investment and shared operational standards.",
+              "The result is a set of products that gets more capable with each addition. Security improvements spread across the ecosystem. Infrastructure work lifts every product. Compliance work done once serves every regulated platform.",
+              "That's why we call it an ecosystem rather than a collection of products. They're built to compound.",
+            ]}
+          />
+        </Reveal>
+      </Section>
+
+      {/* ── 8. LOOKING AHEAD ──────────────────────────────────────────────── */}
+      <Section container="narrow" divider glow="center" aria-labelledby="about-outlook-heading">
+        <Reveal>
+          <ProseBand
+            number="/09"
+            sectionKey="about.outlook"
+            heading="Looking Ahead"
+            headingId="about-outlook-heading"
+            paragraphs={[
+              "The financial and technological infrastructure African businesses depend on is still largely being built. That's not a criticism, it's just where things stand, and it's the opportunity we're focused on.",
+              "We want to build the systems businesses on this continent will run on for the next generation. This isn't charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it.",
+              "We're also building for a global market. What we build will scale across regions, meet international compliance standards, and compete with any equivalent platform anywhere. We're not trying to be the best option in Nigeria or in Africa. We're trying to be the best option, period.",
+              "To the businesses that use our products, and the engineers and operators who build with us: we're committed to building technology that matters, to a standard that matters, and taking the time it takes to do it properly.",
+            ]}
+          />
+        </Reveal>
+
+        {/* Closing statement */}
+        <Reveal>
+          <blockquote
+            data-allow-select
+            className="mt-14 text-center sm:mt-20"
+            aria-label="Closing statement from the founders"
+          >
+            {fieldParagraphs(closing, "body", [CLOSING_QUOTE]).map((paragraph, i) => (
+              <p key={i} className="type-h3 mx-auto max-w-3xl text-foreground">
+                <StyledText text={paragraph} accentClassName="text-gold" />
               </p>
+            ))}
+            <div className="mt-8 flex items-center gap-5">
+              <span aria-hidden className="rule-fade h-px flex-1" />
+              <footer className="font-mono text-[12px] tracking-[0.14em] text-bone-faint">
+                {fieldText(closing, "heading", CLOSING_ATTRIBUTION)}
+              </footer>
+              <span aria-hidden className="rule-fade h-px flex-1" />
             </div>
-          </div>
-        </section>
-
-        {/* ── 6. OUR PRINCIPLES ───────────────────────────────────────────── */}
-        <section className="border-b border-border py-24 sm:py-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="mb-10 sm:mb-16">
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                /06
-              </span>
-              <h2 className="mt-4 text-3xl font-bold leading-snug tracking-tight text-foreground sm:text-4xl">
-                <StyledText text={fieldText(values, "heading", "Our Principles")} />
-              </h2>
-              <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-                <StyledText
-                  text={fieldText(
-                    values,
-                    "subheading",
-                    "These aren't aspirational values written for a careers page. They're the standards we hold every decision, every system, and every person on the team to.",
-                  )}
-                />
-              </p>
-            </div>
-
-            <div className="grid gap-4 sm:gap-6 sm:grid-cols-2">
-              {principles.map((p, i) => (
-                <article
-                  key={p.title}
-                  className="rounded-xl border border-border bg-background p-8"
-                >
-                  <div className="flex items-start gap-4">
-                    <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-muted-foreground shrink-0 mt-0.5">
-                      /{String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div>
-                      <h3 className="text-lg font-semibold tracking-tight text-foreground">
-                        {p.title}
-                      </h3>
-                      <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{p.body}</p>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── 7. OUR ECOSYSTEM ────────────────────────────────────────────── */}
-        <section className="border-b border-border bg-secondary py-24 sm:py-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <ProseBand
-              number="/07"
-              sectionKey="about.ecosystem"
-              heading={"Our Ecosystem"}
-              paragraphs={[
-                "The most important part of the ENICE Group model isn't any single product, it's the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same data isolation standards, and the same deployment pipeline.",
-                "That shared foundation pays off twice. Each new product reaches production-grade reliability faster, because the hard infrastructure problems are already solved at the group level. And each existing product gets stronger as we add new ones, through shared investment and shared operational standards.",
-                "The result is a set of products that gets more capable with each addition. Security improvements spread across the ecosystem. Infrastructure work lifts every product. Compliance work done once serves every regulated platform.",
-                "That's why we call it an ecosystem rather than a collection of products. They're built to compound.",
-              ]}
-            />
-          </div>
-        </section>
-
-        {/* ── 8. LOOKING AHEAD ────────────────────────────────────────────── */}
-        <section className="border-b border-border bg-[#060912] py-24 sm:py-32">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <ProseBand
-              number="/09"
-              sectionKey="about.outlook"
-              heading={"Looking Ahead"}
-              paragraphs={[
-                "The financial and technological infrastructure African businesses depend on is still largely being built. That's not a criticism, it's just where things stand, and it's the opportunity we're focused on.",
-                "We want to build the systems businesses on this continent will run on for the next generation. This isn't charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it.",
-                "We're also building for a global market. What we build will scale across regions, meet international compliance standards, and compete with any equivalent platform anywhere. We're not trying to be the best option in Nigeria or in Africa. We're trying to be the best option, period.",
-                "To the businesses that use our products, and the engineers and operators who build with us: we're committed to building technology that matters, to a standard that matters, and taking the time it takes to do it properly.",
-              ]}
-              dark
-            />
-
-            {/* Closing statement */}
-            <div className="mt-12 rounded-2xl border border-white/10 bg-white/[0.03] p-7 sm:mt-20 sm:p-16 text-center">
-              <p className="mx-auto max-w-3xl text-xl font-semibold leading-snug tracking-tight text-white sm:text-3xl">
-                "The infrastructure a society depends on is the most durable thing it can build.
-                That's what we're here to build."
-              </p>
-              <div className="mt-6 text-sm font-medium text-white/40">
-                — The Founders, ENICE Group
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </div>
+          </blockquote>
+        </Reveal>
+      </Section>
+    </SiteShell>
   );
 }

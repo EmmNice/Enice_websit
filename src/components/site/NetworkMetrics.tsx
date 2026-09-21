@@ -1,84 +1,139 @@
-import { Activity, ShieldCheck, Gauge, Zap, Lock } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { Activity, Boxes, ShieldCheck, Gauge, Zap, Lock } from "lucide-react";
+import { Reveal } from "./Reveal";
+import { CardIndex, Eyebrow, HairlineGrid, Section } from "./primitives";
+import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
 
-const items = [
+/**
+ * Platform capabilities — what the systems do, stated in terms that can be checked.
+ *
+ * The band was previously headed "Live network health" beside a pulsing green dot, which framed
+ * five static strings as telemetry. Nothing on this page measures anything; /status is the only
+ * surface that runs checks. The heading and the dot are gone, and the figures that were invented
+ * ("99.99% rolling 90 days", "14ms p50") were already replaced with the mechanism actually in
+ * place. What remains is a capability list, presented as one.
+ *
+ * The list below is now the *fallback* for the `home.capabilities` section rather than the only
+ * source of it: the band overlays whatever an administrator has published, so this copy is what
+ * paints before the CMS answers and what survives an outage — `useSectionFields` treats a degraded
+ * bootstrap as "not loaded" on purpose. See `src/lib/cms/use-section.ts`.
+ *
+ * Mapped onto the `featureGrid` row shape: `kicker` is the small uppercase label, `title` is the
+ * figure beneath it, and `description` is the supporting line.
+ */
+const CAPABILITIES = [
   {
     icon: Gauge,
-    label: "Global API Latency",
+    label: "API delivery",
     value: "Edge",
-    sub: "p50, multi-region",
+    sub: "Multi-region, served from the nearest edge",
   },
-  /*
-   * "99.99% rolling 90 days" was the worst of these, because the `sub` made it sound measured.
-   * Nobody measured it. There is no uptime monitor behind that figure and no SLA behind the
-   * number — it is the kind of claim a customer quotes back during an outage.
-   */
   {
     icon: Activity,
-    label: "Tenant Isolation",
+    label: "Tenant isolation",
     value: "Row-level",
-    sub: "enforced in the database",
+    sub: "Enforced in the database, not the application",
   },
   {
     icon: ShieldCheck,
-    label: "Data Encryption",
+    label: "Data encryption",
     value: "TLS + at rest",
-    sub: "managed database and storage",
+    sub: "Managed database and object storage",
   },
   {
     icon: Zap,
-    label: "Card Issuance Speed",
+    label: "Card issuance",
     value: "< 5s",
-    sub: "virtual card provisioning",
+    sub: "Virtual card provisioning",
   },
   {
     icon: Lock,
-    label: "KYC Verification",
+    label: "KYC verification",
     value: "Real-time",
-    sub: "automated compliance checks",
+    sub: "Automated compliance checks",
   },
 ];
 
-export function NetworkMetrics() {
-  return (
-    <section className="border-y border-border bg-secondary/50 py-16">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <div className="mb-10 flex items-center gap-3">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-70" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-[0.26em] text-muted-foreground">
-            Live network health
-          </span>
-        </div>
+/**
+ * Icons an editor may name on a CMS-managed capability tile.
+ *
+ * A curated map rather than importing all of lucide, which would add a large amount of JavaScript
+ * to the public bundle for the sake of a handful of names. Anything unrecognised falls back to a
+ * neutral icon, so a typo degrades instead of leaving an empty tile. Same approach as `CARD_ICONS`
+ * in src/routes/index.tsx.
+ */
+const CARD_ICONS: Record<string, LucideIcon> = {
+  Activity,
+  Boxes,
+  Gauge,
+  Lock,
+  ShieldCheck,
+  Zap,
+};
 
-        <div
-          className="grid overflow-hidden rounded-2xl border border-border bg-background sm:grid-cols-2 lg:grid-cols-5"
-          style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 6px rgba(17,24,39,0.05)" }}
-        >
-          {items.map((it, i) => (
-            <div
-              key={it.label}
-              className={`flex flex-col justify-between gap-4 p-7 ${
-                i !== 0 ? "border-t border-border sm:border-t-0 sm:border-l lg:border-l" : ""
-              } ${i === 2 ? "sm:border-t sm:border-l-0 lg:border-t-0 lg:border-l" : ""}`}
+function cardIcon(name: string): LucideIcon {
+  return CARD_ICONS[name] ?? Boxes;
+}
+
+export function NetworkMetrics() {
+  const section = useSectionFields("home.capabilities");
+
+  // Rows without a figure are skipped rather than rendered as an empty tile.
+  const capabilities = fieldItems(section, "items", CAPABILITIES, (row) => {
+    const value = typeof row.title === "string" ? row.title.trim() : "";
+    if (!value) return null;
+    return {
+      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
+      label: typeof row.kicker === "string" ? row.kicker.trim() : "",
+      value,
+      sub: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
+  return (
+    <Section spacing="tight" tone="recessed" divider aria-labelledby="capabilities-heading">
+      <Reveal>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <Eyebrow>{fieldText(section, "eyebrow", "Platform capabilities")}</Eyebrow>
+            <h2
+              id="capabilities-heading"
+              className="mt-4 text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground sm:text-2xl"
             >
-              <div className="grid h-11 w-11 place-items-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/15">
-                <it.icon className="h-5 w-5" strokeWidth={1.75} />
+              {fieldText(section, "heading", "How the platform is built.")}
+            </h2>
+          </div>
+          <p className="max-w-sm text-[12px] leading-relaxed text-bone-faint">
+            {fieldText(
+              section,
+              "subheading",
+              "Mechanisms in place across every product. Current availability is reported on the status page.",
+            )}
+          </p>
+        </div>
+      </Reveal>
+
+      <HairlineGrid columns={4} className="mt-10 lg:grid-cols-5">
+        {capabilities.map((it, i) => (
+          <Reveal key={`${it.label}-${i}`} delay={i * 50} className="flex">
+            <div className="flex h-full w-full flex-col justify-between gap-6 bg-background p-6">
+              <div className="flex items-start justify-between">
+                <it.icon aria-hidden className="h-4 w-4 text-gold" strokeWidth={1.75} />
+                <CardIndex value={i + 1} />
               </div>
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">
+                <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-bone-faint">
                   {it.label}
                 </div>
-                <div className="mt-1.5 text-2xl font-bold tracking-tight text-foreground">
+                <div className="tnum mt-2 text-xl font-semibold tracking-tight text-foreground">
                   {it.value}
                 </div>
-                <div className="mt-1 text-[11px] text-muted-foreground">{it.sub}</div>
+                <p className="mt-1.5 text-[11px] leading-relaxed text-bone-soft">{it.sub}</p>
               </div>
             </div>
-          ))}
-        </div>
-      </div>
-    </section>
+          </Reveal>
+        ))}
+      </HairlineGrid>
+    </Section>
   );
 }

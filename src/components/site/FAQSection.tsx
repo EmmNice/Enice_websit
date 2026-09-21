@@ -6,6 +6,7 @@ import {
 } from "@/components/ui/accordion";
 import { Reveal } from "./Reveal";
 import { StyledText } from "./StyledText";
+import { Section, SectionIntro } from "./primitives";
 import { FAQS } from "@/lib/faqs";
 import { faqJsonLd } from "@/lib/seo";
 import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
@@ -36,7 +37,8 @@ export function FAQSection() {
   });
 
   return (
-    <section className="border-t border-border bg-secondary py-24 sm:py-32">
+    // `id` is the anchor target for the assistant fallback's "Read the FAQ" link.
+    <Section id="faq" divider container="narrow" aria-labelledby="faq-heading">
       {/* Generated from `entries`, so it always describes what is rendered below. */}
       <script
         type="application/ld+json"
@@ -47,48 +49,40 @@ export function FAQSection() {
         }}
       />
 
-      <div className="mx-auto max-w-3xl px-5 sm:px-8">
+      <div className="grid gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
         <Reveal>
-          <div className="text-center">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              {fieldText(faq, "eyebrow", "Frequently asked")}
-            </div>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
-              <StyledText text={fieldText(faq, "heading", "Questions, answered.")} />
-            </h2>
-            <p className="mt-5 text-base leading-relaxed text-muted-foreground">
-              <StyledText
-                text={fieldText(
-                  faq,
-                  "subheading",
-                  "A plain look at the company, the products, and the technology behind them.",
-                )}
-              />
-            </p>
+          <div className="lg:sticky lg:top-28">
+            <SectionIntro
+              id="faq-heading"
+              eyebrow={fieldText(faq, "eyebrow", "Frequently asked")}
+              heading={fieldText(faq, "heading", "Questions, answered.")}
+              lead={fieldText(
+                faq,
+                "subheading",
+                "A plain look at the company, the products, and the technology behind them.",
+              )}
+            />
           </div>
         </Reveal>
 
-        <Reveal delay={80}>
-          <div className="mt-12 rounded-xl border border-border bg-background px-2 sm:px-4">
-            <Accordion type="single" collapsible className="w-full">
-              {entries.map((f, i) => (
-                <AccordionItem
-                  key={f.q}
-                  value={`item-${i}`}
-                  className={i === entries.length - 1 ? "border-b-0" : ""}
+        <Reveal delay={60}>
+          <Accordion type="single" collapsible className="w-full border-t border-border">
+            {entries.map((f, i) => (
+              <AccordionItem key={f.q} value={`item-${i}`} className="border-border">
+                <AccordionTrigger className="gap-6 py-5 text-left text-[15px] font-medium tracking-tight text-foreground hover:text-gold hover:no-underline">
+                  {f.q}
+                </AccordionTrigger>
+                <AccordionContent
+                  data-allow-select
+                  className="pb-6 pr-8 text-[14px] leading-relaxed text-bone-soft"
                 >
-                  <AccordionTrigger className="px-3 py-5 text-left text-[15px] font-semibold tracking-tight text-foreground hover:no-underline sm:px-4">
-                    {f.q}
-                  </AccordionTrigger>
-                  <AccordionContent className="px-3 pb-6 text-[14px] leading-relaxed text-muted-foreground sm:px-4">
-                    {f.a}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
+                  <StyledText text={f.a} accentClassName="text-gold" />
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
         </Reveal>
       </div>
-    </section>
+    </Section>
   );
 }

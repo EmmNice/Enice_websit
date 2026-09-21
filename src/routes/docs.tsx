@@ -1,14 +1,23 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowUpRight, ChevronRight, Copy, Check } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
+import { ChevronRight, Copy, Check } from "lucide-react";
+import { SiteShell } from "@/components/site/SiteShell";
+import { Cta, Eyebrow, Section, SectionIntro } from "@/components/site/primitives";
+import { CORPORATE_EMAIL, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/docs")({
   head: () => pageHead("/docs", [breadcrumbJsonLd([{ name: "API Documentation", path: "/docs" }])]),
   component: DocsPage,
 });
+
+/**
+ * The published API base.
+ *
+ * It was written out by hand in three places — the header chip and two examples — which is how a
+ * reference ends up documenting a host it no longer answers on. One constant, interpolated
+ * everywhere, so the prose and the examples cannot disagree.
+ */
+const API_BASE_URL = "https://api.enice.group/v1";
 
 // ─── Sidebar nav ──────────────────────────────────────────────────────────────
 
@@ -25,25 +34,48 @@ const NAV = [
 
 // ─── Method badge ─────────────────────────────────────────────────────────────
 
+/**
+ * HTTP verbs are the one place on the site where distinct hues carry meaning rather than
+ * decoration: a developer scanning a reference reads the colour before the word. The set is still
+ * drawn from the system's three accents — positive for a safe read, warm for a write, destructive
+ * for a delete — at pill scale, so the page never accumulates a field of colour.
+ */
 const METHOD_COLORS: Record<string, string> = {
-  GET: "bg-emerald-50 text-emerald-700 border-emerald-200",
-  POST: "bg-blue-50   text-blue-700   border-blue-200",
-  DELETE: "bg-red-50    text-red-700    border-red-200",
-  PATCH: "bg-amber-50  text-amber-700  border-amber-200",
+  GET: "border-positive/25 bg-positive/[0.08] text-positive",
+  POST: "border-gold/25 bg-gold/[0.08] text-gold",
+  PUT: "border-gold/25 bg-gold/[0.08] text-gold",
+  PATCH: "border-gold/25 bg-gold/[0.08] text-gold",
+  DELETE: "border-destructive/25 bg-destructive/[0.08] text-destructive",
 };
 
 function MethodBadge({ method }: { method: string }) {
   return (
     <span
-      className={`inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-widest ${METHOD_COLORS[method] ?? "bg-secondary text-foreground border-border"}`}
+      className={`inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[10px] font-bold tracking-widest ${METHOD_COLORS[method] ?? "border-border bg-surface-1 text-bone-strong"}`}
     >
       {method}
     </span>
   );
 }
 
-// ─── Dark code block ──────────────────────────────────────────────────────────
+// ─── Code block ───────────────────────────────────────────────────────────────
 
+/**
+ * A highlighted example.
+ *
+ * The examples used to carry their own theme — a `#0d1117` GitHub-dark panel with sky, amber and
+ * violet tokens — which was the brightest thing on any page and belonged to no palette the site
+ * uses. The highlighting now runs on five roles only, all from the system:
+ *
+ * - `text-bone-faint`  comments
+ * - `text-gold`        object keys, and a pending state
+ * - `text-bone-strong` string literals
+ * - `text-bone-soft`   numbers, booleans, null, and the block's base text
+ * - `text-positive`    a verb or value that reports success
+ *
+ * Five roles is the ceiling on purpose. A reference is read, not admired, and a token per data
+ * type turns a code sample into a legend the reader has to learn first.
+ */
 function CodeBlock({ title, code }: { title?: string; code: string }) {
   const [copied, setCopied] = useState(false);
 
@@ -54,29 +86,33 @@ function CodeBlock({ title, code }: { title?: string; code: string }) {
   };
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#1e2433] bg-[#0d1117] text-[12.5px]">
+    <div
+      data-allow-select
+      className="overflow-hidden rounded-lg border border-border bg-surface-1 text-[12.5px]"
+    >
       {title && (
-        <div className="flex items-center justify-between border-b border-[#1e2433] px-4 py-2.5">
-          <span className="font-mono text-[10px] tracking-[0.18em] text-slate-400">{title}</span>
+        <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
+          <span className="font-mono text-[10px] tracking-[0.18em] text-bone-faint">{title}</span>
           <button
+            type="button"
             onClick={copy}
-            className="flex items-center gap-1.5 rounded px-2 py-1 text-[10px] font-semibold text-slate-400 transition-colors hover:bg-white/5 hover:text-slate-200"
+            className="flex items-center gap-1.5 rounded px-2 py-1 text-[10px] font-semibold text-bone-soft transition-colors hover:bg-surface-3 hover:text-foreground"
           >
             {copied ? (
               <>
-                <Check className="h-3 w-3" />
+                <Check aria-hidden className="h-3 w-3" />
                 Copied
               </>
             ) : (
               <>
-                <Copy className="h-3 w-3" />
+                <Copy aria-hidden className="h-3 w-3" />
                 Copy
               </>
             )}
           </button>
         </div>
       )}
-      <pre className="overflow-x-auto p-5 font-mono leading-[1.75] text-slate-300 whitespace-pre">
+      <pre className="overflow-x-auto p-5 font-mono leading-[1.75] text-bone-soft whitespace-pre">
         <code dangerouslySetInnerHTML={{ __html: code }} />
       </pre>
     </div>
@@ -85,11 +121,36 @@ function CodeBlock({ title, code }: { title?: string; code: string }) {
 
 // ─── Section wrapper ─────────────────────────────────────────────────────────
 
-function DocSection({ id, children }: { id: string; children: React.ReactNode }) {
+/**
+ * One block of the reference.
+ *
+ * Renders its own heading so the band and the `aria-labelledby` that names it cannot come apart,
+ * and takes its rhythm from the system's `tight` spacing rather than a hand-picked `py-16`. The
+ * heading sits at the `h3` type role while remaining an `h2` in the outline: it is a subsection of
+ * the page's one `h1`, and at display scale eight of them in a column would read as eight pages.
+ */
+function DocSection({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
-    <section id={id} className="scroll-mt-24 border-t border-border py-16 first:border-t-0">
+    <Section
+      id={id}
+      spacing="tight"
+      container={null}
+      aria-labelledby={`${id}-heading`}
+      className="scroll-mt-24 border-t border-border first:border-t-0 first:pt-0"
+    >
+      <h2 id={`${id}-heading`} className="type-h3 text-foreground">
+        {title}
+      </h2>
       {children}
-    </section>
+    </Section>
   );
 }
 
@@ -106,6 +167,13 @@ function SplitRow({ left, right }: { left: React.ReactNode; right: React.ReactNo
 
 // ─── Param table ──────────────────────────────────────────────────────────────
 
+/**
+ * A parameter row.
+ *
+ * Name and description are a `dt`/`dd` pair inside the enclosing `dl`. They were two anonymous
+ * `div`s, so a screen reader read a reference of forty parameters as a flat run of text with
+ * nothing tying a name to what it does.
+ */
 function ParamRow({
   name,
   type,
@@ -119,21 +187,24 @@ function ParamRow({
 }) {
   return (
     <div className="flex flex-col gap-1 border-t border-border py-4 first:border-t-0 sm:flex-row sm:gap-6">
-      <div className="flex shrink-0 items-baseline gap-2 sm:w-48">
+      <dt className="flex shrink-0 items-baseline gap-2 sm:w-48">
         <span className="font-mono text-[13px] font-semibold text-foreground">{name}</span>
         {required && (
-          <span className="text-[10px] font-semibold uppercase tracking-widest text-red-500">
+          <span className="text-[10px] font-semibold uppercase tracking-widest text-destructive">
             required
           </span>
         )}
-      </div>
-      <div className="min-w-0">
-        <span className="font-mono text-[11px] text-muted-foreground">{type}</span>
-        <p className="mt-0.5 text-[13.5px] leading-relaxed text-muted-foreground">{desc}</p>
-      </div>
+      </dt>
+      <dd className="min-w-0">
+        <span className="font-mono text-[11px] text-bone-faint">{type}</span>
+        <p className="mt-0.5 text-[13.5px] leading-relaxed text-bone-soft">{desc}</p>
+      </dd>
     </div>
   );
 }
+
+/** The inline `<code>` treatment used inside reference prose. */
+const INLINE_CODE = "rounded bg-surface-2 px-1.5 py-0.5 font-mono text-[12px] text-bone-strong";
 
 // ─── Page ────────────────────────────────────────────────────────────────────
 
@@ -146,765 +217,726 @@ function DocsPage() {
   };
 
   return (
-    <div className="min-h-dvh bg-background text-foreground antialiased">
-      <SiteHeader />
-      <main id="main">
-        {/* Page header */}
-        <div className="border-b border-border bg-secondary/40 py-14 sm:py-20">
-          <div className="mx-auto max-w-7xl px-5 sm:px-8">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              Developers · ENICE Core
+    <SiteShell>
+      {/* Page header. Was a `bg-secondary/40` strip with a hard bottom rule; the dark system
+          separates bands with rhythm and ambient light instead of a tinted block. */}
+      <Section spacing="tight" glow="center" aria-labelledby="docs-heading">
+        <SectionIntro
+          level={1}
+          id="docs-heading"
+          eyebrow="Developers · ENICE Core"
+          heading="API Documentation"
+          lead="A complete reference for the ENICE Core REST API. Full sandbox keys and partner onboarding are issued upon request."
+        >
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <div className="inline-flex items-center gap-2 rounded-md border border-border bg-surface-1 px-3.5 py-1.5 text-[11px] font-semibold text-bone-soft">
+              Base URL:
+              <span className="font-mono text-foreground">{API_BASE_URL}</span>
             </div>
-            <h1 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-foreground sm:text-4xl md:text-5xl">
-              API Documentation
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground">
-              A complete reference for the ENICE Core REST API. Full sandbox keys and partner
-              onboarding are issued upon request.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <div className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-3.5 py-1.5 text-[11px] font-semibold text-muted-foreground">
-                Base URL:
-                <span className="font-mono text-foreground">https://api.enice.group/v1</span>
-              </div>
-              <Link
-                to="/contact"
-                className="group inline-flex items-center gap-1.5 rounded-md border border-primary bg-primary px-3.5 py-1.5 text-[11px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-              >
-                Request API Access
-                <ArrowUpRight className="h-3 w-3 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-              </Link>
+            <Cta to="/contact" size="sm" icon="external">
+              Request API Access
+            </Cta>
+          </div>
+        </SectionIntro>
+      </Section>
+
+      {/* Body: sidebar + content */}
+      <Section spacing="tight" divider containerClassName="flex gap-0 lg:gap-12">
+        {/* Sticky sidebar */}
+        <aside className="hidden w-52 shrink-0 lg:block">
+          <div className="sticky top-24">
+            <Eyebrow muted className="mb-3 text-[10px] tracking-[0.22em]">
+              Reference
+            </Eyebrow>
+            <nav aria-label="API reference sections" className="space-y-0.5">
+              {NAV.map((n) => (
+                <button
+                  key={n.id}
+                  type="button"
+                  onClick={() => scrollTo(n.id)}
+                  aria-current={active === n.id ? "true" : undefined}
+                  className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[13px] font-medium transition-colors ${
+                    active === n.id
+                      ? "bg-surface-1 text-foreground"
+                      : "text-bone-soft hover:bg-surface-1 hover:text-foreground"
+                  }`}
+                >
+                  {active === n.id && (
+                    <ChevronRight aria-hidden className="h-3 w-3 shrink-0 text-gold" />
+                  )}
+                  {n.label}
+                </button>
+              ))}
+            </nav>
+
+            <div className="panel-quiet mt-10 p-4">
+              <p className="text-[11px] font-semibold text-foreground">Need help?</p>
+              <p className="mt-1 text-[11px] leading-relaxed text-bone-soft">
+                Write to us at{" "}
+                <a
+                  href={`mailto:${CORPORATE_EMAIL}`}
+                  className="text-foreground underline underline-offset-2 transition-colors hover:text-gold"
+                >
+                  {CORPORATE_EMAIL}
+                </a>
+              </p>
             </div>
           </div>
-        </div>
+        </aside>
 
-        {/* Body: sidebar + content */}
-        <div className="mx-auto flex max-w-7xl gap-0 px-5 sm:px-8 lg:gap-12">
-          {/* Sticky sidebar */}
-          <aside className="hidden w-52 shrink-0 lg:block">
-            <div className="sticky top-24 py-12">
-              <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                Reference
-              </p>
-              <nav className="space-y-0.5">
-                {NAV.map((n) => (
-                  <button
-                    key={n.id}
-                    onClick={() => scrollTo(n.id)}
-                    className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-[13px] font-medium transition-colors ${
-                      active === n.id
-                        ? "bg-primary/8 text-primary"
-                        : "text-muted-foreground hover:bg-secondary hover:text-foreground"
-                    }`}
-                  >
-                    {active === n.id && <ChevronRight className="h-3 w-3 shrink-0 text-primary" />}
-                    {n.label}
-                  </button>
-                ))}
-              </nav>
+        {/* Main content. A nested `<main>` used to sit inside the shell's own `<main>`, which gave
+            the page two main landmarks and made the skip link ambiguous. */}
+        <div data-allow-select className="min-w-0 flex-1">
+          {/* ── INTRODUCTION ── */}
+          <DocSection id="introduction" title="Introduction">
+            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
+              The ENICE Core API gives verified partners programmatic access to our infrastructure:
+              wallet issuance, ledger operations, AI agent routing, KYC verification, and more. All
+              endpoints use HTTPS and return JSON.
+            </p>
 
-              <div className="mt-10 rounded-lg border border-border bg-secondary/60 p-4">
-                <p className="text-[11px] font-semibold text-foreground">Need help?</p>
-                <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
-                  Write to us at{" "}
-                  <a href="mailto:corporate@enicehq.com" className="text-primary hover:underline">
-                    corporate@enicehq.com
-                  </a>
-                </p>
-              </div>
-            </div>
-          </aside>
-
-          {/* Main content */}
-          <main className="min-w-0 flex-1 py-12">
-            {/* ── INTRODUCTION ── */}
-            <DocSection id="introduction">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                Introduction
-              </h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                The ENICE Core API gives verified partners programmatic access to our
-                infrastructure: wallet issuance, ledger operations, AI agent routing, KYC
-                verification, and more. All endpoints use HTTPS and return JSON.
-              </p>
-
-              <SplitRow
-                left={
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-[15px] font-semibold text-foreground">Base URL</h3>
-                      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                        All API requests must be made to the versioned base URL. We maintain
-                        backward compatibility within each version prefix.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="text-[15px] font-semibold text-foreground">Response format</h3>
-                      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                        Every response is a JSON object. Successful responses carry a{" "}
-                        <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[12px]">
-                          data
-                        </code>{" "}
-                        key. Errors include{" "}
-                        <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[12px]">
-                          error.code
-                        </code>{" "}
-                        and{" "}
-                        <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[12px]">
-                          error.message
-                        </code>
-                        .
-                      </p>
-                    </div>
+            <SplitRow
+              left={
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-foreground">Base URL</h3>
+                    <p className="mt-2 text-[14px] leading-relaxed text-bone-soft">
+                      All API requests must be made to the versioned base URL. We maintain backward
+                      compatibility within each version prefix.
+                    </p>
                   </div>
-                }
-                right={
-                  <CodeBlock
-                    title="BASE URL"
-                    code={`<span class="text-slate-500"># All requests target this versioned base</span>
-https://api.enice.group/v1
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-foreground">Response format</h3>
+                    <p className="mt-2 text-[14px] leading-relaxed text-bone-soft">
+                      Every response is a JSON object. Successful responses carry a{" "}
+                      <code className={INLINE_CODE}>data</code> key. Errors include{" "}
+                      <code className={INLINE_CODE}>error.code</code> and{" "}
+                      <code className={INLINE_CODE}>error.message</code>.
+                    </p>
+                  </div>
+                </div>
+              }
+              right={
+                <CodeBlock
+                  title="BASE URL"
+                  code={`<span class="text-bone-faint"># All requests target this versioned base</span>
+${API_BASE_URL}
 
-<span class="text-slate-500"># Example: retrieve ecosystem health</span>
-<span class="text-emerald-400">GET</span> /v1/core
+<span class="text-bone-faint"># Example: retrieve ecosystem health</span>
+<span class="text-positive">GET</span> /v1/core
 
-<span class="text-slate-500"># Standard response envelope</span>
+<span class="text-bone-faint"># Standard response envelope</span>
 {
-  <span class="text-sky-300">"data"</span>: { ... },
-  <span class="text-sky-300">"meta"</span>: {
-    <span class="text-sky-300">"request_id"</span>: <span class="text-amber-300">"req_01jz..."</span>,
-    <span class="text-sky-300">"timestamp"</span>:  <span class="text-amber-300">"2026-07-03T00:00:00Z"</span>
+  <span class="text-gold">"data"</span>: { ... },
+  <span class="text-gold">"meta"</span>: {
+    <span class="text-gold">"request_id"</span>: <span class="text-bone-strong">"req_01jz..."</span>,
+    <span class="text-gold">"timestamp"</span>:  <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>
+  }
+}`}
+                />
+              }
+            />
+          </DocSection>
+
+          {/* ── AUTHENTICATION ── */}
+          <DocSection id="authentication" title="Authentication">
+            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
+              The API uses scoped Bearer tokens issued through the ENICE Partner Console. Tokens are
+              environment-specific. Always use <code className={INLINE_CODE}>ek_test_</code> keys
+              during development and <code className={INLINE_CODE}>ek_live_</code> keys in
+              production.
+            </p>
+
+            <SplitRow
+              left={
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-foreground">Bearer token</h3>
+                    <p className="mt-2 text-[14px] leading-relaxed text-bone-soft">
+                      Pass your API key in the <code className={INLINE_CODE}>Authorization</code>{" "}
+                      header of every request. Never expose live keys in client-side code or public
+                      repositories.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-foreground">Token scopes</h3>
+                    <dl className="mt-3 rounded-lg border border-border">
+                      {[
+                        ["wallets:read", "Read wallet balances and transaction history"],
+                        ["wallets:write", "Issue cards and initiate transfers"],
+                        ["ledger:write", "Post and reconcile ledger entries"],
+                        ["kyc:verify", "Submit and retrieve identity verifications"],
+                        ["assist:*", "Full access to AI agent routing"],
+                      ].map(([scope, desc]) => (
+                        <div
+                          key={scope}
+                          className="flex flex-col gap-1 border-t border-border px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-6"
+                        >
+                          <dt className="w-28 shrink-0">
+                            <code className="font-mono text-[12px] text-gold">{scope}</code>
+                          </dt>
+                          <dd className="text-[13px] text-bone-soft">{desc}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                </div>
+              }
+              right={
+                <>
+                  <CodeBlock
+                    title="REQUEST HEADER"
+                    code={`Authorization: Bearer <span class="text-bone-strong">ek_live_xxxxxxxxxxxxxxxxxxxx</span>
+Content-Type: application/json`}
+                  />
+                  <CodeBlock
+                    title="EXAMPLE: cURL"
+                    code={`<span class="text-bone-faint"># Authenticated request to /v1/core</span>
+curl <span class="text-bone-strong">${API_BASE_URL}/core</span> \\
+  -H <span class="text-bone-strong">"Authorization: Bearer ek_live_xxx"</span> \\
+  -H <span class="text-bone-strong">"Content-Type: application/json"</span>
+
+<span class="text-bone-faint"># 401: missing or invalid token</span>
+{
+  <span class="text-gold">"error"</span>: {
+    <span class="text-gold">"code"</span>:    <span class="text-bone-strong">"unauthorized"</span>,
+    <span class="text-gold">"message"</span>: <span class="text-bone-strong">"API key missing or invalid."</span>
   }
 }`}
                   />
-                }
-              />
-            </DocSection>
+                </>
+              }
+            />
+          </DocSection>
 
-            {/* ── AUTHENTICATION ── */}
-            <DocSection id="authentication">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                Authentication
-              </h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                The API uses scoped Bearer tokens issued through the ENICE Partner Console. Tokens
-                are environment-specific. Always use{" "}
-                <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[12px]">
-                  ek_test_
-                </code>{" "}
-                keys during development and{" "}
-                <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[12px]">
-                  ek_live_
-                </code>{" "}
-                keys in production.
-              </p>
+          {/* ── ERRORS & RATE LIMITS ── */}
+          <DocSection id="errors" title="Errors & Rate Limits">
+            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
+              The API uses standard HTTP status codes. All error bodies follow a consistent shape so
+              you can handle them uniformly.
+            </p>
 
-              <SplitRow
-                left={
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-[15px] font-semibold text-foreground">Bearer token</h3>
-                      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                        Pass your API key in the{" "}
-                        <code className="rounded bg-secondary px-1.5 py-0.5 font-mono text-[12px]">
-                          Authorization
-                        </code>{" "}
-                        header of every request. Never expose live keys in client-side code or
-                        public repositories.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="text-[15px] font-semibold text-foreground">Token scopes</h3>
-                      <div className="mt-3 rounded-lg border border-border">
-                        {[
-                          ["wallets:read", "Read wallet balances and transaction history"],
-                          ["wallets:write", "Issue cards and initiate transfers"],
-                          ["ledger:write", "Post and reconcile ledger entries"],
-                          ["kyc:verify", "Submit and retrieve identity verifications"],
-                          ["assist:*", "Full access to AI agent routing"],
-                        ].map(([scope, desc]) => (
-                          <div
-                            key={scope}
-                            className="flex flex-col gap-1 border-t border-border px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-6"
-                          >
-                            <code className="w-28 shrink-0 font-mono text-[12px] text-primary">
-                              {scope}
-                            </code>
-                            <span className="text-[13px] text-muted-foreground">{desc}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                }
-                right={
-                  <>
-                    <CodeBlock
-                      title="REQUEST HEADER"
-                      code={`Authorization: Bearer <span class="text-amber-300">ek_live_xxxxxxxxxxxxxxxxxxxx</span>
-Content-Type: application/json`}
-                    />
-                    <CodeBlock
-                      title="EXAMPLE: cURL"
-                      code={`<span class="text-slate-500"># Authenticated request to /v1/core</span>
-curl <span class="text-amber-300">https://api.enice.group/v1/core</span> \\
-  -H <span class="text-emerald-400">"Authorization: Bearer ek_live_xxx"</span> \\
-  -H <span class="text-emerald-400">"Content-Type: application/json"</span>
-
-<span class="text-slate-500"># 401: missing or invalid token</span>
-{
-  <span class="text-sky-300">"error"</span>: {
-    <span class="text-sky-300">"code"</span>:    <span class="text-amber-300">"unauthorized"</span>,
-    <span class="text-sky-300">"message"</span>: <span class="text-amber-300">"API key missing or invalid."</span>
-  }
-}`}
-                    />
-                  </>
-                }
-              />
-            </DocSection>
-
-            {/* ── ERRORS & RATE LIMITS ── */}
-            <DocSection id="errors">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                Errors & Rate Limits
-              </h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                The API uses standard HTTP status codes. All error bodies follow a consistent shape
-                so you can handle them uniformly.
-              </p>
-
-              <SplitRow
-                left={
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-[15px] font-semibold text-foreground">
-                        HTTP status codes
-                      </h3>
-                      <div className="mt-3 rounded-lg border border-border">
-                        {[
-                          ["200", "Success"],
-                          ["201", "Resource created"],
-                          ["400", "Bad request: validation failed"],
-                          ["401", "Unauthorized: invalid or missing token"],
-                          ["403", "Forbidden: insufficient token scope"],
-                          ["404", "Resource not found"],
-                          ["429", "Rate limit exceeded"],
-                          ["500", "Internal server error"],
-                        ].map(([code, desc]) => (
-                          <div
-                            key={code}
-                            className="flex items-center gap-4 border-t border-border px-4 py-3 first:border-t-0"
-                          >
+            <SplitRow
+              left={
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-foreground">HTTP status codes</h3>
+                    <dl className="mt-3 rounded-lg border border-border">
+                      {[
+                        ["200", "Success"],
+                        ["201", "Resource created"],
+                        ["400", "Bad request: validation failed"],
+                        ["401", "Unauthorized: invalid or missing token"],
+                        ["403", "Forbidden: insufficient token scope"],
+                        ["404", "Resource not found"],
+                        ["429", "Rate limit exceeded"],
+                        ["500", "Internal server error"],
+                      ].map(([code, desc]) => (
+                        <div
+                          key={code}
+                          className="flex items-center gap-4 border-t border-border px-4 py-3 first:border-t-0"
+                        >
+                          <dt className="w-10 shrink-0">
                             <code
-                              className={`w-10 shrink-0 font-mono text-[13px] font-semibold ${code.startsWith("2") ? "text-emerald-600" : code.startsWith("4") || code.startsWith("5") ? "text-red-600" : "text-foreground"}`}
+                              className={`font-mono text-[13px] font-semibold ${code.startsWith("2") ? "text-positive" : code.startsWith("4") || code.startsWith("5") ? "text-destructive" : "text-foreground"}`}
                             >
                               {code}
                             </code>
-                            <span className="text-[13px] text-muted-foreground">{desc}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h3 className="text-[15px] font-semibold text-foreground">Rate limits</h3>
-                      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                        Production keys are provisioned at{" "}
-                        <strong className="font-semibold text-foreground">1,000 req/min</strong> by
-                        default, burstable to 5,000. Enterprise agreements unlock higher tiers.
-                        Remaining quota is returned on every response header.
-                      </p>
-                    </div>
+                          </dt>
+                          <dd className="text-[13px] text-bone-soft">{desc}</dd>
+                        </div>
+                      ))}
+                    </dl>
                   </div>
-                }
-                right={
-                  <CodeBlock
-                    title="ERROR RESPONSE"
-                    code={`<span class="text-slate-500"># HTTP 429: rate limit exceeded</span>
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-foreground">Rate limits</h3>
+                    <p className="mt-2 text-[14px] leading-relaxed text-bone-soft">
+                      Production keys are provisioned at{" "}
+                      <strong className="font-semibold text-foreground">1,000 req/min</strong> by
+                      default, burstable to 5,000. Enterprise agreements unlock higher tiers.
+                      Remaining quota is returned on every response header.
+                    </p>
+                  </div>
+                </div>
+              }
+              right={
+                <CodeBlock
+                  title="ERROR RESPONSE"
+                  code={`<span class="text-bone-faint"># HTTP 429: rate limit exceeded</span>
 {
-  <span class="text-sky-300">"error"</span>: {
-    <span class="text-sky-300">"code"</span>:       <span class="text-amber-300">"rate_limit_exceeded"</span>,
-    <span class="text-sky-300">"message"</span>:    <span class="text-amber-300">"Too many requests. Retry after 60s."</span>,
-    <span class="text-sky-300">"retry_after"</span>: <span class="text-violet-400">60</span>
+  <span class="text-gold">"error"</span>: {
+    <span class="text-gold">"code"</span>:       <span class="text-bone-strong">"rate_limit_exceeded"</span>,
+    <span class="text-gold">"message"</span>:    <span class="text-bone-strong">"Too many requests. Retry after 60s."</span>,
+    <span class="text-gold">"retry_after"</span>: <span class="text-bone-soft">60</span>
   }
 }
 
-<span class="text-slate-500"># Rate-limit response headers</span>
-X-RateLimit-Limit:     <span class="text-violet-400">1000</span>
-X-RateLimit-Remaining: <span class="text-violet-400">0</span>
-X-RateLimit-Reset:     <span class="text-violet-400">1751500860</span>`}
-                  />
-                }
-              />
-            </DocSection>
-
-            {/* ── WALLETS ── */}
-            <DocSection id="wallets">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">Wallets</h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                Programmable wallets support multi-currency balances, virtual card issuance, and
-                peer-to-peer transfers. Each wallet is isolated per tenant.
-              </p>
-
-              {/* List wallet */}
-              <div className="mt-10">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="GET" />
-                  <code className="font-mono text-[14px] font-semibold text-foreground">
-                    /v1/wallets
-                  </code>
-                  <span className="text-[12px] text-muted-foreground">List all wallets</span>
-                </div>
-                <SplitRow
-                  left={
-                    <div>
-                      <p className="text-[14px] leading-relaxed text-muted-foreground">
-                        Returns a paginated list of wallets scoped to your tenant. Supports
-                        filtering by currency and status.
-                      </p>
-                      <div className="mt-6">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Query parameters
-                        </p>
-                        <div className="mt-3 rounded-lg border border-border">
-                          <ParamRow
-                            name="currency"
-                            type="string"
-                            desc="Filter by ISO 4217 currency code (e.g. NGN, USD)."
-                          />
-                          <ParamRow
-                            name="limit"
-                            type="integer"
-                            desc="Number of results per page. Default: 20. Max: 100."
-                          />
-                          <ParamRow
-                            name="after"
-                            type="string"
-                            desc="Cursor for pagination. Use the last result's id."
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  }
-                  right={
-                    <CodeBlock
-                      title="RESPONSE: 200 OK"
-                      code={`{
-  <span class="text-sky-300">"data"</span>: [
-    {
-      <span class="text-sky-300">"id"</span>:       <span class="text-amber-300">"wlt_01jz4k9m..."</span>,
-      <span class="text-sky-300">"currency"</span>: <span class="text-amber-300">"NGN"</span>,
-      <span class="text-sky-300">"balance"</span>:  <span class="text-violet-400">500000</span>,
-      <span class="text-sky-300">"status"</span>:   <span class="text-amber-300">"active"</span>,
-      <span class="text-sky-300">"created_at"</span>: <span class="text-amber-300">"2026-07-03T..."</span>
-    }
-  ],
-  <span class="text-sky-300">"pagination"</span>: {
-    <span class="text-sky-300">"has_more"</span>: <span class="text-violet-400">false</span>,
-    <span class="text-sky-300">"next_cursor"</span>: <span class="text-slate-500">null</span>
-  }
-}`}
-                    />
-                  }
+<span class="text-bone-faint"># Rate-limit response headers</span>
+X-RateLimit-Limit:     <span class="text-bone-soft">1000</span>
+X-RateLimit-Remaining: <span class="text-bone-soft">0</span>
+X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                 />
+              }
+            />
+          </DocSection>
+
+          {/* ── WALLETS ── */}
+          <DocSection id="wallets" title="Wallets">
+            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
+              Programmable wallets support multi-currency balances, virtual card issuance, and
+              peer-to-peer transfers. Each wallet is isolated per tenant.
+            </p>
+
+            {/* List wallet */}
+            <div className="mt-10">
+              <div className="flex items-center gap-3">
+                <MethodBadge method="GET" />
+                <code className="font-mono text-[14px] font-semibold text-foreground">
+                  /v1/wallets
+                </code>
+                <span className="text-[12px] text-bone-soft">List all wallets</span>
               </div>
-
-              {/* Create wallet */}
-              <div className="mt-12 border-t border-border pt-10">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="POST" />
-                  <code className="font-mono text-[14px] font-semibold text-foreground">
-                    /v1/wallets
-                  </code>
-                  <span className="text-[12px] text-muted-foreground">Create a wallet</span>
-                </div>
-                <SplitRow
-                  left={
-                    <div>
-                      <p className="text-[14px] leading-relaxed text-muted-foreground">
-                        Provisions a new wallet for an end-user or sub-account. Optionally issue a
-                        virtual card at creation.
-                      </p>
-                      <div className="mt-6">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Body parameters
-                        </p>
-                        <div className="mt-3 rounded-lg border border-border">
-                          <ParamRow
-                            name="currency"
-                            type="string"
-                            required
-                            desc="ISO 4217 currency code. Supported: NGN, USD."
-                          />
-                          <ParamRow
-                            name="label"
-                            type="string"
-                            desc="Human-readable name for this wallet."
-                          />
-                          <ParamRow
-                            name="issue_card"
-                            type="boolean"
-                            desc="If true, a virtual card is issued and linked on creation."
-                          />
-                          <ParamRow
-                            name="metadata"
-                            type="object"
-                            desc="Arbitrary key-value pairs for your internal reference."
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  }
-                  right={
-                    <CodeBlock
-                      title="REQUEST BODY"
-                      code={`{
-  <span class="text-sky-300">"currency"</span>:   <span class="text-amber-300">"USD"</span>,
-  <span class="text-sky-300">"label"</span>:      <span class="text-amber-300">"Operating Account"</span>,
-  <span class="text-sky-300">"issue_card"</span>: <span class="text-violet-400">true</span>,
-  <span class="text-sky-300">"metadata"</span>: {
-    <span class="text-sky-300">"user_id"</span>: <span class="text-amber-300">"usr_8823..."</span>
-  }
-}`}
-                    />
-                  }
-                />
-              </div>
-            </DocSection>
-
-            {/* ── LEDGER ── */}
-            <DocSection id="ledger">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">Ledger</h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                The ENICE Core ledger is a double-entry, append-only transaction log. Every
-                financial event is recorded as an immutable entry and reconciled in real time.
-              </p>
-
-              <div className="mt-10">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="POST" />
-                  <code className="font-mono text-[14px] font-semibold text-foreground">
-                    /v1/ledger/tx
-                  </code>
-                  <span className="text-[12px] text-muted-foreground">Post a transaction</span>
-                </div>
-                <SplitRow
-                  left={
-                    <div>
-                      <p className="text-[14px] leading-relaxed text-muted-foreground">
-                        Posts a debit/credit pair to the ledger. The operation is atomic: if either
-                        leg fails, the entire transaction is rolled back.
-                      </p>
-                      <div className="mt-6">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Body parameters
-                        </p>
-                        <div className="mt-3 rounded-lg border border-border">
-                          <ParamRow
-                            name="debit_wallet"
-                            type="string"
-                            required
-                            desc="Wallet ID to debit."
-                          />
-                          <ParamRow
-                            name="credit_wallet"
-                            type="string"
-                            required
-                            desc="Wallet ID to credit."
-                          />
-                          <ParamRow
-                            name="amount"
-                            type="integer"
-                            required
-                            desc="Amount in the smallest currency unit (kobo / cents)."
-                          />
-                          <ParamRow
-                            name="currency"
-                            type="string"
-                            required
-                            desc="Must match both wallets' currency."
-                          />
-                          <ParamRow
-                            name="reference"
-                            type="string"
-                            desc="Unique idempotency key. Duplicate references are ignored."
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  }
-                  right={
-                    <CodeBlock
-                      title="REQUEST / RESPONSE"
-                      code={`<span class="text-slate-500"># POST /v1/ledger/tx</span>
-{
-  <span class="text-sky-300">"debit_wallet"</span>:  <span class="text-amber-300">"wlt_01jz..."</span>,
-  <span class="text-sky-300">"credit_wallet"</span>: <span class="text-amber-300">"wlt_02ab..."</span>,
-  <span class="text-sky-300">"amount"</span>:         <span class="text-violet-400">500000</span>,
-  <span class="text-sky-300">"currency"</span>:       <span class="text-amber-300">"NGN"</span>,
-  <span class="text-sky-300">"reference"</span>:      <span class="text-amber-300">"inv_2026_07_001"</span>
-}
-
-<span class="text-slate-500"># 201 Created</span>
-{
-  <span class="text-sky-300">"data"</span>: {
-    <span class="text-sky-300">"id"</span>:        <span class="text-amber-300">"txn_01kz9..."</span>,
-    <span class="text-sky-300">"status"</span>:    <span class="text-amber-300">"settled"</span>,
-    <span class="text-sky-300">"settled_at"</span>: <span class="text-amber-300">"2026-07-03T00:00:00Z"</span>
-  }
-}`}
-                    />
-                  }
-                />
-              </div>
-            </DocSection>
-
-            {/* ── ASSIST ── */}
-            <DocSection id="assist">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">Assist</h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                The Assist API exposes PulseAssist's multi-tenant AI routing engine. Invoke agents,
-                manage conversation state, and configure policy-bound automations via REST.
-              </p>
-
-              <div className="mt-10">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="POST" />
-                  <code className="font-mono text-[14px] font-semibold text-foreground">
-                    /v1/assist/query
-                  </code>
-                  <span className="text-[12px] text-muted-foreground">Invoke an AI agent</span>
-                </div>
-                <SplitRow
-                  left={
-                    <div>
-                      <p className="text-[14px] leading-relaxed text-muted-foreground">
-                        Routes a user message through the configured tenant agent. The agent applies
-                        your policy rules, executes permitted actions, and returns a structured
-                        response.
-                      </p>
-                      <div className="mt-6">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Body parameters
-                        </p>
-                        <div className="mt-3 rounded-lg border border-border">
-                          <ParamRow
-                            name="session_id"
-                            type="string"
-                            required
-                            desc="Unique conversation session identifier. Use the same ID to maintain context across turns."
-                          />
-                          <ParamRow
-                            name="message"
-                            type="string"
-                            required
-                            desc="End-user's input message."
-                          />
-                          <ParamRow
-                            name="tenant_id"
-                            type="string"
-                            required
-                            desc="Your PulseAssist tenant identifier."
-                          />
-                          <ParamRow
-                            name="language"
-                            type="string"
-                            desc="BCP-47 language tag. Default: en."
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  }
-                  right={
-                    <CodeBlock
-                      title="REQUEST / RESPONSE"
-                      code={`<span class="text-slate-500"># POST /v1/assist/query</span>
-{
-  <span class="text-sky-300">"session_id"</span>: <span class="text-amber-300">"sess_01kz..."</span>,
-  <span class="text-sky-300">"message"</span>:    <span class="text-amber-300">"What is my account balance?"</span>,
-  <span class="text-sky-300">"tenant_id"</span>:  <span class="text-amber-300">"ten_bank_ng"</span>,
-  <span class="text-sky-300">"language"</span>:   <span class="text-amber-300">"en"</span>
-}
-
-<span class="text-slate-500"># 200 OK</span>
-{
-  <span class="text-sky-300">"data"</span>: {
-    <span class="text-sky-300">"reply"</span>:      <span class="text-amber-300">"Your NGN balance is ₦500,000."</span>,
-    <span class="text-sky-300">"intent"</span>:     <span class="text-amber-300">"account.balance_inquiry"</span>,
-    <span class="text-sky-300">"confidence"</span>: <span class="text-violet-400">0.98</span>,
-    <span class="text-sky-300">"actions"</span>:    []
-  }
-}`}
-                    />
-                  }
-                />
-              </div>
-            </DocSection>
-
-            {/* ── KYC ── */}
-            <DocSection id="kyc">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">
-                KYC & Identity
-              </h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                Submit identity verification requests and retrieve screening results. All KYC data
-                is encrypted in transit and at rest and is never stored beyond the retention window.
-              </p>
-
-              <div className="mt-10">
-                <div className="flex items-center gap-3">
-                  <MethodBadge method="POST" />
-                  <code className="font-mono text-[14px] font-semibold text-foreground">
-                    /v1/kyc/verify
-                  </code>
-                  <span className="text-[12px] text-muted-foreground">Submit a verification</span>
-                </div>
-                <SplitRow
-                  left={
-                    <div>
-                      <p className="text-[14px] leading-relaxed text-muted-foreground">
-                        Initiates an identity verification workflow. Returns immediately with a
-                        pending status. Subscribe to the{" "}
-                        <code className="rounded bg-secondary px-1 py-0.5 font-mono text-[11px]">
-                          kyc.verified
-                        </code>{" "}
-                        webhook for the final result.
-                      </p>
-                      <div className="mt-6">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                          Body parameters
-                        </p>
-                        <div className="mt-3 rounded-lg border border-border">
-                          <ParamRow
-                            name="first_name"
-                            type="string"
-                            required
-                            desc="Legal first name of the individual."
-                          />
-                          <ParamRow
-                            name="last_name"
-                            type="string"
-                            required
-                            desc="Legal last name of the individual."
-                          />
-                          <ParamRow
-                            name="dob"
-                            type="string"
-                            required
-                            desc="Date of birth in ISO 8601 format (YYYY-MM-DD)."
-                          />
-                          <ParamRow
-                            name="id_type"
-                            type="string"
-                            required
-                            desc="One of: national_id, passport, drivers_license."
-                          />
-                          <ParamRow
-                            name="id_number"
-                            type="string"
-                            required
-                            desc="Document identification number."
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  }
-                  right={
-                    <CodeBlock
-                      title="REQUEST / RESPONSE"
-                      code={`<span class="text-slate-500"># POST /v1/kyc/verify</span>
-{
-  <span class="text-sky-300">"first_name"</span>: <span class="text-amber-300">"Amara"</span>,
-  <span class="text-sky-300">"last_name"</span>:  <span class="text-amber-300">"Osei"</span>,
-  <span class="text-sky-300">"dob"</span>:        <span class="text-amber-300">"1992-04-15"</span>,
-  <span class="text-sky-300">"id_type"</span>:    <span class="text-amber-300">"passport"</span>,
-  <span class="text-sky-300">"id_number"</span>:  <span class="text-amber-300">"A09123456"</span>
-}
-
-<span class="text-slate-500"># 202 Accepted</span>
-{
-  <span class="text-sky-300">"data"</span>: {
-    <span class="text-sky-300">"verification_id"</span>: <span class="text-amber-300">"kyc_01mn..."</span>,
-    <span class="text-sky-300">"status"</span>:          <span class="text-amber-300">"pending"</span>
-  }
-}`}
-                    />
-                  }
-                />
-              </div>
-            </DocSection>
-
-            {/* ── WEBHOOKS ── */}
-            <DocSection id="webhooks">
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground">Webhooks</h2>
-              <p className="mt-4 text-[15px] leading-relaxed text-muted-foreground">
-                The ENICE Core delivers all asynchronous events via HMAC-SHA256 signed webhooks with
-                at-least-once delivery semantics and configurable retry windows.
-              </p>
-
               <SplitRow
                 left={
-                  <div className="space-y-6">
-                    <div>
-                      <h3 className="text-[15px] font-semibold text-foreground">
-                        Signature verification
-                      </h3>
-                      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-                        Each delivery includes an{" "}
-                        <code className="rounded bg-secondary px-1 py-0.5 font-mono text-[12px]">
-                          X-ENICE-Signature
-                        </code>{" "}
-                        header. Verify it against your webhook secret to confirm authenticity.
+                  <div>
+                    <p className="text-[14px] leading-relaxed text-bone-soft">
+                      Returns a paginated list of wallets scoped to your tenant. Supports filtering
+                      by currency and status.
+                    </p>
+                    <div className="mt-6">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+                        Query parameters
                       </p>
-                    </div>
-                    <div>
-                      <h3 className="text-[15px] font-semibold text-foreground">Event types</h3>
-                      <div className="mt-3 rounded-lg border border-border">
-                        {[
-                          ["wallet.created", "A new wallet was provisioned"],
-                          ["ledger.tx.settled", "A ledger transaction settled"],
-                          ["kyc.verified", "Identity verification completed"],
-                          ["kyc.failed", "Identity verification failed"],
-                          ["assist.escalated", "Agent escalated to live agent"],
-                        ].map(([event, desc]) => (
-                          <div
-                            key={event}
-                            className="flex flex-col gap-1 border-t border-border px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-6"
-                          >
-                            <code className="shrink-0 font-mono text-[12px] text-primary sm:w-44">
-                              {event}
-                            </code>
-                            <span className="text-[13px] text-muted-foreground">{desc}</span>
-                          </div>
-                        ))}
-                      </div>
+                      <dl className="mt-3 rounded-lg border border-border">
+                        <ParamRow
+                          name="currency"
+                          type="string"
+                          desc="Filter by ISO 4217 currency code (e.g. NGN, USD)."
+                        />
+                        <ParamRow
+                          name="limit"
+                          type="integer"
+                          desc="Number of results per page. Default: 20. Max: 100."
+                        />
+                        <ParamRow
+                          name="after"
+                          type="string"
+                          desc="Cursor for pagination. Use the last result's id."
+                        />
+                      </dl>
                     </div>
                   </div>
                 }
                 right={
                   <CodeBlock
-                    title="WEBHOOK PAYLOAD"
-                    code={`<span class="text-slate-500"># Example: kyc.verified event</span>
-{
-  <span class="text-sky-300">"id"</span>:      <span class="text-amber-300">"evt_01pq..."</span>,
-  <span class="text-sky-300">"type"</span>:    <span class="text-amber-300">"kyc.verified"</span>,
-  <span class="text-sky-300">"created"</span>: <span class="text-amber-300">"2026-07-03T00:00:00Z"</span>,
-  <span class="text-sky-300">"data"</span>: {
-    <span class="text-sky-300">"verification_id"</span>: <span class="text-amber-300">"kyc_01mn..."</span>,
-    <span class="text-sky-300">"status"</span>:          <span class="text-amber-300">"verified"</span>,
-    <span class="text-sky-300">"name"</span>:            <span class="text-amber-300">"Amara Osei"</span>
+                    title="RESPONSE: 200 OK"
+                    code={`{
+  <span class="text-gold">"data"</span>: [
+    {
+      <span class="text-gold">"id"</span>:       <span class="text-bone-strong">"wlt_01jz4k9m..."</span>,
+      <span class="text-gold">"currency"</span>: <span class="text-bone-strong">"NGN"</span>,
+      <span class="text-gold">"balance"</span>:  <span class="text-bone-soft">500000</span>,
+      <span class="text-gold">"status"</span>:   <span class="text-positive">"active"</span>,
+      <span class="text-gold">"created_at"</span>: <span class="text-bone-strong">"2026-07-03T..."</span>
+    }
+  ],
+  <span class="text-gold">"pagination"</span>: {
+    <span class="text-gold">"has_more"</span>: <span class="text-bone-soft">false</span>,
+    <span class="text-gold">"next_cursor"</span>: <span class="text-bone-faint">null</span>
   }
-}
-
-<span class="text-slate-500"># Verify the signature</span>
-X-ENICE-Signature: <span class="text-emerald-400">sha256=a1b2c3d4e5f6...</span>`}
+}`}
                   />
                 }
               />
-            </DocSection>
-          </main>
+            </div>
+
+            {/* Create wallet */}
+            <div className="mt-12 border-t border-border pt-10">
+              <div className="flex items-center gap-3">
+                <MethodBadge method="POST" />
+                <code className="font-mono text-[14px] font-semibold text-foreground">
+                  /v1/wallets
+                </code>
+                <span className="text-[12px] text-bone-soft">Create a wallet</span>
+              </div>
+              <SplitRow
+                left={
+                  <div>
+                    <p className="text-[14px] leading-relaxed text-bone-soft">
+                      Provisions a new wallet for an end-user or sub-account. Optionally issue a
+                      virtual card at creation.
+                    </p>
+                    <div className="mt-6">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+                        Body parameters
+                      </p>
+                      <dl className="mt-3 rounded-lg border border-border">
+                        <ParamRow
+                          name="currency"
+                          type="string"
+                          required
+                          desc="ISO 4217 currency code. Supported: NGN, USD."
+                        />
+                        <ParamRow
+                          name="label"
+                          type="string"
+                          desc="Human-readable name for this wallet."
+                        />
+                        <ParamRow
+                          name="issue_card"
+                          type="boolean"
+                          desc="If true, a virtual card is issued and linked on creation."
+                        />
+                        <ParamRow
+                          name="metadata"
+                          type="object"
+                          desc="Arbitrary key-value pairs for your internal reference."
+                        />
+                      </dl>
+                    </div>
+                  </div>
+                }
+                right={
+                  <CodeBlock
+                    title="REQUEST BODY"
+                    code={`{
+  <span class="text-gold">"currency"</span>:   <span class="text-bone-strong">"USD"</span>,
+  <span class="text-gold">"label"</span>:      <span class="text-bone-strong">"Operating Account"</span>,
+  <span class="text-gold">"issue_card"</span>: <span class="text-bone-soft">true</span>,
+  <span class="text-gold">"metadata"</span>: {
+    <span class="text-gold">"user_id"</span>: <span class="text-bone-strong">"usr_8823..."</span>
+  }
+}`}
+                  />
+                }
+              />
+            </div>
+          </DocSection>
+
+          {/* ── LEDGER ── */}
+          <DocSection id="ledger" title="Ledger">
+            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
+              The ENICE Core ledger is a double-entry, append-only transaction log. Every financial
+              event is recorded as an immutable entry and reconciled in real time.
+            </p>
+
+            <div className="mt-10">
+              <div className="flex items-center gap-3">
+                <MethodBadge method="POST" />
+                <code className="font-mono text-[14px] font-semibold text-foreground">
+                  /v1/ledger/tx
+                </code>
+                <span className="text-[12px] text-bone-soft">Post a transaction</span>
+              </div>
+              <SplitRow
+                left={
+                  <div>
+                    <p className="text-[14px] leading-relaxed text-bone-soft">
+                      Posts a debit/credit pair to the ledger. The operation is atomic: if either
+                      leg fails, the entire transaction is rolled back.
+                    </p>
+                    <div className="mt-6">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+                        Body parameters
+                      </p>
+                      <dl className="mt-3 rounded-lg border border-border">
+                        <ParamRow
+                          name="debit_wallet"
+                          type="string"
+                          required
+                          desc="Wallet ID to debit."
+                        />
+                        <ParamRow
+                          name="credit_wallet"
+                          type="string"
+                          required
+                          desc="Wallet ID to credit."
+                        />
+                        <ParamRow
+                          name="amount"
+                          type="integer"
+                          required
+                          desc="Amount in the smallest currency unit (kobo / cents)."
+                        />
+                        <ParamRow
+                          name="currency"
+                          type="string"
+                          required
+                          desc="Must match both wallets' currency."
+                        />
+                        <ParamRow
+                          name="reference"
+                          type="string"
+                          desc="Unique idempotency key. Duplicate references are ignored."
+                        />
+                      </dl>
+                    </div>
+                  </div>
+                }
+                right={
+                  <CodeBlock
+                    title="REQUEST / RESPONSE"
+                    code={`<span class="text-bone-faint"># POST /v1/ledger/tx</span>
+{
+  <span class="text-gold">"debit_wallet"</span>:  <span class="text-bone-strong">"wlt_01jz..."</span>,
+  <span class="text-gold">"credit_wallet"</span>: <span class="text-bone-strong">"wlt_02ab..."</span>,
+  <span class="text-gold">"amount"</span>:         <span class="text-bone-soft">500000</span>,
+  <span class="text-gold">"currency"</span>:       <span class="text-bone-strong">"NGN"</span>,
+  <span class="text-gold">"reference"</span>:      <span class="text-bone-strong">"inv_2026_07_001"</span>
+}
+
+<span class="text-bone-faint"># 201 Created</span>
+{
+  <span class="text-gold">"data"</span>: {
+    <span class="text-gold">"id"</span>:        <span class="text-bone-strong">"txn_01kz9..."</span>,
+    <span class="text-gold">"status"</span>:    <span class="text-positive">"settled"</span>,
+    <span class="text-gold">"settled_at"</span>: <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>
+  }
+}`}
+                  />
+                }
+              />
+            </div>
+          </DocSection>
+
+          {/* ── ASSIST ── */}
+          <DocSection id="assist" title="Assist">
+            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
+              The Assist API exposes PulseAssist's multi-tenant AI routing engine. Invoke agents,
+              manage conversation state, and configure policy-bound automations via REST.
+            </p>
+
+            <div className="mt-10">
+              <div className="flex items-center gap-3">
+                <MethodBadge method="POST" />
+                <code className="font-mono text-[14px] font-semibold text-foreground">
+                  /v1/assist/query
+                </code>
+                <span className="text-[12px] text-bone-soft">Invoke an AI agent</span>
+              </div>
+              <SplitRow
+                left={
+                  <div>
+                    <p className="text-[14px] leading-relaxed text-bone-soft">
+                      Routes a user message through the configured tenant agent. The agent applies
+                      your policy rules, executes permitted actions, and returns a structured
+                      response.
+                    </p>
+                    <div className="mt-6">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+                        Body parameters
+                      </p>
+                      <dl className="mt-3 rounded-lg border border-border">
+                        <ParamRow
+                          name="session_id"
+                          type="string"
+                          required
+                          desc="Unique conversation session identifier. Use the same ID to maintain context across turns."
+                        />
+                        <ParamRow
+                          name="message"
+                          type="string"
+                          required
+                          desc="End-user's input message."
+                        />
+                        <ParamRow
+                          name="tenant_id"
+                          type="string"
+                          required
+                          desc="Your PulseAssist tenant identifier."
+                        />
+                        <ParamRow
+                          name="language"
+                          type="string"
+                          desc="BCP-47 language tag. Default: en."
+                        />
+                      </dl>
+                    </div>
+                  </div>
+                }
+                right={
+                  <CodeBlock
+                    title="REQUEST / RESPONSE"
+                    code={`<span class="text-bone-faint"># POST /v1/assist/query</span>
+{
+  <span class="text-gold">"session_id"</span>: <span class="text-bone-strong">"sess_01kz..."</span>,
+  <span class="text-gold">"message"</span>:    <span class="text-bone-strong">"What is my account balance?"</span>,
+  <span class="text-gold">"tenant_id"</span>:  <span class="text-bone-strong">"ten_bank_ng"</span>,
+  <span class="text-gold">"language"</span>:   <span class="text-bone-strong">"en"</span>
+}
+
+<span class="text-bone-faint"># 200 OK</span>
+{
+  <span class="text-gold">"data"</span>: {
+    <span class="text-gold">"reply"</span>:      <span class="text-bone-strong">"Your NGN balance is ₦500,000."</span>,
+    <span class="text-gold">"intent"</span>:     <span class="text-bone-strong">"account.balance_inquiry"</span>,
+    <span class="text-gold">"confidence"</span>: <span class="text-bone-soft">0.98</span>,
+    <span class="text-gold">"actions"</span>:    []
+  }
+}`}
+                  />
+                }
+              />
+            </div>
+          </DocSection>
+
+          {/* ── KYC ── */}
+          <DocSection id="kyc" title="KYC & Identity">
+            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
+              Submit identity verification requests and retrieve screening results. All KYC data is
+              encrypted in transit and at rest and is never stored beyond the retention window.
+            </p>
+
+            <div className="mt-10">
+              <div className="flex items-center gap-3">
+                <MethodBadge method="POST" />
+                <code className="font-mono text-[14px] font-semibold text-foreground">
+                  /v1/kyc/verify
+                </code>
+                <span className="text-[12px] text-bone-soft">Submit a verification</span>
+              </div>
+              <SplitRow
+                left={
+                  <div>
+                    <p className="text-[14px] leading-relaxed text-bone-soft">
+                      Initiates an identity verification workflow. Returns immediately with a
+                      pending status. Subscribe to the{" "}
+                      <code className="rounded bg-surface-2 px-1 py-0.5 font-mono text-[11px] text-bone-strong">
+                        kyc.verified
+                      </code>{" "}
+                      webhook for the final result.
+                    </p>
+                    <div className="mt-6">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+                        Body parameters
+                      </p>
+                      <dl className="mt-3 rounded-lg border border-border">
+                        <ParamRow
+                          name="first_name"
+                          type="string"
+                          required
+                          desc="Legal first name of the individual."
+                        />
+                        <ParamRow
+                          name="last_name"
+                          type="string"
+                          required
+                          desc="Legal last name of the individual."
+                        />
+                        <ParamRow
+                          name="dob"
+                          type="string"
+                          required
+                          desc="Date of birth in ISO 8601 format (YYYY-MM-DD)."
+                        />
+                        <ParamRow
+                          name="id_type"
+                          type="string"
+                          required
+                          desc="One of: national_id, passport, drivers_license."
+                        />
+                        <ParamRow
+                          name="id_number"
+                          type="string"
+                          required
+                          desc="Document identification number."
+                        />
+                      </dl>
+                    </div>
+                  </div>
+                }
+                right={
+                  <CodeBlock
+                    title="REQUEST / RESPONSE"
+                    code={`<span class="text-bone-faint"># POST /v1/kyc/verify</span>
+{
+  <span class="text-gold">"first_name"</span>: <span class="text-bone-strong">"Amara"</span>,
+  <span class="text-gold">"last_name"</span>:  <span class="text-bone-strong">"Osei"</span>,
+  <span class="text-gold">"dob"</span>:        <span class="text-bone-strong">"1992-04-15"</span>,
+  <span class="text-gold">"id_type"</span>:    <span class="text-bone-strong">"passport"</span>,
+  <span class="text-gold">"id_number"</span>:  <span class="text-bone-strong">"A09123456"</span>
+}
+
+<span class="text-bone-faint"># 202 Accepted</span>
+{
+  <span class="text-gold">"data"</span>: {
+    <span class="text-gold">"verification_id"</span>: <span class="text-bone-strong">"kyc_01mn..."</span>,
+    <span class="text-gold">"status"</span>:          <span class="text-gold">"pending"</span>
+  }
+}`}
+                  />
+                }
+              />
+            </div>
+          </DocSection>
+
+          {/* ── WEBHOOKS ── */}
+          <DocSection id="webhooks" title="Webhooks">
+            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
+              The ENICE Core delivers all asynchronous events via HMAC-SHA256 signed webhooks with
+              at-least-once delivery semantics and configurable retry windows.
+            </p>
+
+            <SplitRow
+              left={
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-foreground">
+                      Signature verification
+                    </h3>
+                    <p className="mt-2 text-[14px] leading-relaxed text-bone-soft">
+                      Each delivery includes an{" "}
+                      <code className={INLINE_CODE}>X-ENICE-Signature</code> header. Verify it
+                      against your webhook secret to confirm authenticity.
+                    </p>
+                  </div>
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-foreground">Event types</h3>
+                    <dl className="mt-3 rounded-lg border border-border">
+                      {[
+                        ["wallet.created", "A new wallet was provisioned"],
+                        ["ledger.tx.settled", "A ledger transaction settled"],
+                        ["kyc.verified", "Identity verification completed"],
+                        ["kyc.failed", "Identity verification failed"],
+                        ["assist.escalated", "Agent escalated to live agent"],
+                      ].map(([event, desc]) => (
+                        <div
+                          key={event}
+                          className="flex flex-col gap-1 border-t border-border px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-6"
+                        >
+                          <dt className="shrink-0 sm:w-44">
+                            <code className="font-mono text-[12px] text-gold">{event}</code>
+                          </dt>
+                          <dd className="text-[13px] text-bone-soft">{desc}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                </div>
+              }
+              right={
+                <CodeBlock
+                  title="WEBHOOK PAYLOAD"
+                  code={`<span class="text-bone-faint"># Example: kyc.verified event</span>
+{
+  <span class="text-gold">"id"</span>:      <span class="text-bone-strong">"evt_01pq..."</span>,
+  <span class="text-gold">"type"</span>:    <span class="text-bone-strong">"kyc.verified"</span>,
+  <span class="text-gold">"created"</span>: <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>,
+  <span class="text-gold">"data"</span>: {
+    <span class="text-gold">"verification_id"</span>: <span class="text-bone-strong">"kyc_01mn..."</span>,
+    <span class="text-gold">"status"</span>:          <span class="text-positive">"verified"</span>,
+    <span class="text-gold">"name"</span>:            <span class="text-bone-strong">"Amara Osei"</span>
+  }
+}
+
+<span class="text-bone-faint"># Verify the signature</span>
+X-ENICE-Signature: <span class="text-bone-strong">sha256=a1b2c3d4e5f6...</span>`}
+                />
+              }
+            />
+          </DocSection>
         </div>
-      </main>
-      <SiteFooter />
-    </div>
+      </Section>
+    </SiteShell>
   );
 }

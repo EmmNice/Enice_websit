@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Tag } from "@/components/site/primitives";
 import { isBetaAnnouncementActive, isPulseAssistEarlyAccessActive } from "@/lib/beta-announcement";
 import { PulseAssistEarlyAccessModal } from "@/components/site/PulseAssistEarlyAccess";
 
@@ -23,9 +24,9 @@ import { PulseAssistEarlyAccessModal } from "@/components/site/PulseAssistEarlyA
  * `src/lib/beta-announcement.ts`, checked fresh on every mount and every render.
  *
  * Deliberately built on the same Radix `Dialog` primitives as
- * `PulseAssistEarlyAccessModal` — full focus trap, escape-to-close, and click-outside-to-close
- * for free — with its own overlay (blurred rather than opaque black) and its own entrance
- * animation so it reads as an announcement, not a form.
+ * `PulseAssistEarlyAccessModal` — full focus trap, escape-to-close, scroll lock and
+ * click-outside-to-close for free — with a heavier backdrop blur and its own entrance animation
+ * so it reads as an announcement, not a form.
  */
 export function BetaLaunchAnnouncement() {
   const [open, setOpen] = useState(false);
@@ -61,80 +62,55 @@ export function BetaLaunchAnnouncement() {
     <>
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          // Own overlay treatment (blurred, tinted navy rather than the shared flat black) and
-          // own close control, so this reads as a considered announcement rather than the
-          // generic form-dialog shell used elsewhere on the site.
-          overlayClassName="backdrop-blur-sm bg-[#050810]/70"
+          // A deeper blur than the shared scrim, plus its own close control, so this reads as a
+          // considered announcement rather than the generic form-dialog shell used elsewhere.
+          overlayClassName="backdrop-blur-md"
           hideDefaultClose
-          className="w-[calc(100vw-2rem)] max-w-md gap-0 overflow-hidden rounded-2xl border-none bg-transparent p-0 shadow-none duration-300 sm:max-w-lg"
+          className="w-[calc(100vw-2rem)] max-w-md gap-0 overflow-hidden border-none bg-transparent p-0 shadow-none duration-300 sm:max-w-lg"
         >
-          <div
-            className="relative overflow-hidden rounded-2xl border border-white/10"
-            style={{
-              background: "linear-gradient(160deg, #0a1230 0%, #0c1740 45%, #0a1230 100%)",
-              boxShadow: "0 32px 80px -16px rgba(8,12,32,0.65), 0 0 0 1px rgba(255,255,255,0.04)",
-            }}
-          >
-            {/* Ambient glow */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(ellipse 70% 55% at 50% -10%, rgba(59,130,246,0.28) 0%, transparent 65%)",
-              }}
-            />
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-0 opacity-[0.05]"
-              style={{
-                backgroundImage:
-                  "linear-gradient(to right, rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.6) 1px, transparent 1px)",
-                backgroundSize: "32px 32px",
-                maskImage: "radial-gradient(ellipse 80% 60% at 50% 0%, black 40%, transparent 85%)",
-              }}
-            />
+          <div className="panel-raised relative overflow-hidden">
+            {/* Ambient warm lighting and the technical grid — decorative, never in reading order. */}
+            <div aria-hidden className="mesh-glow-center" />
+            <div aria-hidden className="tech-grid" />
 
             {/* Close button */}
             <DialogClose
               aria-label="Close"
-              className="absolute right-4 top-4 z-10 grid h-8 w-8 place-items-center rounded-full text-white/50 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30"
+              className="absolute right-4 top-4 z-10 grid h-8 w-8 cursor-pointer place-items-center rounded-full text-bone-faint transition-colors hover:bg-surface-3 hover:text-foreground"
             >
               <X className="h-4 w-4" />
             </DialogClose>
 
             <div className="relative px-6 pb-8 pt-9 sm:px-9 sm:pb-10 sm:pt-11">
               {/* Badge */}
-              <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-blue-400/25 bg-blue-400/10 px-3.5 py-1.5">
-                <Sparkles className="h-3 w-3 shrink-0 text-blue-300" strokeWidth={2} />
-                <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-300">
-                  PulseAssist Beta Launch
-                </span>
-              </div>
+              <Tag tone="warm" className="max-w-full">
+                <Sparkles aria-hidden className="h-3 w-3 shrink-0" strokeWidth={2} />
+                <span className="whitespace-nowrap">PulseAssist Beta Launch</span>
+              </Tag>
 
               <DialogHeader className="mt-6 text-left">
-                <DialogTitle className="text-[1.6rem] font-semibold leading-[1.15] tracking-[-0.02em] text-white sm:text-3xl">
+                <DialogTitle className="text-[1.6rem] font-semibold leading-[1.15] tracking-[-0.02em] text-foreground sm:text-3xl">
                   We&apos;re entering our next phase.
                 </DialogTitle>
-                <DialogDescription className="mt-4 text-[14px] leading-relaxed text-white/60 sm:text-[15px]">
+                <DialogDescription className="mt-4 text-[14px] leading-relaxed text-bone-soft sm:text-[15px]">
                   Following our ongoing internal testing, we&apos;re preparing to open PulseAssist
                   Beta in the second week of September 2026.
                 </DialogDescription>
               </DialogHeader>
 
-              <p className="mt-4 text-[13.5px] leading-relaxed text-white/45">
+              <p className="mt-4 text-[13.5px] leading-relaxed text-bone-soft">
                 Our team is currently refining the platform, testing core systems, and preparing for
                 a limited beta experience with selected early users.
               </p>
 
               {/* Timeline card */}
-              <div className="mt-7 flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-4 py-3.5">
-                <div className="h-1.5 w-1.5 shrink-0 rounded-full bg-blue-400" />
+              <div className="panel-quiet mt-7 flex items-center gap-3 px-4 py-3.5">
+                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-blue-300">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
                     September 2026 · Beta Phase
                   </div>
-                  <div className="mt-0.5 text-[12.5px] text-white/50">
+                  <div className="mt-0.5 text-[12.5px] text-bone-soft">
                     Be among the first to experience what we&apos;re building.
                   </div>
                 </div>
@@ -143,22 +119,24 @@ export function BetaLaunchAnnouncement() {
               {/* CTAs */}
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 {isPulseAssistEarlyAccessActive() && (
-                  <button
-                    type="button"
-                    onClick={joinBeta}
-                    className="group inline-flex flex-1 items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 py-3 text-[13px] font-semibold text-white transition-all hover:bg-blue-500"
-                  >
+                  <button type="button" onClick={joinBeta} className="btn btn-primary group flex-1">
                     Join the Beta
-                    <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
+                    <ArrowUpRight
+                      aria-hidden
+                      className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px"
+                    />
                   </button>
                 )}
                 <Link
                   to="/about-pulseassist-beta"
                   onClick={() => setOpen(false)}
-                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 px-5 py-3 text-[13px] font-semibold text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  className="btn btn-secondary group flex-1"
                 >
                   Learn More
-                  <ArrowUpRight className="h-3.5 w-3.5" />
+                  <ArrowUpRight
+                    aria-hidden
+                    className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-px group-hover:translate-x-px"
+                  />
                 </Link>
               </div>
             </div>

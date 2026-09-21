@@ -766,6 +766,625 @@ VALUES ('portfolio.payment-collection', 'Payment Collection page', 'Portfolio', 
 ON CONFLICT (key) DO NOTHING;
 `,
   },
+  {
+    id: 12,
+    name: "home_bands_made_editable",
+    sql: /* sql */ `
+-- Seven homepage bands were hardcoded in React and could only be changed by a deploy: the featured
+-- products, the ENICE Core, the technology stack, the company band, the founders' letter and the
+-- hiring band. They are now sections, seeded here with the copy those bands already render, so
+-- wiring them changes nothing visible and the next edit does not need an engineer.
+--
+-- ON CONFLICT DO NOTHING throughout, so this is a no-op on re-run and never overwrites an edit.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.portfolio', 'Featured products', 'Home', 'featureGrid', true, 'published', '{
+  "eyebrow": "Built and operated by ENICE",
+  "heading": "The products we run.\\nNot a services menu.",
+  "subheading": "Each one began as a problem we hit ourselves, and each one is a platform we operate day to day rather than hand over.",
+  "items": [
+    {"icon":"CreditCard","kicker":"Fintech infrastructure","title":"PulsePay","description":"A virtual payment platform for modern commerce: instant Naira card issuance, programmable wallets, embedded KYC, and peer-to-peer transfers built for Nigerian institutions.","bullets":"Cards: Naira & USD\\nMarket: Nigeria","url":"/portfolio/pulsepay"},
+    {"icon":"BrainCircuit","kicker":"Enterprise AI","title":"PulseAssist","description":"An AI operations platform for banking, fintech, and telecoms, with automated queue handling, live agent handoff, and policy-bound workflow automation.","bullets":"Channels: WhatsApp, web, email, SMS, voice\\nTenancy: Multi-tenant","url":"/portfolio/pulseassist"},
+    {"icon":"Banknote","kicker":"Fintech infrastructure","title":"PulsePay Payment Collection","description":"Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.","bullets":"Launch: Q1 2027\\nIntegration: One API","url":"/portfolio/payment-collection"}
+  ]
+}'::jsonb, 32)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.core', 'The ENICE Core', 'Home', 'featureGrid', true, 'published', '{
+  "eyebrow": "What powers our products",
+  "heading": "The ENICE Core.",
+  "subheading": "Every product we operate runs on a shared infrastructure core, so the software customers use inherits scale, compliance, and reliability from the ground up.",
+  "items": [
+    {"icon":"Cpu","title":"Unified AI and Automation Pipeline","description":"Centralized LLM orchestration and vector search routing that powers products like PulseAssist across every tenant."},
+    {"icon":"Database","title":"High-Velocity Ledger and Payment Core","description":"A fast transaction engine and virtual account infrastructure that anchors PulsePay and the financial products we build next."},
+    {"icon":"FileCheck2","title":"Automated Compliance and KYC Layer","description":"Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product."},
+    {"icon":"Globe","title":"Global Cloud Grid","description":"Managed database clustering and serverless edge delivery, so the same infrastructure serves every product without each one reinventing it."}
+  ]
+}'::jsonb, 34)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.infrastructure', 'Technology stack', 'Home', 'featureGrid', true, 'published', '{
+  "eyebrow": "Technology foundation",
+  "heading": "The stack underneath.",
+  "subheading": "Every ENICE Group product runs on the same backbone. We chose it for reliability, compliance, and scale, not because it was the easy option.",
+  "items": [
+    {"kicker":"AWS","title":"Amazon Web Services","description":"Our main cloud backbone. It handles compute, storage, and edge delivery across every ENICE Group platform.","bullets":"Cloud infrastructure and security"},
+    {"kicker":"GCP","title":"Google Cloud","description":"Runs PulseAssist''s AI pipeline: LLM orchestration and workflow automation across tenants, with Gemini as the model layer.","bullets":"Core AI engine and computational intelligence"},
+    {"kicker":"PG","title":"Supabase","description":"Row-level security, real-time data streams, and managed Postgres for PulsePay''s transaction systems.","bullets":"Database infrastructure and auth"}
+  ]
+}'::jsonb, 36)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.company', 'Company band', 'Home', 'featureGrid', true, 'published', '{
+  "eyebrow": "The company",
+  "heading": "ENICE Group is a product company.",
+  "subheading": "We are the parent company behind a growing set of software platforms. We find real problems in financial services, commerce, and business communication, then build and run the products that solve them.",
+  "items": [
+    {"title":"We start from the friction","description":"Every product traces back to something that failed in ordinary use: a payment that should have been simple, a support queue nobody answered. We build from the specific problem outward, not from a category we want to be in."},
+    {"title":"One core, many products","description":"Ledgers, identity, AI orchestration and compliance are solved once and shared. A new product inherits that foundation on its first day instead of rebuilding it, which is what makes a small team''s output look like a much larger one."},
+    {"title":"We operate what we ship","description":"We own the products end to end — engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it."},
+    {"title":"Built to still be here","description":"We design for the version of these systems that exists in ten years: versioned APIs, documented internals, and infrastructure choices made for reliability rather than novelty. Regulated markets do not reward clever."}
+  ]
+}'::jsonb, 38)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.founders', 'Founders'' letter', 'Home', 'prose', true, 'published', '{
+  "eyebrow": "From the founders",
+  "heading": "A letter from the founders",
+  "body": "Every good business runs on good infrastructure. That''s the idea behind ENICE Group. We don''t build technology for its own sake. We build products that solve real problems and give people and businesses infrastructure they can depend on for years.\\n\\nThat idea didn''t start in a boardroom. It came from everyday life in Nigeria: calling a company for help and waiting too long, dealing with poor service, hitting friction that shouldn''t exist. It came from financial platforms that failed exactly when we needed them, from declined international cards to simple payments that turned into a headache.\\n\\nWe decided that shouldn''t be normal. ENICE Group exists because African businesses and consumers deserve technology that is reliable, secure, and built to the same standard as anywhere else. Every product we launch is a step toward that, for Africa first, and for the world as we grow."
+}'::jsonb, 40)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.careers', 'Hiring band', 'Home', 'cta', true, 'published', '{
+  "eyebrow": "Join the builders",
+  "heading": "Build products that matter.",
+  "subheading": "We work with people who care about product quality, solid engineering, and technology that holds up at real scale. If that sounds like you, we want to hear from you.",
+  "ctaLabel": "Meet the team",
+  "ctaUrl": "/contact",
+  "style": "standard"
+}'::jsonb, 60)
+ON CONFLICT (key) DO NOTHING;
+
+-- The stats strip carried three claims nothing backs — a 99.99% SLA, a < 14ms p50 latency and an
+-- encryption standard as a headline metric — plus a product count that was wrong (4 for five).
+-- All four were deleted from the page long ago, but this section still served them, so any site
+-- reading the CMS published them again. Replaced only while the row still holds those exact seeded
+-- values, so an operator who has already curated this band is left alone.
+UPDATE site_sections
+SET fields = fields || '{
+  "items": [
+    {"value": "5", "label": "Products in the ecosystem"},
+    {"value": "2", "label": "Offices in Nigeria"}
+  ]
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'home.statistics'
+  AND fields->'items' @> '[{"label":"Infrastructure SLA"}]'::jsonb;
+
+-- The hero headline's hardcoded line breaks were tuned for one viewport and ragged at every other,
+-- and the [[highlight]] put two lines of display-size accent colour at the top of the page. Both
+-- are still available to an editor; the shipped copy simply no longer uses them. Guarded on the
+-- original string, so an edited headline is untouched.
+UPDATE site_sections
+SET fields = jsonb_set(
+      fields,
+      '{heading}',
+      '"We build the technology behind Africa''s next generation of businesses."'::jsonb
+    ),
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'heading' = 'We build the technology
+[[behind Africa''s next]]
+generation of
+businesses.';
+`,
+  },
+  {
+    id: 13,
+    name: "product_page_bands_and_roadmap_made_editable",
+    sql: /* sql */ `
+-- Migration 11 made each product page's *header* editable and stopped there. Everything below the
+-- header stayed hardcoded in React: the capability grids, the facts strips, the sector tiles, the
+-- compliance pills, the launch framing on the three unlaunched products, the homepage's platform
+-- capabilities band, and the roadmap. Those are the most perishable things on the site — a
+-- milestone slips, a channel is added, a mechanism lands — and every one of them needed an engineer
+-- and a deploy to change.
+--
+-- Each band below is now a section, using an existing section type so the admin form and the
+-- sanitiser already understand it, and seeded here with exactly the copy the page already renders.
+-- Wiring therefore changes nothing visible; the next edit simply no longer needs a deploy. Each
+-- component also keeps its built-in copy as a fallback, which is what paints before the CMS answers
+-- and what survives an outage.
+--
+-- ON CONFLICT (key) DO NOTHING throughout, so this is a no-op on re-run and never overwrites an
+-- edit an administrator has already made.
+--
+-- Two conventions are worth stating, because the code parses them back out:
+--
+--   * Launch-fact strips are \`statistics\` sections, which carry a value and a label and nothing
+--     else. Which row is painted gold is a styling decision, not content, so it is not stored: the
+--     first row is the status row and the component accents it by position.
+--
+--   * Roadmap milestones are \`steps\` rows, which carry a title and a description. A milestone needs
+--     four more things, so they are written as \`label: value\` lines at the top of the description,
+--     with the body after a blank line:
+--
+--         when: Q4 2026
+--         status: in-progress
+--         product: PulseAssist
+--         tags: AI, B2B, Telecom
+--
+--         First rollout of support automation …
+--
+--     Only leading lines matching when/status/product/tags are read as metadata; the first line
+--     that does not starts the body. \`status\` accepts completed, in-progress or planned, and
+--     anything else — including a missing status — resolves to planned rather than throwing. See
+--     \`parseMilestone\` in src/components/site/Roadmap.tsx.
+
+-- ─── Home ────────────────────────────────────────────────────────────────────
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.capabilities', 'Platform capabilities', 'Home', 'featureGrid', true, 'published', '{
+  "eyebrow": "Platform capabilities",
+  "heading": "How the platform is built.",
+  "subheading": "Mechanisms in place across every product. Current availability is reported on the status page.",
+  "items": [
+    {"icon":"Gauge","kicker":"API delivery","title":"Edge","description":"Multi-region, served from the nearest edge"},
+    {"icon":"Activity","kicker":"Tenant isolation","title":"Row-level","description":"Enforced in the database, not the application"},
+    {"icon":"ShieldCheck","kicker":"Data encryption","title":"TLS + at rest","description":"Managed database and object storage"},
+    {"icon":"Zap","kicker":"Card issuance","title":"< 5s","description":"Virtual card provisioning"},
+    {"icon":"Lock","kicker":"KYC verification","title":"Real-time","description":"Automated compliance checks"}
+  ]
+}'::jsonb, 35)
+ON CONFLICT (key) DO NOTHING;
+
+-- Nine milestones. \`SECTION_SCHEMAS.steps\` caps its repeater at eight rows, which only bites on a
+-- write path: this insert writes the JSON directly, so every milestone survives here.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.roadmap', 'Strategic roadmap', 'Home', 'steps', true, 'published', '{
+  "heading": "Built step by step, for the long run.",
+  "subheading": "Our roadmap follows the maturity of the platforms we operate, sequenced so each step builds on the last.",
+  "items": [
+    {"title":"Shared Ecosystem Framework","description":"when: Q1 2026\\nstatus: completed\\nproduct: ENICE Core\\ntags: Infrastructure, AI, Compliance\\n\\nThe unified AI pipeline, ledger, and compliance backbone that now underpins every ENICE product."},
+    {"title":"Extended Pilot with Regional Treasury Partners","description":"when: Q3 2026\\nstatus: completed\\nproduct: PulsePay\\ntags: Fintech, Wallets, KYC\\n\\nProgrammable wallets, instant virtual card issuance, and embedded compliance controls, rolled out to a wider pilot group across West Africa."},
+    {"title":"Enterprise B2B Launch","description":"when: Q4 2026\\nstatus: in-progress\\nproduct: PulseAssist\\ntags: AI, B2B, Telecom\\n\\nFirst rollout of support automation to banking, fintech, and telecom partners, with policy-bound agents and live-agent failover."},
+    {"title":"Developer API Public Beta","description":"when: Q2 2026\\nstatus: in-progress\\nproduct: PulsePay\\ntags: API, Developer, Fintech\\n\\nThe ENICE Core API opens to verified integration partners, with wallet issuance, ledger, KYC, and Assist endpoints available in a sandbox."},
+    {"title":"Multi-Currency Expansion","description":"when: Q3 2026\\nstatus: planned\\nproduct: PulsePay\\ntags: Fintech, Multi-Currency, Treasury\\n\\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform."},
+    {"title":"Payment Collection Launch","description":"when: Q1 2027\\nstatus: planned\\nproduct: PulsePay\\ntags: Fintech, Payments, API\\n\\nPulsePay Payment Collection launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications."},
+    {"title":"Global Digital Asset Exchange Private Beta","description":"when: Q3 2027\\nstatus: planned\\nproduct: PulseX\\ntags: Crypto, Exchange, Global\\n\\nPulseX opens to institutional and qualified retail participants, with support for major digital asset pairs, custody, and compliance reporting."},
+    {"title":"Digital Banking Infrastructure Closed Alpha","description":"when: Q4 2027\\nstatus: planned\\nproduct: ePulse\\ntags: Banking, Alpha\\n\\nePulse begins closed alpha with select institutional partners: digital banking core, account management, and statement APIs."},
+    {"title":"Universal Financial Hub","description":"when: 2027\\nstatus: planned\\nproduct: ENICE Core\\ntags: Infrastructure, Global, Liquidity\\n\\nA global virtual-dollar and asset infrastructure layer connecting institutional liquidity across markets through a single API."}
+  ]
+}'::jsonb, 45)
+ON CONFLICT (key) DO NOTHING;
+
+-- ─── PulsePay ────────────────────────────────────────────────────────────────
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulsepay.stats', 'PulsePay facts strip', 'Portfolio', 'statistics', true, 'published', '{
+  "heading": "PulsePay at a glance",
+  "items": [
+    {"value":"Naira & USD","label":"Card currencies"},
+    {"value":"2","label":"Currency rails (NGN + USD)"},
+    {"value":"Every account","label":"KYC screening"}
+  ]
+}'::jsonb, 211)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulsepay.features', 'PulsePay capabilities', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Platform Capabilities",
+  "heading": "Everything a modern payments stack should be.",
+  "subheading": "PulsePay covers the full payments stack: issuance, compliance, transfers, and spending controls, in one integrated platform.",
+  "items": [
+    {"icon":"CreditCard","title":"Instant virtual card issuance","description":"Issue Naira and USD virtual cards in seconds for individuals and teams."},
+    {"icon":"ShieldCheck","title":"Built-in KYC verification","description":"Identity verification and compliance checks built directly into the onboarding flow."},
+    {"icon":"Users","title":"Peer-to-peer transfers","description":"Move funds between users and fund wallets instantly with no friction."},
+    {"icon":"Lock","title":"Programmable spend controls","description":"Set granular limits and rules for individuals, teams, and departments."},
+    {"icon":"Zap","title":"Value-added services","description":"Bill payments, airtime, utilities, and more built directly into the platform."},
+    {"icon":"BarChart3","title":"Enterprise fraud monitoring","description":"Real-time transaction screening and anomaly detection at every step."}
+  ]
+}'::jsonb, 212)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulsepay.compliance', 'PulsePay compliance', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Compliance & Regulation",
+  "heading": "Built for regulated markets from the ground up.",
+  "subheading": "PulsePay operates within Nigeria''s regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions. PulsePay holds no third-party security certification today, and we will tell you so directly rather than imply otherwise.",
+  "items": [
+    {"title":"Row-Level Security"},
+    {"title":"Tenant Isolation"},
+    {"title":"Audit Logging"},
+    {"title":"KYC Screening"}
+  ]
+}'::jsonb, 213)
+ON CONFLICT (key) DO NOTHING;
+
+-- ─── PulseAssist ─────────────────────────────────────────────────────────────
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist.stats', 'PulseAssist facts strip', 'Portfolio', 'statistics', true, 'published', '{
+  "heading": "PulseAssist at a glance",
+  "items": [
+    {"value":"WhatsApp · Web · Email · SMS · Voice","label":"Channels"},
+    {"value":"Multi-tenant","label":"Architecture"}
+  ]
+}'::jsonb, 221)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist.features', 'PulseAssist capabilities', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Platform Capabilities",
+  "heading": "Operations that run themselves.",
+  "subheading": "PulseAssist covers the full customer operations lifecycle, from first contact to resolution, without needing a human for every interaction.",
+  "items": [
+    {"icon":"Inbox","title":"Five channels, one inbox","description":"WhatsApp, web chat, email, SMS and voice answered from a single shared inbox, so support is consistent wherever people reach you."},
+    {"icon":"MessageSquare","title":"Autonomous support routing","description":"AI-driven triage and routing that resolves common queries without human intervention."},
+    {"icon":"ShieldCheck","title":"Policy-bound agents","description":"Conversational agents that operate strictly within configurable organisational policies."},
+    {"icon":"Zap","title":"Real-time live-agent handoff","description":"Escalation to a human agent mid-conversation, with full context preserved."},
+    {"icon":"Globe","title":"API-driven account management","description":"Agents can query and update account state through secure, scoped API integrations."},
+    {"icon":"Network","title":"Multi-tenant architecture","description":"Enterprise-grade isolation between clients with dedicated model and routing configs."},
+    {"icon":"FileCheck2","title":"Compliance-ready audit trails","description":"Every interaction is logged, timestamped, and exportable for regulatory review."}
+  ]
+}'::jsonb, 222)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist.sectors', 'PulseAssist sectors served', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Sectors Served",
+  "heading": "Built for compliance-heavy industries.",
+  "items": [
+    {"icon":"BarChart3","title":"Banking & Fintech"},
+    {"icon":"Users","title":"Telecom Operators"},
+    {"icon":"Globe","title":"Insurance"},
+    {"icon":"ShieldCheck","title":"Compliance-heavy Enterprises"}
+  ]
+}'::jsonb, 223)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulseassist.compliance', 'PulseAssist compliance', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Enterprise Compliance",
+  "heading": "Every interaction is compliant by design.",
+  "subheading": "PulseAssist maintains comprehensive audit trails of every agent interaction. Policy configurations are version-controlled, every model decision is logged, and all data is tenant-isolated, meeting the regulatory requirements of banking and telecom in Africa and beyond.",
+  "items": [
+    {"title":"Tenant Isolation"},
+    {"title":"Audit Logs"},
+    {"title":"Policy Versioning"},
+    {"title":"Row-Level Security"}
+  ]
+}'::jsonb, 224)
+ON CONFLICT (key) DO NOTHING;
+
+-- ─── ePulse ──────────────────────────────────────────────────────────────────
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.epulse.facts', 'ePulse launch facts', 'Portfolio', 'statistics', true, 'published', '{
+  "heading": "ePulse launch framing",
+  "items": [
+    {"value":"In Development","label":"Status"},
+    {"value":"To Be Announced","label":"Expected Launch"}
+  ]
+}'::jsonb, 231)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.epulse.audience', 'ePulse audience', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Built For",
+  "heading": "People who live and work globally.",
+  "items": [
+    {"icon":"Briefcase","title":"Freelancers","description":"Get paid in USD, GBP, or EUR directly from international clients."},
+    {"icon":"Users","title":"Remote Workers","description":"Receive your salary, save in multiple currencies, spend globally."},
+    {"icon":"CreditCard","title":"Creators","description":"Monetise your content globally and manage earnings in one place."},
+    {"icon":"Globe2","title":"Global Businesses","description":"Pay international suppliers and accept payments from anywhere."}
+  ]
+}'::jsonb, 232)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.epulse.vision', 'ePulse vision', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "The Vision",
+  "heading": "International finance, made simple.",
+  "subheading": "The ePulse platform includes everything you need to live your financial life without borders, from day-to-day spending to long-distance transfers to lifestyle services.",
+  "items": [
+    {"icon":"Wallet","title":"Multi-currency accounts","description":"Hold and manage balances in the currencies that matter to you: NGN, USD, GBP, EUR and more, from a single account."},
+    {"icon":"Building2","title":"Dedicated receiving accounts","description":"Local account details for supported countries, including the US, UK, and Europe. Get paid like a local from anywhere."},
+    {"icon":"Send","title":"Fast international transfers","description":"Send money across borders with predictable timing, transparent fees, and clear pricing. No surprises."},
+    {"icon":"Globe2","title":"Global payment solutions","description":"Pay and get paid anywhere your work takes you, from client invoices to vendor payments across continents."},
+    {"icon":"Gift","title":"Gift card marketplace","description":"Buy and redeem gift cards from trusted global and local brands, all within the ePulse platform."},
+    {"icon":"Plane","title":"Lifestyle services","description":"Book hotels, plan travel, and access premium experiences. Good finance should make life easier too."}
+  ]
+}'::jsonb, 233)
+ON CONFLICT (key) DO NOTHING;
+
+-- ─── PulseX ──────────────────────────────────────────────────────────────────
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulsex.facts', 'PulseX launch facts', 'Portfolio', 'statistics', true, 'published', '{
+  "heading": "PulseX launch framing",
+  "items": [
+    {"value":"Planned Project","label":"Status"},
+    {"value":"Q3 2027","label":"Launch"},
+    {"value":"Digital Assets","label":"Category"}
+  ]
+}'::jsonb, 241)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.pulsex.highlights', 'PulseX capabilities', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Platform Capabilities",
+  "heading": "Digital assets, without the friction.",
+  "subheading": "PulseX will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
+  "items": [
+    {"icon":"BarChart3","title":"Multi-asset trading","description":"Trade major digital assets with deep liquidity and institutional-grade execution: Bitcoin, Ethereum, and beyond."},
+    {"icon":"Lock","title":"Secure custody","description":"Cold storage, multi-signature protection, and continuous on-chain monitoring for every asset in your portfolio."},
+    {"icon":"Layers","title":"Ecosystem-native","description":"Move between PulseX, PulsePay, and ePulse without leaving the ENICE stack: one account, every service."},
+    {"icon":"Globe","title":"Built for scale","description":"Global access with compliance and reporting designed for regulated markets from day one, in Africa, Europe, and beyond."},
+    {"icon":"Zap","title":"Instant settlement","description":"Near-instant on-chain and off-chain settlement rails so your capital moves as fast as the market does."},
+    {"icon":"ShieldCheck","title":"Regulatory-ready","description":"Compliance built in from the ground up: KYC, AML, and transaction monitoring at the core."}
+  ]
+}'::jsonb, 242)
+ON CONFLICT (key) DO NOTHING;
+
+-- ─── PulsePay Payment Collection ─────────────────────────────────────────────
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.payment-collection.facts', 'Payment Collection launch facts', 'Portfolio', 'statistics', true, 'published', '{
+  "heading": "Payment Collection launch framing",
+  "items": [
+    {"value":"Planned","label":"Status"},
+    {"value":"Q1 2027","label":"Launch"},
+    {"value":"Payments","label":"Category"}
+  ]
+}'::jsonb, 251)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.payment-collection.audience', 'Payment Collection audience', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Built For",
+  "heading": "From online businesses to growing enterprises.",
+  "items": [
+    {"icon":"Globe2","title":"Online Businesses","description":"Accept customer payments without stitching together separate providers."},
+    {"icon":"Code2","title":"SaaS Platforms","description":"Add payment collection to your product through one integration."},
+    {"icon":"ShoppingCart","title":"Marketplaces","description":"Manage payments across many sellers and transactions from one place."},
+    {"icon":"TrendingUp","title":"Growing Enterprises","description":"Infrastructure built to scale with transaction volume, not against it."}
+  ]
+}'::jsonb, 252)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('portfolio.payment-collection.capabilities', 'Payment Collection capabilities', 'Portfolio', 'featureGrid', true, 'published', '{
+  "eyebrow": "Key Capabilities",
+  "heading": "Payments, made easier to collect and scale.",
+  "subheading": "Payment Collection is being built as part of ENICE Group''s broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
+  "items": [
+    {"icon":"Code2","title":"Unified payment API","description":"Accept payments through a single, developer friendly integration."},
+    {"icon":"Zap","title":"Real time status updates","description":"Track transactions and payment status as they happen, not after the fact."},
+    {"icon":"Webhook","title":"Webhook notifications","description":"Get notified the moment a payment is received, so your product can react instantly."},
+    {"icon":"Store","title":"Merchant management","description":"View and manage merchants and transactions from a single, clear dashboard."},
+    {"icon":"Users","title":"Built for platforms","description":"Designed for businesses that collect payments on behalf of others, at any scale."},
+    {"icon":"CheckCircle2","title":"Reliable by design","description":"Payment infrastructure built to stay dependable as transaction volume grows."}
+  ]
+}'::jsonb, 253)
+ON CONFLICT (key) DO NOTHING;
+`,
+  },
+  {
+    id: 14,
+    name: "homepage_and_about_remaining_bands_made_editable",
+    sql: /* sql */ `
+-- The last content arrays still living in React on the two most-read pages. Migration 13 did this
+-- for the product pages and the roadmap; these six bands were what it left behind:
+--
+--   home.principles     the three "Built around real problems" cards under the product grid
+--   home.mechanisms     the mechanisms strip at the foot of the ENICE Core band, its sentence
+--                       included — and, with it, the hero's trust-signal list
+--   about.build         the "What We Build" paragraphs
+--   about.verticals     the six sector tiles beneath them
+--   about.leadership    the founding-team cards and the executive-contact note
+--   about.closing       the closing statement and its attribution
+--
+-- Each uses an existing section type, so the admin form and \`sanitizeSectionFields\` already
+-- understand every field, and each is seeded with exactly the copy the page already renders.
+-- Wiring therefore changes nothing visible; the next edit simply no longer needs a deploy. Every
+-- component also keeps its built-in copy as a fallback, which is what paints before the CMS answers
+-- and what survives an outage — \`useSectionFields\` treats a degraded bootstrap as "not loaded".
+--
+-- ON CONFLICT (key) DO NOTHING throughout, so this is a no-op on re-run and never overwrites an
+-- edit an administrator has already made.
+--
+-- Four conventions are worth stating, because the components read them back out:
+--
+--   * \`home.principles\` and \`about.verticals\` render no heading of their own, and neither does the
+--     mechanisms strip. Their \`heading\` is seeded for the admin section list only — a row with no
+--     heading is unnavigable there, and \`featureGrid\` requires the field regardless.
+--
+--   * The hero's trust-signal strip renders the *first three* rows of \`home.mechanisms\`. It was a
+--     second hardcoded copy of the same three strings ("Row-level security", "Per-tenant
+--     isolation", "Audit logging"), and \`hero\` has neither a repeater nor a spare text field to
+--     put them on, so folding them in here is what makes them editable at all. The hero paints a
+--     fixed tick against each one: that icon is the strip's design, not content.
+--
+--   * \`about.build\` interpolates \`{liveProducts}\` with the number of products whose stage is
+--     \`available\`, read from the product registry. The figure used to be written by hand, which is
+--     how it went stale the day a product shipped, and a seeded literal would go stale the same
+--     way. \`**PulsePay**\` and \`**PulseAssist**\` are \`StyledText\`'s bold marker: a text field
+--     cannot carry a \`<strong>\`, and should not be able to.
+--
+--   * \`about.leadership\`'s \`subheading\` is the note *under* the cards, not the lead above them.
+--     \`featureGrid\` has one supporting-copy field and the note is the sentence that changes,
+--     because it carries the contact address. The anchor stays in code: whichever part of the
+--     sentence is the email address is rendered as a mailto link, so an edit can neither break the
+--     link nor inject markup. The lead paragraph above the cards is still in React.
+
+-- ─── Home ────────────────────────────────────────────────────────────────────
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.principles', 'Build principles', 'Home', 'featureGrid', true, 'published', '{
+  "heading": "Build principles",
+  "items": [
+    {"title":"Built around real problems","description":"We start with problems people and businesses actually face."},
+    {"title":"Built to grow","description":"Our products are designed to support users as their needs grow."},
+    {"title":"Built in Africa","description":"We understand the realities of African markets and build with those realities in mind."}
+  ]
+}'::jsonb, 31)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('home.mechanisms', 'Platform mechanisms', 'Home', 'featureGrid', true, 'published', '{
+  "heading": "Platform mechanisms",
+  "subheading": "Regulated in the Federal Republic of Nigeria. These are mechanisms the platform implements, not certifications we hold.",
+  "items": [
+    {"icon":"ShieldCheck","title":"Row-level security"},
+    {"icon":"Lock","title":"Per-tenant isolation"},
+    {"icon":"Check","title":"Audit logging"},
+    {"icon":"Wifi","title":"Encrypted in transit and at rest"}
+  ]
+}'::jsonb, 33)
+ON CONFLICT (key) DO NOTHING;
+
+-- ─── About ───────────────────────────────────────────────────────────────────
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.build', 'What We Build', 'About', 'prose', true, 'published', '{
+  "heading": "What We Build",
+  "body": "We find a real gap, design a product around what it takes to close it, build it to a high standard, launch it, and then operate it with the same discipline we used to build it. We don''t hand products off. We own the full lifecycle.\\n\\nWe work across areas where technical complexity meets real-world consequence: financial infrastructure and digital banking, AI-powered enterprise communication and automation, developer tools and API infrastructure, digital commerce systems, cloud infrastructure, and longer-horizon research.\\n\\nOur {liveProducts} current products are the foundation of this. **PulsePay** is our financial infrastructure platform, a Naira-native payment processing and digital banking system built for Nigerian businesses, from high-frequency transactions to compliance. **PulseAssist** is our enterprise AI platform, a communication and automation layer that helps enterprise teams cut down on procedural overhead.\\n\\nThese are the first two products in a lineup we plan to grow the same way: deliberately, and to a high standard."
+}'::jsonb, 152)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.verticals', 'Sectors we build in', 'About', 'featureGrid', true, 'published', '{
+  "heading": "Sectors we build in",
+  "items": [
+    {"title":"Financial Infrastructure","description":"Core transaction rails, digital banking architecture, and payment processing systems."},
+    {"title":"Enterprise AI","description":"Automated communication and process automation for enterprise teams."},
+    {"title":"Developer Infrastructure","description":"APIs, SDKs, and tooling that give builders a reliable foundation to scale on."},
+    {"title":"Digital Commerce","description":"Commerce platforms built for high transaction volume and institutional standards."},
+    {"title":"Cloud Infrastructure","description":"Region-aware deployment systems with security and compliance built into the architecture."},
+    {"title":"Future Technology","description":"Long-horizon research programmes exploring what comes after our current products."}
+  ]
+}'::jsonb, 153)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.leadership', 'The Founding Team', 'About', 'featureGrid', true, 'published', '{
+  "heading": "The Founding Team",
+  "subheading": "Our founding team prefers to let the work speak. Executive contact is available through corporate@enicehq.com for qualified enterprise and partnership inquiries.",
+  "items": [
+    {"kicker":"CEO","title":"Founder & Chief Executive Officer","description":"Corporate strategy, venture direction, and ecosystem growth."},
+    {"kicker":"CTO","title":"Chief Technology Officer","description":"Platform architecture, engineering standards, and infrastructure design."},
+    {"kicker":"COO","title":"Chief Operations Officer","description":"Product delivery, partner operations, and compliance execution."}
+  ]
+}'::jsonb, 154)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.closing', 'Closing statement', 'About', 'prose', true, 'published', '{
+  "heading": "— The Founders, ENICE Group",
+  "body": "\\"The infrastructure a society depends on is the most durable thing it can build. That''s what we''re here to build.\\""
+}'::jsonb, 172)
+ON CONFLICT (key) DO NOTHING;
+`,
+  },
+  {
+    id: 15,
+    name: "stored_header_and_footer_follow_the_new_information_architecture",
+    sql: /* sql */ `
+-- The header and footer are now read from the CMS instead of from hardcoded arrays in React, and
+-- \`defaultSettings()\` was rewritten to the site's real information architecture at the same time:
+-- a grouped header (Products with five children · Company · Resources with five children, CTA
+-- "Contact") and four footer columns (Products · Developers · Company · Legal).
+--
+-- A database with no stored 'header' or 'footer' row needs nothing at all — \`getSettings()\` merges
+-- stored values over \`defaultSettings()\`, so a fresh install already serves the new IA. This
+-- migration exists solely for databases seeded or saved *before* that rewrite, which hold a
+-- settings document that would otherwise keep overriding the new defaults and leave the live site
+-- on the old four-link header and three-column footer.
+--
+-- Both statements are guarded on the *previous defaults* being still intact — the retired
+-- \`nav-home\` item with a list of exactly four, and the retired \`Updates\` column with exactly three
+-- — so an operator who has added, removed or reordered anything is left completely alone. The
+-- guards also make this idempotent: once applied, neither marker is present, so a re-run matches
+-- nothing.
+--
+-- \`value ||\` merges rather than replaces, so the header's \`showCta\` / \`sticky\` toggles and the
+-- footer's tagline, copyright and \`showSocials\` survive untouched. \`site_settings\` stores one
+-- JSONB document per key in \`value\` (the section tables use \`fields\`; this table does not).
+--
+-- The JSON below is field-for-field identical to \`defaultSettings()\` in
+-- api-src/lib/repo/website.ts — same ids, labels, urls, order and children. A migrated database
+-- that disagreed with a fresh install is precisely the bug this migration exists to prevent, so
+-- the two must be edited together.
+UPDATE site_settings
+SET value = value || '{
+  "items": [
+    {"id":"nav-products","label":"Products","url":"/portfolio","visible":true,"children":[
+      {"id":"nav-pulsepay","label":"PulsePay","url":"/portfolio/pulsepay","visible":true},
+      {"id":"nav-pulseassist","label":"PulseAssist","url":"/portfolio/pulseassist","visible":true},
+      {"id":"nav-collection","label":"Payment Collection","url":"/portfolio/payment-collection","visible":true},
+      {"id":"nav-epulse","label":"ePulse","url":"/portfolio/epulse","visible":true},
+      {"id":"nav-pulsex","label":"PulseX","url":"/portfolio/pulsex","visible":true}
+    ]},
+    {"id":"nav-company","label":"Company","url":"/about","visible":true},
+    {"id":"nav-resources","label":"Resources","url":"#","visible":true,"children":[
+      {"id":"nav-docs","label":"Documentation","url":"/docs","visible":true},
+      {"id":"nav-roadmap","label":"Roadmap","url":"/roadmap","visible":true},
+      {"id":"nav-blog","label":"Blog","url":"/blog/","visible":true},
+      {"id":"nav-news","label":"News & Changelog","url":"/news/","visible":true},
+      {"id":"nav-status","label":"System Status","url":"/status","visible":true}
+    ]}
+  ],
+  "ctaLabel": "Contact",
+  "ctaUrl": "/contact"
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND jsonb_array_length(value->'items') = 4
+  AND value->'items' @> '[{"id":"nav-home"}]'::jsonb;
+
+UPDATE site_settings
+SET value = value || '{
+  "columns": [
+    {"id":"col-products","heading":"Products","links":[
+      {"id":"f-pulsepay","label":"PulsePay","url":"/portfolio/pulsepay","visible":true},
+      {"id":"f-pulseassist","label":"PulseAssist","url":"/portfolio/pulseassist","visible":true},
+      {"id":"f-collection","label":"Payment Collection","url":"/portfolio/payment-collection","visible":true},
+      {"id":"f-epulse","label":"ePulse","url":"/portfolio/epulse","visible":true},
+      {"id":"f-pulsex","label":"PulseX","url":"/portfolio/pulsex","visible":true},
+      {"id":"f-all-products","label":"All products","url":"/portfolio","visible":true}
+    ]},
+    {"id":"col-developers","heading":"Developers","links":[
+      {"id":"f-docs","label":"API documentation","url":"/docs","visible":true},
+      {"id":"f-roadmap","label":"Product roadmap","url":"/roadmap","visible":true},
+      {"id":"f-status","label":"System status","url":"/status","visible":true}
+    ]},
+    {"id":"col-company","heading":"Company","links":[
+      {"id":"f-about","label":"About ENICE Group","url":"/about","visible":true},
+      {"id":"f-contact","label":"Contact","url":"/contact","visible":true},
+      {"id":"f-blog","label":"Blog","url":"/blog/","visible":true},
+      {"id":"f-news","label":"News & changelog","url":"/news/","visible":true},
+      {"id":"f-announcements","label":"Announcements","url":"/announcements/","visible":true}
+    ]},
+    {"id":"col-legal","heading":"Legal","links":[
+      {"id":"f-privacy","label":"Privacy policy","url":"/privacy","visible":true},
+      {"id":"f-terms","label":"Terms of service","url":"/terms","visible":true},
+      {"id":"f-compliance","label":"Regulatory compliance","url":"/compliance","visible":true}
+    ]}
+  ]
+}'::jsonb,
+    updated_at = now()
+WHERE key = 'footer'
+  AND jsonb_typeof(value->'columns') = 'array'
+  AND jsonb_array_length(value->'columns') = 3
+  AND value->'columns' @> '[{"heading":"Updates"}]'::jsonb;
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

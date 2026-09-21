@@ -1,91 +1,101 @@
 import { Reveal } from "./Reveal";
+import { StyledText } from "./StyledText";
+import { CardIndex, HairlineGrid, Section, SectionIntro } from "./primitives";
+import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
 
+/**
+ * The infrastructure the products are built on.
+ *
+ * Named providers, each with what it is actually used for. Editable through the
+ * `home.infrastructure` section — this list changes as the architecture does, and needing a deploy
+ * to correct which database backs which product is how a page like this goes stale.
+ */
 const STACK = [
   {
     name: "Amazon Web Services",
     abbr: "AWS",
-    label: "Cloud Infrastructure and Security",
+    label: "Cloud infrastructure and security",
     detail:
       "Our main cloud backbone. It handles compute, storage, and edge delivery across every ENICE Group platform.",
-    index: "01",
   },
   {
     name: "Google Cloud",
     abbr: "GCP",
-    provider: "and Gemini AI",
-    label: "Core AI Engine and Computational Intelligence",
+    label: "Core AI engine and computational intelligence",
     detail:
-      "Runs PulseAssist's AI pipeline: LLM orchestration and workflow automation across tenants.",
-    index: "02",
+      "Runs PulseAssist's AI pipeline: LLM orchestration and workflow automation across tenants, with Gemini as the model layer.",
   },
   {
     name: "Supabase",
     abbr: "PG",
-    label: "Database Infrastructure and Auth",
+    label: "Database infrastructure and auth",
     detail:
       "Row-level security, real-time data streams, and managed Postgres for PulsePay's transaction systems.",
-    index: "03",
   },
-] as const;
+];
 
 export function InfraStack() {
+  const infra = useSectionFields("home.infrastructure");
+
+  const stack = fieldItems(infra, "items", STACK, (row) => {
+    const name = typeof row.title === "string" ? row.title.trim() : "";
+    if (!name) return null;
+    return {
+      name,
+      abbr: typeof row.kicker === "string" ? row.kicker.trim() : "",
+      label: typeof row.bullets === "string" ? row.bullets.split("\n")[0].trim() : "",
+      detail: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
   return (
-    <section className="border-t border-border bg-background py-28 sm:py-36">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        <Reveal>
-          <div className="mb-16 max-w-3xl">
-            <div className="text-[11px] font-bold uppercase tracking-[0.26em] text-primary">
-              Technology foundation
-            </div>
-            <h2 className="mt-4 text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl">
-              Core infrastructure
-              <br />
-              and technology stack.
-            </h2>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-              Every ENICE Group product runs on the same backbone. We chose it for reliability,
-              compliance, and scale, not because it was the easy option.
-            </p>
-          </div>
-        </Reveal>
+    <Section divider aria-labelledby="infra-heading">
+      <Reveal>
+        <SectionIntro
+          id="infra-heading"
+          eyebrow={fieldText(infra, "eyebrow", "Technology foundation")}
+          heading={fieldText(infra, "heading", "The stack underneath.")}
+          lead={fieldText(
+            infra,
+            "subheading",
+            "Every ENICE Group product runs on the same backbone. We chose it for reliability, compliance, and scale, not because it was the easy option.",
+          )}
+        />
+      </Reveal>
 
-        <div className="grid gap-px overflow-hidden rounded-2xl border border-border bg-border sm:grid-cols-2 lg:grid-cols-3">
-          {STACK.map((s, i) => (
-            <Reveal key={s.name} delay={i * 70}>
-              <div className="group flex h-full flex-col bg-background p-8 transition-colors hover:bg-secondary/50 xl:p-10">
-                <span className="font-mono text-[10px] font-bold tracking-[0.22em] text-muted-foreground/40">
-                  /{s.index}
-                </span>
-
-                <div className="mt-6 flex-1">
-                  <p className="text-[1.35rem] font-bold leading-tight tracking-tight text-foreground">
-                    {s.name}
-                  </p>
-                  {"provider" in s && s.provider && (
-                    <p className="mt-1 text-[13px] font-medium text-muted-foreground">
-                      {s.provider}
-                    </p>
-                  )}
-                  <p className="mt-1 font-mono text-[11px] font-bold tracking-[0.20em] text-muted-foreground/50">
+      <HairlineGrid columns={3} className="mt-14">
+        {stack.map((s, i) => (
+          <Reveal key={s.name} delay={i * 60} className="flex">
+            <div className="panel-interactive flex h-full w-full flex-col p-8 xl:p-10">
+              <div className="flex items-start justify-between">
+                {s.abbr && (
+                  <span className="font-mono text-[11px] font-semibold tracking-[0.2em] text-gold">
                     {s.abbr}
-                  </p>
-                </div>
+                  </span>
+                )}
+                <CardIndex value={i + 1} />
+              </div>
 
-                <div className="my-6 h-px w-full bg-border" />
+              <p className="mt-10 text-xl font-semibold leading-tight tracking-[-0.02em] text-foreground">
+                <StyledText text={s.name} accentClassName="text-gold" />
+              </p>
 
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+              <span aria-hidden className="rule-fade my-6" />
+
+              <div className="mt-auto">
+                {s.label && (
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-bone-strong">
                     {s.label}
                   </p>
-                  <p className="mt-2.5 text-[12px] leading-relaxed text-muted-foreground/70">
-                    {s.detail}
-                  </p>
-                </div>
+                )}
+                <p className="mt-2.5 text-[12px] leading-relaxed text-bone-soft">
+                  <StyledText text={s.detail} accentClassName="text-gold" />
+                </p>
               </div>
-            </Reveal>
-          ))}
-        </div>
-      </div>
-    </section>
+            </div>
+          </Reveal>
+        ))}
+      </HairlineGrid>
+    </Section>
   );
 }

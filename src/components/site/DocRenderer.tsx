@@ -7,10 +7,23 @@
  *
  * ## Two themes, one renderer
  *
- * The public blog is dark (`#09090b`); the admin preview needs the same layout to be legible on
- * light chrome. Rather than duplicate the renderer, every block reads its classes from a theme
- * object. That is what guarantees the admin's preview is structurally identical to what a visitor
- * sees — the only thing that differs is colour.
+ * The public site is dark; the admin preview needs the same layout to be legible on light chrome.
+ * Rather than duplicate the renderer, every block reads its classes from a theme object. That is
+ * what guarantees the admin's preview is structurally identical to what a visitor sees — the only
+ * thing that differs is colour. The two class sets stay separate on purpose: collapsing them would
+ * mean one of the two surfaces silently renders for the wrong background.
+ *
+ * The dark set is written in the public design-system tokens (`bone`, `gold`, `surface-*`), which
+ * are declared on `.site` — a class `__root.tsx` keeps on `<html>` for public routes and removes
+ * under /admin. So the dark theme scopes itself with that class, because the admin preview renders
+ * `theme="dark"` outside `.site` and would otherwise resolve every one of those tokens to nothing.
+ *
+ * ## Reading typography
+ *
+ * Body copy is 1.0625rem / 1.75 in `bone-strong` rather than full bone: long-form text at full
+ * brightness on a near-black canvas is fatiguing to read, and the article body is the one surface
+ * on the site where someone stays for several minutes. Code blocks and tables scroll on their own
+ * axis so a wide sample or a wide table can never push the page sideways on a phone.
  *
  * ## On `dangerouslySetInnerHTML`
  *
@@ -42,6 +55,8 @@ import { inlineHtmlToText } from "@/lib/cms/sanitize";
 export type DocTheme = "dark" | "light";
 
 interface ThemeClasses {
+  /** Token scope. Dark needs `.site`; light inherits the admin theme from the document. */
+  scope: string;
   paragraph: string;
   heading: Record<HeadingLevel, string>;
   strongList: string;
@@ -50,6 +65,7 @@ interface ThemeClasses {
   quoteAttribution: string;
   caption: string;
   divider: string;
+  media: string;
   code: {
     frame: string;
     filename: string;
@@ -66,38 +82,46 @@ interface ThemeClasses {
 
 const THEMES: Record<DocTheme, ThemeClasses> = {
   dark: {
-    paragraph: "mb-6 text-[17px] leading-8 text-zinc-300",
+    scope: "site",
+    paragraph: "mb-6 text-[1.0625rem] leading-[1.75] text-bone-strong",
+    // Generous space above a heading, tight below it: the gap belongs to the section that
+    // follows, which is what makes a long article scannable without rules between parts.
     heading: {
-      2: "mt-12 mb-4 scroll-mt-24 text-2xl font-bold tracking-tight text-white",
-      3: "mt-9 mb-3 scroll-mt-24 text-xl font-bold tracking-tight text-white",
-      4: "mt-7 mb-2 scroll-mt-24 text-lg font-semibold tracking-tight text-white",
+      2: "type-h3 mt-14 mb-4 scroll-mt-24 text-foreground",
+      3: "mt-10 mb-3 scroll-mt-24 text-[1.1875rem] font-semibold tracking-[-0.018em] text-foreground",
+      4: "mt-8 mb-2 scroll-mt-24 text-[1.0625rem] font-semibold tracking-[-0.012em] text-foreground",
     },
-    strongList: "mb-6 space-y-2 pl-6 text-[17px] leading-8 text-zinc-300",
-    listItem: "text-zinc-300",
-    quote: "my-8 border-l-2 border-blue-500 pl-5 text-lg italic leading-8 text-zinc-300",
-    quoteAttribution: "mt-3 text-sm font-medium not-italic text-zinc-500",
-    caption: "mt-3 text-center text-xs text-zinc-500",
-    divider: "my-12 h-px border-0 bg-white/[0.08]",
+    strongList: "mb-6 space-y-2 pl-6 text-[1.0625rem] leading-[1.75] text-bone-strong",
+    listItem: "text-bone-strong marker:text-bone-faint",
+    quote:
+      "my-9 border-l border-gold/40 pl-5 text-[1.0625rem] leading-[1.75] italic text-bone-strong",
+    quoteAttribution: "type-meta mt-3 not-italic",
+    caption: "type-meta mt-3 text-center",
+    divider: "my-12 h-px border-0 bg-border",
+    media: "rounded-lg border border-border",
     code: {
-      frame: "my-8 overflow-hidden rounded-xl border border-white/[0.08] bg-black/40",
+      frame: "my-8 overflow-hidden rounded-lg border border-border bg-surface-1",
       filename:
-        "border-b border-white/[0.08] bg-white/[0.02] px-4 py-2 font-mono text-[11px] text-zinc-400",
-      body: "overflow-x-auto p-4 font-mono text-[13px] leading-6 text-zinc-200",
+        "border-b border-border bg-surface-2 px-4 py-2 font-mono text-[11px] text-bone-soft",
+      body: "overflow-x-auto p-4 font-mono text-[13px] leading-6 text-bone-strong",
     },
     table: {
-      frame: "my-8 overflow-x-auto rounded-xl border border-white/[0.08]",
-      head: "bg-white/[0.03] px-4 py-3 text-left text-[11px] font-bold tracking-wider text-zinc-400 uppercase",
-      cell: "border-t border-white/[0.06] px-4 py-3 text-sm text-zinc-300",
+      frame: "my-8 overflow-x-auto rounded-lg border border-border",
+      head: "bg-surface-1 px-4 py-3 text-left text-[11px] font-semibold tracking-[0.14em] text-bone-soft uppercase",
+      cell: "border-t border-border px-4 py-3 text-sm text-bone-strong",
     },
+    // The warm accent carries "warning" and the one non-warm accent carries "success"; info is
+    // deliberately neutral so the common case does not colour an article.
     callout: {
-      info: "border-blue-500/25 bg-blue-500/[0.07] text-zinc-200",
-      success: "border-emerald-500/25 bg-emerald-500/[0.07] text-zinc-200",
-      warning: "border-amber-500/25 bg-amber-500/[0.07] text-zinc-200",
-      danger: "border-red-500/25 bg-red-500/[0.07] text-zinc-200",
+      info: "border-border bg-surface-1 text-bone-strong",
+      success: "border-positive/25 bg-positive/[0.07] text-bone-strong",
+      warning: "border-gold/25 bg-gold/[0.07] text-bone-strong",
+      danger: "border-destructive/30 bg-destructive/[0.07] text-bone-strong",
     },
-    calloutTitle: "mb-1.5 text-sm font-bold text-white",
+    calloutTitle: "mb-1.5 text-sm font-semibold text-foreground",
   },
   light: {
+    scope: "",
     paragraph: "mb-6 text-[17px] leading-8 text-foreground/85",
     heading: {
       2: "mt-12 mb-4 scroll-mt-24 text-2xl font-bold tracking-tight text-foreground",
@@ -110,6 +134,7 @@ const THEMES: Record<DocTheme, ThemeClasses> = {
     quoteAttribution: "mt-3 text-sm font-medium not-italic text-muted-foreground",
     caption: "mt-3 text-center text-xs text-muted-foreground",
     divider: "my-12 h-px border-0 bg-border",
+    media: "rounded-xl border border-border",
     code: {
       frame: "my-8 overflow-hidden rounded-xl border border-border bg-secondary",
       filename:
@@ -132,13 +157,13 @@ const THEMES: Record<DocTheme, ThemeClasses> = {
 };
 
 /**
- * Link styling, applied to the container rather than per anchor.
+ * Link, inline-code and strong styling, applied to the container rather than per element.
  *
- * Inline links arrive as raw HTML, so they cannot carry Tailwind classes of their own. A
- * descendant selector on the wrapper styles them without needing to rewrite the markup.
+ * Inline content arrives as raw HTML, so it cannot carry Tailwind classes of its own. A descendant
+ * selector on the wrapper styles it without needing to rewrite the markup.
  */
 const LINK_CLASSES: Record<DocTheme, string> = {
-  dark: "[&_a]:font-medium [&_a]:text-blue-400 [&_a]:underline [&_a]:decoration-blue-400/30 [&_a]:underline-offset-2 [&_a:hover]:decoration-blue-400 [&_code]:rounded [&_code]:bg-white/[0.07] [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em] [&_code]:text-blue-300 [&_strong]:font-bold [&_strong]:text-white",
+  dark: "[&_a]:font-medium [&_a]:text-gold [&_a]:underline [&_a]:decoration-gold/40 [&_a]:underline-offset-2 [&_a:hover]:decoration-gold [&_code]:rounded [&_code]:border [&_code]:border-border [&_code]:bg-surface-2 [&_code]:px-1.5 [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-gold [&_strong]:font-semibold [&_strong]:text-foreground",
   light:
     "[&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_a]:decoration-primary/30 [&_a]:underline-offset-2 [&_a:hover]:decoration-primary [&_code]:rounded [&_code]:bg-secondary [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em] [&_code]:text-primary [&_strong]:font-bold [&_strong]:text-foreground",
 };
@@ -157,6 +182,8 @@ function Heading({
   const className = theme.heading[block.level];
   const html = { __html: block.html };
 
+  // A document's top level is `h2`: the page's single `h1` is the article title, so starting the
+  // body any higher would skip a level in the outline.
   if (block.level === 2) return <h2 id={id} className={className} dangerouslySetInnerHTML={html} />;
   if (block.level === 3) return <h3 id={id} className={className} dangerouslySetInnerHTML={html} />;
   return <h4 id={id} className={className} dangerouslySetInnerHTML={html} />;
@@ -188,14 +215,20 @@ function Quote({ block, theme }: { block: QuoteBlock; theme: ThemeClasses }) {
 function Figure({ block, theme }: { block: ImageBlock; theme: ThemeClasses }) {
   return (
     <figure className={block.width === "full" ? "my-10 lg:-mx-24" : "my-8"}>
+      {/*
+        Lazy + async decoding: body images are almost always below the fold, and this keeps them
+        off the critical path without any per-image decision by the author.
+
+        The ratio is fixed rather than intrinsic because the block schema carries no dimensions —
+        without it, every image in a post shifts the paragraphs below it as it loads, which is at
+        its worst for the reader who is already part-way down the article.
+      */}
       <img
         src={block.url}
         alt={block.alt}
-        // Lazy + async decoding: body images are almost always below the fold, and this keeps
-        // them off the critical path without any per-image decision by the author.
         loading="lazy"
         decoding="async"
-        className="w-full rounded-2xl object-cover"
+        className={`aspect-[16/9] w-full object-cover ${theme.media}`}
       />
       {block.caption && <figcaption className={theme.caption}>{block.caption}</figcaption>}
     </figure>
@@ -212,12 +245,12 @@ function Video({ block, theme }: { block: VideoBlock; theme: ThemeClasses }) {
           src={embed}
           controls
           preload="metadata"
-          className="w-full rounded-2xl"
+          className={`aspect-video w-full ${theme.media}`}
           // Poster frames are not part of the block schema; metadata preload gives the browser
           // enough to show a first frame without downloading the whole file.
         />
       ) : (
-        <div className="relative aspect-video w-full overflow-hidden rounded-2xl">
+        <div className={`relative aspect-video w-full overflow-hidden ${theme.media}`}>
           <iframe
             src={embed}
             title={block.caption || "Embedded video"}
@@ -234,6 +267,8 @@ function Video({ block, theme }: { block: VideoBlock; theme: ThemeClasses }) {
 }
 
 function Table({ block, theme }: { block: TableBlock; theme: ThemeClasses }) {
+  // The frame scrolls on its own axis: a wide table is common in a changelog, and without this
+  // one it widens the document and breaks the whole page on a phone.
   return (
     <figure className={theme.table.frame}>
       <table className="w-full border-collapse">
@@ -288,7 +323,7 @@ const CALLOUT_ICONS: Record<CalloutBlock["variant"], string> = {
 function Callout({ block, theme }: { block: CalloutBlock; theme: ThemeClasses }) {
   return (
     <aside
-      className={`my-8 flex gap-3 rounded-xl border px-5 py-4 ${theme.callout[block.variant]}`}
+      className={`my-8 flex gap-3 rounded-lg border px-5 py-4 ${theme.callout[block.variant]}`}
     >
       <span
         aria-hidden="true"
@@ -321,7 +356,12 @@ export function DocRenderer({ doc, theme = "dark", className = "" }: DocRenderer
   const classes = THEMES[theme];
 
   return (
-    <div className={`${LINK_CLASSES[theme]} ${className}`} data-allow-select>
+    // `data-allow-select` is not optional: selection is disabled globally on the site, and prose a
+    // reader cannot copy out of is a real defect rather than a styling detail.
+    <div
+      className={`${classes.scope} ${LINK_CLASSES[theme]} ${className}`.trim()}
+      data-allow-select
+    >
       {doc.blocks.map((block) => {
         switch (block.type) {
           case "heading":
@@ -385,14 +425,18 @@ export function DocTableOfContents({
   return (
     <nav
       aria-label="On this page"
-      className={`mb-10 rounded-xl border px-5 py-4 ${
-        isDark ? "border-white/[0.07] bg-white/[0.02]" : "border-border bg-secondary"
-      }`}
+      className={
+        isDark
+          ? "site panel-quiet mb-10 px-5 py-4"
+          : "mb-10 rounded-xl border border-border bg-secondary px-5 py-4"
+      }
     >
       <p
-        className={`mb-3 text-[11px] font-bold tracking-[0.18em] uppercase ${
-          isDark ? "text-zinc-500" : "text-muted-foreground"
-        }`}
+        className={
+          isDark
+            ? "eyebrow mb-3"
+            : "mb-3 text-[11px] font-bold tracking-[0.18em] text-muted-foreground uppercase"
+        }
       >
         On this page
       </p>
@@ -403,7 +447,7 @@ export function DocTableOfContents({
               href={`#${heading.id}`}
               className={`text-sm transition-colors ${
                 isDark
-                  ? "text-zinc-400 hover:text-blue-400"
+                  ? "text-bone-soft hover:text-gold"
                   : "text-muted-foreground hover:text-primary"
               }`}
             >

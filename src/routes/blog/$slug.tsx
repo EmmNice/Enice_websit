@@ -1,8 +1,8 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowUpRight } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteShell } from "@/components/site/SiteShell";
 import { ArticleView } from "@/components/site/ArticleView";
+import { Section } from "@/components/site/primitives";
 import { SITE_URL } from "@/lib/site";
 import {
   categoryBadgeClasses,
@@ -10,6 +10,7 @@ import {
   formatPublishedDate,
   type PublicArticle,
 } from "@/lib/cms/public-client";
+import { cn } from "@/lib/utils";
 
 /**
  * A blog article.
@@ -18,12 +19,20 @@ import {
  * `ArticleView`, which the admin panel's preview also renders — so what an author previews is
  * produced by the same code that serves this page.
  */
+
+/**
+ * The "more from" list under an article.
+ *
+ * Each entry is one link with nothing interactive inside it, so a keyboard user gets one stop per
+ * post rather than two, and the heading level continues the article's outline (`h2` under the
+ * article title, `h3` per post).
+ */
 function RelatedPosts({ related }: { related: PublicArticle["related"] }) {
   if (related.length === 0) return null;
 
   return (
-    <section className="mt-16 border-t border-white/[0.07] pt-10">
-      <h2 className="mb-6 text-[11px] font-bold tracking-[0.22em] text-zinc-500 uppercase">
+    <section className="mt-16 border-t border-border pt-10" aria-labelledby="related-heading">
+      <h2 id="related-heading" className="eyebrow mb-6">
         More from ENICE Group
       </h2>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -32,24 +41,28 @@ function RelatedPosts({ related }: { related: PublicArticle["related"] }) {
             key={post.id}
             to="/blog/$slug"
             params={{ slug: post.slug }}
-            className="group rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 transition-colors hover:border-blue-500/30 hover:bg-white/[0.04]"
+            className="panel panel-interactive group flex flex-col p-5"
           >
             {post.category && (
               <span
-                className={`mb-2 inline-flex w-fit items-center rounded-full border px-2 py-0.5 text-[9px] font-bold tracking-[0.16em] ${categoryBadgeClasses(post.category)}`}
+                className={cn(
+                  "mb-2 inline-flex w-fit items-center rounded-full border px-2 py-0.5",
+                  "text-[9px] font-semibold tracking-[0.16em]",
+                  categoryBadgeClasses(post.category),
+                )}
               >
                 {post.category.toUpperCase()}
               </span>
             )}
-            <h3 className="mb-1.5 text-sm leading-snug font-bold text-white transition-colors group-hover:text-blue-400">
+            <h3 className="text-sm leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-gold">
               {post.title}
             </h3>
-            <p className="mb-2 text-[11px] text-zinc-500">
-              {formatPublishedDate(post.publishedAt)}
+            <p className="type-meta tnum mt-1.5 mb-2">{formatPublishedDate(post.publishedAt)}</p>
+            <p className="line-clamp-2 text-[13px] leading-relaxed text-bone-soft">
+              {post.excerpt}
             </p>
-            <p className="line-clamp-2 text-[13px] leading-relaxed text-zinc-400">{post.excerpt}</p>
-            <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-blue-400 opacity-0 transition-opacity group-hover:opacity-100">
-              Read <ArrowUpRight className="h-3 w-3" />
+            <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-bone-faint transition-colors group-hover:text-gold">
+              Read <ArrowUpRight aria-hidden className="h-3 w-3" />
             </span>
           </Link>
         ))}
@@ -62,31 +75,26 @@ function ArticlePage() {
   const { item, related } = Route.useLoaderData();
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
-      <SiteHeader />
-
-      <main className="px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-2xl">
-          <ArticleView
-            article={{
-              title: item.title,
-              excerpt: item.excerpt,
-              category: item.category,
-              tags: item.tags,
-              coverImageUrl: item.coverImageUrl,
-              author: item.author,
-              publishedAt: item.publishedAt,
-              body: item.body,
-            }}
-            theme="dark"
-            backLink={{ label: "Back to Blog", href: "/blog/" }}
-            footerSlot={<RelatedPosts related={related} />}
-          />
-        </div>
-      </main>
-
-      <SiteFooter />
-    </div>
+    <SiteShell>
+      {/* `prose` is the 46rem measure: the reading column, not the page width. */}
+      <Section spacing="loose" container="prose">
+        <ArticleView
+          article={{
+            title: item.title,
+            excerpt: item.excerpt,
+            category: item.category,
+            tags: item.tags,
+            coverImageUrl: item.coverImageUrl,
+            author: item.author,
+            publishedAt: item.publishedAt,
+            body: item.body,
+          }}
+          theme="dark"
+          backLink={{ label: "Back to Blog", href: "/blog/" }}
+          footerSlot={<RelatedPosts related={related} />}
+        />
+      </Section>
+    </SiteShell>
   );
 }
 

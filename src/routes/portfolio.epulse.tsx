@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
+import type { LucideIcon } from "lucide-react";
 import {
-  ArrowUpRight,
+  Boxes,
   Wallet,
   Send,
   Gift,
@@ -12,11 +13,19 @@ import {
   Users,
   Briefcase,
 } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteShell } from "@/components/site/SiteShell";
 import { StyledText } from "@/components/site/StyledText";
-import { useSectionFields, fieldText } from "@/lib/cms/use-section";
-import { SHADOW_CARD } from "@/lib/design";
+import { Reveal } from "@/components/site/Reveal";
+import {
+  Cta,
+  HairlineGrid,
+  IconTile,
+  Panel,
+  Section,
+  SectionIntro,
+  Tag,
+} from "@/components/site/primitives";
+import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/epulse")({
@@ -45,6 +54,41 @@ export const Route = createFileRoute("/portfolio/epulse")({
     ]),
   component: EPulsePage,
 });
+
+const WAITLIST_MAILTO = "mailto:corporate@enicehq.com?subject=Join%20the%20ePulse%20waitlist";
+
+// ─── Fallback content ─────────────────────────────────────────────────────────
+//
+// The blocks below are the *fallbacks* for the page's CMS sections, not its only source of
+// content. Each band reads `portfolio.epulse.*` and overlays whatever an administrator has
+// published, so the copy here is what paints before the CMS answers and what survives an outage —
+// `useSectionFields` treats a degraded bootstrap as "not loaded" on purpose. See
+// `src/lib/cms/use-section.ts`.
+
+/**
+ * Icons an editor may name on a CMS-managed card.
+ *
+ * A curated map rather than importing all of lucide, which would add a large amount of JavaScript
+ * to the public bundle for the sake of a handful of names. Anything unrecognised falls back to a
+ * neutral icon, so a typo degrades instead of leaving an empty tile. Same approach as
+ * `CARD_ICONS` in src/routes/index.tsx.
+ */
+const CARD_ICONS: Record<string, LucideIcon> = {
+  Boxes,
+  Briefcase,
+  Building2,
+  CreditCard,
+  Gift,
+  Globe2,
+  Plane,
+  Send,
+  Users,
+  Wallet,
+};
+
+function cardIcon(name: string): LucideIcon {
+  return CARD_ICONS[name] ?? Boxes;
+}
 
 // ─── Vision feature list ───────────────────────────────────────────────────────
 
@@ -106,213 +150,220 @@ const FOR_WHO = [
   },
 ];
 
+/**
+ * Launch framing, as facts rather than a status light.
+ *
+ * ePulse has no launch date, so the pair below says exactly that. The previous treatment wrapped
+ * the same words in a pulsing dot borrowed from live-status indicators, which read as telemetry on
+ * a product that does not exist yet. The stage label is warm because "in development" is a
+ * lifecycle state; `positive` is reserved for things that are genuinely available.
+ *
+ * The gold treatment is no longer stored per row. A `statistics` section carries a value and a
+ * label and nothing else, which is correct: which figure is accented is a styling decision, not
+ * content an editor should have to make. The first row is the status row, and that is the one the
+ * accent belongs to — so the emphasis is derived from position at render time.
+ */
+const LAUNCH_FACTS = [
+  { label: "Status", value: "In Development" },
+  { label: "Expected Launch", value: "To Be Announced" },
+];
+
+/**
+ * The currencies named in the page copy, as a decorative supporting row.
+ *
+ * Flag emoji were dropped: regional-indicator pairs have no glyph in the system font on Windows,
+ * where Chrome and Edge render them as two empty boxes, and the ISO code carries the meaning.
+ */
+const CURRENCIES = ["USD", "GBP", "EUR", "NGN", "CAD", "AUD"];
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function EPulsePage() {
   // Page header, editable through the `portfolio.epulse` section.
   const header = useSectionFields("portfolio.epulse");
+  const factsSection = useSectionFields("portfolio.epulse.facts");
+  const audienceSection = useSectionFields("portfolio.epulse.audience");
+  const visionSection = useSectionFields("portfolio.epulse.vision");
+
+  // Launch facts. Rows without a value are skipped rather than rendered blank; the first row takes
+  // the accent, see `LAUNCH_FACTS`.
+  const launchFacts = fieldItems(factsSection, "items", LAUNCH_FACTS, (row) => {
+    const value = typeof row.value === "string" ? row.value.trim() : "";
+    const label = typeof row.label === "string" ? row.label.trim() : "";
+    return value ? { value, label } : null;
+  });
+
+  // Who the platform is for. A row's `title` is the tile's label.
+  const forWho = fieldItems(audienceSection, "items", FOR_WHO, (row) => {
+    const label = typeof row.title === "string" ? row.title.trim() : "";
+    if (!label) return null;
+    return {
+      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
+      label,
+      desc: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
+  const vision = fieldItems(visionSection, "items", VISION, (row) => {
+    const title = typeof row.title === "string" ? row.title.trim() : "";
+    if (!title) return null;
+    return {
+      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
+      title,
+      desc: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
 
   return (
-    <div className="min-h-dvh bg-background text-foreground antialiased">
-      <SiteHeader />
-      <main id="main">
-        {/* ── Hero ── */}
-        <section className="relative overflow-hidden border-b border-border bg-background">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10"
-            style={{
-              background:
-                "radial-gradient(ellipse 60% 50% at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 70%)",
-            }}
+    <SiteShell>
+      {/* ═══ HERO ═════════════════════════════════════════════════════════════ */}
+      <Section
+        spacing="loose"
+        container="narrow"
+        glow="spread"
+        grid
+        aria-labelledby="epulse-heading"
+      >
+        <div className="flex flex-col items-center text-center" data-allow-select>
+          <Tag tone="warm">Coming Soon</Tag>
+
+          {/*
+            Hand-built rather than `SectionIntro` for one reason: the CMS fallback heading is
+            `e[[Pulse]]`, and `SectionIntro` renders a `[[highlight]]` in gold. At display size that
+            would put almost the whole product name in the accent colour, which is the one thing the
+            warm palette is not for. The highlight run therefore resolves to bone here — the same
+            decision the homepage hero documents — so the heading stays a heading and the accent
+            stays an accent. Nothing about the editable string changes.
+          */}
+          <h1 id="epulse-heading" className="type-display mt-8 max-w-3xl text-foreground">
+            <StyledText
+              text={fieldText(header, "heading", "e[[Pulse]]")}
+              accentClassName="text-foreground"
+            />
+          </h1>
+
+          <p className="type-lead mt-6 max-w-2xl">
+            <StyledText
+              text={fieldText(
+                header,
+                "subheading",
+                "ePulse is ENICE Group's upcoming global financial platform, built for people who **earn, send, and spend money across borders**. Designed for freelancers, remote workers, creators, and global businesses, ePulse aims to make international finance *simple and accessible*.",
+              )}
+              accentClassName="text-gold"
+              boldClassName="font-semibold text-foreground"
+            />
+          </p>
+
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+            <Cta to={WAITLIST_MAILTO} size="lg" icon="external">
+              Join the Waitlist
+            </Cta>
+            <Cta to="/portfolio" variant="secondary" size="lg">
+              Back to Products
+            </Cta>
+          </div>
+
+          <dl className="mt-14 grid w-full max-w-2xl grid-cols-2 gap-3 text-left">
+            {launchFacts.map((f, i) => (
+              <Panel key={`${f.label}-${i}`} tone="quiet" className="p-4">
+                <dt className="text-[10px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+                  {f.label}
+                </dt>
+                <dd
+                  className={`mt-1 text-sm font-semibold ${i === 0 ? "text-gold" : "text-foreground"}`}
+                >
+                  {f.value}
+                </dd>
+              </Panel>
+            ))}
+          </dl>
+
+          <ul className="mt-10 flex flex-wrap items-center justify-center gap-2">
+            {CURRENCIES.map((code) => (
+              <li key={code}>
+                <Tag>{code}</Tag>
+              </li>
+            ))}
+            <li>
+              <Tag className="text-bone-faint">+ more</Tag>
+            </li>
+          </ul>
+        </div>
+      </Section>
+
+      {/* ═══ WHO IT'S FOR ═════════════════════════════════════════════════════ */}
+      <Section divider aria-labelledby="epulse-audience-heading">
+        <Reveal>
+          <SectionIntro
+            id="epulse-audience-heading"
+            align="center"
+            eyebrow={fieldText(audienceSection, "eyebrow", "Built For")}
+            heading={fieldText(audienceSection, "heading", "People who live and work globally.")}
           />
+        </Reveal>
 
-          <div className="mx-auto max-w-5xl px-5 py-24 text-center sm:px-8 sm:py-32">
-            {/* Status badge */}
-            <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 text-[11px] font-semibold tracking-[0.10em] text-primary">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-              </span>
-              Coming Soon
-            </div>
-
-            <h1 className="mx-auto max-w-3xl text-balance text-5xl font-semibold leading-[1.03] tracking-[-0.03em] text-foreground sm:text-6xl md:text-7xl">
-              <StyledText text={fieldText(header, "heading", "e[[Pulse]]")} />
-            </h1>
-
-            <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-              <StyledText
-                text={fieldText(
-                  header,
-                  "subheading",
-                  "ePulse is ENICE Group's upcoming global financial platform, built for people who **earn, send, and spend money across borders**. Designed for freelancers, remote workers, creators, and global businesses, ePulse aims to make international finance *simple and accessible*.",
-                )}
-                boldClassName="font-semibold text-foreground"
-              />
-            </p>
-
-            {/* CTAs */}
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href="mailto:corporate@enicehq.com?subject=Join%20the%20ePulse%20waitlist"
-                className="group inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-              >
-                Join the Waitlist
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-              </a>
-              <Link
-                to="/portfolio"
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-6 py-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
-              >
-                Back to Products
-              </Link>
-            </div>
-
-            {/* Status meta */}
-            <div className="mx-auto mt-14 grid max-w-2xl grid-cols-2 gap-3">
-              <div
-                className="rounded-lg border border-border bg-background p-4 text-left"
-                style={{ boxShadow: SHADOW_CARD }}
-              >
-                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Status
-                </div>
-                <div className="mt-1 text-sm font-semibold text-foreground">In Development</div>
+        <HairlineGrid columns={4} className="mt-14">
+          {forWho.map((f, i) => (
+            <Reveal key={f.label} delay={i * 60} className="flex">
+              <div className="panel-interactive flex h-full flex-col p-8 text-center">
+                <IconTile icon={f.icon} className="mx-auto" />
+                <h3 className="mt-5 text-[15px] font-semibold text-foreground">{f.label}</h3>
+                <p className="type-body mt-2 text-[13px]">{f.desc}</p>
               </div>
-              <div
-                className="rounded-lg border border-border bg-background p-4 text-left"
-                style={{ boxShadow: SHADOW_CARD }}
-              >
-                <div className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                  Expected Launch
-                </div>
-                <div className="mt-1 text-sm font-semibold text-foreground">To Be Announced</div>
-              </div>
-            </div>
+            </Reveal>
+          ))}
+        </HairlineGrid>
+      </Section>
 
-            {/* Currency pills */}
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
-              {[
-                { flag: "🇺🇸", code: "USD" },
-                { flag: "🇬🇧", code: "GBP" },
-                { flag: "🇪🇺", code: "EUR" },
-                { flag: "🇳🇬", code: "NGN" },
-                { flag: "🇨🇦", code: "CAD" },
-                { flag: "🇦🇺", code: "AUD" },
-              ].map((c) => (
-                <span
-                  key={c.code}
-                  className="rounded-full border border-border bg-secondary px-3 py-1.5 text-[12px] font-semibold text-foreground/80"
-                >
-                  {c.flag} {c.code}
-                </span>
-              ))}
-              <span className="rounded-full border border-border bg-secondary px-3 py-1.5 text-[12px] font-medium text-muted-foreground">
-                + more
-              </span>
-            </div>
+      {/* ═══ THE VISION ═══════════════════════════════════════════════════════ */}
+      <Section tone="recessed" divider aria-labelledby="epulse-vision-heading">
+        <Reveal>
+          <SectionIntro
+            id="epulse-vision-heading"
+            align="center"
+            eyebrow={fieldText(visionSection, "eyebrow", "The Vision")}
+            heading={fieldText(visionSection, "heading", "International finance, made simple.")}
+            lead={fieldText(
+              visionSection,
+              "subheading",
+              "The ePulse platform includes everything you need to live your financial life without borders, from day-to-day spending to long-distance transfers to lifestyle services.",
+            )}
+          />
+        </Reveal>
+
+        <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {vision.map((v, i) => (
+            <Reveal key={v.title} as="li" delay={i * 60} className="flex">
+              <Panel interactive className="flex h-full w-full flex-col p-6">
+                <IconTile icon={v.icon} size="sm" />
+                <h3 className="type-h3 mt-5 text-[16px] text-foreground">{v.title}</h3>
+                <p className="type-body mt-2">{v.desc}</p>
+              </Panel>
+            </Reveal>
+          ))}
+        </ul>
+      </Section>
+
+      {/* ═══ WAITLIST ═════════════════════════════════════════════════════════ */}
+      <Section container="narrow" divider glow="center" aria-labelledby="epulse-waitlist-heading">
+        <Reveal>
+          <SectionIntro
+            id="epulse-waitlist-heading"
+            align="center"
+            eyebrow="Be First In Line"
+            heading="Get notified when we launch."
+            lead="Join the ePulse waitlist to receive launch updates, early access opportunities, and priority onboarding as we build toward launch."
+          />
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Cta to={WAITLIST_MAILTO} size="lg" icon="external">
+              Join the Waitlist
+            </Cta>
+            <Cta to="/portfolio" variant="secondary" size="lg">
+              View All Products
+            </Cta>
           </div>
-        </section>
-
-        {/* ── Who it's for ── */}
-        <section className="border-b border-border bg-background py-16 sm:py-20">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            <div className="mb-10 text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Built For
-              </div>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                People who live and work globally.
-              </h2>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {FOR_WHO.map((f) => (
-                <div
-                  key={f.label}
-                  className="rounded-xl border border-border bg-background p-6 text-center"
-                  style={{ boxShadow: SHADOW_CARD }}
-                >
-                  <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/15">
-                    <f.icon className="h-6 w-6" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="mt-4 text-[15px] font-semibold text-foreground">{f.label}</h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">{f.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── The Vision ── */}
-        <section className="bg-secondary py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                The Vision
-              </div>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                International finance, made simple.
-              </h2>
-              <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-                The ePulse platform includes everything you need to live your financial life without
-                borders, from day-to-day spending to long-distance transfers to lifestyle services.
-              </p>
-            </div>
-
-            <ul className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {VISION.map((v) => (
-                <li
-                  key={v.title}
-                  className="rounded-xl border border-border bg-background p-6"
-                  style={{ boxShadow: SHADOW_CARD }}
-                >
-                  <div className="grid h-11 w-11 place-items-center rounded-lg bg-primary/8 text-primary ring-1 ring-primary/15">
-                    <v.icon className="h-5 w-5" strokeWidth={1.75} />
-                  </div>
-                  <h3 className="mt-5 text-[16px] font-semibold text-foreground">{v.title}</h3>
-                  <p className="mt-2 text-[13.5px] leading-relaxed text-muted-foreground">
-                    {v.desc}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
-        {/* ── CTA ── */}
-        <section className="border-t border-border bg-background py-20">
-          <div className="mx-auto max-w-2xl px-5 text-center sm:px-8">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              Be First In Line
-            </div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Get notified when we launch.
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-muted-foreground">
-              Join the ePulse waitlist to receive launch updates, early access opportunities, and
-              priority onboarding as we build toward launch.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href="mailto:corporate@enicehq.com?subject=Join%20the%20ePulse%20waitlist"
-                className="group inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-              >
-                Join the Waitlist
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-              </a>
-              <Link
-                to="/portfolio"
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-7 py-3.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
-              >
-                View All Products
-              </Link>
-            </div>
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </div>
+        </Reveal>
+      </Section>
+    </SiteShell>
   );
 }

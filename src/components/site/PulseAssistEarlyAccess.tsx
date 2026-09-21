@@ -17,10 +17,19 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { isPulseAssistEarlyAccessActive } from "@/lib/beta-announcement";
+import { cn } from "@/lib/utils";
 
+// ─── Form treatments ────────────────────────────────────────────────────────
+//
+// The same three spellings the contact form uses, so a field looks identical wherever a visitor
+// meets one. Inputs sit on `surface-1` — a small lift of the canvas — with a hairline border,
+// which is what makes a field legible on a near-black page without painting a white box on it.
+// There is no bespoke focus ring: `:focus-visible` is defined once globally in `styles.css`, and
+// the previous `outline-none` here suppressed it.
+
+const labelClass = "block text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-soft";
 const inputClass =
-  "mt-1.5 w-full rounded-md border border-border bg-background px-3 py-2.5 text-[14px] text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/15 disabled:opacity-60 aria-[invalid=true]:border-destructive aria-[invalid=true]:focus:ring-destructive/15";
-const labelClass = "text-[12px] font-semibold text-foreground";
+  "mt-2 block w-full rounded-md border border-border bg-surface-1 px-3.5 py-2.5 text-sm text-foreground transition-colors placeholder:text-bone-faint hover:border-hairline-strong disabled:opacity-60 aria-[invalid=true]:border-destructive";
 const errorClass = "mt-1.5 text-[12px] text-destructive";
 
 type Phase = "form" | "submitting" | "done";
@@ -123,7 +132,7 @@ export function PulseAssistEarlyAccessModal({
         // `dvh` keeps the sheet inside the visual viewport when a mobile keyboard opens.
         // `gap-0` / `p-0` neutralise the shared DialogContent grid padding so the header
         // can carry its own divider and the body can scroll independently.
-        className="flex max-h-[92dvh] w-[calc(100vw-2rem)] max-w-lg flex-col gap-0 overflow-hidden rounded-xl border-border bg-background p-0 sm:w-full sm:rounded-xl"
+        className="flex max-h-[92dvh] w-[calc(100vw-2rem)] max-w-lg flex-col gap-0 overflow-hidden rounded-xl border-border bg-surface-2 p-0 sm:w-full sm:rounded-xl"
         onEscapeKeyDown={(e) => submitting && e.preventDefault()}
         onInteractOutside={(e) => submitting && e.preventDefault()}
         onCloseAutoFocus={(e) => {
@@ -133,17 +142,18 @@ export function PulseAssistEarlyAccessModal({
       >
         {phase === "done" ? (
           <div className="overflow-y-auto px-6 py-10 text-center sm:px-8">
+            {/* Success is the one sanctioned use of the positive accent. */}
             <div
-              className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20"
+              className="mx-auto grid h-12 w-12 place-items-center rounded-full border border-positive/25 bg-positive/[0.08] text-positive"
               aria-hidden="true"
             >
-              <Check className="h-6 w-6 text-primary" strokeWidth={2.25} />
+              <Check className="h-6 w-6" strokeWidth={2.25} />
             </div>
             <DialogHeader className="mt-5">
               <DialogTitle className="text-center text-2xl font-semibold tracking-tight text-foreground">
                 You&apos;re on the list.
               </DialogTitle>
-              <DialogDescription className="mt-3 text-center text-[14px] leading-relaxed text-muted-foreground">
+              <DialogDescription className="mt-3 text-center text-[14px] leading-relaxed text-bone-soft">
                 Thank you for your interest in PulseAssist. We&apos;ve received your request and
                 will contact you by email when you&apos;re eligible for early access.
               </DialogDescription>
@@ -156,7 +166,7 @@ export function PulseAssistEarlyAccessModal({
               type="button"
               onClick={() => requestClose(false)}
               autoFocus
-              className="mt-8 inline-flex w-full items-center justify-center rounded-md bg-primary px-6 py-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:outline-none sm:w-auto"
+              className="btn btn-primary mt-8 w-full sm:w-auto"
             >
               Close
             </button>
@@ -165,13 +175,11 @@ export function PulseAssistEarlyAccessModal({
           <>
             {/* `pr-14` reserves room for the shared DialogContent close button. */}
             <DialogHeader className="shrink-0 border-b border-border px-6 pt-5 pr-14 pb-4 text-left sm:px-8 sm:pt-6 sm:pr-14 sm:pb-5">
-              <div className="text-[11px] font-semibold tracking-[0.24em] text-primary uppercase">
-                PulseAssist
-              </div>
+              <p className="eyebrow">PulseAssist</p>
               <DialogTitle className="mt-1.5 text-xl font-semibold tracking-tight text-foreground sm:mt-2 sm:text-2xl">
                 Get Early Access to PulseAssist
               </DialogTitle>
-              <DialogDescription className="text-[13px] leading-relaxed text-muted-foreground sm:text-[14px]">
+              <DialogDescription className="text-[13px] leading-relaxed text-bone-soft sm:text-[14px]">
                 PulseAssist is preparing for its next stage. Join the early-access list and be among
                 the first businesses to experience it.
               </DialogDescription>
@@ -290,7 +298,7 @@ export function PulseAssistEarlyAccessModal({
                     ))}
                   </select>
                   <ChevronDown
-                    className="pointer-events-none absolute top-1/2 right-3 mt-[3px] h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                    className="pointer-events-none absolute top-1/2 right-3 mt-[3px] h-4 w-4 -translate-y-1/2 text-bone-faint"
                     aria-hidden="true"
                   />
                 </div>
@@ -304,7 +312,7 @@ export function PulseAssistEarlyAccessModal({
               <div>
                 <label className={labelClass} htmlFor={`${id}-need`}>
                   What do you want PulseAssist to help your business with?{" "}
-                  <span className="font-normal text-muted-foreground">(optional)</span>
+                  <span className="font-normal text-bone-faint">(optional)</span>
                 </label>
                 <textarea
                   id={`${id}-need`}
@@ -328,7 +336,7 @@ export function PulseAssistEarlyAccessModal({
                     <span />
                   )}
                   {needRemaining <= 120 && (
-                    <span className="shrink-0 text-[11px] text-muted-foreground tabular-nums">
+                    <span className="tnum shrink-0 text-[11px] text-bone-faint">
                       {needRemaining} characters left
                     </span>
                   )}
@@ -352,17 +360,13 @@ export function PulseAssistEarlyAccessModal({
               {formError && (
                 <p
                   role="alert"
-                  className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2.5 text-[13px] break-words text-destructive"
+                  className="rounded-md border border-destructive/30 bg-destructive/[0.08] px-3 py-2.5 text-[13px] break-words text-destructive"
                 >
                   {formError}
                 </p>
               )}
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 text-[13px] font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-              >
+              <button type="submit" disabled={submitting} className="btn btn-primary w-full">
                 {submitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -373,7 +377,7 @@ export function PulseAssistEarlyAccessModal({
                 )}
               </button>
 
-              <p className="text-center text-[11px] leading-relaxed text-muted-foreground">
+              <p className="text-center text-[11px] leading-relaxed text-bone-faint">
                 We use your details only to review early-access requests for PulseAssist. Submitting
                 this form does not grant product access.
               </p>
@@ -406,7 +410,15 @@ export function PulseAssistEarlyAccessButton({
   if (!isPulseAssistEarlyAccessActive()) return null;
   return (
     <>
-      <button type="button" onClick={() => setOpen(true)} className={className}>
+      {/* `className` is merged, never replaced: call sites own the button treatment (they pass
+          `btn btn-primary …`). `group` is added here so the trailing arrow animates even if a
+          caller forgets it. */}
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-haspopup="dialog"
+        className={cn("group", className)}
+      >
         {label}
         {showIcon && (
           <ArrowUpRight

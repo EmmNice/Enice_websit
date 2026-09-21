@@ -13,12 +13,26 @@
  * It accepts a loose `ArticleViewModel` rather than a `ContentItem` so the preview can pass
  * in-progress editor state — including a draft that has never been saved — without inventing the
  * fields a stored record would have.
+ *
+ * ## Two themes, and why the dark one carries `.site`
+ *
+ * The component renders no shell and owns no page chrome; the caller places it. Colour comes
+ * entirely from the `theme` prop, and the seam is kept because /admin is a light-theme tool that
+ * still needs this layout legible on light chrome.
+ *
+ * The dark palette (`bone`, `gold`, `surface-*`) is declared on `.site`, which `__root.tsx` puts
+ * on `<html>` for public routes and removes under /admin. The dark theme therefore *scopes itself*
+ * with that class: the admin preview renders `theme="dark"` outside `.site`, and without the scope
+ * every token in this file would resolve to nothing and the preview would go blank-on-black. The
+ * class only declares custom properties and the canvas colour, so applying it inside the public
+ * site — where it is already inherited — changes nothing.
  */
 
 import { ArrowLeft, Calendar, Clock, Tag, User } from "lucide-react";
 import { asDoc, readingMinutes as computeReadingMinutes } from "@/lib/cms/doc";
 import type { ContentAuthor } from "@/lib/cms/types";
 import { categoryBadgeClasses, formatPublishedDate } from "@/lib/cms/public-client";
+import { cn } from "@/lib/utils";
 import { DocRenderer, DocTableOfContents, type DocTheme } from "./DocRenderer";
 
 export interface ArticleViewModel {
@@ -45,6 +59,72 @@ export interface ArticleViewProps {
   showTableOfContents?: boolean;
 }
 
+// ─── Theme ───────────────────────────────────────────────────────────────────
+
+interface ViewClasses {
+  /** Token scope. Dark needs `.site`; light inherits the admin theme from the document. */
+  scope: string;
+  backLink: string;
+  meta: string;
+  /** Category pills are colour-coded on the public site and neutral in the light tool. */
+  badge: string | null;
+  title: string;
+  lead: string;
+  authorName: string;
+  authorRole: string;
+  authorFallback: string;
+  divider: string;
+  empty: { frame: string; title: string; body: string };
+  tags: { frame: string; chip: string };
+}
+
+const THEMES: Record<DocTheme, ViewClasses> = {
+  dark: {
+    scope: "site",
+    backLink:
+      "type-meta mb-10 inline-flex items-center gap-1.5 font-semibold transition-colors hover:text-gold",
+    meta: "type-meta tnum inline-flex items-center gap-1.5",
+    badge: null, // supplied per-category by `categoryBadgeClasses`
+    title: "type-display mb-5 text-foreground",
+    lead: "type-lead mb-8",
+    authorName: "text-sm font-semibold text-foreground",
+    authorRole: "type-meta",
+    authorFallback: "bg-surface-1 text-bone-soft",
+    divider: "bg-border",
+    empty: {
+      frame: "panel-quiet px-8 py-10 text-center",
+      title: "text-base font-semibold text-foreground",
+      body: "mt-2 text-sm text-bone-soft",
+    },
+    tags: {
+      frame: "border-border",
+      chip: "rounded-full border border-border bg-surface-1 px-3 py-1 text-xs text-bone-soft",
+    },
+  },
+  light: {
+    scope: "",
+    backLink:
+      "mb-10 inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground",
+    meta: "inline-flex items-center gap-1.5 text-xs text-muted-foreground",
+    badge: "border-border bg-secondary text-foreground",
+    title: "mb-5 text-3xl leading-tight font-extrabold tracking-tight text-foreground",
+    lead: "mb-8 text-lg leading-relaxed text-muted-foreground",
+    authorName: "text-sm font-semibold text-foreground",
+    authorRole: "text-xs text-muted-foreground",
+    authorFallback: "bg-secondary text-muted-foreground",
+    divider: "bg-border",
+    empty: {
+      frame: "rounded-xl border border-border bg-secondary px-8 py-10 text-center",
+      title: "text-base font-semibold text-foreground",
+      body: "mt-2 text-sm text-muted-foreground",
+    },
+    tags: {
+      frame: "border-border",
+      chip: "rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground",
+    },
+  },
+};
+
 export function ArticleView({
   article,
   theme = "dark",
@@ -52,18 +132,16 @@ export function ArticleView({
   footerSlot = null,
   showTableOfContents = true,
 }: ArticleViewProps) {
-  const isDark = theme === "dark";
+  const t = THEMES[theme];
   const doc = asDoc(article.body);
   // Recomputed when absent so an unsaved draft still shows a reading time in preview.
   const minutes = article.readingMinutes ?? computeReadingMinutes(doc);
-
-  const mutedText = isDark ? "text-zinc-500" : "text-muted-foreground";
-  const leadText = isDark ? "text-zinc-400" : "text-muted-foreground";
-  const titleText = isDark ? "text-white" : "text-foreground";
-  const dividerColor = isDark ? "bg-white/[0.07]" : "bg-border";
+  const badgeClasses = t.badge ?? categoryBadgeClasses(article.category);
 
   return (
-    <article>
+    // Selection is disabled globally on the site; an article a reader cannot quote is a defect,
+    // so the whole reading surface opts back in here rather than block by block.
+    <article data-allow-select className={t.scope || undefined}>
       {backLink && (
         <a
           href={backLink.href ?? "#"}
@@ -75,13 +153,9 @@ export function ArticleView({
                 }
               : undefined
           }
-          className={`mb-10 inline-flex items-center gap-1.5 text-xs font-semibold transition-colors ${
-            isDark
-              ? "text-zinc-500 hover:text-white"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
+          className={t.backLink}
         >
-          <ArrowLeft className="h-3.5 w-3.5" /> {backLink.label}
+          <ArrowLeft aria-hidden className="h-3.5 w-3.5" /> {backLink.label}
         </a>
       )}
 
@@ -90,35 +164,33 @@ export function ArticleView({
       <div className="mb-5 flex flex-wrap items-center gap-3">
         {article.category && (
           <span
-            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-bold tracking-[0.18em] ${categoryBadgeClasses(article.category)}`}
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-3 py-1",
+              "text-[10px] font-semibold tracking-[0.18em]",
+              badgeClasses,
+            )}
           >
-            <Tag className="h-3 w-3" />
+            <Tag aria-hidden className="h-3 w-3" />
             {article.category.toUpperCase()}
           </span>
         )}
         {article.publishedAt && (
-          <span className={`inline-flex items-center gap-1.5 text-xs ${mutedText}`}>
-            <Calendar className="h-3.5 w-3.5" />
+          <span className={t.meta}>
+            <Calendar aria-hidden className="h-3.5 w-3.5" />
             {formatPublishedDate(article.publishedAt)}
           </span>
         )}
         {minutes > 0 && (
-          <span className={`inline-flex items-center gap-1.5 text-xs ${mutedText}`}>
-            <Clock className="h-3.5 w-3.5" />
+          <span className={t.meta}>
+            <Clock aria-hidden className="h-3.5 w-3.5" />
             {minutes} min read
           </span>
         )}
       </div>
 
-      <h1
-        className={`mb-5 text-3xl leading-tight font-extrabold tracking-tight sm:text-4xl ${titleText}`}
-      >
-        {article.title || "Untitled"}
-      </h1>
+      <h1 className={t.title}>{article.title || "Untitled"}</h1>
 
-      {article.excerpt && (
-        <p className={`mb-8 text-lg leading-relaxed ${leadText}`}>{article.excerpt}</p>
-      )}
+      {article.excerpt && <p className={t.lead}>{article.excerpt}</p>}
 
       {article.author?.name && (
         <div className="mb-10 flex items-center gap-3">
@@ -126,66 +198,61 @@ export function ArticleView({
             <img
               src={article.author.avatarUrl}
               alt={article.author.name}
+              width={36}
+              height={36}
+              loading="lazy"
+              decoding="async"
               className="h-9 w-9 rounded-full object-cover"
             />
           ) : (
             <span
-              className={`flex h-9 w-9 items-center justify-center rounded-full ${
-                isDark ? "bg-white/[0.06] text-zinc-400" : "bg-secondary text-muted-foreground"
-              }`}
+              aria-hidden
+              className={cn(
+                "flex h-9 w-9 items-center justify-center rounded-full",
+                t.authorFallback,
+              )}
             >
               <User className="h-4 w-4" />
             </span>
           )}
           <div className="min-w-0">
-            <p className={`text-sm font-semibold ${titleText}`}>{article.author.name}</p>
-            {article.author.role && <p className={`text-xs ${mutedText}`}>{article.author.role}</p>}
+            <p className={t.authorName}>{article.author.name}</p>
+            {article.author.role && <p className={t.authorRole}>{article.author.role}</p>}
           </div>
         </div>
       )}
 
       {article.coverImageUrl && (
+        // The ratio is fixed because the content model carries no intrinsic dimensions: without
+        // one, the cover reserves no space and every article shifts its own body text on load.
         <img
           src={article.coverImageUrl}
           alt={article.title}
-          className="mb-10 w-full rounded-2xl object-cover"
+          loading="lazy"
+          decoding="async"
+          className="mb-10 aspect-[16/9] w-full rounded-lg border border-border object-cover"
         />
       )}
 
-      <div className={`mb-10 h-px ${dividerColor}`} />
+      <div className={cn("mb-10 h-px", t.divider)} />
 
       {showTableOfContents && <DocTableOfContents doc={doc} theme={theme} />}
 
       {doc.blocks.length > 0 ? (
         <DocRenderer doc={doc} theme={theme} />
       ) : (
-        <div
-          className={`rounded-xl border px-8 py-10 text-center ${
-            isDark ? "border-white/10 bg-white/[0.03]" : "border-border bg-secondary"
-          }`}
-        >
-          <p
-            className={`text-base font-semibold ${isDark ? "text-white/80" : "text-foreground/80"}`}
-          >
-            This article is being prepared.
-          </p>
-          <p className={`mt-2 text-sm ${mutedText}`}>
+        <div className={t.empty.frame}>
+          <p className={t.empty.title}>This article is being prepared.</p>
+          <p className={t.empty.body}>
             The full piece will be published here shortly. Check back soon.
           </p>
         </div>
       )}
 
       {article.tags.length > 0 && (
-        <div
-          className={`mt-12 flex flex-wrap items-center gap-2 border-t pt-8 ${isDark ? "border-white/[0.07]" : "border-border"}`}
-        >
+        <div className={cn("mt-12 flex flex-wrap items-center gap-2 border-t pt-8", t.tags.frame)}>
           {article.tags.map((tag) => (
-            <span
-              key={tag}
-              className={`rounded-full px-3 py-1 text-xs ${
-                isDark ? "bg-white/[0.05] text-zinc-400" : "bg-secondary text-muted-foreground"
-              }`}
-            >
+            <span key={tag} className={t.tags.chip}>
               {tag}
             </span>
           ))}

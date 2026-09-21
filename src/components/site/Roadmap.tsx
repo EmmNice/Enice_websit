@@ -1,6 +1,14 @@
-import { useState } from "react";
-import { ArrowUpRight, Clock, CheckCircle2, Circle, Zap } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { useState, type ElementType } from "react";
+import { Clock, CheckCircle2, Circle, Zap } from "lucide-react";
+import {
+  HairlineGrid,
+  Panel,
+  Section,
+  SectionIntro,
+  Tag,
+  TextLink,
+} from "@/components/site/primitives";
+import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -16,6 +24,15 @@ interface Milestone {
   tags: string[];
 }
 
+/**
+ * The milestones, as the *fallback* for the `home.roadmap` section.
+ *
+ * The list is no longer the only source of the roadmap: the band overlays whatever an administrator
+ * has published, so this copy is what paints before the CMS answers and what survives an outage —
+ * `useSectionFields` treats a degraded bootstrap as "not loaded" on purpose. See
+ * `src/lib/cms/use-section.ts`. A roadmap is the single most perishable thing on the site, so it is
+ * also the last content that should need a deploy to change.
+ */
 const MILESTONES: Milestone[] = [
   {
     when: "Q1 2026",
@@ -102,34 +119,106 @@ const MILESTONES: Milestone[] = [
 
 // ─── Status config ────────────────────────────────────────────────────────────
 
+/**
+ * How a milestone's state is expressed on the dark canvas.
+ *
+ * `tone` hands the pill to the shared `Tag` treatment rather than restating a palette per state:
+ * shipped work is the one genuine positive signal, work in flight takes the warm accent, and
+ * anything still planned stays deliberately quiet so a roadmap of nine cards does not read as
+ * nine highlights. The old light-theme pills (`bg-emerald-50`, `bg-blue-50`) are gone with the
+ * navy system they belonged to.
+ */
 const STATUS_CONFIG: Record<
   Status,
   {
     label: string;
-    icon: React.ElementType;
-    pill: string;
+    icon: ElementType;
+    tone: "neutral" | "warm" | "positive";
+    pillClassName?: string;
     dot: string;
   }
 > = {
   completed: {
     label: "Completed",
     icon: CheckCircle2,
-    pill: "bg-emerald-50 text-emerald-700 border-emerald-200",
-    dot: "bg-emerald-500",
+    tone: "positive",
+    dot: "bg-positive",
   },
   "in-progress": {
     label: "In Progress",
     icon: Zap,
-    pill: "bg-blue-50 text-blue-700 border-blue-200",
-    dot: "bg-primary",
+    tone: "warm",
+    dot: "bg-gold",
   },
   planned: {
     label: "Planned",
     icon: Clock,
-    pill: "bg-secondary text-muted-foreground border-border",
-    dot: "bg-muted-foreground/40",
+    tone: "neutral",
+    pillClassName: "text-bone-faint",
+    dot: "bg-bone-faint",
   },
 };
+
+// ─── CMS encoding ─────────────────────────────────────────────────────────────
+
+/**
+ * A milestone as a `steps` row.
+ *
+ * A `steps` row carries a title and a description and nothing else, while a milestone needs four
+ * more things: when it lands, its status, the product it belongs to, and its tags. Rather than
+ * invent a section type for one band, those four are written as `label: value` lines at the top of
+ * the description, and the body is everything after them:
+ *
+ *     when: Q4 2026
+ *     status: in-progress
+ *     product: PulseAssist
+ *     tags: AI, B2B, Telecom
+ *
+ *     First rollout of support automation to banking, fintech, and telecom partners.
+ *
+ * Only leading lines matching one of those four labels are read as metadata; the first line that
+ * does not starts the body, so a description written with no header at all is simply all body.
+ * `status` accepts `completed`, `in-progress` or `planned`; anything else — including a missing
+ * status — resolves to `planned`, the quiet treatment, rather than throwing. A typo in a CMS field
+ * must never take a page down.
+ */
+const META_KEYS = ["when", "status", "product", "tags"] as const;
+
+function toStatus(value: string): Status {
+  return value === "completed" || value === "in-progress" ? value : "planned";
+}
+
+function parseMilestone(title: string, description: string): Milestone {
+  const meta = new Map<string, string>();
+  const lines = description.split("\n");
+
+  let cursor = 0;
+  for (; cursor < lines.length; cursor++) {
+    const line = lines[cursor].trim();
+    // The blank line between the header and the body, or leading blank lines before either.
+    if (!line) continue;
+    const match = /^([a-z]+)\s*:\s*(.*)$/i.exec(line);
+    const key = match?.[1].toLowerCase();
+    if (!key || !(META_KEYS as readonly string[]).includes(key)) break;
+    meta.set(key, (match?.[2] ?? "").trim());
+  }
+
+  const when = meta.get("when") ?? "";
+  return {
+    when,
+    // `quarter` mirrors `when`: the timeframe is written once, and a CMS row has no second field
+    // for it to drift from.
+    quarter: when,
+    status: toStatus(meta.get("status") ?? ""),
+    product: meta.get("product") ?? "",
+    title,
+    body: lines.slice(cursor).join("\n").trim(),
+    tags: (meta.get("tags") ?? "")
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter(Boolean),
+  };
+}
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
 
@@ -147,48 +236,49 @@ function MilestoneCard({ m }: { m: Milestone }) {
   const Icon = cfg.icon;
 
   return (
-    <article
-      className="group relative flex flex-col rounded-xl border border-border bg-background p-7 transition-all hover:-translate-y-0.5 hover:shadow-md"
-      style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.04), 0 4px 6px -1px rgba(17,24,39,0.05)" }}
-    >
+    <Panel as="article" interactive className="flex h-full flex-col p-7">
       {/* Top row */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-wrap items-center gap-2">
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold ${cfg.pill}`}
-          >
-            <Icon className="h-3 w-3" strokeWidth={2.5} />
+          <Tag tone={cfg.tone} className={cfg.pillClassName}>
+            <Icon aria-hidden className="h-3 w-3 shrink-0" strokeWidth={2.5} />
             {cfg.label}
-          </span>
-          <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            {m.when}
-          </span>
+          </Tag>
+          {/* The timeframe and the product pill are omitted when a row leaves them out, rather
+              than rendering an empty chip beside the status. */}
+          {m.when && (
+            <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+              {m.when}
+            </span>
+          )}
         </div>
-        <span className="shrink-0 rounded-md bg-secondary px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-          {m.product}
-        </span>
+        {m.product && (
+          <span className="shrink-0 rounded-md border border-border bg-surface-1 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-bone-faint">
+            {m.product}
+          </span>
+        )}
       </div>
 
       {/* Title */}
-      <h3 className="mt-5 text-[17px] font-semibold leading-snug tracking-tight text-foreground">
-        {m.title}
-      </h3>
+      <h3 className="type-h3 mt-5 text-foreground">{m.title}</h3>
 
       {/* Body */}
-      <p className="mt-3 text-[13.5px] leading-relaxed text-muted-foreground">{m.body}</p>
+      <p className="type-body mt-3">{m.body}</p>
 
       {/* Tags */}
-      <div className="mt-5 flex flex-wrap gap-2">
-        {m.tags.map((t) => (
-          <span
-            key={t}
-            className="rounded-md bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
-          >
-            {t}
-          </span>
-        ))}
-      </div>
-    </article>
+      {m.tags.length > 0 && (
+        <div className="mt-5 flex flex-wrap gap-2">
+          {m.tags.map((t) => (
+            <span
+              key={t}
+              className="rounded-md border border-border bg-surface-1 px-2 py-0.5 text-[11px] font-medium text-bone-soft"
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+    </Panel>
   );
 }
 
@@ -196,123 +286,129 @@ function MilestoneCard({ m }: { m: Milestone }) {
 
 export function Roadmap() {
   const [tab, setTab] = useState<"all" | Status>("all");
+  const section = useSectionFields("home.roadmap");
 
-  const filtered = tab === "all" ? MILESTONES : MILESTONES.filter((m) => m.status === tab);
+  // Rows without a title are dropped; everything else is decoded by `parseMilestone`.
+  const milestones = fieldItems(section, "items", MILESTONES, (row) => {
+    const title = typeof row.title === "string" ? row.title.trim() : "";
+    if (!title) return null;
+    return parseMilestone(title, typeof row.description === "string" ? row.description : "");
+  });
+
+  const filtered = tab === "all" ? milestones : milestones.filter((m) => m.status === tab);
 
   const counts = {
-    all: MILESTONES.length,
-    completed: MILESTONES.filter((m) => m.status === "completed").length,
-    "in-progress": MILESTONES.filter((m) => m.status === "in-progress").length,
-    planned: MILESTONES.filter((m) => m.status === "planned").length,
+    all: milestones.length,
+    completed: milestones.filter((m) => m.status === "completed").length,
+    "in-progress": milestones.filter((m) => m.status === "in-progress").length,
+    planned: milestones.filter((m) => m.status === "planned").length,
   };
 
   return (
-    <section id="roadmap" className="border-t border-border bg-background py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-5 sm:px-8">
-        {/* Header */}
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-          <div className="max-w-2xl">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              Strategic Roadmap
-            </div>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.02em] text-foreground sm:text-4xl md:text-[2.75rem]">
-              Built step by step, for the long run.
-            </h2>
-            <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-              Our roadmap follows the maturity of the platforms we operate, sequenced so each step
-              builds on the last.
-            </p>
-          </div>
-          <Link
-            to="/contact"
-            className="group inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-primary"
-          >
-            Partner with us
-            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-          </Link>
-        </div>
+    <Section id="roadmap" divider aria-labelledby="roadmap-strategic-heading">
+      {/* Header */}
+      <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+        {/* The eyebrow stays in code: `steps` carries a heading and supporting copy, and adding a
+            field to a shared schema for one band is not a trade worth making. */}
+        <SectionIntro
+          id="roadmap-strategic-heading"
+          eyebrow="Strategic Roadmap"
+          heading={fieldText(section, "heading", "Built step by step, for the long run.")}
+          lead={fieldText(
+            section,
+            "subheading",
+            "Our roadmap follows the maturity of the platforms we operate, sequenced so each step builds on the last.",
+          )}
+          className="max-w-2xl"
+        />
+        <TextLink to="/contact" className="shrink-0 pb-2">
+          Partner with us
+        </TextLink>
+      </div>
 
-        {/* Summary stats */}
-        <div className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {(["completed", "in-progress", "planned"] as const).map((s) => {
-            const cfg = STATUS_CONFIG[s];
-            return (
-              <div
-                key={s}
-                className="rounded-xl border border-border bg-background px-5 py-4"
-                style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.04)" }}
-              >
-                <div className="flex items-center gap-2">
-                  <span className={`h-2 w-2 rounded-full ${cfg.dot}`} />
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    {cfg.label}
-                  </span>
-                </div>
-                <div className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
-                  {counts[s]}
-                </div>
+      {/* Summary stats */}
+      <HairlineGrid columns={4} className="mt-10">
+        {(["completed", "in-progress", "planned"] as const).map((s) => {
+          const cfg = STATUS_CONFIG[s];
+          return (
+            <div key={s} className="px-5 py-4">
+              <div className="flex items-center gap-2">
+                <span aria-hidden className={`h-2 w-2 rounded-full ${cfg.dot}`} />
+                <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+                  {cfg.label}
+                </span>
               </div>
-            );
-          })}
-          <div
-            className="rounded-xl border border-border bg-background px-5 py-4"
-            style={{ boxShadow: "0 1px 2px rgba(17,24,39,0.04)" }}
-          >
-            <div className="flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-primary" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                Total
-              </span>
+              <div className="tnum mt-2 text-2xl font-semibold tracking-tight text-foreground">
+                {counts[s]}
+              </div>
             </div>
-            <div className="mt-2 text-2xl font-semibold tracking-tight text-foreground">
-              {counts.all}
-            </div>
+          );
+        })}
+        <div className="px-5 py-4">
+          <div className="flex items-center gap-2">
+            <span aria-hidden className="h-2 w-2 rounded-full bg-bone-strong" />
+            <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+              Total
+            </span>
+          </div>
+          <div className="tnum mt-2 text-2xl font-semibold tracking-tight text-foreground">
+            {counts.all}
           </div>
         </div>
+      </HairlineGrid>
 
-        {/* Tabs */}
-        <div className="mt-10 flex items-center gap-1 rounded-lg border border-border bg-secondary/60 p-1 sm:w-fit">
-          {TABS.map((t) => (
+      {/*
+        Filters, not tabs. They were unlabelled `<button>`s with no pressed state, so a screen
+        reader announced four bare words and never which one was active — `aria-pressed` on a
+        labelled group reports the filter that is on without pretending this is a tab set (there
+        is no tabpanel to own).
+      */}
+      <div
+        role="group"
+        aria-label="Filter milestones by status"
+        className="mt-10 flex items-center gap-1 rounded-lg border border-border bg-surface-1 p-1 sm:w-fit"
+      >
+        {TABS.map((t) => {
+          const selected = tab === t.key;
+          return (
             <button
               key={t.key}
+              type="button"
+              aria-pressed={selected}
               onClick={() => setTab(t.key)}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-[12px] font-semibold transition-all ${
-                tab === t.key
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+              className={`flex items-center gap-2 rounded-md px-4 py-2 text-[12px] font-semibold transition-colors ${
+                selected
+                  ? "bg-surface-3 text-foreground"
+                  : "text-bone-soft hover:bg-surface-2 hover:text-foreground"
               }`}
             >
               {t.label}
               <span
-                className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                  tab === t.key
-                    ? "bg-primary/10 text-primary"
-                    : "bg-transparent text-muted-foreground/60"
+                className={`tnum rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                  selected ? "bg-gold/[0.12] text-gold" : "bg-transparent text-bone-faint"
                 }`}
               >
                 {counts[t.key]}
               </span>
             </button>
-          ))}
-        </div>
-
-        {/* Cards grid */}
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 xl:grid-cols-2">
-          {filtered.map((m) => (
-            <MilestoneCard key={`${m.when}-${m.title}`} m={m} />
-          ))}
-        </div>
-
-        {/* Empty state */}
-        {filtered.length === 0 && (
-          <div className="mt-8 flex flex-col items-center justify-center rounded-xl border border-border bg-secondary/40 py-16 text-center">
-            <Circle className="h-8 w-8 text-muted-foreground/30" />
-            <p className="mt-4 text-[14px] text-muted-foreground">
-              No milestones in this category yet.
-            </p>
-          </div>
-        )}
+          );
+        })}
       </div>
-    </section>
+
+      {/* Cards grid */}
+      <div className="mt-8 grid gap-5 sm:grid-cols-2">
+        {filtered.map((m) => (
+          <MilestoneCard key={`${m.when}-${m.title}`} m={m} />
+        ))}
+      </div>
+
+      {/* Empty state */}
+      {filtered.length === 0 && (
+        <div className="panel-quiet mt-8 flex flex-col items-center justify-center py-16 text-center">
+          <Circle aria-hidden className="h-8 w-8 text-bone-faint" />
+          <p className="mt-4 text-[14px] text-bone-soft">No milestones in this category yet.</p>
+        </div>
+      )}
+    </Section>
   );
 }

@@ -84,3 +84,28 @@ export function fieldItems<T>(
     .filter((row): row is T => row !== null);
   return mapped.length > 0 ? mapped : fallback;
 }
+
+/**
+ * Reads a multi-paragraph textarea field as an array of paragraphs.
+ *
+ * Blank lines separate paragraphs, which is how the `prose` section type asks editors to write
+ * them. Bands that render long-form copy — the founders' letter, the About page's prose sections —
+ * need the paragraph breaks preserved as real `<p>` elements rather than one block with newlines
+ * in it, both for line-height and because a single paragraph of 200 words is not the same document
+ * to a screen reader.
+ *
+ * Falls back to the built-in copy when the field is unset or contains only whitespace.
+ */
+export function fieldParagraphs(
+  fields: Record<string, unknown> | null,
+  key: string,
+  fallback: string[],
+): string[] {
+  const value = fields?.[key];
+  if (typeof value !== "string") return fallback;
+  const paragraphs = value
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  return paragraphs.length > 0 ? paragraphs : fallback;
+}

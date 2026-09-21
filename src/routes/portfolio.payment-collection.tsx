@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
+import type { LucideIcon } from "lucide-react";
 import {
-  ArrowUpRight,
+  Boxes,
   CheckCircle2,
   Code2,
   Globe2,
@@ -12,11 +13,19 @@ import {
   Webhook,
   Zap,
 } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { StyledText } from "@/components/site/StyledText";
-import { useSectionFields, fieldText } from "@/lib/cms/use-section";
-import { SHADOW_CARD } from "@/lib/design";
+import { SiteShell } from "@/components/site/SiteShell";
+import { Reveal } from "@/components/site/Reveal";
+import {
+  CardIndex,
+  Cta,
+  HairlineGrid,
+  IconTile,
+  Panel,
+  Section,
+  SectionIntro,
+  Tag,
+} from "@/components/site/primitives";
+import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/payment-collection")({
@@ -54,6 +63,42 @@ export const Route = createFileRoute("/portfolio/payment-collection")({
     ]),
   component: PaymentCollectionPage,
 });
+
+const WAITLIST_MAILTO =
+  "mailto:corporate@enicehq.com?subject=Join%20the%20Payment%20Collection%20waitlist";
+
+// ─── Fallback content ─────────────────────────────────────────────────────────
+//
+// The blocks below are the *fallbacks* for the page's CMS sections, not its only source of
+// content. Each band reads `portfolio.payment-collection.*` and overlays whatever an administrator
+// has published, so the copy here is what paints before the CMS answers and what survives an
+// outage — `useSectionFields` treats a degraded bootstrap as "not loaded" on purpose. See
+// `src/lib/cms/use-section.ts`.
+
+/**
+ * Icons an editor may name on a CMS-managed card.
+ *
+ * A curated map rather than importing all of lucide, which would add a large amount of JavaScript
+ * to the public bundle for the sake of a handful of names. Anything unrecognised falls back to a
+ * neutral icon, so a typo degrades instead of leaving an empty tile. Same approach as
+ * `CARD_ICONS` in src/routes/index.tsx.
+ */
+const CARD_ICONS: Record<string, LucideIcon> = {
+  Boxes,
+  CheckCircle2,
+  Code2,
+  Globe2,
+  ShoppingCart,
+  Store,
+  TrendingUp,
+  Users,
+  Webhook,
+  Zap,
+};
+
+function cardIcon(name: string): LucideIcon {
+  return CARD_ICONS[name] ?? Boxes;
+}
 
 // ─── Who it's for ─────────────────────────────────────────────────────────────
 
@@ -115,44 +160,65 @@ const CAPABILITIES = [
   },
 ];
 
+// ─── Launch framing ───────────────────────────────────────────────────────────
+
+/**
+ * The gold treatment is not stored per row.
+ *
+ * A `statistics` section carries a value and a label and nothing else, which is correct: which
+ * figure is accented is a styling decision rather than content an editor should have to make. The
+ * first row is the status row, and that is the one the accent belongs to — so the emphasis is
+ * derived from position at render time.
+ */
+const LAUNCH_FACTS = [
+  { label: "Status", value: "Planned" },
+  { label: "Launch", value: "Q1 2027" },
+  { label: "Category", value: "Payments" },
+];
+
 // ─── Payment notification mockup ──────────────────────────────────────────────
 
+/**
+ * An illustration of the collection flow: a customer pays, the business is notified.
+ *
+ * Retoned from a navy gradient card with white-on-navy type to the surface ramp and hairlines, so
+ * it sits in the same environment as the rest of the page instead of importing the old brand into
+ * it. The success mark is warm rather than green: green means "available" on this site, and this
+ * platform is not. Entirely decorative, so the whole card is hidden from assistive technology —
+ * every fact it depicts is stated in the copy beside it.
+ */
 function PaymentNotificationCard() {
   return (
     <div
-      className="relative flex flex-col justify-between rounded-2xl p-5 text-white"
-      style={{
-        width: 240,
-        aspectRatio: "9/16",
-        background: "linear-gradient(160deg, #0f1f52 0%, #142666 55%, #0c1840 100%)",
-        boxShadow: "0 24px 48px -12px rgba(15,31,82,0.45)",
-      }}
+      aria-hidden
+      className="panel-raised relative flex flex-col justify-between overflow-hidden p-5"
+      style={{ width: 240, aspectRatio: "9/16" }}
     >
-      <div className="flex items-center justify-between text-[10px] font-medium text-white/50">
-        <span>9:41</span>
-        <span>ENICE</span>
+      <div className="type-meta flex items-center justify-between text-[10px]">
+        <span className="tnum">9:41</span>
+        <span className="font-mono tracking-[0.18em]">ENICE</span>
       </div>
 
-      <div className="mt-8 rounded-xl bg-white/10 p-4 backdrop-blur-sm ring-1 ring-white/15">
+      <div className="mt-8 rounded-xl border border-border bg-surface-3 p-4">
         <div className="flex items-center gap-2">
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-emerald-500/20 ring-1 ring-emerald-400/40">
-            <CheckCircle2 className="h-4 w-4 text-emerald-400" strokeWidth={2} />
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/25 bg-gold/[0.08]">
+            <CheckCircle2 className="h-4 w-4 text-gold" strokeWidth={2} />
           </span>
           <div>
-            <div className="text-[11px] font-semibold text-white">Payment Received</div>
-            <div className="text-[9px] text-white/50">from Adaeze&apos;s Store</div>
+            <div className="text-[11px] font-semibold text-foreground">Payment Received</div>
+            <div className="text-[9px] text-bone-faint">from Adaeze&apos;s Store</div>
           </div>
         </div>
-        <div className="mt-3 font-mono text-2xl font-semibold tracking-tight text-white">
+        <div className="tnum mt-3 font-mono text-2xl font-semibold tracking-tight text-foreground">
           ₦45,000.00
         </div>
-        <div className="mt-1 text-[9px] text-white/40">Just now</div>
+        <div className="mt-1 text-[9px] text-bone-faint">Just now</div>
       </div>
 
       <div className="mt-4 space-y-2">
         {["Customer pays", "Payment processed", "Business receives funds"].map((step, i) => (
-          <div key={step} className="flex items-center gap-2 text-[10px] text-white/60">
-            <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-white/10 text-[8px] font-semibold text-white/70">
+          <div key={step} className="flex items-center gap-2 text-[10px] text-bone-soft">
+            <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full border border-border bg-surface-1 text-[8px] font-semibold text-bone-faint">
               {i + 1}
             </span>
             {step}
@@ -168,188 +234,184 @@ function PaymentNotificationCard() {
 function PaymentCollectionPage() {
   // Page header, editable through the `portfolio.payment-collection` section.
   const header = useSectionFields("portfolio.payment-collection");
+  const factsSection = useSectionFields("portfolio.payment-collection.facts");
+  const audienceSection = useSectionFields("portfolio.payment-collection.audience");
+  const capabilitiesSection = useSectionFields("portfolio.payment-collection.capabilities");
+
+  // Launch facts. Rows without a value are skipped rather than rendered blank; the first row takes
+  // the accent, see `LAUNCH_FACTS`.
+  const launchFacts = fieldItems(factsSection, "items", LAUNCH_FACTS, (row) => {
+    const value = typeof row.value === "string" ? row.value.trim() : "";
+    const label = typeof row.label === "string" ? row.label.trim() : "";
+    return value ? { value, label } : null;
+  });
+
+  // Who the platform is for. A row's `title` is the tile's label.
+  const forWho = fieldItems(audienceSection, "items", FOR_WHO, (row) => {
+    const label = typeof row.title === "string" ? row.title.trim() : "";
+    if (!label) return null;
+    return {
+      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
+      label,
+      desc: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
+
+  const capabilities = fieldItems(capabilitiesSection, "items", CAPABILITIES, (row) => {
+    const title = typeof row.title === "string" ? row.title.trim() : "";
+    if (!title) return null;
+    return {
+      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
+      title,
+      desc: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
 
   return (
-    <div className="min-h-dvh bg-background text-foreground antialiased">
-      <SiteHeader />
-      <main id="main">
-        {/* ── Hero ── */}
-        <section className="border-b border-border bg-secondary py-20 sm:py-28">
-          <div className="mx-auto grid max-w-7xl gap-12 px-5 sm:px-8 lg:grid-cols-2 lg:items-center">
-            {/* Copy */}
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-primary/8 px-4 py-1.5 text-[11px] font-semibold tracking-[0.10em] text-primary">
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-60" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-primary" />
-                </span>
-                Coming Q1 2027
-              </div>
+    <SiteShell>
+      {/* ═══ HERO ═════════════════════════════════════════════════════════════ */}
+      <Section spacing="loose" glow="spread" grid aria-labelledby="payments-heading">
+        <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
+          {/* ── Copy ── */}
+          <div data-allow-select>
+            <Tag tone="warm">Coming Q1 2027</Tag>
 
-              <h1 className="mt-4 text-4xl font-semibold leading-[1.05] tracking-[-0.03em] text-foreground sm:text-5xl md:text-6xl">
-                <StyledText text={fieldText(header, "heading", "PulsePay Payment Collection")} />
-              </h1>
-
-              <p className="mt-6 max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                <StyledText
-                  text={fieldText(
-                    header,
-                    "subheading",
-                    "Simple, reliable payment infrastructure for modern businesses. Accept and manage customer payments through a single, developer friendly integration.",
-                  )}
-                />
-              </p>
-
-              <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-muted-foreground">
+            <SectionIntro
+              id="payments-heading"
+              level={1}
+              className="mt-8"
+              heading={fieldText(header, "heading", "PulsePay Payment Collection")}
+              lead={fieldText(
+                header,
+                "subheading",
+                "Simple, reliable payment infrastructure for modern businesses. Accept and manage customer payments through a single, developer friendly integration.",
+              )}
+            >
+              <p className="type-body mt-4 max-w-xl">
                 Built for businesses that need dependable payment infrastructure without managing
                 multiple payment channels: collect payments, track transactions, and connect payment
                 flows directly into your product.
               </p>
+            </SectionIntro>
 
-              {/* Meta cards */}
-              <div className="mt-8 grid grid-cols-3 gap-3">
-                {[
-                  { label: "Status", value: "Planned" },
-                  { label: "Launch", value: "Q1 2027" },
-                  { label: "Category", value: "Payments" },
-                ].map((m) => (
-                  <div
-                    key={m.label}
-                    className="rounded-lg border border-border bg-background p-3"
-                    style={{ boxShadow: SHADOW_CARD }}
+            <dl className="mt-8 grid grid-cols-3 gap-3">
+              {launchFacts.map((m, i) => (
+                <Panel key={`${m.label}-${i}`} tone="quiet" className="p-3">
+                  <dt className="text-[9px] font-semibold uppercase tracking-[0.2em] text-bone-faint">
+                    {m.label}
+                  </dt>
+                  <dd
+                    className={`tnum mt-1 text-[12px] font-semibold ${
+                      i === 0 ? "text-gold" : "text-foreground"
+                    }`}
                   >
-                    <div className="text-[9px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-                      {m.label}
-                    </div>
-                    <div className="mt-1 text-[12px] font-semibold text-foreground">{m.value}</div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href="mailto:corporate@enicehq.com?subject=Join%20the%20Payment%20Collection%20waitlist"
-                  className="group inline-flex items-center gap-2 rounded-md bg-primary px-6 py-3 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-                >
-                  Join the Waitlist
-                  <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-                </a>
-                <Link
-                  to="/portfolio"
-                  className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-6 py-3 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
-                >
-                  Back to Products
-                </Link>
-              </div>
-            </div>
-
-            {/* Visual */}
-            <div className="flex items-center justify-center">
-              <PaymentNotificationCard />
-            </div>
-          </div>
-        </section>
-
-        {/* ── Who it's for ── */}
-        <section className="border-b border-border bg-background py-16 sm:py-20">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            <div className="mb-10 text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Built For
-              </div>
-              <h2 className="mt-3 text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                From online businesses to growing enterprises.
-              </h2>
-            </div>
-
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {FOR_WHO.map((f) => (
-                <div
-                  key={f.label}
-                  className="rounded-xl border border-border bg-background p-6 text-center"
-                  style={{ boxShadow: SHADOW_CARD }}
-                >
-                  <div className="mx-auto grid h-12 w-12 place-items-center rounded-xl bg-primary/8 text-primary ring-1 ring-primary/15">
-                    <f.icon className="h-6 w-6" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="mt-4 text-[15px] font-semibold text-foreground">{f.label}</h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-muted-foreground">{f.desc}</p>
-                </div>
+                    {m.value}
+                  </dd>
+                </Panel>
               ))}
-            </div>
-          </div>
-        </section>
+            </dl>
 
-        {/* ── Key capabilities ── */}
-        <section className="bg-secondary py-20 sm:py-28">
-          <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            <div className="mx-auto max-w-2xl text-center">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-                Key Capabilities
-              </div>
-              <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-                Payments, made easier to collect and scale.
-              </h2>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                Payment Collection is being built as part of ENICE Group's broader financial
-                infrastructure, giving businesses the tools to run modern payment experiences.
-              </p>
-            </div>
-
-            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {CAPABILITIES.map((c) => (
-                <div
-                  key={c.title}
-                  className="flex gap-4 rounded-xl border border-border bg-background p-6"
-                  style={{ boxShadow: SHADOW_CARD }}
-                >
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-lg bg-primary/8 text-primary ring-1 ring-primary/15">
-                    <c.icon className="h-5 w-5" strokeWidth={1.75} />
-                  </div>
-                  <div>
-                    <h3 className="text-[15px] font-semibold text-foreground">{c.title}</h3>
-                    <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
-                      {c.desc}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── CTA ── */}
-        <section className="border-t border-border bg-background py-20">
-          <div className="mx-auto max-w-2xl px-5 text-center sm:px-8">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-primary">
-              Be First In Line
-            </div>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-              Get notified when we launch.
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-muted-foreground">
-              Join the waitlist to receive launch updates and early access when Payment Collection
-              goes live in Q1 2027.
-            </p>
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-              <a
-                href="mailto:corporate@enicehq.com?subject=Join%20the%20Payment%20Collection%20waitlist"
-                className="group inline-flex items-center gap-2 rounded-md bg-primary px-7 py-3.5 text-[13px] font-semibold text-primary-foreground transition-all hover:bg-primary/90"
-              >
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Cta to={WAITLIST_MAILTO} size="lg" icon="external">
                 Join the Waitlist
-                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-px group-hover:translate-x-px" />
-              </a>
-              <Link
-                to="/portfolio"
-                className="inline-flex items-center gap-2 rounded-md border border-border bg-background px-7 py-3.5 text-[13px] font-semibold text-foreground transition-colors hover:bg-secondary"
-              >
-                View All Products
-              </Link>
+              </Cta>
+              <Cta to="/portfolio" variant="secondary" size="lg">
+                Back to Products
+              </Cta>
             </div>
           </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </div>
+
+          {/* ── Decorative flow illustration ── */}
+          <div className="flex items-center justify-center">
+            <PaymentNotificationCard />
+          </div>
+        </div>
+      </Section>
+
+      {/* ═══ WHO IT'S FOR ═════════════════════════════════════════════════════ */}
+      <Section divider aria-labelledby="payments-audience-heading">
+        <Reveal>
+          <SectionIntro
+            id="payments-audience-heading"
+            align="center"
+            eyebrow={fieldText(audienceSection, "eyebrow", "Built For")}
+            heading={fieldText(
+              audienceSection,
+              "heading",
+              "From online businesses to growing enterprises.",
+            )}
+          />
+        </Reveal>
+
+        <HairlineGrid columns={4} className="mt-14">
+          {forWho.map((f, i) => (
+            <Reveal key={f.label} delay={i * 60} className="flex">
+              <div className="panel-interactive flex h-full flex-col p-8 text-center">
+                <IconTile icon={f.icon} className="mx-auto" />
+                <h3 className="mt-5 text-[15px] font-semibold text-foreground">{f.label}</h3>
+                <p className="type-body mt-2 text-[13px]">{f.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </HairlineGrid>
+      </Section>
+
+      {/* ═══ KEY CAPABILITIES ═════════════════════════════════════════════════ */}
+      <Section tone="recessed" divider aria-labelledby="payments-capabilities-heading">
+        <Reveal>
+          <SectionIntro
+            id="payments-capabilities-heading"
+            align="center"
+            eyebrow={fieldText(capabilitiesSection, "eyebrow", "Key Capabilities")}
+            heading={fieldText(
+              capabilitiesSection,
+              "heading",
+              "Payments, made easier to collect and scale.",
+            )}
+            lead={fieldText(
+              capabilitiesSection,
+              "subheading",
+              "Payment Collection is being built as part of ENICE Group's broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
+            )}
+          />
+        </Reveal>
+
+        <HairlineGrid columns={3} className="mt-14">
+          {capabilities.map((c, i) => (
+            <Reveal key={c.title} delay={i * 60} className="flex">
+              <div className="panel-interactive flex h-full flex-col p-8">
+                <div className="flex items-start justify-between">
+                  <IconTile icon={c.icon} size="sm" />
+                  <CardIndex value={i + 1} />
+                </div>
+                <h3 className="mt-6 text-[15px] font-semibold text-foreground">{c.title}</h3>
+                <p className="type-body mt-2 text-[13px]">{c.desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </HairlineGrid>
+      </Section>
+
+      {/* ═══ WAITLIST ═════════════════════════════════════════════════════════ */}
+      <Section container="narrow" divider glow="center" aria-labelledby="payments-waitlist-heading">
+        <Reveal>
+          <SectionIntro
+            id="payments-waitlist-heading"
+            align="center"
+            eyebrow="Be First In Line"
+            heading="Get notified when we launch."
+            lead="Join the waitlist to receive launch updates and early access when Payment Collection goes live in Q1 2027."
+          />
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Cta to={WAITLIST_MAILTO} size="lg" icon="external">
+              Join the Waitlist
+            </Cta>
+            <Cta to="/portfolio" variant="secondary" size="lg">
+              View All Products
+            </Cta>
+          </div>
+        </Reveal>
+      </Section>
+    </SiteShell>
   );
 }

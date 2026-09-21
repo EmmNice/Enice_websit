@@ -1,7 +1,8 @@
 import { Link } from "@tanstack/react-router";
-import { Logo } from "./Logo";
 import { Mail, MapPin } from "lucide-react";
-import { SOCIAL_PROFILES } from "@/lib/seo";
+import { Logo } from "./Logo";
+import { CORPORATE_EMAIL, SOCIAL_PROFILES } from "@/lib/seo";
+import { useSiteChrome, visibleNavItems } from "@/lib/cms/use-chrome";
 
 function XIcon({ className }: { className?: string }) {
   return (
@@ -36,38 +37,55 @@ function FacebookIcon({ className }: { className?: string }) {
   );
 }
 
+/**
+ * Four columns, mirroring the header's grouping.
+ *
+ * Legal was previously mixed in with the company links, which put the privacy policy at the same
+ * visual weight as the About page. Splitting it also gets the column counts even.
+ */
 const FOOTER_COLS = [
   {
     heading: "Products",
     links: [
-      { label: "PulsePay", to: "/portfolio/pulsepay" },
-      { label: "PulseAssist", to: "/portfolio/pulseassist" },
-      { label: "PulsePay Payment Collection", to: "/portfolio/payment-collection" },
-      { label: "ePulse", to: "/portfolio/epulse" },
-      { label: "PulseX", to: "/portfolio/pulsex" },
+      { label: "PulsePay", url: "/portfolio/pulsepay" },
+      { label: "PulseAssist", url: "/portfolio/pulseassist" },
+      { label: "Payment Collection", url: "/portfolio/payment-collection" },
+      { label: "ePulse", url: "/portfolio/epulse" },
+      { label: "PulseX", url: "/portfolio/pulsex" },
+      { label: "All products", url: "/portfolio" },
     ],
   },
   {
-    heading: "Updates",
+    heading: "Developers",
     links: [
-      { label: "Blog", to: "/blog/" },
-      { label: "News & Changelog", to: "/news/" },
-      { label: "Announcements", to: "/announcements/" },
-      { label: "Roadmap", to: "/roadmap" },
-      { label: "System Status", to: "/status" },
+      { label: "API documentation", url: "/docs" },
+      { label: "Product roadmap", url: "/roadmap" },
+      { label: "System status", url: "/status" },
     ],
   },
   {
     heading: "Company",
     links: [
-      { label: "About ENICE Group", to: "/about" },
-      { label: "Contact", to: "/contact" },
-      { label: "Privacy Policy", to: "/privacy" },
-      { label: "Terms of Service", to: "/terms" },
-      { label: "Regulatory Compliance", to: "/compliance" },
+      { label: "About ENICE Group", url: "/about" },
+      { label: "Contact", url: "/contact" },
+      { label: "Blog", url: "/blog/" },
+      { label: "News & changelog", url: "/news/" },
+      { label: "Announcements", url: "/announcements/" },
+    ],
+  },
+  {
+    heading: "Legal",
+    links: [
+      { label: "Privacy policy", url: "/privacy" },
+      { label: "Terms of service", url: "/terms" },
+      { label: "Regulatory compliance", url: "/compliance" },
     ],
   },
 ];
+
+/** Shown until the CMS footer settings resolve, and if they never do. */
+const DEFAULT_TAGLINE =
+  "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.";
 
 const ICONS: Record<string, typeof XIcon> = {
   "X (Twitter)": XIcon,
@@ -85,92 +103,125 @@ const SOCIAL_LINKS = SOCIAL_PROFILES.map((p) => ({
 export function SiteFooter() {
   const year = new Date().getFullYear();
 
+  /*
+   * Columns, tagline, copyright and the socials toggle come from Website → Footer when the CMS
+   * answers, and from the built-ins until it does. Those admin screens had been editable since the
+   * CMS shipped while this component rendered its own constants, so a footer edit did nothing.
+   * A column with no usable links is dropped rather than rendered as a bare heading.
+   */
+  const { footer } = useSiteChrome();
+
+  const columns =
+    footer?.columns
+      ?.map((column) => ({
+        heading: column.heading?.trim() ?? "",
+        links: visibleNavItems(column.links),
+      }))
+      .filter((column) => column.heading && column.links.length > 0) ?? null;
+
+  const cols = columns && columns.length > 0 ? columns : FOOTER_COLS;
+  const tagline = footer?.tagline?.trim() || DEFAULT_TAGLINE;
+  const copyright = footer?.copyright?.trim() || `© ${year} ENICE Group. All rights reserved.`;
+  const showSocials = footer?.showSocials !== false;
+
   return (
-    <footer className="border-t border-border bg-background">
+    <footer className="relative overflow-hidden border-t border-border bg-background">
+      {/* The footer is the one place the ambient warm light sits low in the frame, which closes
+          the page rather than leaving it to end on a flat edge. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-64"
+        style={{
+          background:
+            "radial-gradient(48rem 18rem at 50% 100%, rgb(255 149 41 / 0.05), transparent 70%)",
+        }}
+      />
+
       {/*
-        System status ribbon.
+        Status ribbon.
 
         This previously asserted "PulsePay Network: Operational" and "PulseAssist Engine:
         Operational" as hardcoded text on every page of the site — it would have claimed both
         platforms were healthy in the middle of an outage. Nothing here checks anything, so it
         no longer claims anything: it points at /status, where the checks actually run.
       */}
-      <div className="border-b border-border bg-secondary/50">
-        <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-          <p className="text-[11px] font-medium text-muted-foreground">
+      <div className="relative border-b border-border">
+        <div className="page-shell flex flex-col items-start gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[12px] text-bone-soft">
             Platform availability is checked live on the status page.
           </p>
           <Link
             to="/status"
-            className="text-[10px] font-semibold tracking-[0.22em] text-muted-foreground uppercase transition-colors hover:text-foreground"
+            className="tap text-[10px] font-semibold uppercase tracking-[0.22em] text-bone-soft transition-colors hover:text-gold"
           >
-            View Status Page →
+            View status page →
           </Link>
         </div>
       </div>
 
-      {/* Main footer body */}
-      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
-        <div className="grid gap-12 lg:grid-cols-[1.8fr_repeat(3,1fr)]">
+      <div className="page-shell relative py-16">
+        <div className="grid gap-12 lg:grid-cols-[1.6fr_repeat(4,1fr)] lg:gap-8">
           {/* Brand column */}
-          <div>
+          <div className="lg:max-w-xs">
             <Logo />
-            <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-muted-foreground">
-              ENICE Group is a technology company building, owning, and operating the financial and
-              AI platforms that power global commerce.
-            </p>
+            <p className="mt-5 text-[13px] leading-relaxed text-bone-soft">{tagline}</p>
 
-            {/* Social icons */}
-            <div className="mt-6 flex items-center gap-2">
-              {SOCIAL_LINKS.map((s) => (
-                <a
-                  key={s.label}
-                  href={s.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  aria-label={s.label}
-                  className="grid h-9 w-9 place-items-center rounded-md border border-border bg-background text-foreground/60 transition-colors hover:border-primary hover:text-primary"
-                >
-                  <s.Icon className="h-3.5 w-3.5" />
-                </a>
-              ))}
-            </div>
+            {showSocials && (
+              <ul className="mt-6 flex items-center gap-2">
+                {SOCIAL_LINKS.map((s) => (
+                  <li key={s.label}>
+                    <a
+                      href={s.href}
+                      target="_blank"
+                      rel="noreferrer noopener"
+                      aria-label={`ENICE Group on ${s.label}`}
+                      className="grid h-11 w-11 place-items-center rounded-md border border-border text-bone-soft transition-colors hover:border-gold/40 hover:text-gold"
+                    >
+                      <s.Icon className="h-3.5 w-3.5" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
 
-            {/* Contact */}
-            <div className="mt-6 space-y-2.5">
+            <div className="mt-6 space-y-3">
               <a
-                href="mailto:corporate@enicehq.com"
-                className="flex items-center gap-2.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+                href={`mailto:${CORPORATE_EMAIL}`}
+                className="tap flex items-center gap-2.5 text-[13px] text-bone-soft transition-colors hover:text-foreground"
               >
-                <Mail className="h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.75} />
-                corporate@enicehq.com
+                <Mail aria-hidden className="h-3.5 w-3.5 shrink-0 text-gold" strokeWidth={1.75} />
+                {CORPORATE_EMAIL}
               </a>
-              <div className="flex items-start gap-2.5 text-[13px] text-muted-foreground">
-                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" strokeWidth={1.75} />
+              <p className="flex items-start gap-2.5 text-[13px] text-bone-soft">
+                <MapPin
+                  aria-hidden
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold"
+                  strokeWidth={1.75}
+                />
                 Abuja and Kaduna, Nigeria
-              </div>
+              </p>
             </div>
           </div>
 
           {/* Navigation columns */}
-          {FOOTER_COLS.map((col) => (
-            <div key={col.heading}>
-              <div className="text-[10px] font-bold uppercase tracking-[0.24em] text-muted-foreground">
+          {cols.map((col) => (
+            <nav key={col.heading} aria-labelledby={`footer-${col.heading}`}>
+              <h2 id={`footer-${col.heading}`} className="eyebrow eyebrow-muted">
                 {col.heading}
-              </div>
+              </h2>
               <ul className="mt-5 space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
                     <Link
-                      to={l.to as "/"}
-                      className="text-[13px] text-foreground/65 transition-colors hover:text-foreground"
+                      to={l.url as "/"}
+                      className="tap block text-[13px] text-bone-strong transition-colors hover:text-foreground"
                     >
                       {l.label}
                     </Link>
                   </li>
                 ))}
               </ul>
-            </div>
+            </nav>
           ))}
         </div>
       </div>
@@ -180,14 +231,13 @@ export function SiteFooter() {
         assistant launcher, which is fixed to the bottom-right corner and was sitting on top of
         the tagline.
       */}
-      <div className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-3 px-5 pt-6 pb-24 sm:flex-row sm:items-center sm:px-8 sm:pt-6 sm:pb-6 sm:pr-28">
-          <p className="text-[11px] font-medium text-muted-foreground">
-            © {year} ENICE Group. All rights reserved.
-          </p>
-          <p className="text-[11px] font-medium text-muted-foreground">
-            Enterprise infrastructure, built with intent.
-          </p>
+      <div className="relative border-t border-border">
+        <div
+          className="page-shell safe-bottom flex flex-col items-start justify-between gap-3 pb-24 pt-6 sm:flex-row sm:items-center sm:pb-6 sm:pr-28"
+          style={{ ["--safe-pad" as string]: "6rem" }}
+        >
+          <p className="type-meta">{copyright}</p>
+          <p className="type-meta">Registered in the Federal Republic of Nigeria.</p>
         </div>
       </div>
     </footer>

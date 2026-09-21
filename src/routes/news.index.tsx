@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowUpRight, Megaphone, Newspaper, Sparkles, Zap } from "lucide-react";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteShell } from "@/components/site/SiteShell";
+import { Reveal } from "@/components/site/Reveal";
+import { IconTile, Panel, Section, SectionIntro, Tag } from "@/components/site/primitives";
 import { pageHead } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import {
@@ -11,6 +12,7 @@ import {
   formatPublishedDate,
   type FeedEntry,
 } from "@/lib/cms/public-client";
+import { cn } from "@/lib/utils";
 
 /**
  * The ENICE news and changelog feed.
@@ -31,6 +33,9 @@ const KIND_ICON = {
   blog: Sparkles,
 } as const;
 
+/** The shared card treatment for a row, whether or not the row is a link. */
+const ROW_CLASSES = "panel group flex gap-4 p-5";
+
 function FeedRow({ entry }: { entry: FeedEntry }) {
   const Icon = KIND_ICON[entry.kind] ?? Newspaper;
   // Only linkable kinds get a page; an update stays inline.
@@ -38,53 +43,56 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
 
   const inner = (
     <>
-      <div className="flex shrink-0 flex-col items-center gap-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/[0.08] bg-white/[0.03]">
-          <Icon className="h-4 w-4 text-blue-400" />
-        </span>
-      </div>
+      <IconTile icon={Icon} size="sm" />
 
       <div className="min-w-0 flex-1">
         <div className="mb-2 flex flex-wrap items-center gap-2.5">
           {entry.category && (
             <span
-              className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-[9px] font-bold tracking-[0.16em] ${categoryBadgeClasses(entry.category)}`}
+              className={cn(
+                "inline-flex items-center rounded-full border px-2.5 py-0.5",
+                "text-[9px] font-semibold tracking-[0.16em]",
+                categoryBadgeClasses(entry.category),
+              )}
             >
               {entry.category.toUpperCase()}
             </span>
           )}
           {entry.featured && (
-            <span className="inline-flex items-center rounded-full border border-blue-500/25 bg-blue-500/10 px-2.5 py-0.5 text-[9px] font-bold tracking-[0.16em] text-blue-300">
+            <Tag tone="warm" className="px-2.5 py-0.5 text-[9px] tracking-[0.16em]">
               FEATURED
-            </span>
+            </Tag>
           )}
-          <span className="text-[11px] text-zinc-500">
-            {formatPublishedDate(entry.publishedAt)}
-          </span>
+          <span className="type-meta tnum">{formatPublishedDate(entry.publishedAt)}</span>
         </div>
 
         <h2
-          className={`mb-1.5 text-base leading-snug font-bold text-white ${linkable ? "transition-colors group-hover:text-blue-400" : ""}`}
+          className={cn(
+            "mb-1.5 text-base leading-snug font-semibold tracking-tight text-foreground",
+            linkable && "transition-colors group-hover:text-gold",
+          )}
         >
           {entry.title}
         </h2>
 
-        {entry.excerpt && <p className="text-sm leading-relaxed text-zinc-400">{entry.excerpt}</p>}
+        {entry.excerpt && <p className="text-sm leading-relaxed text-bone-soft">{entry.excerpt}</p>}
 
         {/* An update's call to action is its only navigation, so it is rendered as a real link
             rather than relying on the row wrapper. */}
         {!linkable && entry.cta && (
           <a
             href={entry.cta.url}
-            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-blue-400 hover:underline"
+            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-gold underline-offset-2 hover:underline"
           >
-            {entry.cta.label} <ArrowUpRight className="h-3 w-3" />
+            {entry.cta.label} <ArrowUpRight aria-hidden className="h-3 w-3" />
           </a>
         )}
 
+        {/* The read affordance stays visible rather than appearing on hover: the row is one link,
+            and a touch user never produces the hover that used to reveal it. */}
         {linkable && (
-          <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-blue-400 opacity-0 transition-opacity group-hover:opacity-100">
-            Read more <ArrowUpRight className="h-3 w-3" />
+          <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-bone-faint transition-colors group-hover:text-gold">
+            Read more <ArrowUpRight aria-hidden className="h-3 w-3" />
           </span>
         )}
       </div>
@@ -93,24 +101,23 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
         <img
           src={entry.coverImageUrl}
           alt={entry.title}
+          width={128}
+          height={80}
           loading="lazy"
           decoding="async"
-          className="hidden h-20 w-32 shrink-0 rounded-lg object-cover sm:block"
+          className="hidden h-20 w-32 shrink-0 rounded-lg border border-border object-cover sm:block"
         />
       )}
     </>
   );
 
-  const className =
-    "group flex gap-4 rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 transition-all duration-200";
-
-  if (!linkable) return <div className={className}>{inner}</div>;
+  if (!linkable) return <div className={ROW_CLASSES}>{inner}</div>;
 
   return (
     <Link
       to={entry.kind === "announcement" ? "/announcements/$slug" : "/news/$slug"}
       params={{ slug: entry.slug }}
-      className={`${className} hover:border-blue-500/30 hover:bg-white/[0.04]`}
+      className={cn(ROW_CLASSES, "panel-interactive")}
     >
       {inner}
     </Link>
@@ -134,57 +141,53 @@ function NewsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#09090b] text-white">
-      <SiteHeader />
+    <SiteShell>
+      <Section spacing="loose" container="narrow" grid glow="spread" aria-labelledby="news-heading">
+        <SectionIntro
+          level={1}
+          id="news-heading"
+          eyebrow="Company News"
+          heading="News and Changelog"
+          lead="Announcements, new services, partnerships, milestones, and platform updates from ENICE Group."
+        />
+      </Section>
 
-      <section className="border-b border-white/[0.06] bg-gradient-to-b from-[#0f172a] to-[#09090b] px-5 pt-28 pb-16 sm:px-8">
-        <div className="mx-auto max-w-4xl">
-          <p className="mb-3 text-[11px] font-bold tracking-[0.22em] text-blue-400 uppercase">
-            Company News
-          </p>
-          <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            News and Changelog
-          </h1>
-          <p className="max-w-xl text-base leading-relaxed text-zinc-400">
-            Announcements, new services, partnerships, milestones, and platform updates from ENICE
-            Group.
-          </p>
-        </div>
-      </section>
-
-      <section className="px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-4xl">
-          {loading ? (
-            <div className="space-y-4">
+      <Section container="narrow" divider>
+        {loading ? (
+          // The placeholders are decorative; the wait is not, so it is announced once.
+          <div role="status" aria-label="Loading the news feed">
+            <div className="space-y-4" aria-hidden>
               {[1, 2, 3, 4].map((index) => (
-                <div
-                  key={index}
-                  className="h-28 animate-pulse rounded-xl border border-white/[0.07] bg-white/[0.03]"
-                />
+                <div key={index} className="panel-quiet h-28 animate-pulse" />
               ))}
             </div>
-          ) : entries.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-28 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/[0.07] bg-white/[0.03]">
-                <Newspaper className="h-7 w-7 text-zinc-500" />
-              </div>
-              <h2 className="mb-2 text-lg font-bold text-white">Nothing to report yet</h2>
-              <p className="max-w-xs text-sm text-zinc-500">
-                Company news, announcements and platform updates will appear here.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {entries.map((entry) => (
-                <FeedRow key={`${entry.kind}-${entry.id}`} entry={entry} />
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      <SiteFooter />
-    </div>
+          </div>
+        ) : entries.length === 0 ? (
+          // Deliberate, not broken: the same panel the feed rows use, so an empty feed still
+          // reads as a finished page.
+          <Panel tone="quiet" className="flex flex-col items-center px-8 py-20 text-center">
+            <span
+              aria-hidden
+              className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-gold/20 bg-gold/[0.07] text-gold"
+            >
+              <Newspaper className="h-6 w-6" strokeWidth={1.75} />
+            </span>
+            <h2 className="type-h3 text-foreground">Nothing to report yet</h2>
+            <p className="mt-3 max-w-xs text-sm leading-relaxed text-bone-soft">
+              Company news, announcements and platform updates will appear here.
+            </p>
+          </Panel>
+        ) : (
+          <div className="space-y-4">
+            {entries.map((entry, index) => (
+              <Reveal key={`${entry.kind}-${entry.id}`} delay={Math.min(index, 5) * 50}>
+                <FeedRow entry={entry} />
+              </Reveal>
+            ))}
+          </div>
+        )}
+      </Section>
+    </SiteShell>
   );
 }
 

@@ -9,10 +9,14 @@
  * entries, so they can be edited, reordered or removed individually, and adding a new partner adds
  * to the strip rather than replacing anything. The built-in list below is only a paint-time and
  * outage fallback; once the section loads, the CMS is authoritative, including when it is empty.
+ *
+ * Logos render as bone silhouettes and reveal their brand colours on hover — see `.logo-mono` in
+ * `styles.css` for why that is a correctness fix as much as a stylistic one.
  */
 
 import { useEffect, useState } from "react";
 import { fetchBootstrap, sectionFields } from "@/lib/cms/public-client";
+import { Container } from "./primitives";
 
 interface Partner {
   name: string;
@@ -135,38 +139,30 @@ export function PartnersStrip() {
   const track = buildTrack(partners);
 
   return (
-    <section className="overflow-hidden border-b border-border bg-background py-12">
-      <p className="mb-8 text-center text-[10px] font-semibold uppercase tracking-[0.28em] text-muted-foreground/60">
-        {heading}
-      </p>
+    <section aria-labelledby="partners-heading" className="overflow-hidden border-y border-border">
+      <Container>
+        <h2
+          id="partners-heading"
+          className="eyebrow eyebrow-muted justify-center py-9 text-center"
+          style={{ display: "flex" }}
+        >
+          {heading}
+        </h2>
+      </Container>
 
-      <div
-        className="relative"
-        style={{
-          maskImage:
-            "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-          WebkitMaskImage:
-            "linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%)",
-        }}
-      >
-        <div className="flex animate-marquee gap-4 whitespace-nowrap">
+      <div className="edge-fade relative pb-12">
+        {/* The duplicated half of the track is decorative: announcing every partner twice to a
+            screen reader is noise, so only the first pass is exposed. */}
+        <div className="flex animate-marquee gap-10 whitespace-nowrap">
           {track.map((partner, i) => {
-            const tile = <PartnerTile partner={partner} />;
-            return partner.url ? (
-              <a
+            const duplicate = i >= track.length / 2;
+            return (
+              <PartnerTile
                 key={i}
-                href={partner.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={partner.name}
-                className="shrink-0"
-              >
-                {tile}
-              </a>
-            ) : (
-              <div key={i} className="shrink-0">
-                {tile}
-              </div>
+                partner={partner}
+                aria-hidden={duplicate || undefined}
+                tabIndex={duplicate ? -1 : undefined}
+              />
             );
           })}
         </div>
@@ -175,30 +171,57 @@ export function PartnersStrip() {
   );
 }
 
-/** A single partner: logo (or monogram), a main name, and an optional sub-line. */
-function PartnerTile({ partner }: { partner: Partner }) {
-  return (
-    <div className="inline-flex items-center gap-2.5 rounded-xl border border-border bg-secondary/60 px-5 py-3 transition-colors hover:border-primary/20 hover:bg-secondary">
+/** A single partner: logo (or monogram), a name, and an optional sub-line. */
+function PartnerTile({
+  partner,
+  ...rest
+}: {
+  partner: Partner;
+  "aria-hidden"?: true;
+  tabIndex?: number;
+}) {
+  const body = (
+    <>
       {partner.logo ? (
         <img
           src={partner.logo}
-          alt={partner.name}
+          alt=""
           loading="lazy"
-          className="h-7 w-7 shrink-0 object-contain"
+          decoding="async"
+          width={24}
+          height={24}
+          className="logo-mono h-6 w-6 shrink-0 object-contain"
         />
       ) : (
-        <div className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary/8 text-[11px] font-bold text-primary ring-1 ring-primary/10">
+        <span
+          aria-hidden
+          className="grid h-6 w-6 shrink-0 place-items-center rounded-md border border-gold/20 bg-gold/[0.07] text-[10px] font-semibold text-gold"
+        >
           {monogram(partner.name)}
-        </div>
+        </span>
       )}
-      <div>
-        <p className="text-[12px] font-semibold leading-none tracking-tight text-foreground">
+      <span className="text-left">
+        <span className="block text-[13px] font-medium leading-none text-bone-strong transition-colors group-hover:text-foreground">
           {partner.name}
-        </p>
+        </span>
         {partner.tagline && (
-          <p className="mt-0.5 text-[10px] font-medium text-muted-foreground">{partner.tagline}</p>
+          <span className="mt-1 block text-[10px] font-medium uppercase tracking-[0.14em] text-bone-faint">
+            {partner.tagline}
+          </span>
         )}
-      </div>
-    </div>
+      </span>
+    </>
+  );
+
+  const shell = "group inline-flex shrink-0 items-center gap-3";
+
+  return partner.url ? (
+    <a href={partner.url} target="_blank" rel="noopener noreferrer" className={shell} {...rest}>
+      {body}
+    </a>
+  ) : (
+    <span className={shell} {...rest}>
+      {body}
+    </span>
   );
 }
