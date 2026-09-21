@@ -18,16 +18,20 @@
  * reconstruction rather than an approximation — but it is still a reconstruction. If the original
  * vector artwork turns up, prefer it and delete this script.
  *
- * ## Why there are four files
+ * ## Why there are two files
  *
- * A single asset cannot cover every background, and this mark is two-tone:
+ * `enice-mark.svg` is the logo, in its own colours, and the only mark the site renders. Nothing here
+ * recolours it.
  *
- *   - On dark, the mark is as drawn: blue E, white N. That is `enice-mark.svg`.
- *   - On light, the white N disappears entirely. `-on-light` swaps it for near-black ink.
- *   - Some placements have no room for two colours, or sit inside the site's bone-and-gold palette
- *     where a saturated blue is loud. `-bone` is the single-colour form for those.
- *   - iOS masks its own corners and composites transparency onto black, so the app icon is
- *     full-bleed on the canvas colour: `-appicon`, the raster source for the PNG set.
+ * `enice-mark-appicon.svg` is the same artwork on an opaque square, which the favicon and app icons
+ * are rasterised from. The colours are untouched; the square only supplies a ground, exactly as the
+ * previous icon set did. It is needed because the bare mark is transparent and two-tone, so its white
+ * N would disappear against light browser chrome or a light home screen — and because iOS masks its
+ * own corners and composites transparency onto black.
+ *
+ * That white-N-on-light hazard applies anywhere the mark meets a pale background. The site is dark
+ * throughout, so it does not arise today; if a light surface ever needs the mark, ask for artwork
+ * rather than recolouring this.
  *
  * ## Regenerating the raster icons
  *
@@ -61,8 +65,7 @@ const N_PATH = "M854.7 2.1L1000 2.1L1000 713.7L863.2 713.7L372.6 151.6L578.9 151
  */
 const BLUE = "#0048ED";
 const WHITE = "#FFFFFF";
-const INK = "#080c0e"; // --canvas
-const BONE = "#f4f1eb"; // --bone
+const INK = "#080c0e"; // --canvas, the app icon's ground
 
 // ─── Assembly ────────────────────────────────────────────────────────────────
 
@@ -73,10 +76,11 @@ const svg = (viewBox, body) =>
 </svg>
 `;
 
-const twoTone = (nFill) =>
+/** The mark in its own colours. No recolouring: this is the artwork as supplied. */
+const mark = () =>
   svg(
     `0 0 ${W} ${H}`,
-    `<path fill="${BLUE}" d="${E_PATH}"/>\n  <path fill="${nFill}" d="${N_PATH}"/>`,
+    `<path fill="${BLUE}" d="${E_PATH}"/>\n  <path fill="${WHITE}" d="${N_PATH}"/>`,
   );
 
 /** Square lockup: the mark centred with breathing room, on an opaque canvas-coloured ground. */
@@ -98,19 +102,12 @@ function appicon() {
 }
 
 const files = {
-  // Primary, for dark backgrounds — the mark as drawn.
-  "enice-mark.svg": twoTone(WHITE),
+  // The logo. Used in the header and footer, and the only mark the site renders.
+  "enice-mark.svg": mark(),
 
-  // Light backgrounds: the white N would otherwise vanish.
-  "enice-mark-on-light.svg": twoTone(INK),
-
-  // Single colour, for monochrome placements and palette-sensitive contexts.
-  "enice-mark-bone.svg": svg(
-    `0 0 ${W} ${H}`,
-    `<path fill="${BONE}" d="${E_PATH}"/>\n  <path fill="${BONE}" d="${N_PATH}"/>`,
-  ),
-
-  // Raster source for the app icons: square, full bleed, no transparency.
+  // The same artwork on an opaque square, which the favicon and app icons are rasterised from. Not
+  // a variant of the mark — the colours are untouched; the square only supplies a ground, exactly as
+  // the previous icon set did.
   "enice-mark-appicon.svg": appicon(),
 };
 

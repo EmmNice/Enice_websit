@@ -23,22 +23,23 @@ around a single flat fill, so there is no gradient to reproduce.
 Regenerate the SVGs with `node scripts/brand-mark.mjs`. It has no dependencies and is not part of
 `verify`, because brand assets change rarely and the committed SVGs are the source of truth.
 
-| File                            | Use                                                         |
-| ------------------------------- | ----------------------------------------------------------- |
-| `brand/enice-mark.svg`          | Primary. Dark backgrounds — the mark as drawn.              |
-| `brand/enice-mark-on-light.svg` | Light backgrounds. The N becomes ink.                       |
-| `brand/enice-mark-bone.svg`     | Single colour, for monochrome and palette-tight placements. |
-| `brand/enice-mark-appicon.svg`  | Square, full bleed. The raster source for every icon.       |
+| File                           | Use                                                                 |
+| ------------------------------ | ------------------------------------------------------------------- |
+| `brand/enice-mark.svg`         | The logo. Header and footer — the only mark the site renders.       |
+| `brand/enice-mark-appicon.svg` | The same artwork on an opaque square. Raster source for every icon. |
 
-Four files rather than one because a single asset cannot cover every background. The mark is
-two-tone, and **its white N disappears completely on a light background** — the same trap that makes
-a bone mark invisible on bone. The `-on-light` variant exists for that case; the square `-appicon`
-sidesteps it entirely by carrying its own canvas-coloured ground.
+**Nothing here recolours the mark.** The square is not a variant: the colours are untouched and it
+only supplies a ground, exactly as the previous icon set did. It exists because the bare mark is
+transparent and two-tone, so its white N would disappear against light browser chrome or a light home
+screen, and because iOS masks its own corners and composites transparency onto black.
 
-The two bare colourways map onto the CMS fields under Website → Design: `logoUrl` is the
-light-background logo, `logoDarkUrl` the dark one. `Logo` prefers `logoDarkUrl ?? logoUrl` because
-the public site is dark throughout, and falls back to the committed asset when neither is set —
-which is always the case in production, where there is no database.
+That hazard applies anywhere the mark meets a pale background. The site is dark throughout, so it does
+not arise today. If a light surface ever needs the mark, **ask for artwork rather than recolouring
+this** — the N is white, and white on pale is nothing.
+
+`Logo` uses the CMS fields under Website → Design when they are set, preferring
+`logoDarkUrl ?? logoUrl` because the public site is dark throughout. It falls back to the committed
+asset when neither is set, which is always the case in production, where there is no database.
 
 ## Regenerating the raster icons
 
