@@ -4316,6 +4316,80 @@ WHERE key = 'home.statistics'
   AND fields->'items' @> '[{"value":"5","label":"Products in the ecosystem"}]'::jsonb;
 `
         )
+      },
+      {
+        id: 17,
+        name: "rename_payment_collection_to_devapay",
+        sql: (
+          /* sql */
+          `
+-- PulsePay Payment Collection is now DevaPay: its own brand rather than a PulsePay sub-product.
+-- The route moved from /portfolio/payment-collection to /portfolio/devapay (with a 308 redirect in
+-- vercel.json so the old address keeps working), so the section keys, the page record and every
+-- stored label and URL have to follow. Without this an existing database would keep serving the
+-- old name from the CMS over the new code.
+--
+-- Section keys are renamed rather than re-inserted, so any copy an operator has already edited
+-- moves across with them. Guarded on the old key still existing, which also makes it idempotent.
+
+UPDATE site_sections SET key = 'portfolio.devapay',
+       label = 'DevaPay page', updated_at = now()
+WHERE key = 'portfolio.payment-collection'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.devapay');
+
+UPDATE site_sections SET key = 'portfolio.devapay.facts',
+       label = 'DevaPay launch facts', updated_at = now()
+WHERE key = 'portfolio.payment-collection.facts'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.devapay.facts');
+
+UPDATE site_sections SET key = 'portfolio.devapay.audience',
+       label = 'DevaPay audience', updated_at = now()
+WHERE key = 'portfolio.payment-collection.audience'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.devapay.audience');
+
+UPDATE site_sections SET key = 'portfolio.devapay.capabilities',
+       label = 'DevaPay capabilities', updated_at = now()
+WHERE key = 'portfolio.payment-collection.capabilities'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.devapay.capabilities');
+
+-- The product name inside the seeded copy, wherever it was stored as the old brand.
+UPDATE site_sections
+SET fields = replace(replace(fields::text, 'PulsePay Payment Collection', 'DevaPay'), 'Payment Collection', 'DevaPay')::jsonb,
+    updated_at = now()
+WHERE fields::text LIKE '%Payment Collection%';
+
+-- The managed page record and its address.
+UPDATE cms_pages
+SET path = '/portfolio/devapay', title = 'DevaPay',
+    summary = 'Payment infrastructure for businesses, on one developer-friendly API.',
+    updated_at = now()
+WHERE path = '/portfolio/payment-collection'
+  AND NOT EXISTS (SELECT 1 FROM cms_pages WHERE path = '/portfolio/devapay');
+
+-- Navigation and footer: the stored label and URL both carried the old brand.
+UPDATE site_settings
+SET value = replace(
+      replace(
+        replace(value::text, '/portfolio/payment-collection', '/portfolio/devapay'),
+        'PulsePay Payment Collection', 'DevaPay'),
+      'Payment Collection', 'DevaPay')::jsonb,
+    updated_at = now()
+WHERE key IN ('header', 'footer')
+  AND (position('payment-collection' in value::text) > 0
+       OR position('Payment Collection' in value::text) > 0);
+
+-- The About page's "What We Build" band interpolated a {liveProducts} count beside a sentence that
+-- names PulsePay and PulseAssist. PulsePay is in pilot rather than generally available, so the
+-- derived figure no longer matched the products the words name, and a number that contradicts the
+-- sentence beside it is worse than no number. Dropped only where the token is still present.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{body}',
+      to_jsonb(replace(fields->>'body', 'Our {liveProducts} current products', 'Our current products'))),
+    updated_at = now()
+WHERE key = 'about.build'
+  AND position('{liveProducts}' in COALESCE(fields->>'body', '')) > 0;
+`
+        )
       }
     ];
     MIGRATIONS_TABLE_SQL = /* sql */
@@ -74631,9 +74705,9 @@ function defaultSettings() {
               visible: true
             },
             {
-              id: "nav-collection",
-              label: "Payment Collection",
-              url: "/portfolio/payment-collection",
+              id: "nav-devapay",
+              label: "DevaPay",
+              url: "/portfolio/devapay",
               visible: true
             },
             { id: "nav-epulse", label: "ePulse", url: "/portfolio/epulse", visible: true },
@@ -74680,9 +74754,9 @@ function defaultSettings() {
               visible: true
             },
             {
-              id: "f-collection",
-              label: "Payment Collection",
-              url: "/portfolio/payment-collection",
+              id: "f-devapay",
+              label: "DevaPay",
+              url: "/portfolio/devapay",
               visible: true
             },
             { id: "f-epulse", label: "ePulse", url: "/portfolio/epulse", visible: true },
@@ -74982,10 +75056,10 @@ var init_website = __esm({
             {
               icon: "Banknote",
               kicker: "Fintech infrastructure",
-              title: "PulsePay Payment Collection",
+              title: "DevaPay",
               description: "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
               bullets: "Launch: Q1 2027\nIntegration: One API",
-              url: "/portfolio/payment-collection"
+              url: "/portfolio/devapay"
             }
           ]
         }
@@ -75409,8 +75483,8 @@ var init_website = __esm({
               description: "when: Q3 2026\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Multi-Currency, Treasury\n\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform."
             },
             {
-              title: "Payment Collection Launch",
-              description: "when: Q1 2027\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nPulsePay Payment Collection launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications."
+              title: "DevaPay Launch",
+              description: "when: Q1 2027\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nDevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications."
             },
             {
               title: "Global Digital Asset Exchange Private Beta",
@@ -75773,13 +75847,13 @@ var init_website = __esm({
         }
       },
       {
-        key: "portfolio.payment-collection",
-        label: "Payment Collection page",
+        key: "portfolio.devapay",
+        label: "DevaPay page",
         group: "Portfolio",
         type: "hero",
         order: 250,
         fields: {
-          heading: "PulsePay Payment Collection",
+          heading: "DevaPay",
           subheading: "Simple, reliable payment infrastructure for modern businesses. Accept and manage customer payments through a single, developer friendly integration."
         }
       },
@@ -75795,7 +75869,7 @@ var init_website = __esm({
        *
        * `sort_order` follows the order the bands appear on their page, inside the block already
        * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse, 240 PulseX,
-       * 250 Payment Collection).
+       * 250 DevaPay).
        */
       {
         key: "portfolio.pulsepay.stats",
@@ -76131,13 +76205,13 @@ var init_website = __esm({
         }
       },
       {
-        key: "portfolio.payment-collection.facts",
-        label: "Payment Collection launch facts",
+        key: "portfolio.devapay.facts",
+        label: "DevaPay launch facts",
         group: "Portfolio",
         type: "statistics",
         order: 251,
         fields: {
-          heading: "Payment Collection launch framing",
+          heading: "DevaPay launch framing",
           items: [
             { value: "Planned", label: "Status" },
             { value: "Q1 2027", label: "Launch" },
@@ -76146,8 +76220,8 @@ var init_website = __esm({
         }
       },
       {
-        key: "portfolio.payment-collection.audience",
-        label: "Payment Collection audience",
+        key: "portfolio.devapay.audience",
+        label: "DevaPay audience",
         group: "Portfolio",
         type: "featureGrid",
         order: 252,
@@ -76179,15 +76253,15 @@ var init_website = __esm({
         }
       },
       {
-        key: "portfolio.payment-collection.capabilities",
-        label: "Payment Collection capabilities",
+        key: "portfolio.devapay.capabilities",
+        label: "DevaPay capabilities",
         group: "Portfolio",
         type: "featureGrid",
         order: 253,
         fields: {
           eyebrow: "Key Capabilities",
           heading: "Payments, made easier to collect and scale.",
-          subheading: "Payment Collection is being built as part of ENICE Group's broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
+          subheading: "DevaPay is being built as part of ENICE Group's broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
           items: [
             {
               icon: "Code2",
@@ -76255,8 +76329,8 @@ var init_website = __esm({
       { path: "/portfolio/epulse", title: "ePulse", summary: "Global financial platform." },
       { path: "/portfolio/pulsex", title: "PulseX", summary: "Digital asset platform." },
       {
-        path: "/portfolio/payment-collection",
-        title: "PulsePay Payment Collection",
+        path: "/portfolio/devapay",
+        title: "DevaPay",
         summary: "Payment infrastructure for businesses."
       },
       { path: "/contact", title: "Contact", summary: "Enquiry form and contact details." },

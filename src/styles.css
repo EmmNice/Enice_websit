@@ -694,83 +694,25 @@
   }
 
   /* ── Mobile card rows ─────────────────────────────────────────────────────
-   * A row of cards becomes a horizontal snap-scroller on small screens and the
-   * normal grid from `sm` up.
+   * Cards stack on a phone and become a grid from `sm` up. Deliberately NOT a
+   * horizontal scroller.
    *
-   * Four cards stacked vertically on a phone is a screen and a half of scrolling
-   * to read what is, structurally, one row — the page stops feeling designed and
-   * starts feeling like a desktop layout that fell over. Swiping keeps the set
-   * legible as a set. Uses real overflow scrolling, so it stays keyboard- and
-   * screen-reader-navigable and every card remains in the DOM and in the
-   * document order (unlike a JS carousel, which usually costs both).
+   * An earlier version made each row a `scroll-snap-type: x mandatory` scroller
+   * so a four-card row could be swiped instead of stacking. It broke vertical
+   * scrolling: the rows are tall, so they covered most of the screen, and any
+   * slightly diagonal swipe was captured as a horizontal gesture — the page
+   * simply would not move under your thumb. Reported from a real device, and
+   * reproducible.
+   *
+   * There is no partial fix worth having. `touch-action: pan-y` gives the page
+   * its vertical gesture back but kills the horizontal swipe the row existed
+   * for, and mandatory snap is a known source of scroll trapping on Android
+   * regardless. A page that scrolls is worth more than a row that swipes, and
+   * stacked cards are what most large product sites do on mobile anyway.
    */
-  .scroll-row {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    /* Bleed to the viewport edges so the row reads as continuing off-screen,
-       then restore the gutter as padding. */
-    margin-inline: calc(var(--page-gutter) * -1);
-    padding-inline: var(--page-gutter);
-    padding-bottom: 0.25rem;
-    scrollbar-width: none;
-    overscroll-behavior-x: contain;
-  }
-
-  .scroll-row::-webkit-scrollbar {
-    display: none;
-  }
-
-  .scroll-row > * {
-    flex: 0 0 min(78vw, 20rem);
-    scroll-snap-align: start;
-  }
-
-  /*
-   * A hairline grid cannot also be a bleeding scroller: its 1px rules come from a bordered,
-   * rounded, clipping box, and that box pulled past the viewport edge shows a cut-off border and
-   * two stranded corners. So on a phone the shared frame is dropped and each card becomes a
-   * discrete rounded panel — which is the right mobile treatment anyway — and the frame comes back
-   * with the grid at `sm`.
-   */
-  .scroll-row.grid-hairline {
-    border: 0;
-    border-radius: 0;
-    background-color: transparent;
-    overflow-y: visible;
-  }
-
-  .scroll-row.grid-hairline > * {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-xl);
-  }
-
-  @media (width >= 40rem) {
-    .scroll-row {
-      display: grid;
-      gap: 1px;
-      overflow: visible;
-      margin-inline: 0;
-      padding-inline: 0;
-      padding-bottom: 0;
-    }
-
-    .scroll-row > * {
-      flex: initial;
-    }
-
-    .scroll-row.grid-hairline {
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-xl);
-      background-color: var(--color-border);
-      overflow: hidden;
-    }
-
-    .scroll-row.grid-hairline > * {
-      border: 0;
-      border-radius: 0;
-    }
+  .card-row {
+    display: grid;
+    gap: 1.25rem;
   }
 
   /*
@@ -853,15 +795,27 @@
     --page-gutter: 1.25rem;
   }
 
+  /*
+   * Smaller and tighter than the first attempt, which ran the hero headline to six lines on a
+   * 390px screen. Six lines of 32px type is not a confident headline, it is a wall — and the
+   * giveaway that a layout was scaled down rather than designed for the width.
+   */
   .type-display {
-    font-size: clamp(1.75rem, 8.2vw, 2.25rem);
-    line-height: 1.08;
-    letter-spacing: -0.028em;
+    font-size: clamp(1.5rem, 7vw, 2rem);
+    line-height: 1.12;
+    letter-spacing: -0.022em;
   }
 
   .type-h2 {
-    font-size: clamp(1.5rem, 6.4vw, 1.875rem);
-    line-height: 1.15;
+    font-size: clamp(1.375rem, 5.8vw, 1.75rem);
+    line-height: 1.18;
+    letter-spacing: -0.02em;
+  }
+
+  /* Wide display tracking is a desktop luxury; at phone sizes it just costs characters per line
+     and pushes labels onto a second row. */
+  .eyebrow {
+    letter-spacing: 0.14em;
   }
 
   /* The technical grid is drawn at 72px cells, which at 390px wide is five

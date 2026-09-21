@@ -84,8 +84,8 @@ const MILESTONES: Milestone[] = [
     quarter: "Q1 2027",
     status: "planned",
     product: "PulsePay",
-    title: "Payment Collection Launch",
-    body: "PulsePay Payment Collection launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
+    title: "DevaPay Launch",
+    body: "DevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
     tags: ["Fintech", "Payments", "API"],
   },
   {

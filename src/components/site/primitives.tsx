@@ -257,19 +257,16 @@ export function Panel({
  * Children sit on the border colour and paint their own background. Because the section behind
  * them may be `recessed`, cells inherit `bg-background` by default and can be overridden.
  *
- * On a phone the row becomes a horizontal snap-scroller (`scroll-row`) rather than a tall stack.
- * Four cards stacked vertically is a screen and a half of scrolling to read one row, which is the
- * single biggest reason a desktop layout reads as "not designed for mobile". Pass
- * `stackOnMobile` for a row whose cards are too text-heavy to swipe.
+ * Cards stack on a phone and pick up columns from `sm`. This deliberately does NOT become a
+ * horizontal swipe row: an earlier version did, and it trapped vertical scrolling on Android —
+ * see the note on `.card-row` in `styles.css`.
  */
 export function HairlineGrid({
   columns = 3,
-  stackOnMobile = false,
   className,
   children,
 }: {
   columns?: 2 | 3 | 4;
-  stackOnMobile?: boolean;
   className?: string;
   children: ReactNode;
 }) {
@@ -279,37 +276,7 @@ export function HairlineGrid({
     4: "sm:grid-cols-2 lg:grid-cols-4",
   }[columns];
 
-  return (
-    <div
-      className={cn(stackOnMobile ? "grid-hairline" : "scroll-row grid-hairline", cols, className)}
-    >
-      {children}
-    </div>
-  );
-}
-
-/**
- * A plain horizontal card row for mobile that becomes a normal grid from `sm` up.
- *
- * `HairlineGrid`'s sibling for card sets that carry their own borders (`Panel`s) rather than
- * sitting on a shared hairline background.
- */
-export function ScrollRow({
-  columns = 3,
-  className,
-  children,
-}: {
-  columns?: 2 | 3 | 4;
-  className?: string;
-  children: ReactNode;
-}) {
-  const cols = {
-    2: "sm:grid-cols-2 sm:gap-5",
-    3: "sm:grid-cols-2 lg:grid-cols-3 sm:gap-5",
-    4: "sm:grid-cols-2 lg:grid-cols-4 sm:gap-5",
-  }[columns];
-
-  return <div className={cn("scroll-row", cols, className)}>{children}</div>;
+  return <div className={cn("grid-hairline", cols, className)}>{children}</div>;
 }
 
 /** The small monospaced index that numbers a card within its grid. */

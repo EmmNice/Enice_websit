@@ -49,7 +49,7 @@ const FOOTER_COLS = [
     links: [
       { label: "PulsePay", url: "/portfolio/pulsepay" },
       { label: "PulseAssist", url: "/portfolio/pulseassist" },
-      { label: "Payment Collection", url: "/portfolio/payment-collection" },
+      { label: "DevaPay", url: "/portfolio/devapay" },
       { label: "ePulse", url: "/portfolio/epulse" },
       { label: "PulseX", url: "/portfolio/pulsex" },
       { label: "All products", url: "/portfolio" },

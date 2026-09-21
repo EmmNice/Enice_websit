@@ -1586,6 +1586,77 @@ WHERE key = 'home.statistics'
   AND fields->'items' @> '[{"value":"5","label":"Products in the ecosystem"}]'::jsonb;
 `,
   },
+  {
+    id: 17,
+    name: "rename_payment_collection_to_devapay",
+    sql: /* sql */ `
+-- PulsePay Payment Collection is now DevaPay: its own brand rather than a PulsePay sub-product.
+-- The route moved from /portfolio/payment-collection to /portfolio/devapay (with a 308 redirect in
+-- vercel.json so the old address keeps working), so the section keys, the page record and every
+-- stored label and URL have to follow. Without this an existing database would keep serving the
+-- old name from the CMS over the new code.
+--
+-- Section keys are renamed rather than re-inserted, so any copy an operator has already edited
+-- moves across with them. Guarded on the old key still existing, which also makes it idempotent.
+
+UPDATE site_sections SET key = 'portfolio.devapay',
+       label = 'DevaPay page', updated_at = now()
+WHERE key = 'portfolio.payment-collection'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.devapay');
+
+UPDATE site_sections SET key = 'portfolio.devapay.facts',
+       label = 'DevaPay launch facts', updated_at = now()
+WHERE key = 'portfolio.payment-collection.facts'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.devapay.facts');
+
+UPDATE site_sections SET key = 'portfolio.devapay.audience',
+       label = 'DevaPay audience', updated_at = now()
+WHERE key = 'portfolio.payment-collection.audience'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.devapay.audience');
+
+UPDATE site_sections SET key = 'portfolio.devapay.capabilities',
+       label = 'DevaPay capabilities', updated_at = now()
+WHERE key = 'portfolio.payment-collection.capabilities'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.devapay.capabilities');
+
+-- The product name inside the seeded copy, wherever it was stored as the old brand.
+UPDATE site_sections
+SET fields = replace(replace(fields::text, 'PulsePay Payment Collection', 'DevaPay'), 'Payment Collection', 'DevaPay')::jsonb,
+    updated_at = now()
+WHERE fields::text LIKE '%Payment Collection%';
+
+-- The managed page record and its address.
+UPDATE cms_pages
+SET path = '/portfolio/devapay', title = 'DevaPay',
+    summary = 'Payment infrastructure for businesses, on one developer-friendly API.',
+    updated_at = now()
+WHERE path = '/portfolio/payment-collection'
+  AND NOT EXISTS (SELECT 1 FROM cms_pages WHERE path = '/portfolio/devapay');
+
+-- Navigation and footer: the stored label and URL both carried the old brand.
+UPDATE site_settings
+SET value = replace(
+      replace(
+        replace(value::text, '/portfolio/payment-collection', '/portfolio/devapay'),
+        'PulsePay Payment Collection', 'DevaPay'),
+      'Payment Collection', 'DevaPay')::jsonb,
+    updated_at = now()
+WHERE key IN ('header', 'footer')
+  AND (position('payment-collection' in value::text) > 0
+       OR position('Payment Collection' in value::text) > 0);
+
+-- The About page's "What We Build" band interpolated a {liveProducts} count beside a sentence that
+-- names PulsePay and PulseAssist. PulsePay is in pilot rather than generally available, so the
+-- derived figure no longer matched the products the words name, and a number that contradicts the
+-- sentence beside it is worse than no number. Dropped only where the token is still present.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{body}',
+      to_jsonb(replace(fields->>'body', 'Our {liveProducts} current products', 'Our current products'))),
+    updated_at = now()
+WHERE key = 'about.build'
+  AND position('{liveProducts}' in COALESCE(fields->>'body', '')) > 0;
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

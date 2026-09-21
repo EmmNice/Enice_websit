@@ -28,20 +28,20 @@ import {
 import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/portfolio/payment-collection")({
+export const Route = createFileRoute("/portfolio/devapay")({
   head: () =>
-    pageHead("/portfolio/payment-collection", [
+    pageHead("/portfolio/devapay", [
       breadcrumbJsonLd([
         { name: "Products", path: "/portfolio" },
-        { name: "Payment Collection", path: "/portfolio/payment-collection" },
+        { name: "DevaPay", path: "/portfolio/devapay" },
       ]),
       {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        name: "PulsePay Payment Collection",
+        name: "DevaPay",
         description:
           "ENICE Group's upcoming payment infrastructure for businesses: accept and manage customer payments through a single API, with real time updates and webhook notifications. Launching Q1 2027.",
-        url: `${SITE_URL}/portfolio/payment-collection`,
+        url: `${SITE_URL}/portfolio/devapay`,
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web",
         releaseNotes: "Expected Q1 2027",
@@ -70,7 +70,7 @@ const WAITLIST_MAILTO =
 // ─── Fallback content ─────────────────────────────────────────────────────────
 //
 // The blocks below are the *fallbacks* for the page's CMS sections, not its only source of
-// content. Each band reads `portfolio.payment-collection.*` and overlays whatever an administrator
+// content. Each band reads `portfolio.devapay.*` and overlays whatever an administrator
 // has published, so the copy here is what paints before the CMS answers and what survives an
 // outage — `useSectionFields` treats a degraded bootstrap as "not loaded" on purpose. See
 // `src/lib/cms/use-section.ts`.
@@ -232,11 +232,11 @@ function PaymentNotificationCard() {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 function PaymentCollectionPage() {
-  // Page header, editable through the `portfolio.payment-collection` section.
-  const header = useSectionFields("portfolio.payment-collection");
-  const factsSection = useSectionFields("portfolio.payment-collection.facts");
-  const audienceSection = useSectionFields("portfolio.payment-collection.audience");
-  const capabilitiesSection = useSectionFields("portfolio.payment-collection.capabilities");
+  // Page header, editable through the `portfolio.devapay` section.
+  const header = useSectionFields("portfolio.devapay");
+  const factsSection = useSectionFields("portfolio.devapay.facts");
+  const audienceSection = useSectionFields("portfolio.devapay.audience");
+  const capabilitiesSection = useSectionFields("portfolio.devapay.capabilities");
 
   // Launch facts. Rows without a value are skipped rather than rendered blank; the first row takes
   // the accent, see `LAUNCH_FACTS`.
@@ -280,7 +280,7 @@ function PaymentCollectionPage() {
               id="payments-heading"
               level={1}
               className="mt-8"
-              heading={fieldText(header, "heading", "PulsePay Payment Collection")}
+              heading={fieldText(header, "heading", "DevaPay")}
               lead={fieldText(
                 header,
                 "subheading",
@@ -371,7 +371,7 @@ function PaymentCollectionPage() {
             lead={fieldText(
               capabilitiesSection,
               "subheading",
-              "Payment Collection is being built as part of ENICE Group's broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
+              "DevaPay is being built as part of ENICE Group's broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
             )}
           />
         </Reveal>
@@ -400,7 +400,7 @@ function PaymentCollectionPage() {
             align="center"
             eyebrow="Be First In Line"
             heading="Get notified when we launch."
-            lead="Join the waitlist to receive launch updates and early access when Payment Collection goes live in Q1 2027."
+            lead="Join the waitlist to receive launch updates and early access when DevaPay goes live in Q1 2027."
           />
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Cta to={WAITLIST_MAILTO} size="lg" icon="external">

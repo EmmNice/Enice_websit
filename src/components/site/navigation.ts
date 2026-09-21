@@ -49,10 +49,12 @@ export function isLeaf(entry: NavEntry): entry is NavLeaf {
 
 export const PRODUCTS: NavItem[] = [
   {
+    // Still being built, not generally available. The roadmap agrees: the extended pilot is
+    // complete and the developer API is in public beta, but nothing on it has launched.
     label: "PulsePay",
     to: "/portfolio/pulsepay",
     description: "Virtual card issuance, programmable wallets and embedded treasury.",
-    stage: "available",
+    stage: "building",
   },
   {
     // Channels per the product's own site (getpulseassist.com/channels): WhatsApp, web chat,
@@ -63,7 +65,7 @@ export const PRODUCTS: NavItem[] = [
     stage: "available",
   },
   {
-    // A PulseAssist product, the same way Payment Collection is a PulsePay product — its own page
+    // A PulseAssist product, the same way DevaPay is a PulsePay product — its own page
     // presents it as part of the PulseAssist platform. Shipping today: this site's own
     // transactional mail goes through it.
     label: "PulseAssist Email",
@@ -72,8 +74,8 @@ export const PRODUCTS: NavItem[] = [
     stage: "available",
   },
   {
-    label: "Payment Collection",
-    to: "/portfolio/payment-collection",
+    label: "DevaPay",
+    to: "/portfolio/devapay",
     description: "One developer-friendly API for accepting and reconciling payments.",
     stage: "building",
   },

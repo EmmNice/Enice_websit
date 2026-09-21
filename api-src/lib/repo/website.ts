@@ -716,9 +716,9 @@ export function defaultSettings(): SiteSettings {
               visible: true,
             },
             {
-              id: "nav-collection",
-              label: "Payment Collection",
-              url: "/portfolio/payment-collection",
+              id: "nav-devapay",
+              label: "DevaPay",
+              url: "/portfolio/devapay",
               visible: true,
             },
             { id: "nav-epulse", label: "ePulse", url: "/portfolio/epulse", visible: true },
@@ -765,9 +765,9 @@ export function defaultSettings(): SiteSettings {
               visible: true,
             },
             {
-              id: "f-collection",
-              label: "Payment Collection",
-              url: "/portfolio/payment-collection",
+              id: "f-devapay",
+              label: "DevaPay",
+              url: "/portfolio/devapay",
               visible: true,
             },
             { id: "f-epulse", label: "ePulse", url: "/portfolio/epulse", visible: true },
@@ -1036,11 +1036,11 @@ const DEFAULT_SECTIONS: {
         {
           icon: "Banknote",
           kicker: "Fintech infrastructure",
-          title: "PulsePay Payment Collection",
+          title: "DevaPay",
           description:
             "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
           bullets: "Launch: Q1 2027\nIntegration: One API",
-          url: "/portfolio/payment-collection",
+          url: "/portfolio/devapay",
         },
       ],
     },
@@ -1510,9 +1510,9 @@ const DEFAULT_SECTIONS: {
             "when: Q3 2026\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Multi-Currency, Treasury\n\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform.",
         },
         {
-          title: "Payment Collection Launch",
+          title: "DevaPay Launch",
           description:
-            "when: Q1 2027\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nPulsePay Payment Collection launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
+            "when: Q1 2027\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nDevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
         },
         {
           title: "Global Digital Asset Exchange Private Beta",
@@ -1901,13 +1901,13 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.payment-collection",
-    label: "Payment Collection page",
+    key: "portfolio.devapay",
+    label: "DevaPay page",
     group: "Portfolio",
     type: "hero",
     order: 250,
     fields: {
-      heading: "PulsePay Payment Collection",
+      heading: "DevaPay",
       subheading:
         "Simple, reliable payment infrastructure for modern businesses. Accept and manage customer payments through a single, developer friendly integration.",
     },
@@ -1924,7 +1924,7 @@ const DEFAULT_SECTIONS: {
    *
    * `sort_order` follows the order the bands appear on their page, inside the block already
    * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse, 240 PulseX,
-   * 250 Payment Collection).
+   * 250 DevaPay).
    */
   {
     key: "portfolio.pulsepay.stats",
@@ -2286,13 +2286,13 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.payment-collection.facts",
-    label: "Payment Collection launch facts",
+    key: "portfolio.devapay.facts",
+    label: "DevaPay launch facts",
     group: "Portfolio",
     type: "statistics",
     order: 251,
     fields: {
-      heading: "Payment Collection launch framing",
+      heading: "DevaPay launch framing",
       items: [
         { value: "Planned", label: "Status" },
         { value: "Q1 2027", label: "Launch" },
@@ -2301,8 +2301,8 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.payment-collection.audience",
-    label: "Payment Collection audience",
+    key: "portfolio.devapay.audience",
+    label: "DevaPay audience",
     group: "Portfolio",
     type: "featureGrid",
     order: 252,
@@ -2334,8 +2334,8 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.payment-collection.capabilities",
-    label: "Payment Collection capabilities",
+    key: "portfolio.devapay.capabilities",
+    label: "DevaPay capabilities",
     group: "Portfolio",
     type: "featureGrid",
     order: 253,
@@ -2343,7 +2343,7 @@ const DEFAULT_SECTIONS: {
       eyebrow: "Key Capabilities",
       heading: "Payments, made easier to collect and scale.",
       subheading:
-        "Payment Collection is being built as part of ENICE Group's broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
+        "DevaPay is being built as part of ENICE Group's broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
       items: [
         {
           icon: "Code2",
@@ -2423,8 +2423,8 @@ const SYSTEM_PAGES: { path: string; title: string; summary: string }[] = [
   { path: "/portfolio/epulse", title: "ePulse", summary: "Global financial platform." },
   { path: "/portfolio/pulsex", title: "PulseX", summary: "Digital asset platform." },
   {
-    path: "/portfolio/payment-collection",
-    title: "PulsePay Payment Collection",
+    path: "/portfolio/devapay",
+    title: "DevaPay",
     summary: "Payment infrastructure for businesses.",
   },
   { path: "/contact", title: "Contact", summary: "Enquiry form and contact details." },

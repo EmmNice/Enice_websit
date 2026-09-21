@@ -178,13 +178,13 @@ const PORTFOLIO_PREVIEW = [
   {
     icon: Banknote,
     kicker: "Fintech infrastructure",
-    title: "PulsePay Payment Collection",
+    title: "DevaPay",
     desc: "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
     facts: [
       { label: "Launch", value: "Q1 2027" },
       { label: "Integration", value: "One API" },
     ],
-    to: "/portfolio/payment-collection",
+    to: "/portfolio/devapay",
   },
 ];
 
@@ -342,16 +342,16 @@ function Landing() {
         <div aria-hidden className="mesh-glow" />
 
         <div className="relative flex flex-1 items-center">
-          <Container className="py-16 sm:py-24">
+          <Container className="py-12 sm:py-24">
             <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14 xl:gap-20">
               {/* ── Copy ── */}
               <div>
                 <div
-                  className="animate-hero-up inline-flex items-center gap-2.5 rounded-full border border-border bg-surface-1/80 px-4 py-1.5 backdrop-blur-sm"
+                  className="animate-hero-up inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-surface-1/80 px-3 py-1.5 backdrop-blur-sm sm:gap-2.5 sm:px-4"
                   style={{ animationDelay: "0ms" }}
                 >
                   <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-gold" />
-                  <span className="text-[10.5px] font-semibold uppercase tracking-[0.1em] text-bone-strong sm:text-[11px] sm:tracking-[0.16em]">
+                  <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-bone-strong sm:text-[11px] sm:tracking-[0.16em]">
                     <StyledText
                       text={fieldText(hero, "eyebrow", "Technology Group · Building for Africa")}
                       accentClassName="text-gold"
@@ -369,7 +369,7 @@ function Landing() {
                   capability is still there for an editor who wants to emphasise a short phrase.
                 */}
                 <h1
-                  className="animate-hero-up type-display mt-8 text-foreground lg:max-w-[19ch]"
+                  className="animate-hero-up type-display mt-6 text-foreground sm:mt-8 lg:max-w-[19ch]"
                   style={{ animationDelay: "60ms" }}
                 >
                   <StyledText
@@ -383,7 +383,7 @@ function Landing() {
                 </h1>
 
                 <p
-                  className="animate-hero-up type-lead mt-7 max-w-xl"
+                  className="animate-hero-up type-lead mt-5 max-w-xl sm:mt-7"
                   style={{ animationDelay: "120ms" }}
                 >
                   <StyledText
@@ -400,7 +400,7 @@ function Landing() {
                     their labels, the primary and secondary CTAs ended up different widths on a
                     phone, which reads as an accident rather than a hierarchy. */}
                 <div
-                  className="animate-hero-up btn-stack mt-9 flex flex-wrap gap-3"
+                  className="animate-hero-up btn-stack mt-7 flex flex-wrap gap-3 sm:mt-9"
                   style={{ animationDelay: "180ms" }}
                 >
                   <Cta
@@ -411,10 +411,15 @@ function Landing() {
                   >
                     {fieldText(hero, "primaryCtaLabel", "Explore our products")}
                   </Cta>
+                  {/* On a phone the secondary action drops its border and fill and reads as a
+                      quiet text action. Two identically-sized filled slabs stacked on top of each
+                      other is the single most template-looking thing a mobile hero can do, and it
+                      flattens the hierarchy the two buttons exist to express. */}
                   <Cta
                     to={fieldText(hero, "secondaryCtaUrl", "/about")}
                     variant="secondary"
                     size="lg"
+                    className="max-sm:border-transparent max-sm:bg-transparent max-sm:text-bone-strong"
                     data-cta="hero-secondary"
                   >
                     {fieldText(hero, "secondaryCtaLabel", "What we build")}

@@ -50,7 +50,7 @@ import { SITE_URL } from "@/lib/site";
  * Everything below is drawn from the product's own page at getpulseassist.com/email and condensed —
  * nothing here is invented, and no figure is quoted that the product does not state about itself.
  * That page presents it as "part of the PulseAssist platform", which is how it is framed here too:
- * a PulseAssist product, the same way Payment Collection is a PulsePay product.
+ * a PulseAssist product, the same way DevaPay is a PulsePay product.
  *
  * Every band reads its own `portfolio.pulseassist-email.*` section and falls back to the copy here,
  * so the page is editable without a deploy and still renders during an outage.

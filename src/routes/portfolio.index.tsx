@@ -38,8 +38,8 @@ export const Route = createFileRoute("/portfolio/")({
           },
           {
             "@type": "SoftwareApplication",
-            name: "PulsePay Payment Collection",
-            url: `${SITE_URL}/portfolio/payment-collection`,
+            name: "DevaPay",
+            url: `${SITE_URL}/portfolio/devapay`,
             applicationCategory: "FinanceApplication",
           },
           {
@@ -194,96 +194,11 @@ function PortfolioIndexPage() {
         <SectionIntro
           id="active-heading"
           eyebrow="Active Products"
-          heading="Operational platforms"
-          lead="Products currently being built and operated by ENICE Group."
+          heading="Available today"
+          lead="Products ENICE Group operates and customers can use now."
         />
 
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {/* ── PulsePay ── */}
-          <ProductCard
-            visual={
-              <CardVisual className="h-56 sm:h-64">
-                <div className="tech-grid tech-grid-flat" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  {/* Card peeking from behind */}
-                  <div
-                    className="absolute rounded-2xl border border-border"
-                    style={{
-                      width: 220,
-                      aspectRatio: "1.586/1",
-                      background: CARD_BEHIND,
-                      transform: "rotate(5deg) translate(10%, -8%)",
-                      boxShadow: SHADOW_CARD,
-                    }}
-                  />
-                  {/* Main card */}
-                  <div
-                    className="relative flex flex-col justify-between rounded-2xl border border-border p-4"
-                    style={{
-                      width: 220,
-                      aspectRatio: "1.586/1",
-                      background: CARD_FACE,
-                      transform: "rotate(-3deg)",
-                      boxShadow: SHADOW_FLOAT,
-                    }}
-                  >
-                    <div className="flex items-start justify-between">
-                      <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-bone-strong">
-                        PulsePay
-                      </span>
-                      <Wifi className="h-3.5 w-3.5 rotate-90 text-bone-faint" />
-                    </div>
-                    {/* The metallic chip: the one place a small gold fill is right. */}
-                    <div className="h-6 w-9 rounded-md bg-gradient-to-br from-gold to-gold-deep" />
-                    <div className="tnum font-mono text-[9px] tracking-[0.2em] text-bone-soft">
-                      •••• •••• •••• ••••
-                    </div>
-                    <div className="flex items-end justify-between">
-                      <div>
-                        <div className="text-[6px] uppercase tracking-[0.2em] text-bone-faint">
-                          Cardholder
-                        </div>
-                        <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-foreground">
-                          ENICE GROUP
-                        </div>
-                      </div>
-                      <CreditCard className="h-4 w-4 text-bone-faint" strokeWidth={1.5} />
-                    </div>
-                  </div>
-                </div>
-              </CardVisual>
-            }
-          >
-            <div className="flex flex-wrap items-center gap-3">
-              <Eyebrow>Fintech Infrastructure Platform</Eyebrow>
-              <LifecycleTag to="/portfolio/pulsepay" />
-            </div>
-            <h3 className="type-h3 mt-4 text-foreground">PulsePay</h3>
-            <p className="type-body mt-4">
-              A virtual payment platform that issues Naira and USD cards, handles KYC verification,
-              moves funds between users, and delivers value-added services with speed and
-              reliability.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Cta
-                to="/portfolio/pulsepay"
-                size="sm"
-                icon="arrow"
-                aria-label="View PulsePay platform details"
-              >
-                View Platform
-              </Cta>
-              <Cta
-                to="mailto:corporate@enicehq.com?subject=PulsePay%20Access%20Request"
-                variant="secondary"
-                size="sm"
-                icon="external"
-              >
-                Request Access
-              </Cta>
-            </div>
-          </ProductCard>
-
+        <div className="mt-14 grid gap-8 lg:grid-cols-2">
           {/* ── PulseAssist ── */}
           <ProductCard
             visual={
@@ -425,14 +340,98 @@ function PortfolioIndexPage() {
           id="upcoming-heading"
           eyebrow="Coming Soon"
           heading="Products in development"
-          lead="Platforms in development and planning, expanding what ENICE Group builds."
+          lead="Platforms being built and planned, including PulsePay, which is in pilot ahead of general availability."
         />
 
-        {/* Three columns, not two: at `lg:grid-cols-2` the third card sat alone beside an empty
-            cell, which reads as a missing product rather than a deliberate layout. These are the
-            secondary, not-yet-launched set, so a tighter three-up is also the right weight. */}
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
-          {/* ── PulsePay Payment Collection ── */}
+        {/* Four cards, two up: an even 2x2 rather than a three-up row with one card orphaned
+            beside an empty cell. */}
+        <div className="mt-14 grid gap-6 lg:grid-cols-2">
+          {/* ── PulsePay ── */}
+          <ProductCard
+            visual={
+              <CardVisual className="h-56 sm:h-64">
+                <div className="tech-grid tech-grid-flat" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  {/* Card peeking from behind */}
+                  <div
+                    className="absolute rounded-2xl border border-border"
+                    style={{
+                      width: 220,
+                      aspectRatio: "1.586/1",
+                      background: CARD_BEHIND,
+                      transform: "rotate(5deg) translate(10%, -8%)",
+                      boxShadow: SHADOW_CARD,
+                    }}
+                  />
+                  {/* Main card */}
+                  <div
+                    className="relative flex flex-col justify-between rounded-2xl border border-border p-4"
+                    style={{
+                      width: 220,
+                      aspectRatio: "1.586/1",
+                      background: CARD_FACE,
+                      transform: "rotate(-3deg)",
+                      boxShadow: SHADOW_FLOAT,
+                    }}
+                  >
+                    <div className="flex items-start justify-between">
+                      <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-bone-strong">
+                        PulsePay
+                      </span>
+                      <Wifi className="h-3.5 w-3.5 rotate-90 text-bone-faint" />
+                    </div>
+                    {/* The metallic chip: the one place a small gold fill is right. */}
+                    <div className="h-6 w-9 rounded-md bg-gradient-to-br from-gold to-gold-deep" />
+                    <div className="tnum font-mono text-[9px] tracking-[0.2em] text-bone-soft">
+                      •••• •••• •••• ••••
+                    </div>
+                    <div className="flex items-end justify-between">
+                      <div>
+                        <div className="text-[6px] uppercase tracking-[0.2em] text-bone-faint">
+                          Cardholder
+                        </div>
+                        <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-foreground">
+                          ENICE GROUP
+                        </div>
+                      </div>
+                      <CreditCard className="h-4 w-4 text-bone-faint" strokeWidth={1.5} />
+                    </div>
+                  </div>
+                </div>
+              </CardVisual>
+            }
+          >
+            <div className="flex flex-wrap items-center gap-3">
+              <Eyebrow>Fintech Infrastructure Platform</Eyebrow>
+              <LifecycleTag to="/portfolio/pulsepay" />
+            </div>
+            <h3 className="type-h3 mt-4 text-foreground">PulsePay</h3>
+            <p className="type-body mt-4">
+              A virtual payment platform that issues Naira and USD cards, handles KYC verification,
+              moves funds between users, and delivers value-added services with speed and
+              reliability.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Cta
+                to="/portfolio/pulsepay"
+                size="sm"
+                icon="arrow"
+                aria-label="View PulsePay platform details"
+              >
+                View Platform
+              </Cta>
+              <Cta
+                to="mailto:corporate@enicehq.com?subject=PulsePay%20Access%20Request"
+                variant="secondary"
+                size="sm"
+                icon="external"
+              >
+                Request Access
+              </Cta>
+            </div>
+          </ProductCard>
+
+          {/* ── DevaPay ── */}
           <ProductCard
             visual={
               <CardVisual className="h-56 sm:h-64">
@@ -476,20 +475,20 @@ function PortfolioIndexPage() {
             }
           >
             <div className="flex flex-wrap items-center gap-3">
-              <LifecycleTag to="/portfolio/payment-collection" />
+              <LifecycleTag to="/portfolio/devapay" />
               <span className="type-meta">Launch: Q1 2027</span>
             </div>
-            <h3 className="type-h3 mt-4 text-foreground">PulsePay Payment Collection</h3>
+            <h3 className="type-h3 mt-4 text-foreground">DevaPay</h3>
             <p className="type-body mt-4">
               Simple, reliable payment infrastructure that lets businesses accept and manage
               customer payments through a single, developer friendly integration.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta
-                to="/portfolio/payment-collection"
+                to="/portfolio/devapay"
                 size="sm"
                 icon="arrow"
-                aria-label="Learn more about PulsePay Payment Collection"
+                aria-label="Learn more about DevaPay"
               >
                 View Details
               </Cta>
