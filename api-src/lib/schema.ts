@@ -1657,6 +1657,35 @@ WHERE key = 'about.build'
   AND position('{liveProducts}' in COALESCE(fields->>'body', '')) > 0;
 `,
   },
+  {
+    id: 18,
+    name: "partners_strip_current_providers",
+    sql: /* sql */ `
+-- The partners strip is down to the providers the platform actually runs on: AWS, Vercel, Railway.
+--
+-- Removed: Google Cloud and Supabase, which are no longer part of the stack; Resend, replaced by
+-- PulseAssist Email in #31; and AWS Activate, because a startup credits programme is not
+-- infrastructure and listing it beside AWS itself read as two partnerships where there is one.
+-- PulseAssist is deliberately not added: it is ENICE's own product, and a company does not belong
+-- in its own partners strip.
+--
+-- This is needed because migrations 3 and 4 seed the old six, so a database that ran those would
+-- keep publishing them over the new defaults. Guarded on one of the retired entries still being
+-- present, which leaves a curated list alone and makes a re-run a no-op.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[
+    {"name":"Amazon Web Services","tagline":"Cloud Infrastructure","logo":"/partners/aws.svg","url":"https://aws.amazon.com"},
+    {"name":"Vercel","tagline":"Edge Delivery","logo":"/partners/vercel.svg","url":"https://vercel.com"},
+    {"name":"Railway","tagline":"Application Infrastructure","logo":"/partners/railway.svg","url":"https://railway.com"}
+  ]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.partners'
+  AND (fields->'items' @> '[{"name":"AWS Activate"}]'::jsonb
+       OR fields->'items' @> '[{"name":"Google Cloud"}]'::jsonb
+       OR fields->'items' @> '[{"name":"Supabase"}]'::jsonb
+       OR fields->'items' @> '[{"name":"Resend"}]'::jsonb);
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */
