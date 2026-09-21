@@ -29,13 +29,12 @@ interface Partner {
  * Shown before the CMS section has loaded, and if it can't be reached, so the homepage is never
  * blank. Mirrors the seeded section content, so the common case has no visible change on load.
  *
- * Three providers, and only providers the platform genuinely runs on. Removed: Google Cloud and
- * Supabase (no longer part of the stack), Resend (replaced by PulseAssist Email in #31), and
- * AWS Activate — a startup credits programme is not infrastructure, and listing it beside AWS
- * itself read as two separate partnerships where there is one.
+ * Only providers the platform genuinely runs on. Resend is gone (PulseAssist Email replaced it in
+ * #31) and so is AWS Activate: a startup credits programme is not infrastructure, and listing it
+ * beside AWS itself read as two partnerships where there is one.
  *
- * PulseAssist is deliberately absent: it is ENICE's own product, so putting it in a *partners*
- * strip would present the company as its own third-party vendor. It has a product page instead.
+ * PulseAssist is deliberately absent. It is ENICE's own product, so putting it in a *partners*
+ * strip would present the company as its own third-party vendor; it has a product page instead.
  */
 const DEFAULT_PARTNERS: Partner[] = [
   {
@@ -45,6 +44,18 @@ const DEFAULT_PARTNERS: Partner[] = [
     url: "https://aws.amazon.com",
   },
   {
+    name: "Google Cloud",
+    tagline: "AI & Compute",
+    logo: "/partners/googlecloud.svg",
+    url: "https://cloud.google.com",
+  },
+  {
+    name: "Supabase",
+    tagline: "Database & Auth",
+    logo: "/partners/supabase.svg",
+    url: "https://supabase.com",
+  },
+  {
     name: "Vercel",
     tagline: "Edge Delivery",
     logo: "/partners/vercel.svg",
@@ -52,7 +63,7 @@ const DEFAULT_PARTNERS: Partner[] = [
   },
   {
     name: "Railway",
-    tagline: "Application Infrastructure",
+    tagline: "Application & Database Hosting",
     logo: "/partners/railway.svg",
     url: "https://railway.com",
   },

@@ -309,8 +309,8 @@ function PortfolioIndexPage() {
             <h3 className="type-h3 mt-4 text-foreground">PulseAssist Email</h3>
             <p className="type-body mt-4">
               Transactional and marketing email on your own verified domain, with inbound routing,
-              templates, automations, suppression handling and delivery analytics — from a console
-              or a REST API. Part of the PulseAssist platform.
+              templates, automations, suppression handling and delivery analytics, from a console or
+              a REST API. Part of the PulseAssist platform.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta

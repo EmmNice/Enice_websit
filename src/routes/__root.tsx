@@ -93,7 +93,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
         </h1>
 
         <p className="mb-10 max-w-sm text-[15px] leading-relaxed" style={{ color: "#a1a09e" }}>
-          We are fixing it right now — please refresh the page or try again shortly.
+          We are fixing it right now. Please refresh the page or try again shortly.
         </p>
 
         <div className="flex flex-col gap-3 sm:flex-row">
