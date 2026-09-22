@@ -4460,6 +4460,48 @@ SET fields = replace(fields::text,
 WHERE key = 'home.company' AND position('end to end \u2014' in fields::text) > 0;
 `
         )
+      },
+      {
+        id: 19,
+        name: "about_page_acronym_band",
+        sql: (
+          /* sql */
+          `
+-- The About page now opens, straight after the hero, by saying what the name is built from:
+-- Empower, Nurture, Innovate, Create, Elevate. The page never explained its own acronym.
+--
+-- \`featureGrid\` because every other multi-item About band is one, and its row shape \u2014 \`title\` plus
+-- \`description\` \u2014 is already word plus gloss. \`sanitizeSectionFields\` and the admin form therefore
+-- need no changes.
+--
+-- Two conventions the component reads back out:
+--
+--   * The initial shown beside each word is derived from the word, not stored. A stored letter could
+--     drift from editable text until the page claimed an acronym it no longer formed, and there is no
+--     field for it in any case.
+--
+--   * Every \`description\` is deliberately empty. The five words are the company's own; a sentence
+--     written here to pad each letter would be invented meaning dressed as brand copy. The field is
+--     seeded so the owner can add one per letter from the Website Manager without a deploy, and the
+--     component renders a row's gloss only when it is non-empty.
+--
+-- ON CONFLICT (key) DO NOTHING, so a re-run is a no-op and an administrator's edits are never
+-- overwritten. The component keeps the same five words as its built-in fallback, which is what paints
+-- before the CMS answers and what survives an outage.
+INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
+VALUES ('about.acronym', 'What the name stands for', 'About', 'featureGrid', true, 'published', '{
+  "heading": "What the name stands for",
+  "items": [
+    {"title":"Empower","description":""},
+    {"title":"Nurture","description":""},
+    {"title":"Innovate","description":""},
+    {"title":"Create","description":""},
+    {"title":"Elevate","description":""}
+  ]
+}'::jsonb, 110)
+ON CONFLICT (key) DO NOTHING;
+`
+        )
       }
     ];
     MIGRATIONS_TABLE_SQL = /* sql */
@@ -75606,6 +75648,29 @@ var init_website = __esm({
           eyebrow: "About ENICE Group",
           heading: "We build technology products. [[Then we operate them.]]",
           subheading: "ENICE Group is the parent company behind a growing set of software products. We find real problems in financial services, commerce, and business communication, then build and run the platforms that solve them."
+        }
+      },
+      {
+        key: "about.acronym",
+        label: "What the name stands for",
+        group: "About",
+        type: "featureGrid",
+        order: 110,
+        fields: {
+          heading: "What the name stands for",
+          // `title` is the word; the initial the page shows beside it is derived from that word rather
+          // than stored, so the column of letters always spells whatever the words spell.
+          //
+          // `description` is intentionally blank on every row. The five words are the company's own; a
+          // sentence written here to pad each letter would be invented meaning. The field exists so the
+          // brand owner can add one per letter without a deploy.
+          items: [
+            { title: "Empower", description: "" },
+            { title: "Nurture", description: "" },
+            { title: "Innovate", description: "" },
+            { title: "Create", description: "" },
+            { title: "Elevate", description: "" }
+          ]
         }
       },
       {

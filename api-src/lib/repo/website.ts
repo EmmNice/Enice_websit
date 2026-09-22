@@ -1569,6 +1569,29 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
+    key: "about.acronym",
+    label: "What the name stands for",
+    group: "About",
+    type: "featureGrid",
+    order: 110,
+    fields: {
+      heading: "What the name stands for",
+      // `title` is the word; the initial the page shows beside it is derived from that word rather
+      // than stored, so the column of letters always spells whatever the words spell.
+      //
+      // `description` is intentionally blank on every row. The five words are the company's own; a
+      // sentence written here to pad each letter would be invented meaning. The field exists so the
+      // brand owner can add one per letter without a deploy.
+      items: [
+        { title: "Empower", description: "" },
+        { title: "Nurture", description: "" },
+        { title: "Innovate", description: "" },
+        { title: "Create", description: "" },
+        { title: "Elevate", description: "" },
+      ],
+    },
+  },
+  {
     key: "about.story",
     label: "Our Story",
     group: "About",
