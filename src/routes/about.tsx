@@ -197,6 +197,22 @@ const BUILD_BOLD_CLASS = "font-semibold text-foreground";
 const CLOSING_QUOTE = `"The infrastructure a society depends on is the most durable thing it can build. That's what we're here to build."`;
 const CLOSING_ATTRIBUTION = "— The Founders, ENICE Group";
 
+/**
+ * What the name stands for.
+ *
+ * Only the five words, with no gloss under any of them. The acronym is the company's own, and a
+ * sentence invented here to pad each letter would be marketing copy passing itself off as meaning.
+ * The `description` field is wired through regardless, so whoever owns the brand can add a line per
+ * letter from the Website Manager without a deploy — and until they do, the words stand alone.
+ */
+const ACRONYM: { word: string; description: string }[] = [
+  { word: "Empower", description: "" },
+  { word: "Nurture", description: "" },
+  { word: "Innovate", description: "" },
+  { word: "Create", description: "" },
+  { word: "Elevate", description: "" },
+];
+
 /** The band number, at the one size and weight every band uses. */
 function BandNumber({ children }: { children: string }) {
   return (
@@ -262,11 +278,28 @@ function ProseBand({
 function AboutPage() {
   // Editable bands, each falling back to the copy below until the section is edited.
   const hero = useSectionFields("about.hero");
+  const acronym = useSectionFields("about.acronym");
   const values = useSectionFields("about.values");
   const build = useSectionFields("about.build");
   const verticalsSection = useSectionFields("about.verticals");
   const leadership = useSectionFields("about.leadership");
   const closing = useSectionFields("about.closing");
+
+  /**
+   * The five words the name is built from.
+   *
+   * The initial shown against each word is taken from the word itself rather than stored, so the
+   * column of letters always spells whatever the words actually spell. Hardcoding "E N I C E" beside
+   * editable text would let the two drift until the page claimed an acronym it no longer formed.
+   */
+  const acronymEntries = fieldItems(acronym, "items", ACRONYM, (row) => {
+    const word = typeof row.title === "string" ? row.title.trim() : "";
+    if (!word) return null;
+    return {
+      word,
+      description: typeof row.description === "string" ? row.description.trim() : "",
+    };
+  });
 
   // The principles cards. Numbering is positional, so nobody maintains /01, /02 by hand.
   const principles = fieldItems(values, "items", PRINCIPLES, (row) => {
@@ -351,6 +384,54 @@ function AboutPage() {
             "ENICE Group is the parent company behind a growing set of software products. We find real problems in financial services, commerce, and business communication, then build and run the platforms that solve them.",
           )}
         />
+      </Section>
+
+      {/* ── 1. WHAT THE NAME STANDS FOR ───────────────────────────────────── */}
+      <Section container="narrow" divider aria-labelledby="about-acronym-heading">
+        <Reveal>
+          <div className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
+            <div>
+              <BandNumber>/01</BandNumber>
+              <h2 id="about-acronym-heading" className="type-h2 mt-4 text-foreground">
+                <StyledText
+                  text={fieldText(acronym, "heading", "What the name stands for")}
+                  accentClassName="text-gold"
+                />
+              </h2>
+            </div>
+
+            {/*
+              A list, not a grid. `HairlineGrid` tops out at four columns, so five letters would
+              wrap three-then-two and the acronym would stop reading in order. Stacked, the initials
+              form a single column that spells the name top to bottom, which is the one arrangement
+              that makes the point without a caption explaining it.
+            */}
+            <ol className="-mt-1">
+              {acronymEntries.map(({ word, description }) => (
+                <li
+                  key={word}
+                  className="flex items-baseline gap-6 border-t border-border py-5 first:border-t-0 first:pt-0 sm:gap-8"
+                >
+                  {/*
+                    Decorative: the initial is the first letter of the word beside it, so a screen
+                    reader announcing both would read "E, Empower". Fixed width and tabular figures
+                    keep the letters on one axis regardless of how wide each glyph is.
+                  */}
+                  <span
+                    aria-hidden
+                    className="w-7 shrink-0 text-center font-mono text-2xl font-semibold leading-none text-gold sm:w-8 sm:text-[1.75rem]"
+                  >
+                    {word.charAt(0).toUpperCase()}
+                  </span>
+                  <span>
+                    <span className="type-h3 block text-foreground">{word}</span>
+                    {description && <span className="type-body mt-2 block">{description}</span>}
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </Reveal>
       </Section>
 
       {/* ── 2. OUR STORY ──────────────────────────────────────────────────── */}
