@@ -1763,6 +1763,83 @@ VALUES ('about.acronym', 'What the name stands for', 'About', 'featureGrid', tru
 ON CONFLICT (key) DO NOTHING;
 `,
   },
+  {
+    id: 20,
+    name: "trim_redundant_home_and_about_copy",
+    sql: /* sql */ `
+-- An editorial pass to cut repetition, not information. The About page carried five prose bands
+-- that circled the same three ideas, and the home page repeated them. Every statement is guarded
+-- so an administrator's own edits are left alone, and a re-run is a no-op.
+
+-- "Our Vision" and "Our Ecosystem" were standalone bands that restated "Our Story" (shared
+-- infrastructure compounds) and each other (a ten-to-twenty-year global ambition). Vision's
+-- distinct point is folded into "Looking Ahead" below; both standalone bands go.
+DELETE FROM site_sections WHERE key IN ('about.vision', 'about.ecosystem');
+
+-- "Looking Ahead" absorbs the vision point and drops the overlap. Guarded on the old closing line.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{body}', '"The infrastructure African businesses depend on is still largely being built, and that gap is what we''re focused on — over a ten-to-twenty-year horizon most organisations aren''t structured to sustain. We''re building a home-grown technology group that competes globally, not one that follows trends.\\n\\nThis isn''t charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it — with systems businesses on this continent can run on for the next generation.\\n\\nWhat we build is made for a global market: it scales across regions, meets international compliance standards, and is built to compete with any equivalent platform anywhere. To the businesses and builders who rely on us — we''re committed to technology that matters, to a standard that matters, and to taking the time to do it properly."'::jsonb),
+    updated_at = now()
+WHERE key = 'about.outlook'
+  AND position('best option, period' in COALESCE(fields->>'body', '')) > 0;
+
+-- "Our Principles" was eight cards, a wall of text. Trimmed to five, dropping the three that
+-- overlapped others: Institutional Quality, Continuous Innovation, Ownership Mentality.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[
+    {"title":"Long-Term Thinking","description":"We evaluate decisions against decades, not quarters. We want companies that outlast trends and survive economic cycles. We won''t trade long-term integrity for short-term convenience."},
+    {"title":"Engineering Excellence","description":"We hold our engineering to the standards of regulated industries. Our codebases are documented, our APIs are versioned and backward-compatible, and our system designs favour resilience over novelty."},
+    {"title":"Security by Design","description":"Security isn''t added after a product ships. It''s built in from the start. Zero-trust architecture, per-tenant data isolation, end-to-end encryption, and continuous threat modelling are standard across every product we run. We treat our partners'' data as our responsibility."},
+    {"title":"Customer Obsession","description":"We measure ourselves by outcomes for the people we serve, not feature counts. Every product decision traces back to a real constraint facing a specific type of business, and our job is to remove it."},
+    {"title":"Responsible AI","description":"AI can help or cause real harm. Our AI systems ship with clear guardrails, full auditability, and ongoing human oversight. We don''t release a capability until we''re confident in its reliability and we can explain how it works."}
+  ]'::jsonb),
+    updated_at = now()
+WHERE key = 'about.values'
+  AND jsonb_array_length(fields->'items') > 5;
+
+-- The founders' letter dropped from three paragraphs to two.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{body}', '"Every good business runs on good infrastructure — that''s the idea behind ENICE Group. We don''t build technology for its own sake; we build products that solve real problems and give businesses something they can depend on for years.\\n\\nThe idea came from everyday life in Nigeria: support queues nobody answered, payments that failed exactly when they mattered, cards declined for no reason. We decided that shouldn''t be normal. African businesses and consumers deserve technology built to the same standard as anywhere else — for Africa first, and the world as we grow."'::jsonb),
+    updated_at = now()
+WHERE key = 'home.founders'
+  AND position('didn''t start in a boardroom' in COALESCE(fields->>'body', '')) > 0;
+
+-- The "2 Offices in Nigeria" figure implied a physical office the company does not have yet. Only
+-- the (real) product count remains in the hero stats strip.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[{"value":"6","label":"Products in the ecosystem"}]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.statistics'
+  AND fields->'items' @> '[{"label":"Offices in Nigeria"}]'::jsonb;
+
+-- PulseAssist page: it described only the AI support platform, so the "Compliance-ready audit
+-- trails" capability card is replaced with the PulseAssist Email platform. The audit-trail claim
+-- was also only partly true — logging exists, but "comprehensive audit trails of every agent
+-- interaction / every model decision is logged" overstated it — so the compliance band is reworded
+-- to the mechanisms actually in place (tenant isolation, row-level security, policy versioning) and
+-- the "Audit Logs" pill is dropped. Migration 13 seeded the original strings, so these correct any
+-- database that ran it; guarded on the old text so an edited band is left alone.
+UPDATE site_sections
+SET fields = jsonb_set(
+      fields,
+      '{items}',
+      ((fields->'items') - 6) || '[{"icon":"Mail","title":"Email on your own domain","description":"PulseAssist Email sends transactional and marketing email from your own verified domain, with deliverability and sending reputation managed for you."}]'::jsonb
+    ),
+    updated_at = now()
+WHERE key = 'portfolio.pulseassist.features'
+  AND fields->'items' @> '[{"title":"Compliance-ready audit trails"}]'::jsonb;
+
+UPDATE site_sections
+SET fields = jsonb_set(
+      jsonb_set(fields, '{subheading}', '"Policy configurations are version-controlled and every conversation runs with per-tenant data isolation and row-level security, built to meet the regulatory requirements of banking and telecom in Africa and beyond."'::jsonb),
+      '{items}',
+      '[{"title":"Tenant Isolation"},{"title":"Policy Versioning"},{"title":"Row-Level Security"}]'::jsonb
+    ),
+    updated_at = now()
+WHERE key = 'portfolio.pulseassist.compliance'
+  AND position('comprehensive audit trails' in COALESCE(fields->>'subheading', '')) > 0;
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

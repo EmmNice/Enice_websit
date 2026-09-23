@@ -80,7 +80,7 @@ export const Route = createFileRoute("/compliance")({
           heading: "Contact for Regulatory Matters",
           body: (
             <p>
-              Regulators, auditors, and compliance partners can reach our office at{" "}
+              Regulators, auditors, and compliance partners can reach our compliance team at{" "}
               <a
                 href="mailto:compliance@enicehq.com"
                 className="font-medium text-primary hover:underline"

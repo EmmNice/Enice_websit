@@ -10,6 +10,7 @@ import {
   Globe,
   Users,
   BarChart3,
+  Mail,
   MessageSquare,
   FileCheck2,
   Network,
@@ -68,7 +69,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
           "Real-time handoff to live agents",
           "API-driven account management",
           "Multi-tenant architecture for enterprises",
-          "Compliance-ready audit trails",
+          "Transactional and marketing email on a verified domain",
         ],
       },
     ]),
@@ -98,6 +99,7 @@ const CARD_ICONS: Record<string, LucideIcon> = {
   FileCheck2,
   Globe,
   Inbox,
+  Mail,
   MessageSquare,
   Network,
   ShieldCheck,
@@ -144,9 +146,12 @@ const FEATURES = [
     desc: "Enterprise-grade isolation between clients with dedicated model and routing configs.",
   },
   {
-    icon: FileCheck2,
-    title: "Compliance-ready audit trails",
-    desc: "Every interaction is logged, timestamped, and exportable for regulatory review.",
+    // PulseAssist is two platforms under one roof: the AI support layer above, and PulseAssist
+    // Email. The page described only the first, so the email platform is named here and gets its
+    // own page at /portfolio/pulseassist-email.
+    icon: Mail,
+    title: "Email on your own domain",
+    desc: "PulseAssist Email sends transactional and marketing email from your own verified domain, with deliverability and sending reputation managed for you.",
   },
 ];
 
@@ -172,12 +177,7 @@ const SECTORS = [
   { icon: ShieldCheck, label: "Compliance-heavy Enterprises" },
 ];
 
-const COMPLIANCE_MECHANISMS = [
-  "Tenant Isolation",
-  "Audit Logs",
-  "Policy Versioning",
-  "Row-Level Security",
-];
+const COMPLIANCE_MECHANISMS = ["Tenant Isolation", "Policy Versioning", "Row-Level Security"];
 
 /** Product lifecycle, from the shared registry — never a hand-written status string. */
 const STAGE_LABEL = { available: "Available", building: "In development" } as const;
@@ -520,7 +520,7 @@ function PulseAssistPage() {
               {fieldText(
                 complianceSection,
                 "subheading",
-                "PulseAssist maintains comprehensive audit trails of every agent interaction. Policy configurations are version-controlled, every model decision is logged, and all data is tenant-isolated, meeting the regulatory requirements of banking and telecom in Africa and beyond.",
+                "Policy configurations are version-controlled and every conversation runs with per-tenant data isolation and row-level security, built to meet the regulatory requirements of banking and telecom in Africa and beyond.",
               )}
             </p>
             <ul className="mt-5 flex flex-wrap gap-2">
