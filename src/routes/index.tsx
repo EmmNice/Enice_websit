@@ -64,10 +64,7 @@ export const Route = createFileRoute("/")({
  * act on. The fourth was simply wrong — there are five products, not four, which is exactly the
  * failure mode of writing a count by hand, so the count is now derived from the product registry.
  */
-const HERO_STATS = [
-  { value: String(PRODUCTS.length), label: "Products in the ecosystem" },
-  { value: "2", label: "Offices in Nigeria" },
-];
+const HERO_STATS = [{ value: String(PRODUCTS.length), label: "Products in the ecosystem" }];
 
 /**
  * Icons an editor may name on a CMS-managed card.
@@ -213,9 +210,8 @@ const COMPLIANCE_BADGES = [
 ];
 
 const FOUNDERS_LETTER = [
-  "Every good business runs on good infrastructure. That's the idea behind ENICE Group. We don't build technology for its own sake. We build products that solve real problems and give people and businesses infrastructure they can depend on for years.",
-  "That idea didn't start in a boardroom. It came from everyday life in Nigeria: calling a company for help and waiting too long, dealing with poor service, hitting friction that shouldn't exist. It came from financial platforms that failed exactly when we needed them, from declined international cards to simple payments that turned into a headache.",
-  "We decided that shouldn't be normal. ENICE Group exists because African businesses and consumers deserve technology that is reliable, secure, and built to the same standard as anywhere else. Every product we launch is a step toward that, for Africa first, and for the world as we grow.",
+  "Every good business runs on good infrastructure — that's the idea behind ENICE Group. We don't build technology for its own sake; we build products that solve real problems and give businesses something they can depend on for years.",
+  "The idea came from everyday life in Nigeria: support queues nobody answered, payments that failed exactly when they mattered, cards declined for no reason. We decided that shouldn't be normal. African businesses and consumers deserve technology built to the same standard as anywhere else — for Africa first, and the world as we grow.",
 ];
 
 /**
@@ -342,7 +338,10 @@ function Landing() {
 
         <div className="relative flex flex-1 items-center">
           <Container className="py-12 sm:py-24">
-            <div className="grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-14 xl:gap-20">
+            {/* Single column. The hero used to pair this copy with a product-ecosystem panel in a
+                two-column grid; the panel is gone, so the statement now stands on its own, capped
+                so lines stay a comfortable measure rather than stretching the full container. */}
+            <div className="max-w-3xl">
               {/* ── Copy ── */}
               <div>
                 <div
@@ -439,21 +438,6 @@ function Landing() {
                     </li>
                   ))}
                 </ul>
-              </div>
-
-              {/* ── Product ecosystem panel ──
-                  Rendered on every viewport. It used to be `hidden lg:block`, which meant a phone
-                  got the hero as a column of text and nothing else — the single clearest sign that
-                  the page was a desktop layout reflowed rather than a design. On mobile it sits
-                  below the copy.
-                  Was a mock "Control Panel" asserting "All Systems Operational" and a
-                  `GET /v1/core/status` response of `"status": "operational"` — a hardcoded
-                  health claim on every page load, contradicting /status, which is the only
-                  surface that actually checks anything. It now shows the product ecosystem and
-                  each product's lifecycle stage, read from the shared product registry in
-                  `navigation.ts`, so it cannot drift from the header, the footer or reality. */}
-              <div className="animate-hero-up lg:animate-none" style={{ animationDelay: "320ms" }}>
-                <EcosystemPanel />
               </div>
             </div>
           </Container>
@@ -717,75 +701,5 @@ function Landing() {
       <Careers />
       <ContactSection />
     </SiteShell>
-  );
-}
-
-// ─── Hero panel ───────────────────────────────────────────────────────────────
-
-/** Lifecycle stages, in the order a visitor cares about them. */
-const STAGE_LABEL = { available: "Available", building: "In development" } as const;
-
-/**
- * The hero's supporting visual: the product ecosystem, drawn from the shared registry.
- *
- * It describes what exists and what is being built — facts with a source — rather than
- * simulating telemetry. A mock dashboard on a marketing page is read as real by exactly the
- * people who matter most, and this one previously claimed uptime nothing measured.
- */
-function EcosystemPanel() {
-  return (
-    <Panel raised className="overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-        <span className="flex items-center gap-2.5">
-          <span aria-hidden className="flex items-baseline text-[13px] tracking-tight">
-            <span className="enice-mark font-extrabold">E</span>
-            <span className="-ml-px font-light tracking-[0.24em] text-foreground">NICE</span>
-          </span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-bone-faint">
-            Product ecosystem
-          </span>
-        </span>
-        <span className="tnum font-mono text-[10px] text-bone-faint">
-          {PRODUCTS.length} products
-        </span>
-      </div>
-
-      {/* Descriptions wrap rather than truncate. `truncate` was clipping three of the five to
-          "…paym…", and an ellipsis in the first viewport reads as a layout that ran out of room. */}
-      <ul className="divide-y divide-border">
-        {PRODUCTS.map((p) => (
-          <li key={p.to} className="flex items-start justify-between gap-4 px-5 py-3.5">
-            <span className="min-w-0">
-              <span className="block text-[13px] font-semibold text-foreground">{p.label}</span>
-              <span className="mt-1 block text-[11px] leading-relaxed text-bone-soft">
-                {p.description}
-              </span>
-            </span>
-            <span
-              className={`mt-px shrink-0 text-[10px] font-semibold uppercase tracking-[0.14em] ${
-                p.stage === "available" ? "text-positive" : "text-gold"
-              }`}
-            >
-              {STAGE_LABEL[p.stage ?? "building"]}
-            </span>
-          </li>
-        ))}
-      </ul>
-
-      <div className="grid grid-cols-3 gap-px border-t border-border bg-border">
-        {[
-          { label: "Isolation", value: "Per-tenant" },
-          { label: "Database", value: "Row-level" },
-          { label: "Transport", value: "TLS" },
-        ].map((m) => (
-          <div key={m.label} className="bg-surface-2 px-3 py-4 text-center">
-            <div className="font-mono text-[13px] font-semibold text-foreground">{m.value}</div>
-            <div className="mt-1 text-[10px] uppercase tracking-[0.16em] text-bone-faint">
-              {m.label}
-            </div>
-          </div>
-        ))}
-      </div>
-    </Panel>
   );
 }

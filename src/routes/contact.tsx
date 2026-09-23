@@ -196,9 +196,9 @@ function ContactPage() {
                 <MapPin aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-gold" strokeWidth={2} />
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
-                    Headquarters
+                    Based in
                   </div>
-                  <div className="mt-1 text-sm text-foreground">Abuja, Nigeria</div>
+                  <div className="mt-1 text-sm text-foreground">Abuja and Kaduna, Nigeria</div>
                   <div className="type-meta mt-0.5">WAT, UTC+1. Business hours 9am to 6pm</div>
                 </div>
               </li>

@@ -889,10 +889,7 @@ const DEFAULT_SECTIONS: {
        * wrong (4 for five products), which is why the code derives it from the product registry
        * rather than storing it.
        */
-      items: [
-        { value: "6", label: "Products in the ecosystem" },
-        { value: "2", label: "Offices in Nigeria" },
-      ],
+      items: [{ value: "6", label: "Products in the ecosystem" }],
     },
   },
   {
@@ -1129,7 +1126,7 @@ const DEFAULT_SECTIONS: {
       eyebrow: "From the founders",
       heading: "A letter from the founders",
       // Blank lines separate paragraphs; see `fieldParagraphs` in src/lib/cms/use-section.ts.
-      body: "Every good business runs on good infrastructure. That's the idea behind ENICE Group. We don't build technology for its own sake. We build products that solve real problems and give people and businesses infrastructure they can depend on for years.\n\nThat idea didn't start in a boardroom. It came from everyday life in Nigeria: calling a company for help and waiting too long, dealing with poor service, hitting friction that shouldn't exist. It came from financial platforms that failed exactly when we needed them, from declined international cards to simple payments that turned into a headache.\n\nWe decided that shouldn't be normal. ENICE Group exists because African businesses and consumers deserve technology that is reliable, secure, and built to the same standard as anywhere else. Every product we launch is a step toward that, for Africa first, and for the world as we grow.",
+      body: "Every good business runs on good infrastructure — that's the idea behind ENICE Group. We don't build technology for its own sake; we build products that solve real problems and give businesses something they can depend on for years.\n\nThe idea came from everyday life in Nigeria: support queues nobody answered, payments that failed exactly when they mattered, cards declined for no reason. We decided that shouldn't be normal. African businesses and consumers deserve technology built to the same standard as anywhere else — for Africa first, and the world as we grow.",
     },
   },
   {
@@ -1614,28 +1611,6 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "about.vision",
-    label: "Our Vision",
-    group: "About",
-    type: "prose",
-    order: 150,
-    fields: {
-      heading: "Our Vision",
-      body: "Over the next ten to twenty years, we want to build what Africa doesn't yet have: a home-grown technology infrastructure group that competes globally, not one that just follows trends.\n\nWe're building toward a future where African-originated financial infrastructure is trusted across multiple continents, where enterprise AI built here sets the regional standard for reliability, and where developer tools from our ecosystem are chosen by builders worldwide because they're simply good.\n\nThat's a ten-to-twenty-year project. It takes discipline and patience most organisations aren't built to sustain. We're structured for the long run, not the short cycle of a typical startup.",
-    },
-  },
-  {
-    key: "about.ecosystem",
-    label: "Our Ecosystem",
-    group: "About",
-    type: "prose",
-    order: 160,
-    fields: {
-      heading: "Our Ecosystem",
-      body: "The most important part of the ENICE Group model isn't any single product, it's the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same zero-trust access model, the same data isolation standards, and the same deployment pipeline.\n\nThat shared foundation pays off twice. Each new product reaches production-grade reliability faster, because the hard infrastructure problems are already solved at the group level. And each existing product gets stronger as we add new ones, through shared investment and shared operational standards.\n\nThe result is a set of products that gets more capable with each addition. Security improvements spread across the ecosystem. Infrastructure work lifts every product. Compliance work done once serves every regulated platform.\n\nThat's why we call it an ecosystem rather than a collection of products. They're built to compound.",
-    },
-  },
-  {
     key: "about.outlook",
     label: "Looking Ahead",
     group: "About",
@@ -1643,7 +1618,7 @@ const DEFAULT_SECTIONS: {
     order: 170,
     fields: {
       heading: "Looking Ahead",
-      body: "The financial and technological infrastructure African businesses depend on is still largely being built. That's not a criticism, it's just where things stand, and it's the opportunity we're focused on.\n\nWe want to build the systems businesses on this continent will run on for the next generation. This isn't charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it.\n\nWe're also building for a global market. What we build will scale across regions, meet international compliance standards, and compete with any equivalent platform anywhere. We're not trying to be the best option in Nigeria or in Africa. We're trying to be the best option, period.\n\nTo the businesses that use our products, and the engineers and operators who build with us: we're committed to building technology that matters, to a standard that matters, and taking the time it takes to do it properly.",
+      body: "The infrastructure African businesses depend on is still largely being built, and that gap is what we're focused on — over a ten-to-twenty-year horizon most organisations aren't structured to sustain. We're building a home-grown technology group that competes globally, not one that follows trends.\n\nThis isn't charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it — with systems businesses on this continent can run on for the next generation.\n\nWhat we build is made for a global market: it scales across regions, meets international compliance standards, and is built to compete with any equivalent platform anywhere. To the businesses and builders who rely on us — we're committed to technology that matters, to a standard that matters, and to taking the time to do it properly.",
     },
   },
   {
@@ -1678,24 +1653,9 @@ const DEFAULT_SECTIONS: {
             "We measure ourselves by outcomes for the people we serve, not feature counts. Every product decision traces back to a real constraint facing a specific type of business, and our job is to remove it.",
         },
         {
-          title: "Institutional Quality",
-          description:
-            "We build for enterprise, not for early adopters willing to tolerate rough edges. Our documentation, onboarding, support, and SLA commitments are built to satisfy legal, compliance, and procurement teams at serious organisations.",
-        },
-        {
           title: "Responsible AI",
           description:
             "AI can help or cause real harm. Our AI systems ship with clear guardrails, full auditability, and ongoing human oversight. We don't release a capability until we're confident in its reliability and we can explain how it works.",
-        },
-        {
-          title: "Continuous Innovation",
-          description:
-            "Staying relevant takes sustained investment in research and experimentation. It isn't one team's job, it's built into how every product team works. We set aside engineering time for exploratory work because what we build in five years doesn't have a name yet.",
-        },
-        {
-          title: "Ownership Mentality",
-          description:
-            "Everyone at ENICE, from engineers to operations leads, is expected to think like an owner: accountable, deeply knowledgeable in their domain, and biased toward action. We trust people to lead, and we hold them to that standard.",
         },
       ],
     },
@@ -2059,10 +2019,10 @@ const DEFAULT_SECTIONS: {
             "Enterprise-grade isolation between clients with dedicated model and routing configs.",
         },
         {
-          icon: "FileCheck2",
-          title: "Compliance-ready audit trails",
+          icon: "Mail",
+          title: "Email on your own domain",
           description:
-            "Every interaction is logged, timestamped, and exportable for regulatory review.",
+            "PulseAssist Email sends transactional and marketing email from your own verified domain, with deliverability and sending reputation managed for you.",
         },
       ],
     },
@@ -2095,10 +2055,9 @@ const DEFAULT_SECTIONS: {
       eyebrow: "Enterprise Compliance",
       heading: "Every interaction is compliant by design.",
       subheading:
-        "PulseAssist maintains comprehensive audit trails of every agent interaction. Policy configurations are version-controlled, every model decision is logged, and all data is tenant-isolated, meeting the regulatory requirements of banking and telecom in Africa and beyond.",
+        "Policy configurations are version-controlled and every conversation runs with per-tenant data isolation and row-level security, built to meet the regulatory requirements of banking and telecom in Africa and beyond.",
       items: [
         { title: "Tenant Isolation" },
-        { title: "Audit Logs" },
         { title: "Policy Versioning" },
         { title: "Row-Level Security" },
       ],

@@ -68,23 +68,8 @@ const PRINCIPLES = [
   },
   {
     index: "05",
-    title: "Institutional Quality",
-    body: "We build for enterprise, not for early adopters willing to tolerate rough edges. Our documentation, onboarding, support, and SLA commitments are built to satisfy legal, compliance, and procurement teams at serious organisations.",
-  },
-  {
-    index: "06",
     title: "Responsible AI",
     body: "AI can help or cause real harm. Our AI systems ship with clear guardrails, full auditability, and ongoing human oversight. We don't release a capability until we're confident in its reliability and we can explain how it works.",
-  },
-  {
-    index: "07",
-    title: "Continuous Innovation",
-    body: "Staying relevant takes sustained investment in research and experimentation. It isn't one team's job, it's built into how every product team works. We set aside engineering time for exploratory work because what we build in five years doesn't have a name yet.",
-  },
-  {
-    index: "08",
-    title: "Ownership Mentality",
-    body: "Everyone at ENICE, from engineers to operations leads, is expected to think like an owner: accountable, deeply knowledgeable in their domain, and biased toward action. We trust people to lead, and we hold them to that standard.",
   },
 ];
 
@@ -468,24 +453,7 @@ function AboutPage() {
         </Reveal>
       </Section>
 
-      {/* ── 4. OUR VISION ─────────────────────────────────────────────────── */}
-      <Section container="narrow" divider glow="center" aria-labelledby="about-vision-heading">
-        <Reveal>
-          <ProseBand
-            number="/04"
-            sectionKey="about.vision"
-            heading="Our Vision"
-            headingId="about-vision-heading"
-            paragraphs={[
-              "Over the next ten to twenty years, we want to build what Africa doesn't yet have: a home-grown technology infrastructure group that competes globally, not one that just follows trends.",
-              "We're building toward a future where African-originated financial infrastructure is trusted across multiple continents, where enterprise AI built here sets the regional standard for reliability, and where developer tools from our ecosystem are chosen by builders worldwide because they're simply good.",
-              "That's a ten-to-twenty-year project. It takes discipline and patience most organisations aren't built to sustain. We're structured for the long run, not the short cycle of a typical startup.",
-            ]}
-          />
-        </Reveal>
-      </Section>
-
-      {/* ── 5. WHAT WE BUILD ──────────────────────────────────────────────── */}
+      {/* ── 4. WHAT WE BUILD ──────────────────────────────────────────────── */}
       <Section
         container="narrow"
         tone="recessed"
@@ -495,7 +463,7 @@ function AboutPage() {
         <Reveal>
           <div className="grid gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
             <div>
-              <BandNumber>/05</BandNumber>
+              <BandNumber>/04</BandNumber>
               <h2 id="about-what-we-build-heading" className="type-h2 mt-4 text-foreground">
                 <StyledText
                   text={fieldText(build, "heading", "What We Build")}
@@ -532,11 +500,11 @@ function AboutPage() {
         </HairlineGrid>
       </Section>
 
-      {/* ── LEADERSHIP ────────────────────────────────────────────────────── */}
+      {/* ── 5. LEADERSHIP ─────────────────────────────────────────────────── */}
       <Section container="narrow" divider aria-labelledby="about-team-heading">
         <Reveal>
           <div className="max-w-2xl">
-            <BandNumber>/05b</BandNumber>
+            <BandNumber>/05</BandNumber>
             <h2 id="about-team-heading" className="type-h2 mt-4 text-foreground">
               <StyledText
                 text={fieldText(leadership, "heading", "The Founding Team")}
@@ -643,37 +611,18 @@ function AboutPage() {
         </div>
       </Section>
 
-      {/* ── 7. OUR ECOSYSTEM ──────────────────────────────────────────────── */}
-      <Section container="narrow" divider aria-labelledby="about-ecosystem-heading">
-        <Reveal>
-          <ProseBand
-            number="/07"
-            sectionKey="about.ecosystem"
-            heading="Our Ecosystem"
-            headingId="about-ecosystem-heading"
-            paragraphs={[
-              "The most important part of the ENICE Group model isn't any single product, it's the infrastructure they share. Every product we build runs on the same engineering foundation: the same security architecture, the same data isolation standards, and the same deployment pipeline.",
-              "That shared foundation pays off twice. Each new product reaches production-grade reliability faster, because the hard infrastructure problems are already solved at the group level. And each existing product gets stronger as we add new ones, through shared investment and shared operational standards.",
-              "The result is a set of products that gets more capable with each addition. Security improvements spread across the ecosystem. Infrastructure work lifts every product. Compliance work done once serves every regulated platform.",
-              "That's why we call it an ecosystem rather than a collection of products. They're built to compound.",
-            ]}
-          />
-        </Reveal>
-      </Section>
-
-      {/* ── 8. LOOKING AHEAD ──────────────────────────────────────────────── */}
+      {/* ── 7. LOOKING AHEAD ──────────────────────────────────────────────── */}
       <Section container="narrow" divider glow="center" aria-labelledby="about-outlook-heading">
         <Reveal>
           <ProseBand
-            number="/09"
+            number="/07"
             sectionKey="about.outlook"
             heading="Looking Ahead"
             headingId="about-outlook-heading"
             paragraphs={[
-              "The financial and technological infrastructure African businesses depend on is still largely being built. That's not a criticism, it's just where things stand, and it's the opportunity we're focused on.",
-              "We want to build the systems businesses on this continent will run on for the next generation. This isn't charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it.",
-              "We're also building for a global market. What we build will scale across regions, meet international compliance standards, and compete with any equivalent platform anywhere. We're not trying to be the best option in Nigeria or in Africa. We're trying to be the best option, period.",
-              "To the businesses that use our products, and the engineers and operators who build with us: we're committed to building technology that matters, to a standard that matters, and taking the time it takes to do it properly.",
+              "The infrastructure African businesses depend on is still largely being built, and that gap is what we're focused on — over a ten-to-twenty-year horizon most organisations aren't structured to sustain. We're building a home-grown technology group that competes globally, not one that follows trends.",
+              "This isn't charity. Demand for institutional-quality infrastructure is large, growing, and underserved, and we intend to supply it — with systems businesses on this continent can run on for the next generation.",
+              "What we build is made for a global market: it scales across regions, meets international compliance standards, and is built to compete with any equivalent platform anywhere. To the businesses and builders who rely on us — we're committed to technology that matters, to a standard that matters, and to taking the time to do it properly.",
             ]}
           />
         </Reveal>
