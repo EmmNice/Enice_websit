@@ -1840,6 +1840,32 @@ WHERE key = 'portfolio.pulseassist.compliance'
   AND position('comprehensive audit trails' in COALESCE(fields->>'subheading', '')) > 0;
 `,
   },
+  {
+    id: 21,
+    name: "enice_acronym_updated",
+    sql: /* sql */ `
+-- The ENICE acronym now reads "Enabling Next-Generation Innovations in Customer Experience",
+-- replacing the earlier Empower / Nurture / Innovate / Create / Elevate that migration 19 seeded.
+-- The five list words carry the initials E, N, I, C, E; the connective "in" lives only in the
+-- subheading, which the page shows as a lead above the list. Guarded on the old first word, so an
+-- administrator's own edit is left alone and a re-run is a no-op.
+UPDATE site_sections
+SET fields = jsonb_set(
+      jsonb_set(fields, '{subheading}', '"Enabling Next-Generation Innovations in Customer Experience."'::jsonb),
+      '{items}',
+      '[
+        {"title":"Enabling","description":""},
+        {"title":"Next-Generation","description":""},
+        {"title":"Innovations","description":""},
+        {"title":"Customer","description":""},
+        {"title":"Experience","description":""}
+      ]'::jsonb
+    ),
+    updated_at = now()
+WHERE key = 'about.acronym'
+  AND fields->'items' @> '[{"title":"Empower"}]'::jsonb;
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */
