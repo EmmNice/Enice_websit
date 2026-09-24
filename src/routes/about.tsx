@@ -191,12 +191,19 @@ const CLOSING_ATTRIBUTION = "— The Founders, ENICE Group";
  * letter from the Website Manager without a deploy — and until they do, the words stand alone.
  */
 const ACRONYM: { word: string; description: string }[] = [
-  { word: "Empower", description: "" },
-  { word: "Nurture", description: "" },
-  { word: "Innovate", description: "" },
-  { word: "Create", description: "" },
-  { word: "Elevate", description: "" },
+  { word: "Enabling", description: "" },
+  { word: "Next-Generation", description: "" },
+  { word: "Innovations", description: "" },
+  { word: "Customer", description: "" },
+  { word: "Experience", description: "" },
 ];
+
+/**
+ * The name read as one line, connective "in" included. The list drops it — a per-letter column
+ * cannot carry a linking word — so the full phrase is shown once, above the breakdown, and is the
+ * only place a reader sees the acronym as the sentence it actually forms.
+ */
+const ACRONYM_PHRASE = "Enabling Next-Generation Innovations in Customer Experience.";
 
 /** The band number, at the one size and weight every band uses. */
 function BandNumber({ children }: { children: string }) {
@@ -383,6 +390,12 @@ function AboutPage() {
                   accentClassName="text-gold"
                 />
               </h2>
+              <p className="type-lead mt-5">
+                <StyledText
+                  text={fieldText(acronym, "subheading", ACRONYM_PHRASE)}
+                  accentClassName="text-gold"
+                />
+              </p>
             </div>
 
             {/*

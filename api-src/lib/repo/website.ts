@@ -1573,18 +1573,20 @@ const DEFAULT_SECTIONS: {
     order: 110,
     fields: {
       heading: "What the name stands for",
+      // The full phrase, shown as a lead above the per-letter list, which cannot carry the "in".
+      subheading: "Enabling Next-Generation Innovations in Customer Experience.",
       // `title` is the word; the initial the page shows beside it is derived from that word rather
       // than stored, so the column of letters always spells whatever the words spell.
       //
-      // `description` is intentionally blank on every row. The five words are the company's own; a
-      // sentence written here to pad each letter would be invented meaning. The field exists so the
-      // brand owner can add one per letter without a deploy.
+      // `description` is intentionally blank on every row: the words already form the phrase in the
+      // subheading, and a gloss per letter would be invented filler. The field exists so the brand
+      // owner can add one per letter later without a deploy.
       items: [
-        { title: "Empower", description: "" },
-        { title: "Nurture", description: "" },
-        { title: "Innovate", description: "" },
-        { title: "Create", description: "" },
-        { title: "Elevate", description: "" },
+        { title: "Enabling", description: "" },
+        { title: "Next-Generation", description: "" },
+        { title: "Innovations", description: "" },
+        { title: "Customer", description: "" },
+        { title: "Experience", description: "" },
       ],
     },
   },

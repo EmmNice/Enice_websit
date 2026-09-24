@@ -4582,6 +4582,35 @@ WHERE key = 'portfolio.pulseassist.compliance'
   AND position('comprehensive audit trails' in COALESCE(fields->>'subheading', '')) > 0;
 `
         )
+      },
+      {
+        id: 21,
+        name: "enice_acronym_updated",
+        sql: (
+          /* sql */
+          `
+-- The ENICE acronym now reads "Enabling Next-Generation Innovations in Customer Experience",
+-- replacing the earlier Empower / Nurture / Innovate / Create / Elevate that migration 19 seeded.
+-- The five list words carry the initials E, N, I, C, E; the connective "in" lives only in the
+-- subheading, which the page shows as a lead above the list. Guarded on the old first word, so an
+-- administrator's own edit is left alone and a re-run is a no-op.
+UPDATE site_sections
+SET fields = jsonb_set(
+      jsonb_set(fields, '{subheading}', '"Enabling Next-Generation Innovations in Customer Experience."'::jsonb),
+      '{items}',
+      '[
+        {"title":"Enabling","description":""},
+        {"title":"Next-Generation","description":""},
+        {"title":"Innovations","description":""},
+        {"title":"Customer","description":""},
+        {"title":"Experience","description":""}
+      ]'::jsonb
+    ),
+    updated_at = now()
+WHERE key = 'about.acronym'
+  AND fields->'items' @> '[{"title":"Empower"}]'::jsonb;
+`
+        )
       }
     ];
     MIGRATIONS_TABLE_SQL = /* sql */
@@ -75735,18 +75764,20 @@ var init_website = __esm({
         order: 110,
         fields: {
           heading: "What the name stands for",
+          // The full phrase, shown as a lead above the per-letter list, which cannot carry the "in".
+          subheading: "Enabling Next-Generation Innovations in Customer Experience.",
           // `title` is the word; the initial the page shows beside it is derived from that word rather
           // than stored, so the column of letters always spells whatever the words spell.
           //
-          // `description` is intentionally blank on every row. The five words are the company's own; a
-          // sentence written here to pad each letter would be invented meaning. The field exists so the
-          // brand owner can add one per letter without a deploy.
+          // `description` is intentionally blank on every row: the words already form the phrase in the
+          // subheading, and a gloss per letter would be invented filler. The field exists so the brand
+          // owner can add one per letter later without a deploy.
           items: [
-            { title: "Empower", description: "" },
-            { title: "Nurture", description: "" },
-            { title: "Innovate", description: "" },
-            { title: "Create", description: "" },
-            { title: "Elevate", description: "" }
+            { title: "Enabling", description: "" },
+            { title: "Next-Generation", description: "" },
+            { title: "Innovations", description: "" },
+            { title: "Customer", description: "" },
+            { title: "Experience", description: "" }
           ]
         }
       },
