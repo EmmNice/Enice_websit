@@ -146,7 +146,7 @@ export const BLOCK_META: Record<BlockType, { label: string; icon: string; hint: 
   paragraph: { label: "Text", icon: "Type", hint: "Body copy" },
   list: { label: "List", icon: "List", hint: "Bulleted or numbered" },
   quote: { label: "Quote", icon: "Quote", hint: "Pull quote with attribution" },
-  image: { label: "Image", icon: "Image", hint: "From the media library" },
+  image: { label: "Image", icon: "Image", hint: "By URL" },
   video: { label: "Video", icon: "Video", hint: "YouTube, Vimeo or a file" },
   table: { label: "Table", icon: "Table", hint: "Rows and columns" },
   code: { label: "Code", icon: "Code", hint: "Syntax-highlighted snippet" },

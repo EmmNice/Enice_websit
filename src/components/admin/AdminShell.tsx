@@ -521,7 +521,7 @@ export function AdminShell({ children, requiredPermission }: AdminShellProps) {
         <EmptyState
           icon={ShieldAlert}
           title="You do not have access to this area"
-          description="Your role does not include this permission. An Owner can change that under Administration → Administrators."
+          description="Your role does not include this permission. Roles are set in the database — ask whoever administers this deployment."
           action={
             <Button variant="outline" onClick={() => window.history.back()}>
               Go back
