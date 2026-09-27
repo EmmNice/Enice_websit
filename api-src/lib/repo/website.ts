@@ -2037,13 +2037,15 @@ const DEFAULT_SECTIONS: {
     order: 223,
     fields: {
       eyebrow: "Sectors Served",
-      heading: "Built for compliance-heavy industries.",
-      // Icon tiles with a name only, so each row's title is the tile's label.
+      heading: "Built for businesses that put customer communication first.",
+      // Icon tiles with a name only, so each row's title is the tile's label. The icon names must
+      // exist in `CARD_ICONS` in src/routes/portfolio.pulseassist.tsx — that map is curated rather
+      // than the whole of lucide, so an unlisted name silently degrades to a neutral tile.
       items: [
-        { icon: "BarChart3", title: "Banking & Fintech" },
-        { icon: "Users", title: "Telecom Operators" },
-        { icon: "Globe", title: "Insurance" },
-        { icon: "ShieldCheck", title: "Compliance-heavy Enterprises" },
+        { icon: "CreditCard", title: "Fintech" },
+        { icon: "ShoppingBag", title: "E-commerce & Retail" },
+        { icon: "HeartPulse", title: "Healthcare & Wellness" },
+        { icon: "Cloud", title: "Technology & SaaS" },
       ],
     },
   },

@@ -12,12 +12,17 @@ export const Route = createFileRoute("/compliance")({
       intro="ENICE Group operates with transparency, integrity, and full adherence to global and local statutory frameworks. As a product-driven technology company, our compliance program covers the platforms we build and operate."
       sections={[
         {
+          // Deliberately no RC number and no entity class ("Business Name", "Limited by Shares").
+          // A regulator reading this page looks for exactly those, so they are worth adding — but
+          // they are worth adding *correctly*, from the certificate, rather than inferred. Same
+          // discipline as the Security Architecture section below, which states plainly what we do
+          // not hold rather than implying it.
           heading: "Corporate and Enterprise Registration",
           body: (
             <p>
-              ENICE Group is fully registered with the Small and Medium Enterprises Development
-              Agency of Nigeria (SMEDAN) as a certified Nano Enterprise, and meets all local
-              operational, reporting, and statutory requirements for enterprise businesses.
+              ENICE Group is registered with the Corporate Affairs Commission (CAC) of Nigeria, and
+              meets all local operational, reporting, and statutory requirements that apply to
+              registered Nigerian businesses.
             </p>
           ),
         },

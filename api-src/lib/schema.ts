@@ -1037,12 +1037,12 @@ ON CONFLICT (key) DO NOTHING;
 INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
 VALUES ('portfolio.pulseassist.sectors', 'PulseAssist sectors served', 'Portfolio', 'featureGrid', true, 'published', '{
   "eyebrow": "Sectors Served",
-  "heading": "Built for compliance-heavy industries.",
+  "heading": "Built for businesses that put customer communication first.",
   "items": [
-    {"icon":"BarChart3","title":"Banking & Fintech"},
-    {"icon":"Users","title":"Telecom Operators"},
-    {"icon":"Globe","title":"Insurance"},
-    {"icon":"ShieldCheck","title":"Compliance-heavy Enterprises"}
+    {"icon":"CreditCard","title":"Fintech"},
+    {"icon":"ShoppingBag","title":"E-commerce & Retail"},
+    {"icon":"HeartPulse","title":"Healthcare & Wellness"},
+    {"icon":"Cloud","title":"Technology & SaaS"}
   ]
 }'::jsonb, 223)
 ON CONFLICT (key) DO NOTHING;
