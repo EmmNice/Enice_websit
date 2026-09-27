@@ -18,9 +18,13 @@ import {
   Settings,
   TrendingUp,
   Clock,
+  Cloud,
+  CreditCard,
   Database,
+  HeartPulse,
   Inbox,
   BookOpen,
+  ShoppingBag,
   UserCircle,
   Ticket,
 } from "lucide-react";
@@ -60,7 +64,7 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
         offers: {
           "@type": "Offer",
           availability: "https://schema.org/InStock",
-          description: "Request enterprise integration access via corporate@enicehq.com",
+          description: "Request enterprise integration access via sales@getpulseassist.com",
         },
         author: ORGANIZATION_REF,
         featureList: [
@@ -96,13 +100,17 @@ const CARD_ICONS: Record<string, LucideIcon> = {
   BarChart3,
   Boxes,
   BrainCircuit,
+  Cloud,
+  CreditCard,
   FileCheck2,
   Globe,
+  HeartPulse,
   Inbox,
   Mail,
   MessageSquare,
   Network,
   ShieldCheck,
+  ShoppingBag,
   Users,
   Zap,
 };
@@ -171,10 +179,10 @@ const STATS = [
 // ─── Sectors served ────────────────────────────────────────────────────────────
 
 const SECTORS = [
-  { icon: BarChart3, label: "Banking & Fintech" },
-  { icon: Users, label: "Telecom Operators" },
-  { icon: Globe, label: "Insurance" },
-  { icon: ShieldCheck, label: "Compliance-heavy Enterprises" },
+  { icon: CreditCard, label: "Fintech" },
+  { icon: ShoppingBag, label: "E-commerce & Retail" },
+  { icon: HeartPulse, label: "Healthcare & Wellness" },
+  { icon: Cloud, label: "Technology & SaaS" },
 ];
 
 const COMPLIANCE_MECHANISMS = ["Tenant Isolation", "Policy Versioning", "Row-Level Security"];
@@ -432,7 +440,7 @@ function PulseAssistPage() {
               {/* Opens the early-access modal in place, so it stays a button rather than a Cta. */}
               <PulseAssistEarlyAccessButton className="btn btn-primary group" />
               <Cta
-                to="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
+                to="mailto:sales@getpulseassist.com?subject=PulseAssist%20Integration%20Request"
                 variant="secondary"
                 icon="external"
               >
@@ -490,7 +498,11 @@ function PulseAssistPage() {
           id="sectors-heading"
           align="center"
           eyebrow={fieldText(sectorsSection, "eyebrow", "Sectors Served")}
-          heading={fieldText(sectorsSection, "heading", "Built for compliance-heavy industries.")}
+          heading={fieldText(
+            sectorsSection,
+            "heading",
+            "Built for businesses that put customer communication first.",
+          )}
         />
         <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {sectors.map((s) => (
@@ -554,7 +566,7 @@ function PulseAssistPage() {
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
           <PulseAssistEarlyAccessButton className="btn btn-primary btn-lg group" />
           <Cta
-            to="mailto:corporate@enicehq.com?subject=PulseAssist%20Integration%20Request"
+            to="mailto:sales@getpulseassist.com?subject=PulseAssist%20Integration%20Request"
             variant="secondary"
             size="lg"
             icon="external"
