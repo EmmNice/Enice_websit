@@ -155,10 +155,10 @@ const FOR_WHO = [
  *
  * ePulse has no launch date, so the pair below says exactly that. The previous treatment wrapped
  * the same words in a pulsing dot borrowed from live-status indicators, which read as telemetry on
- * a product that does not exist yet. The stage label is warm because "in development" is a
+ * a product that does not exist yet. The stage label is the brand accent because "in development" is a
  * lifecycle state; `positive` is reserved for things that are genuinely available.
  *
- * The gold treatment is no longer stored per row. A `statistics` section carries a value and a
+ * The accent treatment is no longer stored per row. A `statistics` section carries a value and a
  * label and nothing else, which is correct: which figure is accented is a styling decision, not
  * content an editor should have to make. The first row is the status row, and that is the one the
  * accent belongs to — so the emphasis is derived from position at render time.
@@ -225,13 +225,13 @@ function EPulsePage() {
         aria-labelledby="epulse-heading"
       >
         <div className="flex flex-col items-center text-center" data-allow-select>
-          <Tag tone="warm">Coming Soon</Tag>
+          <Tag tone="accent">Coming Soon</Tag>
 
           {/*
             Hand-built rather than `SectionIntro` for one reason: the CMS fallback heading is
-            `e[[Pulse]]`, and `SectionIntro` renders a `[[highlight]]` in gold. At display size that
+            `e[[Pulse]]`, and `SectionIntro` renders a `[[highlight]]` in electric. At display size that
             would put almost the whole product name in the accent colour, which is the one thing the
-            warm palette is not for. The highlight run therefore resolves to bone here — the same
+            accent is not for. The highlight run therefore resolves to bone here — the same
             decision the homepage hero documents — so the heading stays a heading and the accent
             stays an accent. Nothing about the editable string changes.
           */}
@@ -249,7 +249,7 @@ function EPulsePage() {
                 "subheading",
                 "ePulse is ENICE Group's upcoming global financial platform, built for people who **earn, send, and spend money across borders**. Designed for freelancers, remote workers, creators, and global businesses, ePulse aims to make international finance *simple and accessible*.",
               )}
-              accentClassName="text-gold"
+              accentClassName="text-electric"
               boldClassName="font-semibold text-foreground"
             />
           </p>
@@ -270,7 +270,7 @@ function EPulsePage() {
                   {f.label}
                 </dt>
                 <dd
-                  className={`mt-1 text-sm font-semibold ${i === 0 ? "text-gold" : "text-foreground"}`}
+                  className={`mt-1 text-sm font-semibold ${i === 0 ? "text-electric" : "text-foreground"}`}
                 >
                   {f.value}
                 </dd>

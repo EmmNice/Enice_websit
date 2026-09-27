@@ -13,7 +13,7 @@
  * thing that differs is colour. The two class sets stay separate on purpose: collapsing them would
  * mean one of the two surfaces silently renders for the wrong background.
  *
- * The dark set is written in the public design-system tokens (`bone`, `gold`, `surface-*`), which
+ * The dark set is written in the public design-system tokens (`bone`, `electric`, `surface-*`), which
  * are declared on `.site` — a class `__root.tsx` keeps on `<html>` for public routes and removes
  * under /admin. So the dark theme scopes itself with that class, because the admin preview renders
  * `theme="dark"` outside `.site` and would otherwise resolve every one of those tokens to nothing.
@@ -94,7 +94,7 @@ const THEMES: Record<DocTheme, ThemeClasses> = {
     strongList: "mb-6 space-y-2 pl-6 text-[1.0625rem] leading-[1.75] text-bone-strong",
     listItem: "text-bone-strong marker:text-bone-faint",
     quote:
-      "my-9 border-l border-gold/40 pl-5 text-[1.0625rem] leading-[1.75] italic text-bone-strong",
+      "my-9 border-l border-electric/40 pl-5 text-[1.0625rem] leading-[1.75] italic text-bone-strong",
     quoteAttribution: "type-meta mt-3 not-italic",
     caption: "type-meta mt-3 text-center",
     divider: "my-12 h-px border-0 bg-border",
@@ -110,12 +110,12 @@ const THEMES: Record<DocTheme, ThemeClasses> = {
       head: "bg-surface-1 px-4 py-3 text-left text-[11px] font-semibold tracking-[0.14em] text-bone-soft uppercase",
       cell: "border-t border-border px-4 py-3 text-sm text-bone-strong",
     },
-    // The warm accent carries "warning" and the one non-warm accent carries "success"; info is
+    // The brand accent carries "warning" and the one accent that is not the brand blue carries "success"; info is
     // deliberately neutral so the common case does not colour an article.
     callout: {
       info: "border-border bg-surface-1 text-bone-strong",
       success: "border-positive/25 bg-positive/[0.07] text-bone-strong",
-      warning: "border-gold/25 bg-gold/[0.07] text-bone-strong",
+      warning: "border-electric/25 bg-electric/[0.07] text-bone-strong",
       danger: "border-destructive/30 bg-destructive/[0.07] text-bone-strong",
     },
     calloutTitle: "mb-1.5 text-sm font-semibold text-foreground",
@@ -163,7 +163,7 @@ const THEMES: Record<DocTheme, ThemeClasses> = {
  * selector on the wrapper styles it without needing to rewrite the markup.
  */
 const LINK_CLASSES: Record<DocTheme, string> = {
-  dark: "[&_a]:font-medium [&_a]:text-gold [&_a]:underline [&_a]:decoration-gold/40 [&_a]:underline-offset-2 [&_a:hover]:decoration-gold [&_code]:rounded [&_code]:border [&_code]:border-border [&_code]:bg-surface-2 [&_code]:px-1.5 [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-gold [&_strong]:font-semibold [&_strong]:text-foreground",
+  dark: "[&_a]:font-medium [&_a]:text-electric [&_a]:underline [&_a]:decoration-electric/40 [&_a]:underline-offset-2 [&_a:hover]:decoration-electric [&_code]:rounded [&_code]:border [&_code]:border-border [&_code]:bg-surface-2 [&_code]:px-1.5 [&_code]:font-mono [&_code]:text-[0.9em] [&_code]:text-electric [&_strong]:font-semibold [&_strong]:text-foreground",
   light:
     "[&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_a]:decoration-primary/30 [&_a]:underline-offset-2 [&_a:hover]:decoration-primary [&_code]:rounded [&_code]:bg-secondary [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:font-mono [&_code]:text-[0.85em] [&_code]:text-primary [&_strong]:font-bold [&_strong]:text-foreground",
 };
@@ -447,7 +447,7 @@ export function DocTableOfContents({
               href={`#${heading.id}`}
               className={`text-sm transition-colors ${
                 isDark
-                  ? "text-bone-soft hover:text-gold"
+                  ? "text-bone-soft hover:text-electric"
                   : "text-muted-foreground hover:text-primary"
               }`}
             >

@@ -123,7 +123,7 @@ const MILESTONES: Milestone[] = [
  * How a milestone's state is expressed on the dark canvas.
  *
  * `tone` hands the pill to the shared `Tag` treatment rather than restating a palette per state:
- * shipped work is the one genuine positive signal, work in flight takes the warm accent, and
+ * shipped work is the one genuine positive signal, work in flight takes the brand accent, and
  * anything still planned stays deliberately quiet so a roadmap of nine cards does not read as
  * nine highlights. The old light-theme pills (`bg-emerald-50`, `bg-blue-50`) are gone with the
  * navy system they belonged to.
@@ -133,7 +133,7 @@ const STATUS_CONFIG: Record<
   {
     label: string;
     icon: ElementType;
-    tone: "neutral" | "warm" | "positive";
+    tone: "neutral" | "accent" | "positive";
     pillClassName?: string;
     dot: string;
   }
@@ -147,8 +147,8 @@ const STATUS_CONFIG: Record<
   "in-progress": {
     label: "In Progress",
     icon: Zap,
-    tone: "warm",
-    dot: "bg-gold",
+    tone: "accent",
+    dot: "bg-electric",
   },
   planned: {
     label: "Planned",
@@ -385,7 +385,7 @@ export function Roadmap() {
               {t.label}
               <span
                 className={`tnum rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                  selected ? "bg-gold/[0.12] text-gold" : "bg-transparent text-bone-faint"
+                  selected ? "bg-electric/[0.12] text-electric" : "bg-transparent text-bone-faint"
                 }`}
               >
                 {counts[t.key]}

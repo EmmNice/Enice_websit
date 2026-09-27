@@ -195,7 +195,7 @@ function AssistFallback() {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-label={open ? "Close contact options" : "Open contact options"}
-        className="grid h-14 w-14 place-items-center rounded-full border border-gold/25 bg-surface-2 text-gold shadow-[0_18px_40px_-16px_rgb(0_0_0/0.8)] transition-colors hover:border-gold/45 hover:bg-surface-3"
+        className="grid h-14 w-14 place-items-center rounded-full border border-electric/25 bg-surface-2 text-electric shadow-[0_18px_40px_-16px_rgb(0_0_0/0.8)] transition-colors hover:border-electric/45 hover:bg-surface-3"
       >
         {open ? (
           <X aria-hidden className="h-5 w-5" />

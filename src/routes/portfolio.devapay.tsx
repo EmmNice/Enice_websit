@@ -163,7 +163,7 @@ const CAPABILITIES = [
 // ─── Launch framing ───────────────────────────────────────────────────────────
 
 /**
- * The gold treatment is not stored per row.
+ * The accent treatment is not stored per row.
  *
  * A `statistics` section carries a value and a label and nothing else, which is correct: which
  * figure is accented is a styling decision rather than content an editor should have to make. The
@@ -183,7 +183,7 @@ const LAUNCH_FACTS = [
  *
  * Retoned from a navy gradient card with white-on-navy type to the surface ramp and hairlines, so
  * it sits in the same environment as the rest of the page instead of importing the old brand into
- * it. The success mark is warm rather than green: green means "available" on this site, and this
+ * it. The success mark is the brand accent rather than green: green means "available" on this site, and this
  * platform is not. Entirely decorative, so the whole card is hidden from assistive technology —
  * every fact it depicts is stated in the copy beside it.
  */
@@ -201,8 +201,8 @@ function PaymentNotificationCard() {
 
       <div className="mt-8 rounded-xl border border-border bg-surface-3 p-4">
         <div className="flex items-center gap-2">
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/25 bg-gold/[0.08]">
-            <CheckCircle2 className="h-4 w-4 text-gold" strokeWidth={2} />
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-electric/25 bg-electric/[0.08]">
+            <CheckCircle2 className="h-4 w-4 text-electric" strokeWidth={2} />
           </span>
           <div>
             <div className="text-[11px] font-semibold text-foreground">Payment Received</div>
@@ -274,7 +274,7 @@ function PaymentCollectionPage() {
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           {/* ── Copy ── */}
           <div data-allow-select>
-            <Tag tone="warm">Coming Q1 2027</Tag>
+            <Tag tone="accent">Coming Q1 2027</Tag>
 
             <SectionIntro
               id="payments-heading"
@@ -302,7 +302,7 @@ function PaymentCollectionPage() {
                   </dt>
                   <dd
                     className={`tnum mt-1 text-[12px] font-semibold ${
-                      i === 0 ? "text-gold" : "text-foreground"
+                      i === 0 ? "text-electric" : "text-foreground"
                     }`}
                   >
                     {m.value}

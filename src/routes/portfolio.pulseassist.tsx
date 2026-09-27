@@ -187,7 +187,7 @@ const STAGE = PRODUCTS.find((p) => p.to === "/portfolio/pulseassist")?.stage ?? 
 //
 // A product illustration, not a reading. It is `aria-hidden` and contains nothing focusable —
 // the "Create AI Agent" control used to be a real `<button>`, which put a dead tab stop inside a
-// decorative image. Every tile is warm-toned: the mock previously ran violet, blue, emerald and
+// decorative image. Every tile is accent-toned: the mock previously ran violet, blue, emerald and
 // amber icons at once, which read as clip art against a near-black and bone page.
 
 const NAV_SECONDARY = [
@@ -211,7 +211,7 @@ const MOCK_STATS_SECONDARY = [
 ];
 
 const MOCK_TILE =
-  "grid h-3.5 w-3.5 shrink-0 place-items-center rounded bg-gold/[0.1] sm:h-4 sm:w-4";
+  "grid h-3.5 w-3.5 shrink-0 place-items-center rounded bg-electric/[0.1] sm:h-4 sm:w-4";
 const MOCK_LABEL =
   "text-[5.5px] font-semibold uppercase leading-tight tracking-[0.06em] text-bone-faint sm:text-[6px]";
 const MOCK_VALUE = "tnum text-[15px] font-bold leading-none text-foreground sm:text-[18px]";
@@ -226,7 +226,7 @@ function DashboardMock() {
         <div className="flex w-9 shrink-0 flex-col border-r border-border bg-background py-3 sm:w-[130px] sm:p-3">
           {/* Logo */}
           <div className="mb-3 flex items-center justify-center sm:mb-4 sm:justify-start sm:gap-1.5 sm:px-1">
-            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md border border-gold/25 bg-gold/[0.08] text-gold">
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md border border-electric/25 bg-electric/[0.08] text-electric">
               <BrainCircuit className="h-3 w-3" />
             </span>
             <span className="hidden text-[9px] font-bold tracking-tight text-foreground sm:block">
@@ -247,7 +247,7 @@ function DashboardMock() {
               <span className="hidden text-[8px] font-semibold text-foreground sm:block">
                 Dashboard
               </span>
-              <span className="ml-auto hidden h-1 w-1 rounded-full bg-gold sm:block" />
+              <span className="ml-auto hidden h-1 w-1 rounded-full bg-electric sm:block" />
             </div>
 
             <div className="flex w-full items-center justify-center py-1.5 sm:justify-start sm:gap-1.5 sm:px-2">
@@ -297,11 +297,12 @@ function DashboardMock() {
 
           {/* Agent config banner */}
           <div className="mb-2 flex items-center gap-1.5 rounded-lg border border-border bg-surface-2 px-2 py-1.5 sm:mb-3 sm:gap-2 sm:px-2.5 sm:py-2">
-            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md border border-gold/25 bg-gold/[0.08] text-gold sm:h-6 sm:w-6">
+            <span className="grid h-5 w-5 shrink-0 place-items-center rounded-md border border-electric/25 bg-electric/[0.08] text-electric sm:h-6 sm:w-6">
               <BrainCircuit className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
             </span>
             <p className="min-w-0 flex-1 truncate text-[7px] text-bone-soft sm:text-[8px]">
-              Configured for: <span className="font-semibold text-gold">General Commercial</span>
+              Configured for:{" "}
+              <span className="font-semibold text-electric">General Commercial</span>
             </p>
             <div className="flex shrink-0 items-center gap-1 rounded-md border border-border px-1.5 py-0.5 text-[6px] text-bone-faint sm:px-2 sm:py-1 sm:text-[7px]">
               <Settings className="h-2 w-2 sm:h-2.5 sm:w-2.5" strokeWidth={2} />
@@ -316,7 +317,7 @@ function DashboardMock() {
                 <div className="mb-1 flex items-start justify-between gap-1">
                   <span className={MOCK_LABEL}>{label}</span>
                   <span className={MOCK_TILE}>
-                    <Icon className="h-2 w-2 text-gold sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+                    <Icon className="h-2 w-2 text-electric sm:h-2.5 sm:w-2.5" strokeWidth={2} />
                   </span>
                 </div>
                 <p className={MOCK_VALUE}>{value}</p>
@@ -334,7 +335,7 @@ function DashboardMock() {
                 <div className="mb-1 flex items-start justify-between gap-1">
                   <span className={MOCK_LABEL}>{label}</span>
                   <span className={MOCK_TILE}>
-                    <Icon className="h-2 w-2 text-gold sm:h-2.5 sm:w-2.5" strokeWidth={2} />
+                    <Icon className="h-2 w-2 text-electric sm:h-2.5 sm:w-2.5" strokeWidth={2} />
                   </span>
                 </div>
                 <p className={MOCK_VALUE}>{value}</p>
@@ -416,7 +417,7 @@ function PulseAssistPage() {
                 now states the product's lifecycle stage, read from the product registry, which is
                 a fact with a source. */}
             <div className="mt-8 flex flex-wrap gap-2">
-              <Tag tone={STAGE === "available" ? "positive" : "warm"}>{STAGE_LABEL[STAGE]}</Tag>
+              <Tag tone={STAGE === "available" ? "positive" : "accent"}>{STAGE_LABEL[STAGE]}</Tag>
               <Tag>
                 <BrainCircuit aria-hidden className="h-3 w-3 shrink-0" />
                 Multi-tenant · API-native
@@ -527,7 +528,11 @@ function PulseAssistPage() {
               {complianceMechanisms.map((b) => (
                 <li key={b}>
                   <Tag>
-                    <Check aria-hidden className="h-3 w-3 shrink-0 text-gold" strokeWidth={2.5} />
+                    <Check
+                      aria-hidden
+                      className="h-3 w-3 shrink-0 text-electric"
+                      strokeWidth={2.5}
+                    />
                     {b}
                   </Tag>
                 </li>

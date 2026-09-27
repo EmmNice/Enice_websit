@@ -348,11 +348,11 @@ function Landing() {
                   className="animate-hero-up inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-surface-1/80 px-3 py-1.5 backdrop-blur-sm sm:gap-2.5 sm:px-4"
                   style={{ animationDelay: "0ms" }}
                 >
-                  <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-gold" />
+                  <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-electric" />
                   <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-bone-strong sm:text-[11px] sm:tracking-[0.16em]">
                     <StyledText
                       text={fieldText(hero, "eyebrow", "Technology Group · Building for Africa")}
-                      accentClassName="text-gold"
+                      accentClassName="text-electric"
                     />
                   </span>
                 </div>
@@ -361,9 +361,9 @@ function Landing() {
                   No manual line breaks and no [[highlight]] in the default copy.
 
                   The breaks were tuned for one viewport and broke at every other, and the
-                  highlight put two lines of ~60px gold at the top of the page — the accent is for
+                  highlight put two lines of ~60px electric at the top of the page — the accent is for
                   small emphasis, and at that size it stopped reading as an accent and started
-                  reading as a gold website. `text-wrap: balance` handles the ragging. The
+                  reading as a electric website. `text-wrap: balance` handles the ragging. The
                   capability is still there for an editor who wants to emphasise a short phrase.
                 */}
                 <h1
@@ -376,7 +376,7 @@ function Landing() {
                       "heading",
                       "We build the technology behind Africa's next generation of businesses.",
                     )}
-                    accentClassName="text-gold"
+                    accentClassName="text-electric"
                   />
                 </h1>
 
@@ -390,7 +390,7 @@ function Landing() {
                       "subheading",
                       "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
                     )}
-                    accentClassName="text-gold"
+                    accentClassName="text-electric"
                   />
                 </p>
 
@@ -433,7 +433,7 @@ function Landing() {
                       key={m.label}
                       className="flex items-center gap-2 text-[11px] font-medium text-bone-soft"
                     >
-                      <Check aria-hidden className="h-3 w-3 text-gold" strokeWidth={2.5} />
+                      <Check aria-hidden className="h-3 w-3 text-electric" strokeWidth={2.5} />
                       {m.label}
                     </li>
                   ))}
@@ -502,10 +502,10 @@ function Landing() {
                     <Eyebrow className="text-[10px] tracking-[0.2em]">{v.kicker}</Eyebrow>
                   )}
                   <h3 className="type-h3 mt-2.5 text-foreground">
-                    <StyledText text={v.title} accentClassName="text-gold" />
+                    <StyledText text={v.title} accentClassName="text-electric" />
                   </h3>
                   <p className="type-body mt-3.5">
-                    <StyledText text={v.desc} accentClassName="text-gold" />
+                    <StyledText text={v.desc} accentClassName="text-electric" />
                   </p>
                 </div>
 
@@ -516,7 +516,11 @@ function Landing() {
                         key={b}
                         className="flex items-center gap-2.5 text-[13px] font-medium text-bone-strong"
                       >
-                        <Check aria-hidden className="h-3 w-3 shrink-0 text-gold" strokeWidth={3} />
+                        <Check
+                          aria-hidden
+                          className="h-3 w-3 shrink-0 text-electric"
+                          strokeWidth={3}
+                        />
                         {b}
                       </li>
                     ))}
@@ -530,7 +534,7 @@ function Landing() {
         <div className="mt-6 grid gap-6 sm:grid-cols-3">
           {buildPrinciples.map((item, i) => (
             <Reveal key={item.title} delay={i * 60}>
-              <div className="h-full border-t border-gold/25 pt-5">
+              <div className="h-full border-t border-electric/25 pt-5">
                 <h3 className="text-[14px] font-semibold tracking-tight text-foreground">
                   {item.title}
                 </h3>
@@ -577,10 +581,10 @@ function Landing() {
                     )}
                   </div>
                   <h3 className="mt-5 text-2xl font-semibold tracking-[-0.025em] text-foreground sm:text-[1.75rem]">
-                    <StyledText text={p.title} accentClassName="text-gold" />
+                    <StyledText text={p.title} accentClassName="text-electric" />
                   </h3>
                   <p className="type-body mt-3.5 max-w-xl">
-                    <StyledText text={p.desc} accentClassName="text-gold" />
+                    <StyledText text={p.desc} accentClassName="text-electric" />
                   </p>
                   <Cta to={p.to} variant="secondary" size="sm" icon="external" className="mt-7">
                     View {p.title}
@@ -631,10 +635,10 @@ function Landing() {
                   <CardIndex value={i + 1} />
                 </div>
                 <h3 className="type-h3 mt-8 text-foreground">
-                  <StyledText text={c.title} accentClassName="text-gold" />
+                  <StyledText text={c.title} accentClassName="text-electric" />
                 </h3>
                 <p className="type-body mt-3">
-                  <StyledText text={c.desc} accentClassName="text-gold" />
+                  <StyledText text={c.desc} accentClassName="text-electric" />
                 </p>
               </div>
             </Reveal>
@@ -656,7 +660,11 @@ function Landing() {
               {mechanismList.map((b) => (
                 <li key={b.label}>
                   <Tag>
-                    <b.icon aria-hidden className="h-3 w-3 shrink-0 text-gold" strokeWidth={2} />
+                    <b.icon
+                      aria-hidden
+                      className="h-3 w-3 shrink-0 text-electric"
+                      strokeWidth={2}
+                    />
                     {b.label}
                   </Tag>
                 </li>
@@ -683,7 +691,7 @@ function Landing() {
             >
               {letter.map((paragraph, i) => (
                 <p key={i} className={i === 0 ? "text-foreground" : undefined}>
-                  <StyledText text={paragraph} accentClassName="text-gold" />
+                  <StyledText text={paragraph} accentClassName="text-electric" />
                 </p>
               ))}
             </div>

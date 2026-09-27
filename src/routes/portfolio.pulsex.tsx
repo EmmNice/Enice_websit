@@ -93,7 +93,7 @@ const TICKER_DATA = [
 /**
  * An abstract trend line.
  *
- * Direction is drawn in the site's own palette — warm for rising, bone-faint for falling — rather
+ * Direction is drawn in the site's own palette — the brand accent for rising, bone-faint for falling — rather
  * than the green/red of a trading terminal. Green on this site means one thing, "available", and
  * spending it on a decorative line would make the one honest availability signal meaningless.
  */
@@ -116,7 +116,7 @@ function Sparkline({ data, up }: { data: number[]; up: boolean }) {
       <polyline
         points={pts}
         fill="none"
-        stroke={up ? "var(--gold)" : "var(--bone-faint)"}
+        stroke={up ? "var(--electric)" : "var(--bone-faint)"}
         strokeWidth="1.5"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -151,12 +151,12 @@ function CandlestickChart() {
         return (
           <div key={i} className="relative flex flex-1 flex-col items-center">
             <div
-              className={`w-px ${bar.up ? "bg-gold/35" : "bg-bone-faint/30"}`}
+              className={`w-px ${bar.up ? "bg-electric/35" : "bg-bone-faint/30"}`}
               style={{ height: bar.h + "px" }}
             />
             <div
               className={`absolute w-full max-w-[8px] rounded-sm ${
-                bar.up ? "bg-gold/70" : "bg-bone-faint/45"
+                bar.up ? "bg-electric/70" : "bg-bone-faint/45"
               }`}
               style={{ height: Math.max(bodyH, 4) + "px", top: bodyTop + "px" }}
             />
@@ -172,7 +172,7 @@ function MarketsPanel() {
     <Panel raised aria-hidden className="overflow-hidden">
       <div className="flex items-center justify-between border-b border-border px-5 py-3">
         <span className="flex items-center gap-2">
-          <Bitcoin className="h-4 w-4 text-gold" strokeWidth={1.5} />
+          <Bitcoin className="h-4 w-4 text-electric" strokeWidth={1.5} />
           <span className="text-[12px] font-semibold text-bone-strong">PulseX Markets</span>
         </span>
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-bone-faint">
@@ -249,7 +249,7 @@ function cardIcon(name: string): LucideIcon {
 // ─── Launch framing ───────────────────────────────────────────────────────────
 
 /**
- * The gold treatment is not stored per row.
+ * The accent treatment is not stored per row.
  *
  * A `statistics` section carries a value and a label and nothing else, which is correct: which
  * figure is accented is a styling decision rather than content an editor should have to make. The
@@ -346,13 +346,13 @@ function PulseXPage() {
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
           {/* ── Copy ── */}
           <div data-allow-select>
-            <Tag tone="warm">Coming Q3 2027</Tag>
+            <Tag tone="accent">Coming Q3 2027</Tag>
 
             {/*
               Hand-built rather than `SectionIntro`: the editable heading is `Pulse[[X]]`, and
-              `SectionIntro` paints a `[[highlight]]` gold. A display-size word in the accent colour
-              is the one thing the warm palette is not for, so the highlight resolves to bone and the
-              gold stays where it belongs — the eyebrow, the icons and the hairlines.
+              `SectionIntro` paints a `[[highlight]]` electric. A display-size word in the accent colour
+              is the one thing the accent is not for, so the highlight resolves to bone and the
+              electric stays where it belongs — the eyebrow, the icons and the hairlines.
             */}
             <h1 id="pulsex-heading" className="type-display mt-8 text-foreground">
               <StyledText
@@ -368,7 +368,7 @@ function PulseXPage() {
                   "subheading",
                   "PulseX is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
                 )}
-                accentClassName="text-gold"
+                accentClassName="text-electric"
                 boldClassName="font-semibold text-foreground"
               />
             </p>
@@ -381,7 +381,7 @@ function PulseXPage() {
                   </dt>
                   <dd
                     className={`tnum mt-1 text-[12px] font-semibold ${
-                      i === 0 ? "text-gold" : "text-foreground"
+                      i === 0 ? "text-electric" : "text-foreground"
                     }`}
                   >
                     {m.value}
@@ -472,7 +472,7 @@ function PulseXPage() {
                   {p.stage === "available" ? (
                     <Tag tone="positive">Available</Tag>
                   ) : (
-                    <Tag tone="warm">In development</Tag>
+                    <Tag tone="accent">In development</Tag>
                   )}
                 </span>
                 <span className="type-body text-[12px]">{p.description}</span>

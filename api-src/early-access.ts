@@ -77,7 +77,7 @@ function layout(kicker: string, heading: string, bodyHtml: string): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
   <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
     <tr><td style="padding:0 0 24px;">
-      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#1e3a8a;font-weight:700;">${kicker}</p>
+      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#0048ed;font-weight:700;">${kicker}</p>
       <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#111827;">${heading}</h1>
     </td></tr>
     <tr><td>${bodyHtml}</td></tr>

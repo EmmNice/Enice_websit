@@ -54,14 +54,14 @@ function RelatedPosts({ related }: { related: PublicArticle["related"] }) {
                 {post.category.toUpperCase()}
               </span>
             )}
-            <h3 className="text-sm leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-gold">
+            <h3 className="text-sm leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-electric">
               {post.title}
             </h3>
             <p className="type-meta tnum mt-1.5 mb-2">{formatPublishedDate(post.publishedAt)}</p>
             <p className="line-clamp-2 text-[13px] leading-relaxed text-bone-soft">
               {post.excerpt}
             </p>
-            <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-bone-faint transition-colors group-hover:text-gold">
+            <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-bone-faint transition-colors group-hover:text-electric">
               Read <ArrowUpRight aria-hidden className="h-3 w-3" />
             </span>
           </Link>

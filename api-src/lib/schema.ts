@@ -906,8 +906,8 @@ businesses.';
 -- Two conventions are worth stating, because the code parses them back out:
 --
 --   * Launch-fact strips are \`statistics\` sections, which carry a value and a label and nothing
---     else. Which row is painted gold is a styling decision, not content, so it is not stored: the
---     first row is the status row and the component accents it by position.
+--     else. Which row carries the accent is a styling decision, not content, so it is not stored:
+--     the first row is the status row and the component accents it by position.
 --
 --   * Roadmap milestones are \`steps\` rows, which carry a title and a description. A milestone needs
 --     four more things, so they are written as \`label: value\` lines at the top of the description,

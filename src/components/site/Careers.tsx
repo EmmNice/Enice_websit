@@ -27,7 +27,7 @@ export function Careers() {
         <h2 id="careers-heading" className="type-h2 mt-5 text-foreground">
           <StyledText
             text={fieldText(careers, "heading", "Build products that matter.")}
-            accentClassName="text-gold"
+            accentClassName="text-electric"
           />
         </h2>
         <p className="type-lead mx-auto mt-5">
@@ -37,7 +37,7 @@ export function Careers() {
               "subheading",
               "We work with people who care about product quality, solid engineering, and technology that holds up at real scale. If that sounds like you, we want to hear from you.",
             )}
-            accentClassName="text-gold"
+            accentClassName="text-electric"
           />
         </p>
         <Cta

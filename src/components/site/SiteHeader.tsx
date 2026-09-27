@@ -269,7 +269,7 @@ function MenuButton({
                   <span className="flex items-center gap-2">
                     <span className="text-[13px] font-semibold text-foreground">{item.label}</span>
                     {item.stage === "building" && (
-                      <span className="rounded-full border border-gold/25 px-1.5 py-px text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">
+                      <span className="rounded-full border border-electric/25 px-1.5 py-px text-[10px] font-semibold uppercase tracking-[0.14em] text-electric">
                         In development
                       </span>
                     )}
@@ -289,7 +289,7 @@ function MenuButton({
               <Link
                 to={group.footer.to as "/"}
                 onClick={onClose}
-                className="group/all flex items-center justify-between rounded-md px-3 py-2.5 text-[12px] font-semibold text-gold transition-colors hover:bg-surface-3"
+                className="group/all flex items-center justify-between rounded-md px-3 py-2.5 text-[12px] font-semibold text-electric transition-colors hover:bg-surface-3"
               >
                 {group.footer.label}
                 <ArrowUpRight
@@ -436,7 +436,7 @@ function MobileNav({
                     <Link
                       to={group.footer.to as "/"}
                       onClick={onClose}
-                      className="flex items-center gap-1.5 rounded-md px-2 py-2.5 text-[13px] font-semibold text-gold"
+                      className="flex items-center gap-1.5 rounded-md px-2 py-2.5 text-[13px] font-semibold text-electric"
                     >
                       {group.footer.label}
                       <ArrowUpRight aria-hidden className="h-3.5 w-3.5" />
@@ -503,7 +503,7 @@ function MobileLink({
         <span className="flex items-center gap-2">
           <span className="text-[15px] font-medium text-foreground">{item.label}</span>
           {item.stage === "building" && (
-            <span className="rounded-full border border-gold/25 px-1.5 py-px text-[10px] font-semibold uppercase tracking-[0.14em] text-gold">
+            <span className="rounded-full border border-electric/25 px-1.5 py-px text-[10px] font-semibold uppercase tracking-[0.14em] text-electric">
               Soon
             </span>
           )}

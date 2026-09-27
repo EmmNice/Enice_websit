@@ -65,9 +65,9 @@ type Result = { state: CheckState; code: number | null; ms: number | null };
 /**
  * State colours.
  *
- * `--positive` is the one non-warm accent in the system and this page is the only surface allowed
+ * `--positive` is the one accent in the system that is not the brand blue and this page is the only surface allowed
  * to assert availability, so green here means something: a probe that answered. Degraded takes the
- * warm accent and unreachable the destructive tone; "checking" stays deliberately quiet so a page
+ * brand accent and unreachable the destructive tone; "checking" stays deliberately quiet so a page
  * mid-check never looks like a verdict.
  */
 const STATE_META: Record<
@@ -86,7 +86,7 @@ const STATE_META: Record<
   },
   degraded: {
     label: "Degraded",
-    className: "text-gold",
+    className: "text-electric",
     Icon: AlertTriangle,
   },
   down: { label: "Unreachable", className: "text-destructive", Icon: XCircle },
@@ -262,7 +262,7 @@ function StatusPage() {
           integration partners directly under their agreements. For an incident report, contact{" "}
           <a
             href={`mailto:${CORPORATE_EMAIL}`}
-            className="text-foreground underline underline-offset-2 transition-colors hover:text-gold"
+            className="text-foreground underline underline-offset-2 transition-colors hover:text-electric"
           >
             {CORPORATE_EMAIL}
           </a>

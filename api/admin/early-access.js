@@ -29,6 +29,41 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
+// node_modules/standardwebhooks/dist/timing_safe_equal.js
+var require_timing_safe_equal = __commonJS({
+  "node_modules/standardwebhooks/dist/timing_safe_equal.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.timingSafeEqual = void 0;
+    function assert(expr, msg = "") {
+      if (!expr) {
+        throw new Error(msg);
+      }
+    }
+    function timingSafeEqual2(a, b) {
+      if (a.byteLength !== b.byteLength) {
+        return false;
+      }
+      if (!(a instanceof DataView)) {
+        a = new DataView(ArrayBuffer.isView(a) ? a.buffer : a);
+      }
+      if (!(b instanceof DataView)) {
+        b = new DataView(ArrayBuffer.isView(b) ? b.buffer : b);
+      }
+      assert(a instanceof DataView);
+      assert(b instanceof DataView);
+      const length = a.byteLength;
+      let out = 0;
+      let i = -1;
+      while (++i < length) {
+        out |= a.getUint8(i) ^ b.getUint8(i);
+      }
+      return out === 0;
+    }
+    exports.timingSafeEqual = timingSafeEqual2;
+  }
+});
+
 // node_modules/@stablelib/base64/lib/base64.js
 var require_base64 = __commonJS({
   "node_modules/@stablelib/base64/lib/base64.js"(exports) {
@@ -666,49 +701,15 @@ var require_sha256 = __commonJS({
   }
 });
 
-// node_modules/standardwebhooks/dist/timing_safe_equal.js
-var require_timing_safe_equal = __commonJS({
-  "node_modules/standardwebhooks/dist/timing_safe_equal.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.timingSafeEqual = timingSafeEqual2;
-    function assert(expr, msg = "") {
-      if (!expr) {
-        throw new Error(msg);
-      }
-    }
-    function timingSafeEqual2(a, b) {
-      if (a.byteLength !== b.byteLength) {
-        return false;
-      }
-      if (!(a instanceof DataView)) {
-        a = new DataView(ArrayBuffer.isView(a) ? a.buffer : a);
-      }
-      if (!(b instanceof DataView)) {
-        b = new DataView(ArrayBuffer.isView(b) ? b.buffer : b);
-      }
-      assert(a instanceof DataView);
-      assert(b instanceof DataView);
-      const length = a.byteLength;
-      let out = 0;
-      let i = -1;
-      while (++i < length) {
-        out |= a.getUint8(i) ^ b.getUint8(i);
-      }
-      return out === 0;
-    }
-  }
-});
-
 // node_modules/standardwebhooks/dist/index.js
 var require_dist = __commonJS({
   "node_modules/standardwebhooks/dist/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Webhook = exports.WebhookVerificationError = void 0;
+    var timing_safe_equal_1 = require_timing_safe_equal();
     var base64 = require_base64();
     var sha256 = require_sha256();
-    var timing_safe_equal_1 = require_timing_safe_equal();
     var WEBHOOK_TOLERANCE_IN_SECONDS = 5 * 60;
     var ExtendableError = class _ExtendableError extends Error {
       constructor(message) {
@@ -728,6 +729,9 @@ var require_dist = __commonJS({
     exports.WebhookVerificationError = WebhookVerificationError;
     var Webhook2 = class _Webhook {
       constructor(secret, options) {
+        if (!secret) {
+          throw new Error("Secret can't be empty.");
+        }
         if ((options === null || options === void 0 ? void 0 : options.format) === "raw") {
           if (secret instanceof Uint8Array) {
             this.key = secret;
@@ -743,20 +747,15 @@ var require_dist = __commonJS({
           }
           this.key = base64.decode(secret);
         }
-        if (this.key.length === 0) {
-          throw new Error("Secret can't be empty.");
-        }
       }
-      verify(payload, headers, options) {
-        var _a;
-        const jsonParse = (_a = options === null || options === void 0 ? void 0 : options.jsonParse) !== null && _a !== void 0 ? _a : true;
-        const normalizedHeaders = {};
-        for (const key of Object.keys(headers)) {
-          normalizedHeaders[key.toLowerCase()] = headers[key];
+      verify(payload, headers_) {
+        const headers = {};
+        for (const key of Object.keys(headers_)) {
+          headers[key.toLowerCase()] = headers_[key];
         }
-        const msgId = normalizedHeaders["webhook-id"];
-        const msgSignature = normalizedHeaders["webhook-signature"];
-        const msgTimestamp = normalizedHeaders["webhook-timestamp"];
+        const msgId = headers["webhook-id"];
+        const msgSignature = headers["webhook-signature"];
+        const msgTimestamp = headers["webhook-timestamp"];
         if (!msgSignature || !msgId || !msgTimestamp) {
           throw new WebhookVerificationError("Missing required headers");
         }
@@ -771,15 +770,7 @@ var require_dist = __commonJS({
             continue;
           }
           if ((0, timing_safe_equal_1.timingSafeEqual)(encoder.encode(signature), encoder.encode(expectedSignature))) {
-            const payloadString = payload.toString();
-            if (payloadString === "") {
-              return void 0;
-            }
-            if (jsonParse) {
-              return JSON.parse(payloadString);
-            } else {
-              return void 0;
-            }
+            return JSON.parse(payload.toString());
           }
         }
         throw new WebhookVerificationError("No matching signature found");
@@ -800,7 +791,7 @@ var require_dist = __commonJS({
       verifyTimestamp(timestampHeader) {
         const now = Math.floor(Date.now() / 1e3);
         const timestamp = parseInt(timestampHeader, 10);
-        if (Number.isNaN(timestamp)) {
+        if (isNaN(timestamp)) {
           throw new WebhookVerificationError("Invalid Signature Headers");
         }
         if (now - timestamp > WEBHOOK_TOLERANCE_IN_SECONDS) {
@@ -1603,7 +1594,6 @@ var MimeNode = class {
     }
     await this.finalizeChildNodes();
     this.content = this.contentDecoder ? await this.contentDecoder.finalize() : null;
-    this.contentDecoder = false;
     this.state = "finished";
   }
   async finalizeChildNodes() {
@@ -4596,41 +4586,20 @@ function base64ArrayBuffer(arrayBuffer) {
 // node_modules/postal-mime/src/postal-mime.js
 var MAX_NESTING_DEPTH = 256;
 var MAX_HEADERS_SIZE = 2 * 1024 * 1024;
-var MAX_RFC822_NESTING_DEPTH = 10;
 function toCamelCase(key) {
   return key.replace(/-(.)/g, (o, c) => c.toUpperCase());
 }
-function parseLimitOption(value, defaultValue, name) {
-  if (value === void 0 || value === null) {
-    return defaultValue;
-  }
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
-    throw new TypeError(`${name} must be a non-negative integer`);
-  }
-  return value;
-}
 var PostalMime = class _PostalMime {
-  // async so that an invalid option rejects the returned promise instead of throwing
-  // synchronously, which would escape a `.catch()` chain
-  static async parse(buf, options) {
+  static parse(buf, options) {
     const parser = new _PostalMime(options);
     return parser.parse(buf);
   }
-  // rfc822NestingDepth is internal state that nested parsers receive from their parent.
-  // It is deliberately a separate argument rather than an option, so that forwarding a
-  // caller supplied options object can not seed it and switch the recursion limit off.
-  constructor(options, rfc822NestingDepth = 0) {
+  constructor(options) {
     this.options = options || {};
     this.mimeOptions = {
-      maxNestingDepth: parseLimitOption(this.options.maxNestingDepth, MAX_NESTING_DEPTH, "maxNestingDepth"),
-      maxHeadersSize: parseLimitOption(this.options.maxHeadersSize, MAX_HEADERS_SIZE, "maxHeadersSize")
+      maxNestingDepth: this.options.maxNestingDepth || MAX_NESTING_DEPTH,
+      maxHeadersSize: this.options.maxHeadersSize || MAX_HEADERS_SIZE
     };
-    this.maxRfc822NestingDepth = parseLimitOption(
-      this.options.maxRfc822NestingDepth,
-      MAX_RFC822_NESTING_DEPTH,
-      "maxRfc822NestingDepth"
-    );
-    this.rfc822NestingDepth = rfc822NestingDepth;
     this.root = this.currentNode = new MimeNode({
       postalMime: this,
       ...this.mimeOptions
@@ -4730,20 +4699,8 @@ var PostalMime = class _PostalMime {
       alternative = alternative || false;
       related = related || false;
       if (!node.contentType.multipart) {
-        const inlineRfc822 = this.isInlineMessageRfc822(node) && !forceRfc822Attachments;
-        const rfc822DepthExceeded = inlineRfc822 && this.rfc822NestingDepth >= this.maxRfc822NestingDepth;
-        if (inlineRfc822 && !rfc822DepthExceeded) {
-          const subParser = new _PostalMime(
-            {
-              // Only the limits are inherited. Options that decide how a part
-              // is classified stay with the parser that was configured.
-              ...this.mimeOptions,
-              maxRfc822NestingDepth: this.maxRfc822NestingDepth,
-              // attachments are encoded by the parent parser, keep raw buffers here
-              attachmentEncoding: "arraybuffer"
-            },
-            this.rfc822NestingDepth + 1
-          );
+        if (this.isInlineMessageRfc822(node) && !forceRfc822Attachments) {
+          const subParser = new _PostalMime();
           node.subMessage = await subParser.parse(node.content);
           if (!textMap.has(node)) {
             textMap.set(node, {});
@@ -4784,11 +4741,8 @@ var PostalMime = class _PostalMime {
             mimeType: node.contentType.parsed.value,
             disposition: node.contentDisposition?.parsed?.value || null
           };
-          if (related && node.contentId && !rfc822DepthExceeded) {
+          if (related && node.contentId) {
             attachment.related = true;
-          }
-          if (rfc822DepthExceeded) {
-            attachment.rfc822DepthExceeded = true;
           }
           if (node.contentDescription) {
             attachment.description = node.contentDescription;
@@ -5063,7 +5017,7 @@ var PostalMime = class _PostalMime {
 
 // node_modules/resend/dist/index.mjs
 var import_standardwebhooks = __toESM(require_dist(), 1);
-var version = "6.28.1";
+var version = "6.20.0";
 function buildPaginationUrl(base, options) {
   const queryString = buildPaginationQuery(options);
   return queryString ? `${base}?${queryString}` : base;
@@ -5085,9 +5039,6 @@ var ApiKeys = class {
   async list(options = {}) {
     const url = buildPaginationUrl("/api-keys", options);
     return await this.resend.get(url);
-  }
-  async update(id, payload) {
-    return await this.resend.patch(`/api-keys/${id}`, payload);
   }
   async remove(id) {
     return await this.resend.delete(`/api-keys/${id}`);
@@ -5332,22 +5283,11 @@ var Broadcasts = class {
   async get(id) {
     return await this.resend.get(`/broadcasts/${id}`);
   }
-  async recipients(id, options) {
-    const url = `/broadcasts/${id}/recipients?${buildRecipientsQuery(options)}`;
-    return await this.resend.get(url);
-  }
-  async clickedLinks(id, options = {}) {
-    const url = buildPaginationUrl(`/broadcasts/${id}/clicked-links`, options);
-    return await this.resend.get(url);
-  }
   async remove(id) {
     return await this.resend.delete(`/broadcasts/${id}`);
   }
   async cancel(id) {
     return await this.resend.post(`/broadcasts/${id}/cancel`);
-  }
-  async duplicate(id) {
-    return await this.resend.post(`/broadcasts/${id}/duplicate`);
   }
   async update(id, payload) {
     const html = payload.react ? await render(payload.react) : payload.html;
@@ -5365,14 +5305,6 @@ var Broadcasts = class {
     });
   }
 };
-function buildRecipientsQuery(options) {
-  const { type, email, bounceType, ...pagination } = options;
-  const searchParams = new URLSearchParams(buildPaginationQuery(pagination));
-  searchParams.set("type", type);
-  if (email !== void 0) searchParams.set("email", email);
-  if (bounceType !== void 0) searchParams.set("bounce_type", bounceType);
-  return searchParams.toString();
-}
 function parseContactPropertyFromApi(contactProperty) {
   return {
     id: contactProperty.id,
@@ -5909,32 +5841,8 @@ var Emails = class {
   async cancel(id) {
     return await this.resend.post(`/emails/${id}/cancel`);
   }
-  async share(id, payload) {
-    return await this.resend.post(`/emails/${id}/share`, { expires_in: payload?.expiresIn });
-  }
-  async metrics(options = {}) {
-    const queryString = buildMetricsQuery(options);
-    const url = queryString ? `/emails/metrics?${queryString}` : "/emails/metrics";
-    return await this.resend.get(url);
-  }
 };
-function buildMetricsQuery(options) {
-  const params = {
-    start_date: options.startDate,
-    end_date: options.endDate,
-    timezone: options.timezone,
-    granularity: options.granularity,
-    metrics: options.metrics?.join(","),
-    dimensions: options.dimensions?.join(","),
-    domain_id: options.domainId?.join(","),
-    email_id: options.emailId?.join(","),
-    broadcast_id: options.broadcastId?.join(",")
-  };
-  const searchParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) if (value !== void 0 && value !== "") searchParams.set(key, value);
-  return searchParams.toString();
-}
-var Events$1 = class {
+var Events = class {
   constructor(resend) {
     this.resend = resend;
   }
@@ -5995,9 +5903,6 @@ var Segments = class {
   }
   async get(id) {
     return await this.resend.get(`/segments/${id}`);
-  }
-  async update(id, payload) {
-    return await this.resend.patch(`/segments/${id}`, payload);
   }
   async remove(id) {
     return await this.resend.delete(`/segments/${id}`);
@@ -6177,39 +6082,9 @@ var Topics = class {
     return await this.resend.delete(`/topics/${id}`);
   }
 };
-var Attempts = class {
-  constructor(resend) {
-    this.resend = resend;
-  }
-  async list(options) {
-    const { webhookId, eventId } = options;
-    const url = buildPaginationUrl(`/webhooks/${webhookId}/events/${eventId}/attempts`, options);
-    return await this.resend.get(url);
-  }
-};
-var Events = class {
-  constructor(resend) {
-    this.resend = resend;
-    this.attempts = new Attempts(resend);
-  }
-  async list(options) {
-    const { webhookId } = options;
-    const url = buildPaginationUrl(`/webhooks/${webhookId}/events`, options);
-    return await this.resend.get(url);
-  }
-  async get(options) {
-    const { webhookId, eventId } = options;
-    return await this.resend.get(`/webhooks/${webhookId}/events/${eventId}`);
-  }
-  async replay(options) {
-    const { webhookId, eventId } = options;
-    return await this.resend.post(`/webhooks/${webhookId}/events/${eventId}/replay`);
-  }
-};
 var Webhooks = class {
   constructor(resend) {
     this.resend = resend;
-    this.events = new Events(resend);
   }
   async create(payload, options = {}) {
     return await this.resend.post("/webhooks", payload, options);
@@ -6226,9 +6101,6 @@ var Webhooks = class {
   }
   async remove(id) {
     return await this.resend.delete(`/webhooks/${id}`);
-  }
-  async rotateSigningSecret(id) {
-    return await this.resend.post(`/webhooks/${id}/signing-secret/rotate`);
   }
   verify(payload) {
     return new import_standardwebhooks.Webhook(payload.webhookSecret).verify(payload.payload, {
@@ -6259,7 +6131,7 @@ var Resend = class {
     this.contacts = new Contacts(this);
     this.domains = new Domains(this);
     this.emails = new Emails(this);
-    this.events = new Events$1(this);
+    this.events = new Events(this);
     this.logs = new Logs(this);
     this.oauthGrants = new OAuthGrants(this);
     this.suppressions = new Suppressions(this);

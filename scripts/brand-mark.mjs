@@ -65,7 +65,7 @@ const N_PATH = "M854.7 2.1L1000 2.1L1000 713.7L863.2 713.7L372.6 151.6L578.9 151
  */
 const BLUE = "#0048ED";
 const WHITE = "#FFFFFF";
-const INK = "#080c0e"; // --canvas, the app icon's ground
+const INK = "#05070d"; // --canvas, the app icon's ground
 
 // ─── Assembly ────────────────────────────────────────────────────────────────
 

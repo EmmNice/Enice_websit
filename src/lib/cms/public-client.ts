@@ -268,27 +268,28 @@ export function formatRelativeTime(iso: string | null | undefined): string {
  * indigo, orange — which on the dark ENICE canvas read as a bag of highlighter pens and put more
  * colour on a listing page than the rest of the site uses in total. The palette has three
  * registers, so the categories map onto those three instead of inventing a twelfth: neutral for a
- * label that is simply a label, warm for something newly announced, and the one non-warm accent
- * for availability. Distinction now comes from the word, which is what a reader actually reads.
+ * label that is simply a label, the brand blue for something newly announced, and the one accent
+ * that is not the brand blue for availability. Distinction now comes from the word, which is what
+ * a reader actually reads.
  *
  * Keys and the function signature are unchanged, so every existing call site keeps working.
  */
 const BADGE_NEUTRAL = "border-border bg-surface-1 text-bone-strong";
-const BADGE_WARM = "border-gold/25 bg-gold/[0.08] text-gold";
+const BADGE_ACCENT = "border-electric/25 bg-electric/[0.08] text-electric";
 const BADGE_POSITIVE = "border-positive/25 bg-positive/[0.08] text-positive";
 
 export const CATEGORY_BADGE: Record<string, string> = {
   BLOG: BADGE_NEUTRAL,
-  ANNOUNCEMENT: BADGE_WARM,
+  ANNOUNCEMENT: BADGE_ACCENT,
   NEW: BADGE_POSITIVE,
-  UPDATE: BADGE_WARM,
+  UPDATE: BADGE_ACCENT,
   PARTNERSHIP: BADGE_NEUTRAL,
   MILESTONE: BADGE_NEUTRAL,
   NEWS: BADGE_NEUTRAL,
   PRODUCT: BADGE_NEUTRAL,
   SERVICE: BADGE_NEUTRAL,
   COMPANY: BADGE_NEUTRAL,
-  LAUNCH: BADGE_WARM,
+  LAUNCH: BADGE_ACCENT,
 };
 
 export function categoryBadgeClasses(category: string | null | undefined): string {

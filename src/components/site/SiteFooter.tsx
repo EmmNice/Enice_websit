@@ -126,14 +126,14 @@ export function SiteFooter() {
 
   return (
     <footer className="relative overflow-hidden border-t border-border bg-background">
-      {/* The footer is the one place the ambient warm light sits low in the frame, which closes
+      {/* The footer is the one place the ambient blue light sits low in the frame, which closes
           the page rather than leaving it to end on a flat edge. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0 h-64"
         style={{
           background:
-            "radial-gradient(48rem 18rem at 50% 100%, rgb(255 149 41 / 0.05), transparent 70%)",
+            "radial-gradient(48rem 18rem at 50% 100%, rgb(0 72 237 / 0.14), transparent 70%)",
         }}
       />
 
@@ -152,7 +152,7 @@ export function SiteFooter() {
           </p>
           <Link
             to="/status"
-            className="tap text-[10px] font-semibold uppercase tracking-[0.22em] text-bone-soft transition-colors hover:text-gold"
+            className="tap text-[10px] font-semibold uppercase tracking-[0.22em] text-bone-soft transition-colors hover:text-electric"
           >
             View status page →
           </Link>
@@ -175,7 +175,7 @@ export function SiteFooter() {
                       target="_blank"
                       rel="noreferrer noopener"
                       aria-label={`ENICE Group on ${s.label}`}
-                      className="grid h-11 w-11 place-items-center rounded-md border border-border text-bone-soft transition-colors hover:border-gold/40 hover:text-gold"
+                      className="grid h-11 w-11 place-items-center rounded-md border border-border text-bone-soft transition-colors hover:border-electric/40 hover:text-electric"
                     >
                       <s.Icon className="h-3.5 w-3.5" />
                     </a>
@@ -189,13 +189,17 @@ export function SiteFooter() {
                 href={`mailto:${CORPORATE_EMAIL}`}
                 className="tap flex items-center gap-2.5 text-[13px] text-bone-soft transition-colors hover:text-foreground"
               >
-                <Mail aria-hidden className="h-3.5 w-3.5 shrink-0 text-gold" strokeWidth={1.75} />
+                <Mail
+                  aria-hidden
+                  className="h-3.5 w-3.5 shrink-0 text-electric"
+                  strokeWidth={1.75}
+                />
                 {CORPORATE_EMAIL}
               </a>
               <p className="flex items-start gap-2.5 text-[13px] text-bone-soft">
                 <MapPin
                   aria-hidden
-                  className="mt-0.5 h-3.5 w-3.5 shrink-0 text-gold"
+                  className="mt-0.5 h-3.5 w-3.5 shrink-0 text-electric"
                   strokeWidth={1.75}
                 />
                 Abuja and Kaduna, Nigeria

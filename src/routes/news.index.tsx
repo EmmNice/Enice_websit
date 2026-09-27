@@ -59,7 +59,7 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
             </span>
           )}
           {entry.featured && (
-            <Tag tone="warm" className="px-2.5 py-0.5 text-[9px] tracking-[0.16em]">
+            <Tag tone="accent" className="px-2.5 py-0.5 text-[9px] tracking-[0.16em]">
               FEATURED
             </Tag>
           )}
@@ -69,7 +69,7 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
         <h2
           className={cn(
             "mb-1.5 text-base leading-snug font-semibold tracking-tight text-foreground",
-            linkable && "transition-colors group-hover:text-gold",
+            linkable && "transition-colors group-hover:text-electric",
           )}
         >
           {entry.title}
@@ -82,7 +82,7 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
         {!linkable && entry.cta && (
           <a
             href={entry.cta.url}
-            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-gold underline-offset-2 hover:underline"
+            className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-electric underline-offset-2 hover:underline"
           >
             {entry.cta.label} <ArrowUpRight aria-hidden className="h-3 w-3" />
           </a>
@@ -91,7 +91,7 @@ function FeedRow({ entry }: { entry: FeedEntry }) {
         {/* The read affordance stays visible rather than appearing on hover: the row is one link,
             and a touch user never produces the hover that used to reveal it. */}
         {linkable && (
-          <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-bone-faint transition-colors group-hover:text-gold">
+          <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-bone-faint transition-colors group-hover:text-electric">
             Read more <ArrowUpRight aria-hidden className="h-3 w-3" />
           </span>
         )}
@@ -168,7 +168,7 @@ function NewsPage() {
           <Panel tone="quiet" className="flex flex-col items-center px-8 py-20 text-center">
             <span
               aria-hidden
-              className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-gold/20 bg-gold/[0.07] text-gold"
+              className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-electric/20 bg-electric/[0.07] text-electric"
             >
               <Newspaper className="h-6 w-6" strokeWidth={1.75} />
             </span>

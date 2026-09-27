@@ -69,14 +69,14 @@ export function FAQSection() {
           <Accordion type="single" collapsible className="w-full border-t border-border">
             {entries.map((f, i) => (
               <AccordionItem key={f.q} value={`item-${i}`} className="border-border">
-                <AccordionTrigger className="gap-6 py-5 text-left text-[15px] font-medium tracking-tight text-foreground hover:text-gold hover:no-underline">
+                <AccordionTrigger className="gap-6 py-5 text-left text-[15px] font-medium tracking-tight text-foreground hover:text-electric hover:no-underline">
                   {f.q}
                 </AccordionTrigger>
                 <AccordionContent
                   data-allow-select
                   className="pb-6 pr-8 text-[14px] leading-relaxed text-bone-soft"
                 >
-                  <StyledText text={f.a} accentClassName="text-gold" />
+                  <StyledText text={f.a} accentClassName="text-electric" />
                 </AccordionContent>
               </AccordionItem>
             ))}
