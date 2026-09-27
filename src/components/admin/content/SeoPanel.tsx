@@ -17,7 +17,7 @@ import type { SeoFields } from "@/lib/cms/types";
 import { resolveSeo, FALLBACK_SEO_DEFAULTS } from "@/lib/cms/seo-resolve";
 import { SITE_URL } from "@/lib/site";
 import { Field, Input, Textarea, Toggle } from "../primitives";
-import { ImageField } from "../MediaPicker";
+import { ImageUrlField } from "../ImageUrlField";
 
 export interface SeoSourceLite {
   title: string;
@@ -111,12 +111,11 @@ export function SeoPanel({
         )}
       </Field>
 
-      <ImageField
+      <ImageUrlField
         label="Social share image"
         hint="Shown when the page is shared. 1200×630 works best. Defaults to the cover image."
         value={seo.ogImage ?? ""}
         onChange={(url) => set({ ogImage: url || undefined })}
-        folder="social"
       />
 
       <Field

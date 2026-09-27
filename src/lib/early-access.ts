@@ -9,7 +9,6 @@
 
 /** POST target. Same-origin Vercel function — no cross-origin call, no public API key. */
 export const EARLY_ACCESS_ENDPOINT = "/api/early-access";
-export const ADMIN_EARLY_ACCESS_ENDPOINT = "/api/admin/early-access";
 
 /**
  * Review workflow. The server enforces this exact list, so an operator can only move a

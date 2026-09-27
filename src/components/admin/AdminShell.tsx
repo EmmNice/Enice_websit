@@ -51,10 +51,7 @@ function iconByName(name: string): LucideIcon {
 
 const HIT_ICONS: Record<SearchHit["type"], string> = {
   content: "FileText",
-  page: "Files",
-  section: "LayoutTemplate",
-  media: "Image",
-  admin: "Users",
+  knowledge: "Sparkles",
 };
 
 /**
@@ -483,7 +480,7 @@ export interface AdminShellProps {
 }
 
 export function AdminShell({ children, requiredPermission }: AdminShellProps) {
-  const { phase, can, config } = useAdmin();
+  const { phase, can } = useAdmin();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -554,7 +551,6 @@ export function AdminShell({ children, requiredPermission }: AdminShellProps) {
             </nav>
           ) : null
         }
-        showStorageWarning={!config.mediaStorageConfigured}
       >
         {children}
       </ShellFrame>
@@ -571,7 +567,6 @@ function ShellFrame({
   setDrawerOpen,
   setPaletteOpen,
   breadcrumb,
-  showStorageWarning = false,
 }: {
   children: ReactNode;
   pathname: string;
@@ -579,7 +574,6 @@ function ShellFrame({
   setDrawerOpen: (next: boolean) => void;
   setPaletteOpen: (next: boolean) => void;
   breadcrumb: ReactNode;
-  showStorageWarning?: boolean;
 }) {
   return (
     <div className="bg-background min-h-dvh">
@@ -660,14 +654,6 @@ function ShellFrame({
 
             <AccountMenu />
           </div>
-
-          {showStorageWarning && (
-            <div className="border-t border-amber-200 bg-amber-50/70 px-4 py-1.5 text-[11.5px] text-amber-900 sm:px-6">
-              Media storage is not configured, so uploads are unavailable. Set the{" "}
-              <code className="font-mono">MEDIA_S3_*</code> environment variables to enable the
-              media library.
-            </div>
-          )}
         </header>
 
         <main className="px-4 py-6 sm:px-6 lg:px-8">

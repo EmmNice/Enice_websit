@@ -58,38 +58,9 @@ export const PERMISSIONS = [
   "content.publish",
   "content.delete",
 
-  // Pages and website sections.
-  "pages.read",
-  "pages.write",
-  "pages.publish",
-  "pages.delete",
-  "sections.read",
-  "sections.write",
-
-  // Media library.
-  "media.read",
-  "media.write",
-  "media.delete",
-
-  // Navigation, footer, SEO defaults, design controls, site settings.
-  "settings.read",
-  "settings.write",
-  "design.write",
-
-  // AI Website Manager.
-  "ai.read",
-  "ai.request",
-  "ai.approve",
-  "ai.deploy",
-
   // AI assistant knowledge base (what the public chatbot is trained on).
   "ai.knowledge.read",
   "ai.knowledge.write",
-
-  // Administration.
-  "admins.read",
-  "admins.write",
-  "activity.read",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
@@ -106,43 +77,12 @@ export const PERMISSION_META: Record<Permission, PermissionMeta> = {
   "content.publish": { label: "Publish, schedule and archive content", group: "Content" },
   "content.delete": { label: "Delete content", group: "Content", sensitive: true },
 
-  "pages.read": { label: "View pages", group: "Website" },
-  "pages.write": { label: "Create and edit pages", group: "Website" },
-  "pages.publish": { label: "Publish and unpublish pages", group: "Website" },
-  "pages.delete": { label: "Delete pages", group: "Website", sensitive: true },
-  "sections.read": { label: "View website sections", group: "Website" },
-  "sections.write": { label: "Edit website sections", group: "Website" },
-
-  "media.read": { label: "View media", group: "Media" },
-  "media.write": { label: "Upload and rename media", group: "Media" },
-  "media.delete": { label: "Delete media", group: "Media", sensitive: true },
-
-  "settings.read": { label: "View website settings", group: "Configuration" },
-  "settings.write": {
-    label: "Change navigation, footer and SEO defaults",
-    group: "Configuration",
-    sensitive: true,
-  },
-  "design.write": { label: "Change logo, palette and typography", group: "Configuration" },
-
-  "ai.read": { label: "View AI change requests", group: "AI" },
-  "ai.request": { label: "Ask the AI for website changes", group: "AI" },
-  "ai.approve": { label: "Approve AI proposals", group: "AI", sensitive: true },
-  "ai.deploy": { label: "Deploy approved code changes", group: "AI", sensitive: true },
-  "ai.knowledge.read": { label: "View the assistant knowledge base", group: "AI" },
+  "ai.knowledge.read": { label: "View the assistant knowledge base", group: "AI training" },
   "ai.knowledge.write": {
-    label: "Edit what the assistant knows (incl. uploading PDFs)",
-    group: "AI",
+    label: "Edit what the assistant knows",
+    group: "AI training",
     sensitive: true,
   },
-
-  "admins.read": { label: "View administrators", group: "Administration" },
-  "admins.write": {
-    label: "Invite and manage administrators",
-    group: "Administration",
-    sensitive: true,
-  },
-  "activity.read": { label: "View the activity log", group: "Administration" },
 };
 
 // ─── Role → permission matrix ────────────────────────────────────────────────
@@ -163,39 +103,11 @@ export const ROLE_PERMISSIONS: Record<AdminRole, readonly Permission[]> = {
     "content.write",
     "content.publish",
     "content.delete",
-    "pages.read",
-    "pages.write",
-    "pages.publish",
-    "sections.read",
-    "sections.write",
-    "media.read",
-    "media.write",
-    "media.delete",
-    "settings.read",
-    "settings.write",
-    "design.write",
-    "ai.read",
-    "ai.request",
-    "ai.approve",
     "ai.knowledge.read",
     "ai.knowledge.write",
-    "admins.read",
-    "activity.read",
   ],
 
-  editor: [
-    "content.read",
-    "content.write",
-    "content.publish",
-    "pages.read",
-    "sections.read",
-    "media.read",
-    "media.write",
-    "settings.read",
-    "ai.read",
-    "ai.request",
-    "activity.read",
-  ],
+  editor: ["content.read", "content.write", "content.publish", "ai.knowledge.read"],
 };
 
 // ─── Checks ──────────────────────────────────────────────────────────────────
@@ -220,12 +132,14 @@ export function canAny(role: AdminRole | null | undefined, permissions: Permissi
 /**
  * Whether `actor` may modify or remove an administrator holding `target`.
  *
- * Beyond the `admins.write` grant, an administrator may only act on strictly lower-ranked
- * roles. Without this an owner could be demoted by another owner, and the last privileged
- * account could be locked out of its own system.
+ * An administrator may only act on strictly lower-ranked roles. Without this an owner could be
+ * demoted by another owner, and the last privileged account could be locked out of its own system.
+ *
+ * This used to also require an `admins.write` grant. That permission went away with the
+ * administrator-management screens, so the rank comparison is now the whole rule — which is the
+ * conservative direction: it can only ever refuse more than the old check, never less.
  */
 export function canManageRole(actor: AdminRole, target: AdminRole): boolean {
-  if (!can(actor, "admins.write")) return false;
   return ROLE_META[actor].rank < ROLE_META[target].rank;
 }
 

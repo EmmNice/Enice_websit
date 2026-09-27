@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
   Database,
@@ -10,11 +10,9 @@ import {
   Sparkles,
   StickyNote,
   Trash2,
-  Upload,
 } from "lucide-react";
 import type { KnowledgeEntry, KnowledgeStatus } from "@/lib/cms/types";
-import { KNOWLEDGE_PDF_MAX_BYTES } from "@/lib/cms/types";
-import { knowledge, uploadKnowledgePdf, CmsError } from "@/lib/cms/admin-client";
+import { knowledge, CmsError } from "@/lib/cms/admin-client";
 import { formatShortDate } from "@/lib/cms/public-client";
 import { AdminShell, describeError } from "@/components/admin/AdminShell";
 import { useAdmin } from "@/components/admin/AdminContext";
@@ -59,10 +57,23 @@ const EMPTY_EDITOR: EditorState = {
 /**
  * The AI assistant knowledge base.
  *
- * This is where the website chatbot is taught. Each entry — a typed note or the text extracted
- * from an uploaded PDF — becomes material the assistant retrieves and grounds its answers in, so
- * the owner can expand what it knows without a developer changing code. Only `active` entries are
- * surfaced to the assistant; disabling one parks it without losing it.
+ * A curated set of company facts, each entry `active` or `disabled` so one can be parked without
+ * being lost.
+ *
+ * ## Nothing in this repository reads these entries yet — that is deliberate
+ *
+ * The visitor-facing chatbot is **PulseAssist**, an external product, and the knowledge it answers
+ * from lives in the PulseAssist console. There is no `/api/chat` function here and no retrieval
+ * code; an earlier in-house chatbot had both, and they were removed with it.
+ *
+ * This screen is kept as the fallback: if PulseAssist is ever dropped, the facts are already here in
+ * a structured form and only the retrieval half has to be built — a Postgres full-text search over
+ * `knowledge_entries` injected into a chat endpoint. The table, the CRUD, the permissions and the
+ * active/disabled flag all exist.
+ *
+ * So do not delete this as dead code, and **do not reword the copy below to claim the assistant is
+ * reading it.** An operator who believes a note is live when it is not will assume the chatbot is
+ * broken rather than unwired, which is a much more expensive thing to debug.
  */
 function KnowledgeScreen() {
   const { can, config } = useAdmin();
@@ -80,8 +91,6 @@ function KnowledgeScreen() {
 
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState<{ name: string; progress: number } | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -138,42 +147,6 @@ function KnowledgeScreen() {
     }
   };
 
-  const uploadPdf = async (files: FileList | null) => {
-    const file = files?.[0];
-    if (inputRef.current) inputRef.current.value = "";
-    if (!file) return;
-    if (file.type !== "application/pdf") {
-      toast.error("Not a PDF", "Only PDF files can be added this way.");
-      return;
-    }
-    if (file.size > KNOWLEDGE_PDF_MAX_BYTES) {
-      toast.error(
-        "Too large",
-        `PDFs must be under ${Math.round(KNOWLEDGE_PDF_MAX_BYTES / 1024 / 1024)} MB.`,
-      );
-      return;
-    }
-
-    setUploading({ name: file.name, progress: 0 });
-    try {
-      const result = await uploadKnowledgePdf(file, {
-        onProgress: (fraction) => setUploading({ name: file.name, progress: fraction }),
-      });
-      toast.success(
-        "PDF added",
-        `Read ${result.pages} page(s) into the knowledge base${result.truncated ? " (truncated to the size limit)" : ""}.`,
-      );
-      load();
-    } catch (caught) {
-      toast.error(
-        "Could not add that PDF",
-        caught instanceof CmsError ? caught.message : "The upload failed.",
-      );
-    } finally {
-      setUploading(null);
-    }
-  };
-
   const toggleStatus = async (entry: KnowledgeEntry) => {
     const next: KnowledgeStatus = entry.status === "active" ? "disabled" : "active";
     try {
@@ -216,7 +189,7 @@ function KnowledgeScreen() {
       <>
         <PageHeader
           title="Assistant knowledge"
-          description="Teach the website chatbot facts it should know, and upload PDFs to train it further."
+          description="Company facts kept ready for the assistant."
         />
         <NotConfiguredNotice title="A database is required">
           The knowledge base is stored in the Website Manager database. Set{" "}
@@ -231,46 +204,21 @@ function KnowledgeScreen() {
     <>
       <PageHeader
         title="Assistant knowledge"
-        description="Everything here is fed to the website chatbot so it can answer from facts you control. Type a note, or upload a PDF and its text is extracted automatically."
+        description="Company facts, kept in a structured form and ready to train an assistant on."
         actions={
           canWrite ? (
-            <>
-              <input
-                ref={inputRef}
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => uploadPdf(e.target.files)}
-              />
-              <Button
-                variant="outline"
-                icon={Upload}
-                disabled={!config.mediaStorageConfigured || Boolean(uploading)}
-                loading={Boolean(uploading)}
-                onClick={() => inputRef.current?.click()}
-              >
-                {uploading ? `Uploading ${Math.round(uploading.progress * 100)}%` : "Upload PDF"}
-              </Button>
-              <Button icon={Plus} onClick={() => setEditor({ ...EMPTY_EDITOR })}>
-                Add note
-              </Button>
-            </>
+            <Button icon={Plus} onClick={() => setEditor({ ...EMPTY_EDITOR })}>
+              Add note
+            </Button>
           ) : undefined
         }
       />
 
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Metric label="Entries" value={stats.total} icon={BookOpen} />
-        <Metric label="Used by the assistant" value={stats.active} icon={Sparkles} tone="success" />
+        <Metric label="Active" value={stats.active} icon={Sparkles} tone="success" />
         <Metric label="Disabled" value={disabledCount} icon={Database} tone="neutral" />
       </div>
-
-      {canWrite && !config.mediaStorageConfigured && (
-        <NotConfiguredNotice title="PDF upload needs file storage" className="mb-6">
-          You can add typed notes right now. To upload PDFs, connect a Vercel Blob store (or set the{" "}
-          <code>MEDIA_S3_*</code> variables) and redeploy — the same storage the media library uses.
-        </NotConfiguredNotice>
-      )}
 
       <Toolbar className="mb-4">
         <div className="relative min-w-0 flex-1">
@@ -304,7 +252,7 @@ function KnowledgeScreen() {
           description={
             search
               ? "Try a different search."
-              : "Add a note or upload a PDF, and the website chatbot will start answering from it."
+              : "Add the facts you would want an assistant to answer from."
           }
           action={
             canWrite && !search ? (

@@ -61,7 +61,7 @@ import { useAdmin } from "../AdminContext";
 import { useToast } from "../Toaster";
 import { describeError } from "../AdminShell";
 import { BlockEditor } from "../editor/BlockEditor";
-import { ImageField } from "../MediaPicker";
+import { ImageUrlField } from "../ImageUrlField";
 import { PreviewPane, type PreviewDevice } from "./PreviewPane";
 import { SeoPanel } from "./SeoPanel";
 import { PublishControls } from "./PublishControls";
@@ -505,11 +505,10 @@ export function ContentEditor({ kind, itemId }: { kind: ContentKind; itemId: str
           <Card className="p-4">
             <CardHeader title="Details" className="-mx-4 -mt-4 mb-4" />
             <div className="space-y-4">
-              <ImageField
+              <ImageUrlField
                 label="Cover image"
                 value={draft.coverImageUrl ?? ""}
                 onChange={(url) => patch({ coverImageUrl: url || null })}
-                folder={segment}
                 hint="Shown in listings and as the social share image."
               />
 

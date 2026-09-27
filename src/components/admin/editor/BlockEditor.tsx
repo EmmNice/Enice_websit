@@ -47,7 +47,6 @@ import {
 } from "@/lib/cms/doc";
 import { cn } from "@/lib/utils";
 import { InlineEditable } from "./InlineEditable";
-import { MediaPicker } from "../MediaPicker";
 import { Button, Select } from "../primitives";
 
 // ─── Block menu ──────────────────────────────────────────────────────────────
@@ -270,8 +269,6 @@ function QuoteEditor({
 }
 
 function ImageEditor({ block, onChange }: BlockEditorProps<ImageBlock>) {
-  const [pickerOpen, setPickerOpen] = useState(false);
-
   return (
     <div className="border-border rounded-lg border p-3">
       {block.url ? (
@@ -307,62 +304,40 @@ function ImageEditor({ block, onChange }: BlockEditorProps<ImageBlock>) {
               />
               Full width
             </label>
-            <Button size="sm" variant="ghost" onClick={() => setPickerOpen(true)}>
+            <Button size="sm" variant="ghost" onClick={() => onChange({ ...block, url: "" })}>
               Replace image
             </Button>
           </div>
         </div>
       ) : (
-        <Button
-          variant="outline"
-          onClick={() => setPickerOpen(true)}
-          className="w-full justify-center"
-        >
-          Choose an image
-        </Button>
+        <input
+          value={block.url}
+          onChange={(event) => onChange({ ...block, url: event.target.value.trim() })}
+          placeholder="Image URL — https://…"
+          aria-label="Image URL"
+          className="border-border bg-background h-8 w-full rounded-md border px-2.5 text-[12px] outline-none"
+        />
       )}
-
-      <MediaPicker
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        onSelect={({ url, alt }) => onChange({ ...block, url, alt: block.alt || alt || "" })}
-        kind="image"
-        folder="articles"
-      />
     </div>
   );
 }
 
 function VideoEditor({ block, onChange }: BlockEditorProps<VideoBlock>) {
-  const [pickerOpen, setPickerOpen] = useState(false);
-
   return (
     <div className="border-border rounded-lg border p-3">
-      <div className="flex items-center gap-2">
-        <input
-          value={block.url}
-          onChange={(event) => onChange({ ...block, url: event.target.value })}
-          placeholder="YouTube, Vimeo or file URL"
-          aria-label="Video URL"
-          className="border-border bg-background h-8 flex-1 rounded-md border px-2.5 text-[12px] outline-none"
-        />
-        <Button size="sm" variant="outline" onClick={() => setPickerOpen(true)}>
-          Library
-        </Button>
-      </div>
+      <input
+        value={block.url}
+        onChange={(event) => onChange({ ...block, url: event.target.value.trim() })}
+        placeholder="YouTube, Vimeo or file URL"
+        aria-label="Video URL"
+        className="border-border bg-background h-8 w-full rounded-md border px-2.5 text-[12px] outline-none"
+      />
       <input
         value={block.caption}
         onChange={(event) => onChange({ ...block, caption: event.target.value })}
         placeholder="Caption (optional)"
         aria-label="Video caption"
         className="border-border bg-background mt-2 h-8 w-full rounded-md border px-2.5 text-[12px] outline-none"
-      />
-      <MediaPicker
-        open={pickerOpen}
-        onClose={() => setPickerOpen(false)}
-        onSelect={({ url }) => onChange({ ...block, url })}
-        kind="video"
-        folder="articles"
       />
     </div>
   );

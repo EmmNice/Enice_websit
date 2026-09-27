@@ -65,9 +65,6 @@ interface AdminContextValue {
 const FALLBACK_CONFIG: ConfigFlags = {
   databaseConfigured: false,
   secretConfigured: false,
-  mediaStorageConfigured: false,
-  codeDeliveryConfigured: false,
-  aiConfigured: false,
 };
 
 const AdminContext = createContext<AdminContextValue | null>(null);

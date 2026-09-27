@@ -23,11 +23,7 @@ import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminAiRouteImport } from './routes/admin/ai'
-import { Route as AdminEarlyAccessRouteImport } from './routes/admin/early-access'
-import { Route as AdminInviteRouteImport } from './routes/admin/invite'
 import { Route as AdminKnowledgeRouteImport } from './routes/admin/knowledge'
-import { Route as AdminMediaRouteImport } from './routes/admin/media'
 import { Route as AnnouncementsIndexRouteImport } from './routes/announcements.index'
 import { Route as AnnouncementsSlugRouteImport } from './routes/announcements.$slug'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
@@ -41,23 +37,9 @@ import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pul
 import { Route as PortfolioPulseassistEmailRouteImport } from './routes/portfolio.pulseassist-email'
 import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
 import { Route as PortfolioPulsexRouteImport } from './routes/portfolio.pulsex'
-import { Route as AdminAdministrationActivityRouteImport } from './routes/admin/administration.activity'
-import { Route as AdminAdministrationAdminsRouteImport } from './routes/admin/administration.admins'
-import { Route as AdminAdministrationRolesRouteImport } from './routes/admin/administration.roles'
 import { Route as AdminAdministrationSettingsRouteImport } from './routes/admin/administration.settings'
-import { Route as AdminPublishingArchivedRouteImport } from './routes/admin/publishing.archived'
-import { Route as AdminPublishingDraftsRouteImport } from './routes/admin/publishing.drafts'
-import { Route as AdminPublishingPublishedRouteImport } from './routes/admin/publishing.published'
-import { Route as AdminPublishingScheduledRouteImport } from './routes/admin/publishing.scheduled'
-import { Route as AdminWebsiteDesignRouteImport } from './routes/admin/website.design'
-import { Route as AdminWebsiteFooterRouteImport } from './routes/admin/website.footer'
-import { Route as AdminWebsiteNavigationRouteImport } from './routes/admin/website.navigation'
-import { Route as AdminWebsiteSectionsRouteImport } from './routes/admin/website.sections'
-import { Route as AdminWebsiteSeoRouteImport } from './routes/admin/website.seo'
 import { Route as AdminContentKindIndexRouteImport } from './routes/admin/content.$kind.index'
 import { Route as AdminContentKindItemIdRouteImport } from './routes/admin/content.$kind.$itemId'
-import { Route as AdminWebsitePagesIndexRouteImport } from './routes/admin/website.pages.index'
-import { Route as AdminWebsitePagesPageIdRouteImport } from './routes/admin/website.pages.$pageId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -129,29 +111,9 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAiRoute = AdminAiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminEarlyAccessRoute = AdminEarlyAccessRouteImport.update({
-  id: '/early-access',
-  path: '/early-access',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminInviteRoute = AdminInviteRouteImport.update({
-  id: '/invite',
-  path: '/invite',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminMediaRoute = AdminMediaRouteImport.update({
-  id: '/media',
-  path: '/media',
   getParentRoute: () => AdminRoute,
 } as any)
 const AnnouncementsIndexRoute = AnnouncementsIndexRouteImport.update({
@@ -220,77 +182,12 @@ const PortfolioPulsexRoute = PortfolioPulsexRouteImport.update({
   path: '/pulsex',
   getParentRoute: () => PortfolioRoute,
 } as any)
-const AdminAdministrationActivityRoute =
-  AdminAdministrationActivityRouteImport.update({
-    id: '/administration/activity',
-    path: '/administration/activity',
-    getParentRoute: () => AdminRoute,
-  } as any)
-const AdminAdministrationAdminsRoute =
-  AdminAdministrationAdminsRouteImport.update({
-    id: '/administration/admins',
-    path: '/administration/admins',
-    getParentRoute: () => AdminRoute,
-  } as any)
-const AdminAdministrationRolesRoute =
-  AdminAdministrationRolesRouteImport.update({
-    id: '/administration/roles',
-    path: '/administration/roles',
-    getParentRoute: () => AdminRoute,
-  } as any)
 const AdminAdministrationSettingsRoute =
   AdminAdministrationSettingsRouteImport.update({
     id: '/administration/settings',
     path: '/administration/settings',
     getParentRoute: () => AdminRoute,
   } as any)
-const AdminPublishingArchivedRoute = AdminPublishingArchivedRouteImport.update({
-  id: '/publishing/archived',
-  path: '/publishing/archived',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPublishingDraftsRoute = AdminPublishingDraftsRouteImport.update({
-  id: '/publishing/drafts',
-  path: '/publishing/drafts',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminPublishingPublishedRoute =
-  AdminPublishingPublishedRouteImport.update({
-    id: '/publishing/published',
-    path: '/publishing/published',
-    getParentRoute: () => AdminRoute,
-  } as any)
-const AdminPublishingScheduledRoute =
-  AdminPublishingScheduledRouteImport.update({
-    id: '/publishing/scheduled',
-    path: '/publishing/scheduled',
-    getParentRoute: () => AdminRoute,
-  } as any)
-const AdminWebsiteDesignRoute = AdminWebsiteDesignRouteImport.update({
-  id: '/website/design',
-  path: '/website/design',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminWebsiteFooterRoute = AdminWebsiteFooterRouteImport.update({
-  id: '/website/footer',
-  path: '/website/footer',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminWebsiteNavigationRoute = AdminWebsiteNavigationRouteImport.update({
-  id: '/website/navigation',
-  path: '/website/navigation',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminWebsiteSectionsRoute = AdminWebsiteSectionsRouteImport.update({
-  id: '/website/sections',
-  path: '/website/sections',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminWebsiteSeoRoute = AdminWebsiteSeoRouteImport.update({
-  id: '/website/seo',
-  path: '/website/seo',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminContentKindIndexRoute = AdminContentKindIndexRouteImport.update({
   id: '/content/$kind/',
   path: '/content/$kind/',
@@ -299,16 +196,6 @@ const AdminContentKindIndexRoute = AdminContentKindIndexRouteImport.update({
 const AdminContentKindItemIdRoute = AdminContentKindItemIdRouteImport.update({
   id: '/content/$kind/$itemId',
   path: '/content/$kind/$itemId',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminWebsitePagesIndexRoute = AdminWebsitePagesIndexRouteImport.update({
-  id: '/website/pages/',
-  path: '/website/pages/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminWebsitePagesPageIdRoute = AdminWebsitePagesPageIdRouteImport.update({
-  id: '/website/pages/$pageId',
-  path: '/website/pages/$pageId',
   getParentRoute: () => AdminRoute,
 } as any)
 
@@ -326,11 +213,7 @@ export interface FileRoutesByFullPath {
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
-  '/admin/ai': typeof AdminAiRoute
-  '/admin/early-access': typeof AdminEarlyAccessRoute
-  '/admin/invite': typeof AdminInviteRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
-  '/admin/media': typeof AdminMediaRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -345,23 +228,9 @@ export interface FileRoutesByFullPath {
   '/blog/': typeof BlogIndexRoute
   '/news/': typeof NewsIndexRoute
   '/portfolio/': typeof PortfolioIndexRoute
-  '/admin/administration/activity': typeof AdminAdministrationActivityRoute
-  '/admin/administration/admins': typeof AdminAdministrationAdminsRoute
-  '/admin/administration/roles': typeof AdminAdministrationRolesRoute
   '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
-  '/admin/publishing/archived': typeof AdminPublishingArchivedRoute
-  '/admin/publishing/drafts': typeof AdminPublishingDraftsRoute
-  '/admin/publishing/published': typeof AdminPublishingPublishedRoute
-  '/admin/publishing/scheduled': typeof AdminPublishingScheduledRoute
-  '/admin/website/design': typeof AdminWebsiteDesignRoute
-  '/admin/website/footer': typeof AdminWebsiteFooterRoute
-  '/admin/website/navigation': typeof AdminWebsiteNavigationRoute
-  '/admin/website/sections': typeof AdminWebsiteSectionsRoute
-  '/admin/website/seo': typeof AdminWebsiteSeoRoute
   '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
-  '/admin/website/pages/$pageId': typeof AdminWebsitePagesPageIdRoute
   '/admin/content/$kind/': typeof AdminContentKindIndexRoute
-  '/admin/website/pages/': typeof AdminWebsitePagesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -375,11 +244,7 @@ export interface FileRoutesByTo {
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
-  '/admin/ai': typeof AdminAiRoute
-  '/admin/early-access': typeof AdminEarlyAccessRoute
-  '/admin/invite': typeof AdminInviteRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
-  '/admin/media': typeof AdminMediaRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -394,23 +259,9 @@ export interface FileRoutesByTo {
   '/blog': typeof BlogIndexRoute
   '/news': typeof NewsIndexRoute
   '/portfolio': typeof PortfolioIndexRoute
-  '/admin/administration/activity': typeof AdminAdministrationActivityRoute
-  '/admin/administration/admins': typeof AdminAdministrationAdminsRoute
-  '/admin/administration/roles': typeof AdminAdministrationRolesRoute
   '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
-  '/admin/publishing/archived': typeof AdminPublishingArchivedRoute
-  '/admin/publishing/drafts': typeof AdminPublishingDraftsRoute
-  '/admin/publishing/published': typeof AdminPublishingPublishedRoute
-  '/admin/publishing/scheduled': typeof AdminPublishingScheduledRoute
-  '/admin/website/design': typeof AdminWebsiteDesignRoute
-  '/admin/website/footer': typeof AdminWebsiteFooterRoute
-  '/admin/website/navigation': typeof AdminWebsiteNavigationRoute
-  '/admin/website/sections': typeof AdminWebsiteSectionsRoute
-  '/admin/website/seo': typeof AdminWebsiteSeoRoute
   '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
-  '/admin/website/pages/$pageId': typeof AdminWebsitePagesPageIdRoute
   '/admin/content/$kind': typeof AdminContentKindIndexRoute
-  '/admin/website/pages': typeof AdminWebsitePagesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -427,11 +278,7 @@ export interface FileRoutesById {
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
-  '/admin/ai': typeof AdminAiRoute
-  '/admin/early-access': typeof AdminEarlyAccessRoute
-  '/admin/invite': typeof AdminInviteRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
-  '/admin/media': typeof AdminMediaRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -446,23 +293,9 @@ export interface FileRoutesById {
   '/blog/': typeof BlogIndexRoute
   '/news/': typeof NewsIndexRoute
   '/portfolio/': typeof PortfolioIndexRoute
-  '/admin/administration/activity': typeof AdminAdministrationActivityRoute
-  '/admin/administration/admins': typeof AdminAdministrationAdminsRoute
-  '/admin/administration/roles': typeof AdminAdministrationRolesRoute
   '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
-  '/admin/publishing/archived': typeof AdminPublishingArchivedRoute
-  '/admin/publishing/drafts': typeof AdminPublishingDraftsRoute
-  '/admin/publishing/published': typeof AdminPublishingPublishedRoute
-  '/admin/publishing/scheduled': typeof AdminPublishingScheduledRoute
-  '/admin/website/design': typeof AdminWebsiteDesignRoute
-  '/admin/website/footer': typeof AdminWebsiteFooterRoute
-  '/admin/website/navigation': typeof AdminWebsiteNavigationRoute
-  '/admin/website/sections': typeof AdminWebsiteSectionsRoute
-  '/admin/website/seo': typeof AdminWebsiteSeoRoute
   '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
-  '/admin/website/pages/$pageId': typeof AdminWebsitePagesPageIdRoute
   '/admin/content/$kind/': typeof AdminContentKindIndexRoute
-  '/admin/website/pages/': typeof AdminWebsitePagesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -480,11 +313,7 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/status'
     | '/terms'
-    | '/admin/ai'
-    | '/admin/early-access'
-    | '/admin/invite'
     | '/admin/knowledge'
-    | '/admin/media'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
@@ -499,23 +328,9 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/news/'
     | '/portfolio/'
-    | '/admin/administration/activity'
-    | '/admin/administration/admins'
-    | '/admin/administration/roles'
     | '/admin/administration/settings'
-    | '/admin/publishing/archived'
-    | '/admin/publishing/drafts'
-    | '/admin/publishing/published'
-    | '/admin/publishing/scheduled'
-    | '/admin/website/design'
-    | '/admin/website/footer'
-    | '/admin/website/navigation'
-    | '/admin/website/sections'
-    | '/admin/website/seo'
     | '/admin/content/$kind/$itemId'
-    | '/admin/website/pages/$pageId'
     | '/admin/content/$kind/'
-    | '/admin/website/pages/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -529,11 +344,7 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/status'
     | '/terms'
-    | '/admin/ai'
-    | '/admin/early-access'
-    | '/admin/invite'
     | '/admin/knowledge'
-    | '/admin/media'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
@@ -548,23 +359,9 @@ export interface FileRouteTypes {
     | '/blog'
     | '/news'
     | '/portfolio'
-    | '/admin/administration/activity'
-    | '/admin/administration/admins'
-    | '/admin/administration/roles'
     | '/admin/administration/settings'
-    | '/admin/publishing/archived'
-    | '/admin/publishing/drafts'
-    | '/admin/publishing/published'
-    | '/admin/publishing/scheduled'
-    | '/admin/website/design'
-    | '/admin/website/footer'
-    | '/admin/website/navigation'
-    | '/admin/website/sections'
-    | '/admin/website/seo'
     | '/admin/content/$kind/$itemId'
-    | '/admin/website/pages/$pageId'
     | '/admin/content/$kind'
-    | '/admin/website/pages'
   id:
     | '__root__'
     | '/'
@@ -580,11 +377,7 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/status'
     | '/terms'
-    | '/admin/ai'
-    | '/admin/early-access'
-    | '/admin/invite'
     | '/admin/knowledge'
-    | '/admin/media'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
@@ -599,23 +392,9 @@ export interface FileRouteTypes {
     | '/blog/'
     | '/news/'
     | '/portfolio/'
-    | '/admin/administration/activity'
-    | '/admin/administration/admins'
-    | '/admin/administration/roles'
     | '/admin/administration/settings'
-    | '/admin/publishing/archived'
-    | '/admin/publishing/drafts'
-    | '/admin/publishing/published'
-    | '/admin/publishing/scheduled'
-    | '/admin/website/design'
-    | '/admin/website/footer'
-    | '/admin/website/navigation'
-    | '/admin/website/sections'
-    | '/admin/website/seo'
     | '/admin/content/$kind/$itemId'
-    | '/admin/website/pages/$pageId'
     | '/admin/content/$kind/'
-    | '/admin/website/pages/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -740,39 +519,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/ai': {
-      id: '/admin/ai'
-      path: '/ai'
-      fullPath: '/admin/ai'
-      preLoaderRoute: typeof AdminAiRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/early-access': {
-      id: '/admin/early-access'
-      path: '/early-access'
-      fullPath: '/admin/early-access'
-      preLoaderRoute: typeof AdminEarlyAccessRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/invite': {
-      id: '/admin/invite'
-      path: '/invite'
-      fullPath: '/admin/invite'
-      preLoaderRoute: typeof AdminInviteRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/knowledge': {
       id: '/admin/knowledge'
       path: '/knowledge'
       fullPath: '/admin/knowledge'
       preLoaderRoute: typeof AdminKnowledgeRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/media': {
-      id: '/admin/media'
-      path: '/media'
-      fullPath: '/admin/media'
-      preLoaderRoute: typeof AdminMediaRouteImport
       parentRoute: typeof AdminRoute
     }
     '/announcements/': {
@@ -866,95 +617,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioPulsexRouteImport
       parentRoute: typeof PortfolioRoute
     }
-    '/admin/administration/activity': {
-      id: '/admin/administration/activity'
-      path: '/administration/activity'
-      fullPath: '/admin/administration/activity'
-      preLoaderRoute: typeof AdminAdministrationActivityRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/administration/admins': {
-      id: '/admin/administration/admins'
-      path: '/administration/admins'
-      fullPath: '/admin/administration/admins'
-      preLoaderRoute: typeof AdminAdministrationAdminsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/administration/roles': {
-      id: '/admin/administration/roles'
-      path: '/administration/roles'
-      fullPath: '/admin/administration/roles'
-      preLoaderRoute: typeof AdminAdministrationRolesRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/administration/settings': {
       id: '/admin/administration/settings'
       path: '/administration/settings'
       fullPath: '/admin/administration/settings'
       preLoaderRoute: typeof AdminAdministrationSettingsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/publishing/archived': {
-      id: '/admin/publishing/archived'
-      path: '/publishing/archived'
-      fullPath: '/admin/publishing/archived'
-      preLoaderRoute: typeof AdminPublishingArchivedRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/publishing/drafts': {
-      id: '/admin/publishing/drafts'
-      path: '/publishing/drafts'
-      fullPath: '/admin/publishing/drafts'
-      preLoaderRoute: typeof AdminPublishingDraftsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/publishing/published': {
-      id: '/admin/publishing/published'
-      path: '/publishing/published'
-      fullPath: '/admin/publishing/published'
-      preLoaderRoute: typeof AdminPublishingPublishedRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/publishing/scheduled': {
-      id: '/admin/publishing/scheduled'
-      path: '/publishing/scheduled'
-      fullPath: '/admin/publishing/scheduled'
-      preLoaderRoute: typeof AdminPublishingScheduledRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/website/design': {
-      id: '/admin/website/design'
-      path: '/website/design'
-      fullPath: '/admin/website/design'
-      preLoaderRoute: typeof AdminWebsiteDesignRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/website/footer': {
-      id: '/admin/website/footer'
-      path: '/website/footer'
-      fullPath: '/admin/website/footer'
-      preLoaderRoute: typeof AdminWebsiteFooterRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/website/navigation': {
-      id: '/admin/website/navigation'
-      path: '/website/navigation'
-      fullPath: '/admin/website/navigation'
-      preLoaderRoute: typeof AdminWebsiteNavigationRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/website/sections': {
-      id: '/admin/website/sections'
-      path: '/website/sections'
-      fullPath: '/admin/website/sections'
-      preLoaderRoute: typeof AdminWebsiteSectionsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/website/seo': {
-      id: '/admin/website/seo'
-      path: '/website/seo'
-      fullPath: '/admin/website/seo'
-      preLoaderRoute: typeof AdminWebsiteSeoRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/content/$kind/': {
@@ -971,73 +638,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminContentKindItemIdRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/website/pages/': {
-      id: '/admin/website/pages/'
-      path: '/website/pages'
-      fullPath: '/admin/website/pages/'
-      preLoaderRoute: typeof AdminWebsitePagesIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/website/pages/$pageId': {
-      id: '/admin/website/pages/$pageId'
-      path: '/website/pages/$pageId'
-      fullPath: '/admin/website/pages/$pageId'
-      preLoaderRoute: typeof AdminWebsitePagesPageIdRouteImport
-      parentRoute: typeof AdminRoute
-    }
   }
 }
 
 interface AdminRouteChildren {
-  AdminAiRoute: typeof AdminAiRoute
-  AdminEarlyAccessRoute: typeof AdminEarlyAccessRoute
-  AdminInviteRoute: typeof AdminInviteRoute
   AdminKnowledgeRoute: typeof AdminKnowledgeRoute
-  AdminMediaRoute: typeof AdminMediaRoute
   AdminIndexRoute: typeof AdminIndexRoute
-  AdminAdministrationActivityRoute: typeof AdminAdministrationActivityRoute
-  AdminAdministrationAdminsRoute: typeof AdminAdministrationAdminsRoute
-  AdminAdministrationRolesRoute: typeof AdminAdministrationRolesRoute
   AdminAdministrationSettingsRoute: typeof AdminAdministrationSettingsRoute
-  AdminPublishingArchivedRoute: typeof AdminPublishingArchivedRoute
-  AdminPublishingDraftsRoute: typeof AdminPublishingDraftsRoute
-  AdminPublishingPublishedRoute: typeof AdminPublishingPublishedRoute
-  AdminPublishingScheduledRoute: typeof AdminPublishingScheduledRoute
-  AdminWebsiteDesignRoute: typeof AdminWebsiteDesignRoute
-  AdminWebsiteFooterRoute: typeof AdminWebsiteFooterRoute
-  AdminWebsiteNavigationRoute: typeof AdminWebsiteNavigationRoute
-  AdminWebsiteSectionsRoute: typeof AdminWebsiteSectionsRoute
-  AdminWebsiteSeoRoute: typeof AdminWebsiteSeoRoute
   AdminContentKindItemIdRoute: typeof AdminContentKindItemIdRoute
-  AdminWebsitePagesPageIdRoute: typeof AdminWebsitePagesPageIdRoute
   AdminContentKindIndexRoute: typeof AdminContentKindIndexRoute
-  AdminWebsitePagesIndexRoute: typeof AdminWebsitePagesIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
-  AdminAiRoute: AdminAiRoute,
-  AdminEarlyAccessRoute: AdminEarlyAccessRoute,
-  AdminInviteRoute: AdminInviteRoute,
   AdminKnowledgeRoute: AdminKnowledgeRoute,
-  AdminMediaRoute: AdminMediaRoute,
   AdminIndexRoute: AdminIndexRoute,
-  AdminAdministrationActivityRoute: AdminAdministrationActivityRoute,
-  AdminAdministrationAdminsRoute: AdminAdministrationAdminsRoute,
-  AdminAdministrationRolesRoute: AdminAdministrationRolesRoute,
   AdminAdministrationSettingsRoute: AdminAdministrationSettingsRoute,
-  AdminPublishingArchivedRoute: AdminPublishingArchivedRoute,
-  AdminPublishingDraftsRoute: AdminPublishingDraftsRoute,
-  AdminPublishingPublishedRoute: AdminPublishingPublishedRoute,
-  AdminPublishingScheduledRoute: AdminPublishingScheduledRoute,
-  AdminWebsiteDesignRoute: AdminWebsiteDesignRoute,
-  AdminWebsiteFooterRoute: AdminWebsiteFooterRoute,
-  AdminWebsiteNavigationRoute: AdminWebsiteNavigationRoute,
-  AdminWebsiteSectionsRoute: AdminWebsiteSectionsRoute,
-  AdminWebsiteSeoRoute: AdminWebsiteSeoRoute,
   AdminContentKindItemIdRoute: AdminContentKindItemIdRoute,
-  AdminWebsitePagesPageIdRoute: AdminWebsitePagesPageIdRoute,
   AdminContentKindIndexRoute: AdminContentKindIndexRoute,
-  AdminWebsitePagesIndexRoute: AdminWebsitePagesIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
