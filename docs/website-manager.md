@@ -150,17 +150,21 @@ contributed usable text anyway.
 external product, and its knowledge lives in the PulseAssist console. So today this screen is a
 curated store that the assistant does not read.
 
-That leaves two honest options, and the choice is a product decision rather than a code one:
+**It is retained on purpose, as a fallback — do not delete it as dead code.** That decision is
+recorded here so it does not have to be rediscovered. If PulseAssist is ever dropped, the company
+facts are already captured in a structured, permissioned form and only the retrieval half has to be
+built: a Postgres full-text search over `knowledge_entries` (`websearch_to_tsquery` over a
+`to_tsvector` index, no extension required) injected into a chat endpoint. The table, the CRUD, the
+permissions and the `active`/`disabled` flag all already exist, so that is the smaller half of the
+work.
 
-1. **Put the facts in the PulseAssist console instead**, and treat this screen as a staging area or
-   drop it.
-2. **Wire retrieval up here** — a Postgres full-text search over `knowledge_entries`
-   (`websearch_to_tsquery` over a `to_tsvector` index, no extension required) injected into a chat
-   endpoint. The table, the CRUD, the permissions and the `active`/`disabled` flag already exist, so
-   this is the smaller half of the work.
+Until then it is a store, not a training pipeline, and **the screen's own copy says so** rather than
+implying the assistant is reading it. That wording is load-bearing: an operator who believes a note is
+live when it is not will conclude the chatbot is broken rather than unwired, which is a far more
+expensive thing to debug. If retrieval is ever wired up, update that copy in the same commit.
 
-It is kept because it is the right home for curated company facts and costs one screen to retain —
-but it should not be mistaken for something that is currently training anything.
+In the meantime, facts that need to affect the live chatbot today belong in the **PulseAssist
+console**.
 
 ---
 

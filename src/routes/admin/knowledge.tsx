@@ -57,10 +57,23 @@ const EMPTY_EDITOR: EditorState = {
 /**
  * The AI assistant knowledge base.
  *
- * This is where the website chatbot is taught. Each entry — a typed note or the text extracted
- * from an uploaded PDF — becomes material the assistant retrieves and grounds its answers in, so
- * the owner can expand what it knows without a developer changing code. Only `active` entries are
- * surfaced to the assistant; disabling one parks it without losing it.
+ * A curated set of company facts, each entry `active` or `disabled` so one can be parked without
+ * being lost.
+ *
+ * ## Nothing in this repository reads these entries yet — that is deliberate
+ *
+ * The visitor-facing chatbot is **PulseAssist**, an external product, and the knowledge it answers
+ * from lives in the PulseAssist console. There is no `/api/chat` function here and no retrieval
+ * code; an earlier in-house chatbot had both, and they were removed with it.
+ *
+ * This screen is kept as the fallback: if PulseAssist is ever dropped, the facts are already here in
+ * a structured form and only the retrieval half has to be built — a Postgres full-text search over
+ * `knowledge_entries` injected into a chat endpoint. The table, the CRUD, the permissions and the
+ * active/disabled flag all exist.
+ *
+ * So do not delete this as dead code, and **do not reword the copy below to claim the assistant is
+ * reading it.** An operator who believes a note is live when it is not will assume the chatbot is
+ * broken rather than unwired, which is a much more expensive thing to debug.
  */
 function KnowledgeScreen() {
   const { can, config } = useAdmin();
@@ -176,7 +189,7 @@ function KnowledgeScreen() {
       <>
         <PageHeader
           title="Assistant knowledge"
-          description="Teach the website chatbot facts it should know."
+          description="Company facts kept ready for the assistant."
         />
         <NotConfiguredNotice title="A database is required">
           The knowledge base is stored in the Website Manager database. Set{" "}
@@ -191,7 +204,7 @@ function KnowledgeScreen() {
     <>
       <PageHeader
         title="Assistant knowledge"
-        description="Everything here is fed to the website chatbot so it can answer from facts you control."
+        description="Company facts, kept in a structured form and ready to train an assistant on."
         actions={
           canWrite ? (
             <Button icon={Plus} onClick={() => setEditor({ ...EMPTY_EDITOR })}>
@@ -203,7 +216,7 @@ function KnowledgeScreen() {
 
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
         <Metric label="Entries" value={stats.total} icon={BookOpen} />
-        <Metric label="Used by the assistant" value={stats.active} icon={Sparkles} tone="success" />
+        <Metric label="Active" value={stats.active} icon={Sparkles} tone="success" />
         <Metric label="Disabled" value={disabledCount} icon={Database} tone="neutral" />
       </div>
 
@@ -239,7 +252,7 @@ function KnowledgeScreen() {
           description={
             search
               ? "Try a different search."
-              : "Add a note or upload a PDF, and the website chatbot will start answering from it."
+              : "Add the facts you would want an assistant to answer from."
           }
           action={
             canWrite && !search ? (
