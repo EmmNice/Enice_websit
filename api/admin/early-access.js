@@ -5063,7 +5063,7 @@ var PostalMime = class _PostalMime {
 
 // node_modules/resend/dist/index.mjs
 var import_standardwebhooks = __toESM(require_dist(), 1);
-var version = "6.28.1";
+var version = "6.30.0";
 function buildPaginationUrl(base, options) {
   const queryString = buildPaginationQuery(options);
   return queryString ? `${base}?${queryString}` : base;
@@ -6177,6 +6177,14 @@ var Topics = class {
     return await this.resend.delete(`/topics/${id}`);
   }
 };
+var Usage = class {
+  constructor(resend) {
+    this.resend = resend;
+  }
+  async get() {
+    return await this.resend.get("/usage");
+  }
+};
 var Attempts = class {
   constructor(resend) {
     this.resend = resend;
@@ -6265,6 +6273,7 @@ var Resend = class {
     this.suppressions = new Suppressions(this);
     this.templates = new Templates(this);
     this.topics = new Topics(this);
+    this.usage = new Usage(this);
     this.webhooks = new Webhooks(this);
     if (!key) {
       if (typeof process !== "undefined" && process.env) this.key = process.env.RESEND_API_KEY;

@@ -29,7 +29,7 @@ function RoadmapPage() {
         The page opening. It was a `bg-secondary/40` band with a hard bottom rule — the one
         pattern the dark system deliberately drops, because a tinted strip at the top of every
         page is what made the site read as a stack of separately-designed blocks. Rhythm and the
-        ambient warm light carry the break instead.
+        ambient blue light carry the break instead.
       */}
       <Section spacing="tight" glow="center" aria-labelledby="roadmap-heading">
         <SectionIntro

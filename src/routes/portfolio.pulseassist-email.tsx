@@ -290,7 +290,7 @@ function PulseAssistEmailPage() {
           <Panel raised aria-hidden className="overflow-hidden">
             <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
               <span className="flex items-center gap-2.5">
-                <Mail className="h-4 w-4 text-gold" strokeWidth={1.75} />
+                <Mail className="h-4 w-4 text-electric" strokeWidth={1.75} />
                 <span className="text-[12px] font-semibold text-bone-strong">Sending domain</span>
               </span>
               <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-positive">
@@ -390,7 +390,7 @@ function PulseAssistEmailPage() {
               <li className="grid gap-4 border-t border-border py-7 sm:grid-cols-[auto_1fr] sm:gap-8">
                 <span
                   aria-hidden
-                  className="tnum font-mono text-[11px] font-semibold tracking-[0.22em] text-gold sm:pt-1"
+                  className="tnum font-mono text-[11px] font-semibold tracking-[0.22em] text-electric sm:pt-1"
                 >
                   /{String(i + 1).padStart(2, "0")}
                 </span>

@@ -18,6 +18,30 @@ script.** The one detail worth re-checking against an original is the blue: `#00
 modal pixel value. Surrounding values form a cluster two units wide, which is antialiasing noise
 around a single flat fill, so there is no gradient to reproduce.
 
+## The palette follows the mark
+
+`#0048ED` is the brand. It is written in three places and they must agree:
+
+| Where            | What                                    |
+| ---------------- | --------------------------------------- |
+| `enice-mark.svg` | the `E`'s `fill`                        |
+| `brand-mark.mjs` | the `BLUE` constant that generates it   |
+| `src/styles.css` | `--enice-blue` in the brand canon block |
+
+They drifted once, and it is worth knowing how, because the failure was invisible. The mark was
+updated to blue while the stylesheet stayed on the warm `bone + gold` palette it had been built
+with, so the site rendered gold accents around a blue logo on every page. Nothing broke, no test
+failed, and the only symptom was that the site looked like a different company from its own
+favicon. **If the mark's colours change, `styles.css` changes in the same commit.**
+
+One thing does not carry over directly. The mark blue measures **3.02:1 on the near-black canvas**,
+which is fine for a logo — a logo is not read — and unusable for text. So the stylesheet derives a
+ramp from it rather than using it flat: `--electric` is a lighter tint at the same hue (222°) and is
+the only tier allowed to carry type, while `--electric-deep` is the mark blue itself and is
+restricted to fills, where whatever sits on top is white. The reasoning is recorded on the `.site`
+block in `styles.css`; the short version is that "use the brand colour everywhere" and "text must
+be legible" are in genuine conflict here, and the ramp is how both are satisfied.
+
 ## The files
 
 Regenerate the SVGs with `node scripts/brand-mark.mjs`. It has no dependencies and is not part of
@@ -32,6 +56,12 @@ Regenerate the SVGs with `node scripts/brand-mark.mjs`. It has no dependencies a
 only supplies a ground, exactly as the previous icon set did. It exists because the bare mark is
 transparent and two-tone, so its white N would disappear against light browser chrome or a light home
 screen, and because iOS masks its own corners and composites transparency onto black.
+
+The ground is `#05070d`, the canvas from `styles.css`. It moved there from `#080c0e` when the palette
+was rebuilt around the mark: the old near-black leaned very slightly green, which is invisible on its
+own and reads as a faint temperature clash next to the blue. Both are near-black, so **the committed
+raster icons are still a visual match and do not urgently need regenerating** — but the next person
+to run the harness will produce files with the new ground, and that is the intended state.
 
 That hazard applies anywhere the mark meets a pale background. The site is dark throughout, so it does
 not arise today. If a light surface ever needs the mark, **ask for artwork rather than recolouring

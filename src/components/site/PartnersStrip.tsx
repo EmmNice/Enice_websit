@@ -204,7 +204,7 @@ function PartnerTile({
       ) : (
         <span
           aria-hidden
-          className="grid h-6 w-6 shrink-0 place-items-center rounded-md border border-gold/20 bg-gold/[0.07] text-[10px] font-semibold text-gold"
+          className="grid h-6 w-6 shrink-0 place-items-center rounded-md border border-electric/20 bg-electric/[0.07] text-[10px] font-semibold text-electric"
         >
           {monogram(partner.name)}
         </span>

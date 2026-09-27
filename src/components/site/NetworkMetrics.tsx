@@ -118,7 +118,7 @@ export function NetworkMetrics() {
           <Reveal key={`${it.label}-${i}`} delay={i * 50} className="flex">
             <div className="flex h-full w-full flex-col justify-between gap-6 bg-background p-6">
               <div className="flex items-start justify-between">
-                <it.icon aria-hidden className="h-4 w-4 text-gold" strokeWidth={1.75} />
+                <it.icon aria-hidden className="h-4 w-4 text-electric" strokeWidth={1.75} />
                 <CardIndex value={i + 1} />
               </div>
               <div>

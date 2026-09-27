@@ -30,7 +30,7 @@ function AboutPulseAssistBetaPage() {
     <SiteShell>
       {/* ── Hero ── */}
       <Section spacing="tight" container="narrow" grid glow="spread" aria-labelledby="beta-heading">
-        <Tag tone="warm" className="max-w-full">
+        <Tag tone="accent" className="max-w-full">
           <Sparkles aria-hidden className="h-3 w-3 shrink-0" strokeWidth={2} />
           September 2026 · PulseAssist Beta
         </Tag>
@@ -94,7 +94,11 @@ function AboutPulseAssistBetaPage() {
         <Panel raised className="mt-10 grid gap-4 p-6 sm:grid-cols-3 sm:p-8">
           {TRAITS.map((trait) => (
             <div key={trait} className="flex items-center gap-2.5">
-              <CheckCircle2 aria-hidden className="h-4 w-4 shrink-0 text-gold" strokeWidth={2} />
+              <CheckCircle2
+                aria-hidden
+                className="h-4 w-4 shrink-0 text-electric"
+                strokeWidth={2}
+              />
               <span className="text-[14px] font-semibold text-foreground">{trait}</span>
             </div>
           ))}

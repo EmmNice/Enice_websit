@@ -126,7 +126,7 @@ function stageOf(to: string): keyof typeof STAGE_LABEL {
 
 function LifecycleTag({ to }: { to: string }) {
   const stage = stageOf(to);
-  return <Tag tone={stage === "available" ? "positive" : "warm"}>{STAGE_LABEL[stage]}</Tag>;
+  return <Tag tone={stage === "available" ? "positive" : "accent"}>{STAGE_LABEL[stage]}</Tag>;
 }
 
 // ─── Card shell ───────────────────────────────────────────────────────────────
@@ -214,14 +214,14 @@ function PortfolioIndexPage() {
                         <span
                           className={cn(
                             "h-1.5 w-1.5 shrink-0 rounded-full",
-                            row.isLive ? "bg-gold" : "bg-surface-3",
+                            row.isLive ? "bg-electric" : "bg-surface-3",
                           )}
                         />
                         <span className="font-mono text-[10px] tracking-wider text-bone-soft">
                           {row.id}
                         </span>
                         <div className="relative ml-1 h-1 flex-1 overflow-hidden rounded-full bg-border">
-                          <div className={cn("h-full rounded-full bg-gold/60", row.width)} />
+                          <div className={cn("h-full rounded-full bg-electric/60", row.width)} />
                         </div>
                         <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
                           {row.state}
@@ -270,7 +270,7 @@ function PortfolioIndexPage() {
                   <div className="panel w-full max-w-sm" style={{ boxShadow: SHADOW_CARD }}>
                     <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
                       <span className="flex items-center gap-2">
-                        <Mail className="h-3.5 w-3.5 text-gold" strokeWidth={1.75} />
+                        <Mail className="h-3.5 w-3.5 text-electric" strokeWidth={1.75} />
                         <span className="text-[11px] font-semibold text-bone-strong">
                           Sending domain
                         </span>
@@ -380,8 +380,8 @@ function PortfolioIndexPage() {
                       </span>
                       <Wifi className="h-3.5 w-3.5 rotate-90 text-bone-faint" />
                     </div>
-                    {/* The metallic chip: the one place a small gold fill is right. */}
-                    <div className="h-6 w-9 rounded-md bg-gradient-to-br from-gold to-gold-deep" />
+                    {/* The metallic chip: the one place a small electric fill is right. */}
+                    <div className="h-6 w-9 rounded-md bg-gradient-to-br from-electric to-electric-deep" />
                     <div className="tnum font-mono text-[9px] tracking-[0.2em] text-bone-soft">
                       •••• •••• •••• ••••
                     </div>
@@ -442,7 +442,7 @@ function PortfolioIndexPage() {
                     style={{ boxShadow: SHADOW_CARD }}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-gold/25 bg-gold/[0.08] text-gold">
+                      <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full border border-electric/25 bg-electric/[0.08] text-electric">
                         <CheckCircle2 className="h-4 w-4" strokeWidth={2} />
                       </span>
                       <div>
@@ -511,11 +511,11 @@ function PortfolioIndexPage() {
                 <div className="tech-grid tech-grid-flat" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6">
                   <div className="flex items-center gap-2.5">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl border border-gold/25 bg-gold/[0.08] text-gold">
+                    <span className="grid h-10 w-10 place-items-center rounded-xl border border-electric/25 bg-electric/[0.08] text-electric">
                       <Bitcoin className="h-5 w-5" strokeWidth={1.5} />
                     </span>
                     <div className="text-xl font-bold tracking-tight text-foreground">
-                      Pulse<span className="text-gold">X</span>
+                      Pulse<span className="text-electric">X</span>
                     </div>
                   </div>
                   <div className="w-full max-w-xs space-y-1.5">
@@ -572,7 +572,7 @@ function PortfolioIndexPage() {
                 <div className="mesh-glow-center" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
                   <div className="flex items-center gap-3">
-                    <span className="grid h-14 w-14 place-items-center rounded-2xl border border-gold/25 bg-gold/[0.08] text-gold">
+                    <span className="grid h-14 w-14 place-items-center rounded-2xl border border-electric/25 bg-electric/[0.08] text-electric">
                       <Wallet className="h-7 w-7" strokeWidth={1.5} />
                     </span>
                     <div className="text-left">
@@ -580,7 +580,7 @@ function PortfolioIndexPage() {
                         Global Finance
                       </div>
                       <div className="text-xl font-bold tracking-tight text-foreground">
-                        e<span className="text-gold">Pulse</span>
+                        e<span className="text-electric">Pulse</span>
                       </div>
                     </div>
                   </div>

@@ -19,6 +19,10 @@ import { CORPORATE_EMAIL } from "@/lib/seo";
  * also cannot assume `.site` is on the document element — a route error under /admin would reach
  * here with the light theme active — so the canvas and bone are set explicitly.
  *
+ * That is why the palette below is literal rather than `var(--…)`: this screen has to survive the
+ * stylesheet not loading at all. The values mirror the `.site` block in `styles.css` and must be
+ * updated with it — `#0048ed` is the mark blue, `#6b98ff` the tint that can carry type.
+ *
  * Typed with the router's own `ErrorComponentProps` rather than a hand-written `{ error: Error }`.
  * The router passes `error` as `unknown` — a thrown value is not guaranteed to be an `Error` — and
  * the local annotation was tight enough to fail `tsc` against the installed router version.
@@ -32,14 +36,14 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
     <main
       id="main"
       className="relative flex min-h-dvh flex-col items-center justify-center overflow-hidden px-5"
-      style={{ background: "#080c0e", color: "#f4f1eb" }}
+      style={{ background: "#05070d", color: "#f7f8fa" }}
     >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(60rem 30rem at 50% -10%, rgb(255 149 41 / 0.05), transparent 70%)",
+            "radial-gradient(60rem 30rem at 50% -10%, rgb(0 72 237 / 0.14), transparent 70%)",
         }}
       />
 
@@ -50,7 +54,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
               className="font-extrabold"
               style={{
                 backgroundImage:
-                  "linear-gradient(108deg,#f4f1eb 0%,#d8a45c 42%,#a8702f 74%,#5c3a18)",
+                  "linear-gradient(108deg,#f7f8fa 0%,#6b98ff 42%,#0048ed 74%,#001f6b)",
                 WebkitBackgroundClip: "text",
                 backgroundClip: "text",
                 color: "transparent",
@@ -60,10 +64,10 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             </span>
             <span className="-ml-px font-light tracking-[0.28em]">NICE</span>
           </span>
-          <span className="h-5 w-px" style={{ background: "rgb(244 241 235 / 0.16)" }} />
+          <span className="h-5 w-px" style={{ background: "rgb(247 248 250 / 0.16)" }} />
           <span
             className="text-[11px] font-semibold uppercase tracking-[0.28em]"
-            style={{ color: "#727371" }}
+            style={{ color: "#888f9c" }}
           >
             Group
           </span>
@@ -72,17 +76,17 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
         <div
           className="mb-8 inline-flex items-center gap-2 rounded-full px-4 py-1.5"
           style={{
-            border: "1px solid rgb(216 164 92 / 0.25)",
-            background: "rgb(216 164 92 / 0.08)",
+            border: "1px solid rgb(107 152 255 / 0.25)",
+            background: "rgb(107 152 255 / 0.08)",
           }}
         >
           <span
             className="h-1.5 w-1.5 animate-pulse rounded-full"
-            style={{ background: "#d8a45c" }}
+            style={{ background: "#6b98ff" }}
           />
           <span
             className="text-[11px] font-semibold uppercase tracking-[0.2em]"
-            style={{ color: "#d8a45c" }}
+            style={{ color: "#6b98ff" }}
           >
             System notice
           </span>
@@ -92,7 +96,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
           Something went wrong on our end.
         </h1>
 
-        <p className="mb-10 max-w-sm text-[15px] leading-relaxed" style={{ color: "#a1a09e" }}>
+        <p className="mb-10 max-w-sm text-[15px] leading-relaxed" style={{ color: "#a0a6b2" }}>
           We are fixing it right now. Please refresh the page or try again shortly.
         </p>
 
@@ -101,7 +105,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             type="button"
             onClick={() => window.location.reload()}
             className="group inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-semibold"
-            style={{ background: "#f4f1eb", color: "#080c0e" }}
+            style={{ background: "#0048ed", color: "#ffffff" }}
           >
             <RefreshCw
               aria-hidden
@@ -117,9 +121,9 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
             }}
             className="inline-flex h-11 items-center justify-center gap-2 rounded-md px-6 text-sm font-medium"
             style={{
-              border: "1px solid rgb(244 241 235 / 0.16)",
-              background: "rgb(244 241 235 / 0.04)",
-              color: "#f4f1eb",
+              border: "1px solid rgb(247 248 250 / 0.16)",
+              background: "rgb(247 248 250 / 0.04)",
+              color: "#f7f8fa",
             }}
           >
             <ArrowLeft aria-hidden className="h-4 w-4" />
@@ -127,7 +131,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
           </button>
         </div>
 
-        <p className="mt-12 text-[12px]" style={{ color: "#727371" }}>
+        <p className="mt-12 text-[12px]" style={{ color: "#888f9c" }}>
           If this keeps happening, contact us at{" "}
           <a href={`mailto:${CORPORATE_EMAIL}`} className="underline underline-offset-2">
             {CORPORATE_EMAIL}

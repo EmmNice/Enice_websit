@@ -179,21 +179,29 @@ function ContactPage() {
             <Eyebrow as="h2">Direct Channels</Eyebrow>
             <ul className="mt-6 space-y-5">
               <li className="flex items-start gap-3">
-                <Mail aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-gold" strokeWidth={2} />
+                <Mail
+                  aria-hidden
+                  className="mt-0.5 h-4 w-4 shrink-0 text-electric"
+                  strokeWidth={2}
+                />
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
                     Corporate
                   </div>
                   <a
                     href="mailto:corporate@enicehq.com"
-                    className="tap mt-1 block text-sm break-all text-foreground transition-colors hover:text-gold"
+                    className="tap mt-1 block text-sm break-all text-foreground transition-colors hover:text-electric"
                   >
                     corporate@enicehq.com
                   </a>
                 </div>
               </li>
               <li className="flex items-start gap-3">
-                <MapPin aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-gold" strokeWidth={2} />
+                <MapPin
+                  aria-hidden
+                  className="mt-0.5 h-4 w-4 shrink-0 text-electric"
+                  strokeWidth={2}
+                />
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
                     Based in
@@ -211,7 +219,7 @@ function ContactPage() {
             <ol className="mt-6 space-y-5">
               {EXPECTATIONS.map((s) => (
                 <li key={s.step} className="flex gap-4">
-                  <span className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold tracking-[0.18em] text-gold">
+                  <span className="mt-0.5 shrink-0 font-mono text-[10px] font-semibold tracking-[0.18em] text-electric">
                     {s.step}
                   </span>
                   <div>
@@ -226,7 +234,11 @@ function ContactPage() {
           {/* Compliance note */}
           <Panel tone="quiet" className="px-6 py-5">
             <div className="flex items-start gap-3">
-              <Check aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-gold" strokeWidth={2.5} />
+              <Check
+                aria-hidden
+                className="mt-0.5 h-4 w-4 shrink-0 text-electric"
+                strokeWidth={2.5}
+              />
               <p className="text-[12px] leading-relaxed text-bone-soft">
                 All inquiries are handled under ENICE Group's privacy policy. We don't share your
                 data with third parties without your consent.
@@ -389,7 +401,7 @@ function ContactPage() {
                   checked={form.updates}
                   onChange={(e) => set("updates", e.target.checked)}
                   disabled={submitting}
-                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-border accent-gold"
+                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-border accent-electric"
                 />
                 <span className="text-[13px] leading-relaxed text-bone-soft">
                   Also keep me updated on ENICE Group products and launches.

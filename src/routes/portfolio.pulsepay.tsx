@@ -223,7 +223,7 @@ function PulsePayPage() {
                 pill now states the product's lifecycle stage, read from the product registry,
                 which is a fact with a source. */}
             <div className="mt-8 flex flex-wrap gap-2">
-              <Tag tone={STAGE === "available" ? "positive" : "warm"}>{STAGE_LABEL[STAGE]}</Tag>
+              <Tag tone={STAGE === "available" ? "positive" : "accent"}>{STAGE_LABEL[STAGE]}</Tag>
               <Tag>
                 <Globe aria-hidden className="h-3 w-3 shrink-0" />
                 Nigeria
@@ -284,8 +284,8 @@ function PulsePayPage() {
                   </span>
                   <Wifi className="h-3.5 w-3.5 rotate-90 text-bone-faint" />
                 </div>
-                {/* Chip — the one place a small gold fill is right */}
-                <div className="h-6 w-9 rounded-md bg-gradient-to-br from-gold to-gold-deep" />
+                {/* Chip — the one place a small electric fill is right */}
+                <div className="h-6 w-9 rounded-md bg-gradient-to-br from-electric to-electric-deep" />
                 {/* Card number */}
                 <div className="tnum font-mono text-[9px] tracking-[0.2em] text-bone-soft">
                   •••• •••• •••• ••••
@@ -377,7 +377,7 @@ function PulsePayPage() {
             {complianceMechanisms.map((b) => (
               <li key={b}>
                 <Tag>
-                  <Check aria-hidden className="h-3 w-3 shrink-0 text-gold" strokeWidth={2.5} />
+                  <Check aria-hidden className="h-3 w-3 shrink-0 text-electric" strokeWidth={2.5} />
                   {b}
                 </Tag>
               </li>

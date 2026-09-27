@@ -437,8 +437,8 @@ var init_types = __esm({
       }
     };
     BRAND_PALETTES = {
-      "enice-navy": { label: "ENICE Navy (default)", primary: "#1E3A8A", accent: "#334155" },
-      "enice-midnight": { label: "ENICE Midnight", primary: "#0F172A", accent: "#1E3A8A" },
+      "enice-navy": { label: "ENICE Electric (default)", primary: "#0048ED", accent: "#6B98FF" },
+      "enice-midnight": { label: "ENICE Midnight", primary: "#001F6B", accent: "#0048ED" },
       "enice-slate": { label: "ENICE Slate", primary: "#334155", accent: "#475569" },
       "enice-indigo": { label: "ENICE Indigo", primary: "#3730A3", accent: "#4F46E5" }
     };
@@ -3627,8 +3627,8 @@ businesses.';
 -- Two conventions are worth stating, because the code parses them back out:
 --
 --   * Launch-fact strips are \`statistics\` sections, which carry a value and a label and nothing
---     else. Which row is painted gold is a styling decision, not content, so it is not stored: the
---     first row is the status row and the component accents it by position.
+--     else. Which row carries the accent is a styling decision, not content, so it is not stored:
+--     the first row is the status row and the component accents it by position.
 --
 --   * Roadmap milestones are \`steps\` rows, which carry a title and a description. A milestone needs
 --     four more things, so they are written as \`label: value\` lines at the top of the description,
@@ -4825,7 +4825,7 @@ var require_version = __commonJS({
       version: () => version
     });
     module.exports = __toCommonJS(version_exports);
-    var version = "3.8.8";
+    var version = "3.8.9";
   }
 });
 
@@ -10050,7 +10050,7 @@ var require_dist2 = __commonJS({
     var credStorageSchema = union([literal("auto"), literal("file"), literal("keyring")]);
     var authConfigSchema = object({ "// Note": string2().optional(), "// Docs": string2().optional(), skipWrite: boolean2().optional(), token: string2().optional(), userId: string2().optional(), refreshToken: string2().optional(), expiresAt: number2().optional(), tokenSource: union([literal("flag"), literal("env")]).optional() });
     var authFileConfigSchema = authConfigSchema.omit({ tokenSource: true });
-    var globalConfigSchema = object({ "// Note": string2().optional(), "// Docs": string2().optional(), credStorage: credStorageSchema.optional(), currentTeam: string2().optional(), api: string2().optional(), telemetry: telemetryConfigSchema.optional(), guidance: guidanceConfigSchema.optional(), updates: updatesConfigSchema.optional(), useNativeBinary: boolean2().optional() });
+    var globalConfigSchema = object({ "// Note": string2().optional(), "// Docs": string2().optional(), credStorage: credStorageSchema.optional(), currentTeam: string2().optional(), api: string2().optional(), telemetry: telemetryConfigSchema.optional(), guidance: guidanceConfigSchema.optional(), updates: updatesConfigSchema.optional(), useNativeBinary: boolean2().optional(), nativeBinaryAutoOptIn: boolean2().optional() });
     function formatCredStorageError(value) {
       return `Invalid value for \`credStorage\`: ${JSON.stringify(value)}. Expected one of: ${CRED_STORAGE_CONFIG_VALUES.map((storage) => JSON.stringify(storage)).join(", ")}.`;
     }
@@ -17258,10 +17258,66 @@ var require_request = __commonJS({
           return false;
         }
       }
-      onUpgrade(statusCode, headers, socket) {
+      /**
+       * @param {number|null} statusCode
+       * @param {Buffer[]|null} headers
+       * @param {import('node:stream').Duplex} socket
+       * @param {string} [statusText]
+       */
+      onUpgrade(statusCode, headers, socket, statusText = "") {
+        this.onFinally();
         assert2(!this.aborted);
         assert2(!this.completed);
-        return this[kHandler].onUpgrade(statusCode, headers, socket);
+        if (statusCode !== null) {
+          this.#publishUpgradeHeaders(statusCode, headers, statusText);
+        }
+        const result = this[kHandler].onUpgrade(statusCode, headers, socket);
+        if (!this.aborted) {
+          this.completed = true;
+          if (statusCode !== null) {
+            this.#publishUpgradeTrailers();
+          }
+        }
+        return result;
+      }
+      /**
+       * @param {number} statusCode
+       * @param {import('node:http2').IncomingHttpHeaders} headers
+       * @param {(headers: import('node:http2').IncomingHttpHeaders) => Buffer[]} parseHeaders
+       * @param {string} [statusText]
+       */
+      onUpgradeResponse(statusCode, headers, parseHeaders, statusText = "") {
+        assert2(!this.aborted);
+        assert2(this.completed);
+        if (channels.headers.hasSubscribers) {
+          this.#publishUpgradeHeaders(statusCode, parseHeaders(headers), statusText);
+        }
+        this.#publishUpgradeTrailers();
+      }
+      /**
+       * @param {Error} error
+       */
+      onUpgradeError(error) {
+        assert2(!this.aborted);
+        assert2(this.completed);
+        if (channels.error.hasSubscribers) {
+          channels.error.publish({ request: this, error });
+        }
+      }
+      /**
+       * @param {number} statusCode
+       * @param {Buffer[]} headers
+       * @param {string} statusText
+       */
+      #publishUpgradeHeaders(statusCode, headers, statusText) {
+        if (channels.headers.hasSubscribers) {
+          channels.headers.publish({ request: this, response: { statusCode, headers, statusText } });
+        }
+      }
+      #publishUpgradeTrailers() {
+        if (channels.trailers.hasSubscribers) {
+          channels.trailers.publish({ request: this, trailers: [] });
+        }
       }
       onComplete(trailers) {
         this.onFinally();
@@ -21404,7 +21460,7 @@ var require_client_h1 = __commonJS({
         }
       }
       onUpgrade(head2) {
-        const { upgrade, client: client2, socket, headers, statusCode } = this;
+        const { upgrade, client: client2, socket, headers, statusCode, statusText } = this;
         assert2(upgrade);
         assert2(client2[kSocket] === socket);
         assert2(!socket.destroyed);
@@ -21429,9 +21485,10 @@ var require_client_h1 = __commonJS({
         client2[kQueue][client2[kRunningIdx]++] = null;
         client2.emit("disconnect", client2[kUrl], [client2], new InformationalError("upgrade"));
         try {
-          request.onUpgrade(statusCode, headers, socket);
-        } catch (err) {
-          util.destroy(socket, err);
+          request.onUpgrade(statusCode, headers, socket, statusText);
+        } catch (error) {
+          util.errorRequest(client2, request, error);
+          util.destroy(socket, error);
         }
         client2[kResume]();
       }
@@ -21834,11 +21891,17 @@ var require_client_h1 = __commonJS({
       }
       const socket = client2[kSocket];
       clearIdleSocketValidation(socket);
-      const abort = (err) => {
-        if (request.aborted || request.completed) {
+      const abort = (error) => {
+        if (request.aborted) {
           return;
         }
-        util.errorRequest(client2, request, err || new RequestAbortedError());
+        if (request.completed) {
+          if (request.upgrade || request.method === "CONNECT") {
+            util.destroy(socket, new InformationalError("aborted"));
+          }
+          return;
+        }
+        util.errorRequest(client2, request, error || new RequestAbortedError());
         util.destroy(body);
         util.destroy(socket, new InformationalError("aborted"));
       };
@@ -22194,6 +22257,7 @@ var require_client_h2 = __commonJS({
   "node_modules/undici/lib/dispatcher/client-h2.js"(exports, module) {
     "use strict";
     var assert2 = __require("node:assert");
+    var { errorMonitor } = __require("node:events");
     var { pipeline } = __require("node:stream");
     var util = require_util();
     var {
@@ -22253,6 +22317,10 @@ var require_client_h2 = __commonJS({
         }
       }
       return result;
+    }
+    function parseH2ResponseHeaders(headers) {
+      const { [HTTP2_HEADER_STATUS]: _statusCode, ...realHeaders } = headers;
+      return parseH2Headers(realHeaders);
     }
     async function connectH2(client2, socket) {
       client2[kSocket] = socket;
@@ -22417,16 +22485,22 @@ var require_client_h2 = __commonJS({
       const { hostname, port } = client2[kUrl];
       headers[HTTP2_HEADER_AUTHORITY] = host || `${hostname}${port ? `:${port}` : ""}`;
       headers[HTTP2_HEADER_METHOD] = method;
-      const abort = (err) => {
-        if (request.aborted || request.completed) {
+      const abort = (error) => {
+        if (request.aborted) {
           return;
         }
-        err = err || new RequestAbortedError();
-        util.errorRequest(client2, request, err);
-        if (stream != null) {
-          util.destroy(stream, err);
+        if (request.completed) {
+          if (method === "CONNECT" && stream != null) {
+            util.destroy(stream, error || new RequestAbortedError());
+          }
+          return;
         }
-        util.destroy(body, err);
+        error = error || new RequestAbortedError();
+        util.errorRequest(client2, request, error);
+        if (stream != null) {
+          util.destroy(stream, error);
+        }
+        util.destroy(body, error);
         client2[kQueue][client2[kRunningIdx]++] = null;
         client2[kResume]();
       };
@@ -22441,18 +22515,42 @@ var require_client_h2 = __commonJS({
       if (method === "CONNECT") {
         session.ref();
         stream = session.request(headers, { endStream: false, signal });
-        if (stream.id && !stream.pending) {
-          request.onUpgrade(null, null, stream);
-          ++session[kOpenStreams];
-          client2[kQueue][client2[kRunningIdx]++] = null;
-        } else {
-          stream.once("ready", () => {
+        let upgradeResponseFinished = false;
+        const onResponse = (headers2) => {
+          upgradeResponseFinished = true;
+          stream.off(errorMonitor, onUpgradeError);
+          request.onUpgradeResponse(Number(headers2[HTTP2_HEADER_STATUS]), headers2, parseH2ResponseHeaders);
+        };
+        const onUpgradeError = (error) => {
+          upgradeResponseFinished = true;
+          stream.off("response", onResponse);
+          request.onUpgradeError(error);
+        };
+        const onReady = () => {
+          try {
             request.onUpgrade(null, null, stream);
-            ++session[kOpenStreams];
-            client2[kQueue][client2[kRunningIdx]++] = null;
-          });
-        }
+          } catch (error) {
+            stream.off("response", onResponse);
+            abort(error);
+            return;
+          }
+          if (request.aborted) {
+            return;
+          }
+          stream.off("error", abort);
+          stream.once(errorMonitor, onUpgradeError);
+          client2[kQueue][client2[kRunningIdx]++] = null;
+        };
+        stream.once("response", onResponse);
+        stream.once("error", abort);
+        ++session[kOpenStreams];
+        onReady();
         stream.once("close", () => {
+          if (!upgradeResponseFinished && request.completed) {
+            stream.off("response", onResponse);
+            stream.off(errorMonitor, onUpgradeError);
+            request.onUpgradeError(new InformationalError(`HTTP/2: "stream error" received - code ${stream.rstCode}`));
+          }
           session[kOpenStreams] -= 1;
           if (session[kOpenStreams] === 0) session.unref();
         });
@@ -24517,7 +24615,7 @@ var require_retry_handler = __commonJS({
         const headers = parseHeaders(rawHeaders);
         this.retryCount += 1;
         if (statusCode >= 300) {
-          if (this.retryOpts.statusCodes.includes(statusCode) === false) {
+          if (!this.headersSent && this.retryOpts.statusCodes.includes(statusCode) === false) {
             this.headersSent = true;
             this.checkpointResponseEnd(headers, resume);
             return this.handler.onHeaders(
@@ -75105,8 +75203,8 @@ var init_website = __esm({
            *
            * The breaks were tuned for one viewport and ragged badly at every other; the headline is
            * now balanced by the browser. The highlight is dropped because at display size it put two
-           * lines of the warm accent at the top of the page — the accent is for small emphasis, and a
-           * 60px gold phrase stops reading as an accent. Both features remain available to an editor
+           * lines of the accent at the top of the page — the accent is for small emphasis, and a 60px
+           * phrase in the brand blue stops reading as an accent. Both remain available to an editor
            * (\n splits a line, [[…]] renders a phrase in the accent colour); they are simply not what
            * the shipped copy uses.
            */

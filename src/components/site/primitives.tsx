@@ -72,7 +72,7 @@ export interface SectionProps {
   tone?: SectionTone;
   /** A hairline that fades at both ends, for an editorial break with no colour change. */
   divider?: boolean;
-  /** Ambient warm lighting. `center` for a band opening, `spread` for a full-width field. */
+  /** Ambient blue lighting. `center` for a band opening, `spread` for a full-width field. */
   glow?: "none" | "center" | "spread";
   /** The technical grid backdrop. */
   grid?: boolean;
@@ -134,7 +134,7 @@ export function Section({
 // ─── Headings ─────────────────────────────────────────────────────────────────
 
 /**
- * A small uppercase label. Warm by default — this is the one place the gold accent appears on
+ * A small uppercase label. Blue by default — this is the one place the electric accent appears on
  * nearly every page, which is exactly the "small highlight" the accent is reserved for.
  */
 export function Eyebrow({
@@ -203,11 +203,11 @@ export function SectionIntro({
           eyebrow && "mt-5",
         )}
       >
-        <StyledText text={heading} accentClassName="text-gold" />
+        <StyledText text={heading} accentClassName="text-electric" />
       </Heading>
       {lead && (
         <p className={cn("type-lead mt-5 max-w-2xl", centered && "mx-auto")}>
-          <StyledText text={lead} accentClassName="text-gold" />
+          <StyledText text={lead} accentClassName="text-electric" />
         </p>
       )}
       {children}
@@ -289,7 +289,7 @@ export function CardIndex({ value }: { value: string | number }) {
 }
 
 /**
- * A bordered icon tile. Warm-tinted, at the small scale the accent is meant for.
+ * A bordered icon tile. Accent-tinted, at the small scale the accent is meant for.
  */
 export function IconTile({
   icon: Icon,
@@ -307,7 +307,7 @@ export function IconTile({
     <span
       aria-hidden
       className={cn(
-        "grid shrink-0 place-items-center border border-gold/20 bg-gold/[0.07] text-gold",
+        "grid shrink-0 place-items-center border border-electric/20 bg-electric/[0.07] text-electric",
         box,
         className,
       )}
@@ -414,7 +414,7 @@ export function TextLink({
 }) {
   const classes = cn(
     "group inline-flex items-center gap-1.5 text-[13px] font-semibold text-foreground",
-    "transition-colors hover:text-gold",
+    "transition-colors hover:text-electric",
     className,
   );
   const body = (
@@ -474,8 +474,8 @@ export function Metric({
 /**
  * A small pill for state and category.
  *
- * `positive` is the one non-warm accent on the site and is reserved for genuine availability
- * signals — it must never be used to assert a status nothing has checked.
+ * `positive` is the one accent on the site that is not the brand blue and is reserved for genuine
+ * availability signals — it must never be used to assert a status nothing has checked.
  */
 export function Tag({
   children,
@@ -483,12 +483,12 @@ export function Tag({
   className,
 }: {
   children: ReactNode;
-  tone?: "neutral" | "warm" | "positive";
+  tone?: "neutral" | "accent" | "positive";
   className?: string;
 }) {
   const tones = {
     neutral: "border-border bg-surface-1 text-bone-strong",
-    warm: "border-gold/25 bg-gold/[0.08] text-gold",
+    accent: "border-electric/25 bg-electric/[0.08] text-electric",
     positive: "border-positive/25 bg-positive/[0.08] text-positive",
   } as const;
 

@@ -82,9 +82,9 @@
   --color-bone-strong: var(--bone-strong);
   --color-bone-soft: var(--bone-soft);
   --color-bone-faint: var(--bone-faint);
-  --color-gold: var(--gold);
-  --color-gold-deep: var(--gold-deep);
-  --color-gold-shadow: var(--gold-shadow);
+  --color-electric: var(--electric);
+  --color-electric-deep: var(--electric-deep);
+  --color-electric-shadow: var(--electric-shadow);
   --color-hairline: var(--hairline);
   --color-hairline-strong: var(--hairline-strong);
   --color-positive: var(--positive);
@@ -99,14 +99,16 @@
   --font-mono:
     ui-monospace, "SFMono-Regular", "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
-  /* Enterprise Light — navy + charcoal. Used by the Website Manager at /admin. */
+  /* Enterprise Light — brand blue + charcoal. Used by the Website Manager at /admin.
+   * `--primary` is the mark blue, which needs no tint here: on white it measures 6.67:1, so
+   * unlike the dark theme the admin side can use the brand colour literally. */
   --background: oklch(1 0 0); /* #FFFFFF */
   --foreground: oklch(0.21 0.02 264); /* #111827 charcoal */
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.21 0.02 264);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.21 0.02 264);
-  --primary: oklch(0.32 0.13 264); /* #1E3A8A deep navy */
+  --primary: oklch(0.494 0.252 263.1); /* #0048ED the mark blue — 6.67:1 on white */
   --primary-foreground: oklch(0.99 0 0);
   --secondary: oklch(0.97 0.005 250); /* #F8F9FA alabaster */
   --secondary-foreground: oklch(0.21 0.02 264);
@@ -118,36 +120,48 @@
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(0.92 0.005 250); /* #E5E7EB */
   --input: oklch(0.92 0.005 250);
-  --ring: oklch(0.32 0.13 264);
-  --chart-1: oklch(0.32 0.13 264);
-  --chart-2: oklch(0.42 0.05 257);
-  --chart-3: oklch(0.55 0.08 257);
-  --chart-4: oklch(0.7 0.04 257);
-  --chart-5: oklch(0.85 0.02 257);
+  --ring: oklch(0.494 0.252 263.1);
+  /* The mark blue stepped toward pale, so a series reads as one brand rather than five hues. */
+  --chart-1: oklch(0.494 0.252 263.1); /* #0048ED */
+  --chart-2: oklch(0.575 0.191 264.3); /* #3D6FE8 */
+  --chart-3: oklch(0.67 0.132 263.7); /* #6B93E6 */
+  --chart-4: oklch(0.797 0.078 263.6); /* #A3BDF0 */
+  --chart-5: oklch(0.894 0.039 266.5); /* #D0DCF7 */
   --sidebar: oklch(0.99 0 0);
   --sidebar-foreground: oklch(0.21 0.02 264);
-  --sidebar-primary: oklch(0.32 0.13 264);
+  --sidebar-primary: oklch(0.494 0.252 263.1);
   --sidebar-primary-foreground: oklch(0.99 0 0);
   --sidebar-accent: oklch(0.97 0.005 250);
   --sidebar-accent-foreground: oklch(0.21 0.02 264);
   --sidebar-border: oklch(0.92 0.005 250);
-  --sidebar-ring: oklch(0.32 0.13 264);
+  --sidebar-ring: oklch(0.494 0.252 263.1);
 
   /* ── ENICE brand canon ──────────────────────────────────────────────────
-   * These five values are the brand itself and are written as the brand
-   * specifies them, not converted, so the spec is checkable against this file.
-   * Everything warm in the design system is derived from them.
+   * These values are the brand itself and are written as the brand specifies
+   * them, not converted, so the spec is checkable against this file.
+   * Everything accented in the design system is derived from them.
+   *
+   * `--enice-blue` is the mark blue, and it is the same literal as the `E` in
+   * `public/brand/enice-mark.svg` and the `BLUE` constant in
+   * `scripts/brand-mark.mjs`. If it changes, it changes in all three — the
+   * whole point of the value being written here in hex is that the comparison
+   * is a string comparison. See `docs/brand.md`.
    */
-  --enice-canvas: #080c0e;
-  --enice-bone: #f4f1eb;
-  --enice-mesh-amber: rgb(255 149 41 / 0.05);
-  --enice-mesh-ember: rgb(255 92 20 / 0.035);
+  --enice-canvas: #05070d;
+  --enice-blue: #0048ed;
+  --enice-white: #f7f8fa;
+
+  /* Ambient light, both stops drawn from the mark blue. Blue carries far less
+     luminance than the amber this replaced, so the alphas are higher for the
+     same perceived lift — 5% blue on near-black is invisible. */
+  --enice-mesh-azure: rgb(0 72 237 / 0.14);
+  --enice-mesh-cobalt: rgb(107 152 255 / 0.07);
 
   /* The ENICE mark gradient. Reserved for the wordmark — see `.enice-mark`. */
-  --mark-1: #f4f1eb;
-  --mark-2: #d8a45c;
-  --mark-3: #a8702f;
-  --mark-4: #5c3a18;
+  --mark-1: #f7f8fa;
+  --mark-2: #6b98ff;
+  --mark-3: #0048ed;
+  --mark-4: #001f6b;
 
   /* ── Layout scale ───────────────────────────────────────────────────────
    * Section rhythm and gutters are fluid rather than a pile of responsive
@@ -162,11 +176,27 @@
 }
 
 /*
- * The public marketing site: dark, near-black canvas with bone type.
+ * The public marketing site: dark, near-black canvas with off-white type and electric blue.
  *
- * Warm tones are accents only — the dominant surfaces stay canvas and the dominant type stays
- * bone. `--primary` is bone on purpose: it makes every existing `bg-primary` button render as
- * the bone-on-near-black primary CTA the brand calls for, with no per-button changes.
+ * The palette is the mark: blue, white, near-black, and nothing else. Blue is an accent only —
+ * the dominant surfaces stay canvas and the dominant type stays bone.
+ *
+ * ## Why the accent is a ramp and not just `--enice-blue`
+ *
+ * The mark blue is `#0048ed`, which measures **3.02:1 on the canvas**. That is fine for a logo
+ * and unusable for type, and the accent carries ~170 small uppercase labels (`.eyebrow`,
+ * `text-electric`). So the accent splits by job:
+ *
+ *   --electric        a tint of the mark blue, same hue, bright enough to set type   7.25:1
+ *   --electric-deep   the mark blue itself, for solid fills where type sits ON it    3.02:1
+ *   --electric-shadow the gradient tail, decorative only                            1.35:1
+ *
+ * All three sit at hue 222 — the mark's own hue — so the ramp reads as one colour rather than
+ * three blues. Only `--electric` may carry text; `-deep` and `-shadow` are fills and stops.
+ * That is why `--primary` below is `--electric` and not `--electric-deep`: `text-primary` is
+ * live on the public site (prose links in `DocRenderer`, the legal pages, `StyledText`), and
+ * pointing it at the mark blue would fail contrast on every one of them. The solid mark blue
+ * gets its moment in `.btn-primary`, where the type on top is white.
  */
 .site {
   color-scheme: dark;
@@ -175,29 +205,33 @@
      consumer app, which is what keeps large panels reading as editorial rather than bubbly. */
   --radius: 0.625rem;
 
-  /* Bone ramp — the same hue stepped toward the canvas, so text tiers never shift temperature. */
-  /* Every tier clears 4.5:1 against both the canvas and the `--surface-2` cards, measured
-     rather than eyeballed: the first pass put `--bone-faint` at #727371, which failed on
-     metadata labels (4.12:1 on canvas, 3.68:1 on a card) — and metadata is exactly the text
-     that is already small. */
-  --bone: #f4f1eb; /* 17.4:1 on canvas */
-  --bone-strong: #c5c3bf; /* 10.8:1 */
-  --bone-soft: #a1a09e; /*  8.0:1 */
-  --bone-faint: #8a8886; /*  5.6:1 on canvas, 5.0:1 on a card */
+  /* Bone ramp — the mark's white stepped toward the canvas, so text tiers never shift
+     temperature. Very slightly cool (hue 220, 9-23% saturation) to sit with the blue rather
+     than against it; the previous ramp was warm off-white, which is what made the old theme
+     read as a different brand from the logo. */
+  /* Every tier clears 4.5:1 against the canvas, the `--surface-2` cards AND `--surface-3`
+     hover, measured rather than eyeballed: an earlier pass put `--bone-faint` at #727371,
+     which failed on metadata labels (4.12:1 on canvas, 3.68:1 on a card) — and metadata is
+     exactly the text that is already small. */
+  --bone: #f7f8fa; /* 18.9:1 on canvas */
+  --bone-strong: #c6cad2; /* 12.3:1 */
+  --bone-soft: #a0a6b2; /*  8.2:1 */
+  --bone-faint: #888f9c; /*  6.2:1 on canvas, 5.6:1 on a card, 5.1:1 on hover */
 
-  /* Warm accents, drawn from the mark. Restrained by design: labels, icons, fine borders. */
-  --gold: #d8a45c;
-  --gold-deep: #a8702f;
-  --gold-shadow: #5c3a18;
+  /* The accent ramp, drawn from the mark. Restrained by design: labels, icons, fine borders,
+     and the one solid CTA. See the note above for which tier may carry text. */
+  --electric: #6b98ff; /* 7.25:1 on canvas — the only tier that may set type */
+  --electric-deep: #0048ed; /* the mark blue. Fills only: 3.02:1 */
+  --electric-shadow: #001f6b; /* gradient tail, decorative only */
 
   /* Surfaces, each a small lift of the canvas toward bone. */
-  --surface-1: #0f1315; /* recessed bands, inputs at rest */
-  --surface-2: #161a1b; /* cards and panels */
-  --surface-3: #1e2324; /* hover, active, raised detail */
+  --surface-1: #0b0e15; /* recessed bands, inputs at rest */
+  --surface-2: #12151d; /* cards and panels */
+  --surface-3: #1b1f29; /* hover, active, raised detail */
 
-  --hairline: rgb(244 241 235 / 0.1);
-  --hairline-strong: rgb(244 241 235 / 0.16);
-  --positive: #5fb98c; /* operational / success, the one non-warm accent */
+  --hairline: rgb(247 248 250 / 0.1);
+  --hairline-strong: rgb(247 248 250 / 0.16);
+  --positive: #4ec08d; /* operational / success, the one accent that is not the brand blue */
 
   --background: var(--enice-canvas);
   --foreground: var(--bone);
@@ -206,21 +240,22 @@
   --popover: var(--surface-2);
   --popover-foreground: var(--bone);
 
-  /* Primary CTA: bone surface, near-black text. */
-  --primary: var(--bone);
+  /* The brand accent, as a semantic token: blue type on the canvas, near-black type on blue.
+     Text-safe by construction — see the note above this block. */
+  --primary: var(--electric);
   --primary-foreground: var(--enice-canvas);
 
   --secondary: var(--surface-1);
   --secondary-foreground: var(--bone);
   --muted: var(--surface-1);
-  --muted-foreground: var(--bone-soft); /* 8.0:1 on canvas */
-  --accent: var(--gold);
+  --muted-foreground: var(--bone-soft); /* 8.2:1 on canvas */
+  --accent: var(--electric);
   --accent-foreground: var(--enice-canvas);
-  --destructive: #e2725b;
+  --destructive: #ff6b6b; /* 7.3:1 — warmed and brightened, the old #e2725b muddied on a cool canvas */
   --destructive-foreground: var(--enice-canvas);
   --border: var(--hairline);
   --input: var(--hairline-strong);
-  --ring: var(--gold);
+  --ring: var(--electric);
 
   background-color: var(--background);
   color: var(--foreground);
@@ -325,7 +360,7 @@
   }
 
   .site ::selection {
-    background-color: rgb(216 164 92 / 0.28);
+    background-color: rgb(0 72 237 / 0.4);
     color: var(--bone);
   }
 }
@@ -415,8 +450,8 @@
     text-wrap: pretty;
   }
 
-  /* Small uppercase label. Warm, because this is exactly the "small highlight"
-     the accent is for — and it is the one place gold appears on every page. */
+  /* Small uppercase label. Blue, because this is exactly the "small highlight"
+     the accent is for — and it is the one place the brand blue appears on every page. */
   .eyebrow {
     display: inline-flex;
     align-items: center;
@@ -426,7 +461,7 @@
     line-height: 1;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--gold);
+    color: var(--electric);
   }
 
   .eyebrow-muted {
@@ -471,7 +506,7 @@
     border: 1px solid var(--color-border);
     background-color: var(--surface-2);
     box-shadow:
-      inset 0 1px 0 0 rgb(244 241 235 / 0.05),
+      inset 0 1px 0 0 rgb(247 248 250 / 0.05),
       0 24px 48px -28px rgb(0 0 0 / 0.75);
   }
 
@@ -540,26 +575,35 @@
     font-size: 0.875rem;
   }
 
+  /*
+   * The primary CTA is the one solid area of the mark blue on the page, and the only place
+   * `--electric-deep` appears as a surface. White type on it measures 6.67:1.
+   *
+   * It used to be a bone button on near-black. That was the right call for a warm palette with
+   * no strong brand hue to spend, but the brand does have one, and a site whose logo is blue
+   * should not have to explain why none of its buttons are. Hover brightens rather than darkens,
+   * because on a near-black canvas a darker button reads as disabled.
+   */
   .btn-primary {
-    background-color: var(--bone);
-    border-color: var(--bone);
-    color: var(--enice-canvas);
+    background-color: var(--electric-deep);
+    border-color: var(--electric-deep);
+    color: #ffffff;
   }
 
   .btn-primary:hover {
-    background-color: var(--bone-strong);
-    border-color: var(--bone-strong);
+    background-color: #1f5cff; /* 5.21:1 with white */
+    border-color: #1f5cff;
   }
 
   .btn-secondary {
-    background-color: rgb(244 241 235 / 0.04);
+    background-color: rgb(247 248 250 / 0.04);
     border-color: var(--hairline-strong);
     color: var(--bone);
   }
 
   .btn-secondary:hover {
-    background-color: rgb(244 241 235 / 0.08);
-    border-color: rgb(216 164 92 / 0.45);
+    background-color: rgb(247 248 250 / 0.08);
+    border-color: rgb(107 152 255 / 0.5);
   }
 
   .btn-ghost {
@@ -569,7 +613,7 @@
   }
 
   .btn-ghost:hover {
-    background-color: rgb(244 241 235 / 0.06);
+    background-color: rgb(247 248 250 / 0.06);
     color: var(--bone);
   }
 
@@ -580,24 +624,24 @@
   }
 
   /* ── Atmosphere ───────────────────────────────────────────────────────────
-   * Ambient warm lighting, the only large-area use of the accent. Both stops are
-   * under 5% alpha, so the surface stays near-black and never reads as an orange
-   * panel. Purely decorative: always paired with aria-hidden.
+   * Ambient blue lighting, the only large-area use of the accent. Both stops are
+   * at or under 14% alpha, so the surface stays near-black and never reads as a
+   * blue panel. Purely decorative: always paired with aria-hidden.
    */
   .mesh-glow {
     position: absolute;
     inset: 0;
     pointer-events: none;
     background:
-      radial-gradient(60rem 32rem at 18% -10%, var(--enice-mesh-amber), transparent 70%),
-      radial-gradient(48rem 28rem at 88% 4%, var(--enice-mesh-ember), transparent 72%);
+      radial-gradient(60rem 32rem at 18% -10%, var(--enice-mesh-azure), transparent 70%),
+      radial-gradient(48rem 28rem at 88% 4%, var(--enice-mesh-cobalt), transparent 72%);
   }
 
   .mesh-glow-center {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(52rem 26rem at 50% 0%, var(--enice-mesh-amber), transparent 72%);
+    background: radial-gradient(52rem 26rem at 50% 0%, var(--enice-mesh-azure), transparent 72%);
   }
 
   /* The technical grid backdrop. Replaces nine hand-tuned inline copies that had
@@ -608,8 +652,8 @@
     pointer-events: none;
     --grid-cell: 72px;
     background-image:
-      linear-gradient(to right, rgb(244 241 235 / 0.035) 1px, transparent 1px),
-      linear-gradient(to bottom, rgb(244 241 235 / 0.035) 1px, transparent 1px);
+      linear-gradient(to right, rgb(247 248 250 / 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(247 248 250 / 0.035) 1px, transparent 1px);
     background-size: var(--grid-cell) var(--grid-cell);
     mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, black 35%, transparent 80%);
     -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 0%, black 35%, transparent 80%);
@@ -930,7 +974,7 @@
 }
 .hover-lift:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px -4px rgba(17, 24, 39, 0.12);
+  box-shadow: 0 8px 24px -4px rgb(5 7 13 / 0.5);
 }
 
 /* ── Reduced motion ──────────────────────────────────────────────────────── */

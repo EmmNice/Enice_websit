@@ -5111,7 +5111,7 @@ var PostalMime = class _PostalMime {
 
 // node_modules/resend/dist/index.mjs
 var import_standardwebhooks = __toESM(require_dist(), 1);
-var version = "6.28.1";
+var version = "6.30.0";
 function buildPaginationUrl(base, options) {
   const queryString = buildPaginationQuery(options);
   return queryString ? `${base}?${queryString}` : base;
@@ -6225,6 +6225,14 @@ var Topics = class {
     return await this.resend.delete(`/topics/${id}`);
   }
 };
+var Usage = class {
+  constructor(resend) {
+    this.resend = resend;
+  }
+  async get() {
+    return await this.resend.get("/usage");
+  }
+};
 var Attempts = class {
   constructor(resend) {
     this.resend = resend;
@@ -6313,6 +6321,7 @@ var Resend = class {
     this.suppressions = new Suppressions(this);
     this.templates = new Templates(this);
     this.topics = new Topics(this);
+    this.usage = new Usage(this);
     this.webhooks = new Webhooks(this);
     if (!key) {
       if (typeof process !== "undefined" && process.env) this.key = process.env.RESEND_API_KEY;
@@ -6763,7 +6772,7 @@ function acknowledgementHtml(name) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
   <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
     <tr><td style="padding:0 0 24px;">
-      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#1e3a8a;font-weight:700;">ENICE Group</p>
+      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#0048ed;font-weight:700;">ENICE Group</p>
       <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#111827;">We received your message, ${firstName}.</h1>
     </td></tr>
     <tr><td>
@@ -6806,7 +6815,7 @@ function notificationHtml(fields, updates) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
   <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
     <tr><td style="padding:0 0 24px;">
-      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#1e3a8a;font-weight:700;">ENICE Group &middot; Contact</p>
+      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#0048ed;font-weight:700;">ENICE Group &middot; Contact</p>
       <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#111827;">New message from ${escapeHtml(fields.name)}</h1>
       <p style="margin:10px 0 0;font-size:13px;color:#6b7280;">Reply to this email to respond directly to the sender.</p>
     </td></tr>

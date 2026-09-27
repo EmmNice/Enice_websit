@@ -129,13 +129,17 @@ export function ContactSection() {
 
             <dl className="mt-8 space-y-5">
               <div className="flex items-start gap-3">
-                <Mail aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-gold" strokeWidth={2} />
+                <Mail
+                  aria-hidden
+                  className="mt-0.5 h-4 w-4 shrink-0 text-electric"
+                  strokeWidth={2}
+                />
                 <div>
                   <dt className={labelClass}>Email us directly</dt>
                   <dd className="mt-1">
                     <a
                       href={`mailto:${CORPORATE_EMAIL}`}
-                      className="tap text-[14px] break-all text-foreground transition-colors hover:text-gold"
+                      className="tap text-[14px] break-all text-foreground transition-colors hover:text-electric"
                     >
                       {CORPORATE_EMAIL}
                     </a>
@@ -143,7 +147,11 @@ export function ContactSection() {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Clock aria-hidden className="mt-0.5 h-4 w-4 shrink-0 text-gold" strokeWidth={2} />
+                <Clock
+                  aria-hidden
+                  className="mt-0.5 h-4 w-4 shrink-0 text-electric"
+                  strokeWidth={2}
+                />
                 <div>
                   <dt className={labelClass}>Response time</dt>
                   <dd className="mt-1 text-[14px] text-foreground">
@@ -301,7 +309,7 @@ export function ContactSection() {
                   checked={values.updates}
                   onChange={(e) => set("updates", e.target.checked)}
                   disabled={submitting}
-                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-border accent-gold"
+                  className="mt-0.5 h-4 w-4 shrink-0 cursor-pointer rounded border-border accent-electric"
                 />
                 <span className="text-[13px] leading-relaxed text-bone-soft">
                   Also keep me updated on ENICE Group products and launches.

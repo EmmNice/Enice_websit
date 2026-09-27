@@ -37,14 +37,14 @@ const NAV = [
 /**
  * HTTP verbs are the one place on the site where distinct hues carry meaning rather than
  * decoration: a developer scanning a reference reads the colour before the word. The set is still
- * drawn from the system's three accents — positive for a safe read, warm for a write, destructive
+ * drawn from the system's three accents — positive for a safe read, the brand accent for a write, destructive
  * for a delete — at pill scale, so the page never accumulates a field of colour.
  */
 const METHOD_COLORS: Record<string, string> = {
   GET: "border-positive/25 bg-positive/[0.08] text-positive",
-  POST: "border-gold/25 bg-gold/[0.08] text-gold",
-  PUT: "border-gold/25 bg-gold/[0.08] text-gold",
-  PATCH: "border-gold/25 bg-gold/[0.08] text-gold",
+  POST: "border-electric/25 bg-electric/[0.08] text-electric",
+  PUT: "border-electric/25 bg-electric/[0.08] text-electric",
+  PATCH: "border-electric/25 bg-electric/[0.08] text-electric",
   DELETE: "border-destructive/25 bg-destructive/[0.08] text-destructive",
 };
 
@@ -68,7 +68,7 @@ function MethodBadge({ method }: { method: string }) {
  * uses. The highlighting now runs on five roles only, all from the system:
  *
  * - `text-bone-faint`  comments
- * - `text-gold`        object keys, and a pending state
+ * - `text-electric`        object keys, and a pending state
  * - `text-bone-strong` string literals
  * - `text-bone-soft`   numbers, booleans, null, and the block's base text
  * - `text-positive`    a verb or value that reports success
@@ -262,7 +262,7 @@ function DocsPage() {
                   }`}
                 >
                   {active === n.id && (
-                    <ChevronRight aria-hidden className="h-3 w-3 shrink-0 text-gold" />
+                    <ChevronRight aria-hidden className="h-3 w-3 shrink-0 text-electric" />
                   )}
                   {n.label}
                 </button>
@@ -275,7 +275,7 @@ function DocsPage() {
                 Write to us at{" "}
                 <a
                   href={`mailto:${CORPORATE_EMAIL}`}
-                  className="text-foreground underline underline-offset-2 transition-colors hover:text-gold"
+                  className="text-foreground underline underline-offset-2 transition-colors hover:text-electric"
                 >
                   {CORPORATE_EMAIL}
                 </a>
@@ -327,10 +327,10 @@ ${API_BASE_URL}
 
 <span class="text-bone-faint"># Standard response envelope</span>
 {
-  <span class="text-gold">"data"</span>: { ... },
-  <span class="text-gold">"meta"</span>: {
-    <span class="text-gold">"request_id"</span>: <span class="text-bone-strong">"req_01jz..."</span>,
-    <span class="text-gold">"timestamp"</span>:  <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>
+  <span class="text-electric">"data"</span>: { ... },
+  <span class="text-electric">"meta"</span>: {
+    <span class="text-electric">"request_id"</span>: <span class="text-bone-strong">"req_01jz..."</span>,
+    <span class="text-electric">"timestamp"</span>:  <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>
   }
 }`}
                 />
@@ -373,7 +373,7 @@ ${API_BASE_URL}
                           className="flex flex-col gap-1 border-t border-border px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-6"
                         >
                           <dt className="w-28 shrink-0">
-                            <code className="font-mono text-[12px] text-gold">{scope}</code>
+                            <code className="font-mono text-[12px] text-electric">{scope}</code>
                           </dt>
                           <dd className="text-[13px] text-bone-soft">{desc}</dd>
                         </div>
@@ -398,9 +398,9 @@ curl <span class="text-bone-strong">${API_BASE_URL}/core</span> \\
 
 <span class="text-bone-faint"># 401: missing or invalid token</span>
 {
-  <span class="text-gold">"error"</span>: {
-    <span class="text-gold">"code"</span>:    <span class="text-bone-strong">"unauthorized"</span>,
-    <span class="text-gold">"message"</span>: <span class="text-bone-strong">"API key missing or invalid."</span>
+  <span class="text-electric">"error"</span>: {
+    <span class="text-electric">"code"</span>:    <span class="text-bone-strong">"unauthorized"</span>,
+    <span class="text-electric">"message"</span>: <span class="text-bone-strong">"API key missing or invalid."</span>
   }
 }`}
                   />
@@ -464,10 +464,10 @@ curl <span class="text-bone-strong">${API_BASE_URL}/core</span> \\
                   title="ERROR RESPONSE"
                   code={`<span class="text-bone-faint"># HTTP 429: rate limit exceeded</span>
 {
-  <span class="text-gold">"error"</span>: {
-    <span class="text-gold">"code"</span>:       <span class="text-bone-strong">"rate_limit_exceeded"</span>,
-    <span class="text-gold">"message"</span>:    <span class="text-bone-strong">"Too many requests. Retry after 60s."</span>,
-    <span class="text-gold">"retry_after"</span>: <span class="text-bone-soft">60</span>
+  <span class="text-electric">"error"</span>: {
+    <span class="text-electric">"code"</span>:       <span class="text-bone-strong">"rate_limit_exceeded"</span>,
+    <span class="text-electric">"message"</span>:    <span class="text-bone-strong">"Too many requests. Retry after 60s."</span>,
+    <span class="text-electric">"retry_after"</span>: <span class="text-bone-soft">60</span>
   }
 }
 
@@ -531,18 +531,18 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                   <CodeBlock
                     title="RESPONSE: 200 OK"
                     code={`{
-  <span class="text-gold">"data"</span>: [
+  <span class="text-electric">"data"</span>: [
     {
-      <span class="text-gold">"id"</span>:       <span class="text-bone-strong">"wlt_01jz4k9m..."</span>,
-      <span class="text-gold">"currency"</span>: <span class="text-bone-strong">"NGN"</span>,
-      <span class="text-gold">"balance"</span>:  <span class="text-bone-soft">500000</span>,
-      <span class="text-gold">"status"</span>:   <span class="text-positive">"active"</span>,
-      <span class="text-gold">"created_at"</span>: <span class="text-bone-strong">"2026-07-03T..."</span>
+      <span class="text-electric">"id"</span>:       <span class="text-bone-strong">"wlt_01jz4k9m..."</span>,
+      <span class="text-electric">"currency"</span>: <span class="text-bone-strong">"NGN"</span>,
+      <span class="text-electric">"balance"</span>:  <span class="text-bone-soft">500000</span>,
+      <span class="text-electric">"status"</span>:   <span class="text-positive">"active"</span>,
+      <span class="text-electric">"created_at"</span>: <span class="text-bone-strong">"2026-07-03T..."</span>
     }
   ],
-  <span class="text-gold">"pagination"</span>: {
-    <span class="text-gold">"has_more"</span>: <span class="text-bone-soft">false</span>,
-    <span class="text-gold">"next_cursor"</span>: <span class="text-bone-faint">null</span>
+  <span class="text-electric">"pagination"</span>: {
+    <span class="text-electric">"has_more"</span>: <span class="text-bone-soft">false</span>,
+    <span class="text-electric">"next_cursor"</span>: <span class="text-bone-faint">null</span>
   }
 }`}
                   />
@@ -600,11 +600,11 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                   <CodeBlock
                     title="REQUEST BODY"
                     code={`{
-  <span class="text-gold">"currency"</span>:   <span class="text-bone-strong">"USD"</span>,
-  <span class="text-gold">"label"</span>:      <span class="text-bone-strong">"Operating Account"</span>,
-  <span class="text-gold">"issue_card"</span>: <span class="text-bone-soft">true</span>,
-  <span class="text-gold">"metadata"</span>: {
-    <span class="text-gold">"user_id"</span>: <span class="text-bone-strong">"usr_8823..."</span>
+  <span class="text-electric">"currency"</span>:   <span class="text-bone-strong">"USD"</span>,
+  <span class="text-electric">"label"</span>:      <span class="text-bone-strong">"Operating Account"</span>,
+  <span class="text-electric">"issue_card"</span>: <span class="text-bone-soft">true</span>,
+  <span class="text-electric">"metadata"</span>: {
+    <span class="text-electric">"user_id"</span>: <span class="text-bone-strong">"usr_8823..."</span>
   }
 }`}
                   />
@@ -678,19 +678,19 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                     title="REQUEST / RESPONSE"
                     code={`<span class="text-bone-faint"># POST /v1/ledger/tx</span>
 {
-  <span class="text-gold">"debit_wallet"</span>:  <span class="text-bone-strong">"wlt_01jz..."</span>,
-  <span class="text-gold">"credit_wallet"</span>: <span class="text-bone-strong">"wlt_02ab..."</span>,
-  <span class="text-gold">"amount"</span>:         <span class="text-bone-soft">500000</span>,
-  <span class="text-gold">"currency"</span>:       <span class="text-bone-strong">"NGN"</span>,
-  <span class="text-gold">"reference"</span>:      <span class="text-bone-strong">"inv_2026_07_001"</span>
+  <span class="text-electric">"debit_wallet"</span>:  <span class="text-bone-strong">"wlt_01jz..."</span>,
+  <span class="text-electric">"credit_wallet"</span>: <span class="text-bone-strong">"wlt_02ab..."</span>,
+  <span class="text-electric">"amount"</span>:         <span class="text-bone-soft">500000</span>,
+  <span class="text-electric">"currency"</span>:       <span class="text-bone-strong">"NGN"</span>,
+  <span class="text-electric">"reference"</span>:      <span class="text-bone-strong">"inv_2026_07_001"</span>
 }
 
 <span class="text-bone-faint"># 201 Created</span>
 {
-  <span class="text-gold">"data"</span>: {
-    <span class="text-gold">"id"</span>:        <span class="text-bone-strong">"txn_01kz9..."</span>,
-    <span class="text-gold">"status"</span>:    <span class="text-positive">"settled"</span>,
-    <span class="text-gold">"settled_at"</span>: <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>
+  <span class="text-electric">"data"</span>: {
+    <span class="text-electric">"id"</span>:        <span class="text-bone-strong">"txn_01kz9..."</span>,
+    <span class="text-electric">"status"</span>:    <span class="text-positive">"settled"</span>,
+    <span class="text-electric">"settled_at"</span>: <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>
   }
 }`}
                   />
@@ -759,19 +759,19 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                     title="REQUEST / RESPONSE"
                     code={`<span class="text-bone-faint"># POST /v1/assist/query</span>
 {
-  <span class="text-gold">"session_id"</span>: <span class="text-bone-strong">"sess_01kz..."</span>,
-  <span class="text-gold">"message"</span>:    <span class="text-bone-strong">"What is my account balance?"</span>,
-  <span class="text-gold">"tenant_id"</span>:  <span class="text-bone-strong">"ten_bank_ng"</span>,
-  <span class="text-gold">"language"</span>:   <span class="text-bone-strong">"en"</span>
+  <span class="text-electric">"session_id"</span>: <span class="text-bone-strong">"sess_01kz..."</span>,
+  <span class="text-electric">"message"</span>:    <span class="text-bone-strong">"What is my account balance?"</span>,
+  <span class="text-electric">"tenant_id"</span>:  <span class="text-bone-strong">"ten_bank_ng"</span>,
+  <span class="text-electric">"language"</span>:   <span class="text-bone-strong">"en"</span>
 }
 
 <span class="text-bone-faint"># 200 OK</span>
 {
-  <span class="text-gold">"data"</span>: {
-    <span class="text-gold">"reply"</span>:      <span class="text-bone-strong">"Your NGN balance is ₦500,000."</span>,
-    <span class="text-gold">"intent"</span>:     <span class="text-bone-strong">"account.balance_inquiry"</span>,
-    <span class="text-gold">"confidence"</span>: <span class="text-bone-soft">0.98</span>,
-    <span class="text-gold">"actions"</span>:    []
+  <span class="text-electric">"data"</span>: {
+    <span class="text-electric">"reply"</span>:      <span class="text-bone-strong">"Your NGN balance is ₦500,000."</span>,
+    <span class="text-electric">"intent"</span>:     <span class="text-bone-strong">"account.balance_inquiry"</span>,
+    <span class="text-electric">"confidence"</span>: <span class="text-bone-soft">0.98</span>,
+    <span class="text-electric">"actions"</span>:    []
   }
 }`}
                   />
@@ -850,18 +850,18 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                     title="REQUEST / RESPONSE"
                     code={`<span class="text-bone-faint"># POST /v1/kyc/verify</span>
 {
-  <span class="text-gold">"first_name"</span>: <span class="text-bone-strong">"Amara"</span>,
-  <span class="text-gold">"last_name"</span>:  <span class="text-bone-strong">"Osei"</span>,
-  <span class="text-gold">"dob"</span>:        <span class="text-bone-strong">"1992-04-15"</span>,
-  <span class="text-gold">"id_type"</span>:    <span class="text-bone-strong">"passport"</span>,
-  <span class="text-gold">"id_number"</span>:  <span class="text-bone-strong">"A09123456"</span>
+  <span class="text-electric">"first_name"</span>: <span class="text-bone-strong">"Amara"</span>,
+  <span class="text-electric">"last_name"</span>:  <span class="text-bone-strong">"Osei"</span>,
+  <span class="text-electric">"dob"</span>:        <span class="text-bone-strong">"1992-04-15"</span>,
+  <span class="text-electric">"id_type"</span>:    <span class="text-bone-strong">"passport"</span>,
+  <span class="text-electric">"id_number"</span>:  <span class="text-bone-strong">"A09123456"</span>
 }
 
 <span class="text-bone-faint"># 202 Accepted</span>
 {
-  <span class="text-gold">"data"</span>: {
-    <span class="text-gold">"verification_id"</span>: <span class="text-bone-strong">"kyc_01mn..."</span>,
-    <span class="text-gold">"status"</span>:          <span class="text-gold">"pending"</span>
+  <span class="text-electric">"data"</span>: {
+    <span class="text-electric">"verification_id"</span>: <span class="text-bone-strong">"kyc_01mn..."</span>,
+    <span class="text-electric">"status"</span>:          <span class="text-electric">"pending"</span>
   }
 }`}
                   />
@@ -905,7 +905,7 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                           className="flex flex-col gap-1 border-t border-border px-4 py-3 first:border-t-0 sm:flex-row sm:items-center sm:gap-6"
                         >
                           <dt className="shrink-0 sm:w-44">
-                            <code className="font-mono text-[12px] text-gold">{event}</code>
+                            <code className="font-mono text-[12px] text-electric">{event}</code>
                           </dt>
                           <dd className="text-[13px] text-bone-soft">{desc}</dd>
                         </div>
@@ -919,13 +919,13 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                   title="WEBHOOK PAYLOAD"
                   code={`<span class="text-bone-faint"># Example: kyc.verified event</span>
 {
-  <span class="text-gold">"id"</span>:      <span class="text-bone-strong">"evt_01pq..."</span>,
-  <span class="text-gold">"type"</span>:    <span class="text-bone-strong">"kyc.verified"</span>,
-  <span class="text-gold">"created"</span>: <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>,
-  <span class="text-gold">"data"</span>: {
-    <span class="text-gold">"verification_id"</span>: <span class="text-bone-strong">"kyc_01mn..."</span>,
-    <span class="text-gold">"status"</span>:          <span class="text-positive">"verified"</span>,
-    <span class="text-gold">"name"</span>:            <span class="text-bone-strong">"Amara Osei"</span>
+  <span class="text-electric">"id"</span>:      <span class="text-bone-strong">"evt_01pq..."</span>,
+  <span class="text-electric">"type"</span>:    <span class="text-bone-strong">"kyc.verified"</span>,
+  <span class="text-electric">"created"</span>: <span class="text-bone-strong">"2026-07-03T00:00:00Z"</span>,
+  <span class="text-electric">"data"</span>: {
+    <span class="text-electric">"verification_id"</span>: <span class="text-bone-strong">"kyc_01mn..."</span>,
+    <span class="text-electric">"status"</span>:          <span class="text-positive">"verified"</span>,
+    <span class="text-electric">"name"</span>:            <span class="text-bone-strong">"Amara Osei"</span>
   }
 }
 

@@ -42,7 +42,7 @@ export function LegalPage({
               <div className="flex items-baseline gap-3">
                 <span
                   aria-hidden
-                  className="font-mono text-[11px] font-semibold tracking-[0.18em] text-gold"
+                  className="font-mono text-[11px] font-semibold tracking-[0.18em] text-electric"
                 >
                   /{String(i + 1).padStart(2, "0")}
                 </span>
@@ -52,7 +52,7 @@ export function LegalPage({
               </div>
               <div
                 data-allow-select
-                className="mt-4 space-y-4 text-[15px] leading-[1.75] text-bone-strong [&_a]:text-gold [&_a]:underline [&_a]:underline-offset-2 [&_li]:mt-1.5 [&_strong]:text-foreground [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5"
+                className="mt-4 space-y-4 text-[15px] leading-[1.75] text-bone-strong [&_a]:text-electric [&_a]:underline [&_a]:underline-offset-2 [&_li]:mt-1.5 [&_strong]:text-foreground [&_ul]:list-disc [&_ul]:space-y-1 [&_ul]:pl-5"
               >
                 {s.body}
               </div>

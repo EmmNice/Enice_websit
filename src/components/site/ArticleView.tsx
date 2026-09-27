@@ -20,7 +20,7 @@
  * entirely from the `theme` prop, and the seam is kept because /admin is a light-theme tool that
  * still needs this layout legible on light chrome.
  *
- * The dark palette (`bone`, `gold`, `surface-*`) is declared on `.site`, which `__root.tsx` puts
+ * The dark palette (`bone`, `electric`, `surface-*`) is declared on `.site`, which `__root.tsx` puts
  * on `<html>` for public routes and removes under /admin. The dark theme therefore *scopes itself*
  * with that class: the admin preview renders `theme="dark"` outside `.site`, and without the scope
  * every token in this file would resolve to nothing and the preview would go blank-on-black. The
@@ -82,7 +82,7 @@ const THEMES: Record<DocTheme, ViewClasses> = {
   dark: {
     scope: "site",
     backLink:
-      "type-meta mb-10 inline-flex items-center gap-1.5 font-semibold transition-colors hover:text-gold",
+      "type-meta mb-10 inline-flex items-center gap-1.5 font-semibold transition-colors hover:text-electric",
     meta: "type-meta tnum inline-flex items-center gap-1.5",
     badge: null, // supplied per-category by `categoryBadgeClasses`
     title: "type-display mb-5 text-foreground",

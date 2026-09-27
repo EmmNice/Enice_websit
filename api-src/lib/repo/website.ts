@@ -856,8 +856,8 @@ const DEFAULT_SECTIONS: {
        *
        * The breaks were tuned for one viewport and ragged badly at every other; the headline is
        * now balanced by the browser. The highlight is dropped because at display size it put two
-       * lines of the warm accent at the top of the page — the accent is for small emphasis, and a
-       * 60px gold phrase stops reading as an accent. Both features remain available to an editor
+       * lines of the accent at the top of the page — the accent is for small emphasis, and a 60px
+       * phrase in the brand blue stops reading as an accent. Both remain available to an editor
        * (\n splits a line, [[…]] renders a phrase in the accent colour); they are simply not what
        * the shipped copy uses.
        */

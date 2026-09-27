@@ -53,13 +53,13 @@ function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
   return (
     <div
       className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-5"
-      style={{ background: "#080810" }}
+      style={{ background: "#05070d" }}
     >
       {/* Background glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           className="absolute left-1/2 top-0 h-[500px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-20"
-          style={{ background: "radial-gradient(ellipse, #1d4ed8 0%, transparent 70%)" }}
+          style={{ background: "radial-gradient(ellipse, #0048ed 0%, transparent 70%)" }}
         />
         {/* Subtle grid */}
         <div
@@ -70,7 +70,7 @@ function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
             backgroundSize: "48px 48px",
           }}
         />
-        <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#080810] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#05070d] to-transparent" />
       </div>
 
       {/* Content */}
@@ -78,7 +78,7 @@ function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
         {/* Wordmark */}
         <div className="mb-10 flex items-center gap-3">
           <span className="font-mono text-xl font-black tracking-[0.12em] text-white">
-            <span className="text-blue-500">E</span>NICE
+            <span className="text-[#6b98ff]">E</span>NICE
           </span>
           <span className="h-5 w-px bg-white/20" />
           <span className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/40">
@@ -87,9 +87,9 @@ function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
         </div>
 
         {/* Status pill */}
-        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-amber-500/25 bg-amber-500/10 px-4 py-1.5">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-amber-400" />
-          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-amber-400">
+        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-[#6b98ff]/25 bg-[#6b98ff]/10 px-4 py-1.5">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#6b98ff]" />
+          <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6b98ff]">
             System Notice
           </span>
         </div>
@@ -98,7 +98,7 @@ function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
         <h1 className="mb-5 text-3xl font-bold leading-[1.15] tracking-[-0.03em] text-white sm:text-4xl">
           Something went wrong
           <br />
-          <span className="bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
+          <span className="bg-gradient-to-r from-[#6b98ff] to-[#0048ed] bg-clip-text text-transparent">
             on our end.
           </span>
         </h1>
@@ -112,7 +112,7 @@ function GlobalErrorFallback({ onRetry }: { onRetry: () => void }) {
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             onClick={() => window.location.reload()}
-            className="group inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 text-sm font-semibold text-white transition-all hover:bg-blue-500 active:scale-95"
+            className="group inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-[#0048ed] px-6 text-sm font-semibold text-white transition-all hover:bg-[#1f5cff] active:scale-95"
           >
             <RefreshCw className="h-4 w-4 transition-transform group-hover:rotate-180 duration-500" />
             Refresh page

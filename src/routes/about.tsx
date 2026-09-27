@@ -252,14 +252,17 @@ function ProseBand({
       <div>
         <BandNumber>{number}</BandNumber>
         <h2 id={headingId} className="type-h2 mt-4 text-foreground">
-          <StyledText text={fieldText(fields, "heading", heading)} accentClassName="text-gold" />
+          <StyledText
+            text={fieldText(fields, "heading", heading)}
+            accentClassName="text-electric"
+          />
         </h2>
       </div>
       {/* Long-form copy stays selectable — selection is disabled globally on the site. */}
       <div data-allow-select className="space-y-6">
         {rendered.map((paragraph, i) => (
           <p key={i} className="type-body">
-            <StyledText text={paragraph} accentClassName="text-gold" />
+            <StyledText text={paragraph} accentClassName="text-electric" />
           </p>
         ))}
       </div>
@@ -357,8 +360,8 @@ function AboutPage() {
         {/*
           No [[highlight]] in the default heading.
 
-          The highlight put a full line of ~56px gold at the top of the page. Gold is the small
-          accent — at display size it stops reading as an accent and starts reading as a gold
+          The highlight put a full line of ~56px electric at the top of the page. Electric is the small
+          accent — at display size it stops reading as an accent and starts reading as a electric
           website. The capability is still there for an editor emphasising a short phrase.
         */}
         <SectionIntro
@@ -387,13 +390,13 @@ function AboutPage() {
               <h2 id="about-acronym-heading" className="type-h2 mt-4 text-foreground">
                 <StyledText
                   text={fieldText(acronym, "heading", "What the name stands for")}
-                  accentClassName="text-gold"
+                  accentClassName="text-electric"
                 />
               </h2>
               <p className="type-lead mt-5">
                 <StyledText
                   text={fieldText(acronym, "subheading", ACRONYM_PHRASE)}
-                  accentClassName="text-gold"
+                  accentClassName="text-electric"
                 />
               </p>
             </div>
@@ -417,7 +420,7 @@ function AboutPage() {
                   */}
                   <span
                     aria-hidden
-                    className="w-7 shrink-0 text-center font-mono text-2xl font-semibold leading-none text-gold sm:w-8 sm:text-[1.75rem]"
+                    className="w-7 shrink-0 text-center font-mono text-2xl font-semibold leading-none text-electric sm:w-8 sm:text-[1.75rem]"
                   >
                     {word.charAt(0).toUpperCase()}
                   </span>
@@ -480,7 +483,7 @@ function AboutPage() {
               <h2 id="about-what-we-build-heading" className="type-h2 mt-4 text-foreground">
                 <StyledText
                   text={fieldText(build, "heading", "What We Build")}
-                  accentClassName="text-gold"
+                  accentClassName="text-electric"
                 />
               </h2>
             </div>
@@ -489,7 +492,7 @@ function AboutPage() {
                 <p key={i} className="type-body">
                   <StyledText
                     text={paragraph}
-                    accentClassName="text-gold"
+                    accentClassName="text-electric"
                     boldClassName={BUILD_BOLD_CLASS}
                   />
                 </p>
@@ -521,7 +524,7 @@ function AboutPage() {
             <h2 id="about-team-heading" className="type-h2 mt-4 text-foreground">
               <StyledText
                 text={fieldText(leadership, "heading", "The Founding Team")}
-                accentClassName="text-gold"
+                accentClassName="text-electric"
               />
             </h2>
             {/* This lead stays in code. `featureGrid` carries one `subheading`, and the note under
@@ -542,9 +545,9 @@ function AboutPage() {
                 {/* Avatar placeholder */}
                 <span
                   aria-hidden
-                  className="grid h-14 w-14 place-items-center rounded-xl border border-gold/20 bg-gold/[0.07]"
+                  className="grid h-14 w-14 place-items-center rounded-xl border border-electric/20 bg-electric/[0.07]"
                 >
-                  <span className="font-mono text-[11px] font-bold tracking-[0.18em] text-gold">
+                  <span className="font-mono text-[11px] font-bold tracking-[0.18em] text-electric">
                     {m.initial}
                   </span>
                 </span>
@@ -569,7 +572,7 @@ function AboutPage() {
                   {note.slice(0, noteEmailAt)}
                   <a
                     href={`mailto:${CORPORATE_EMAIL}`}
-                    className="tap font-medium text-foreground underline-offset-2 transition-colors hover:text-gold hover:underline"
+                    className="tap font-medium text-foreground underline-offset-2 transition-colors hover:text-electric hover:underline"
                   >
                     {CORPORATE_EMAIL}
                   </a>
@@ -589,7 +592,7 @@ function AboutPage() {
             <h2 id="about-principles-heading" className="type-h2 mt-4 text-foreground">
               <StyledText
                 text={fieldText(values, "heading", "Our Principles")}
-                accentClassName="text-gold"
+                accentClassName="text-electric"
               />
             </h2>
             <p className="type-lead mt-5">
@@ -599,7 +602,7 @@ function AboutPage() {
                   "subheading",
                   "These aren't aspirational values written for a careers page. They're the standards we hold every decision, every system, and every person on the team to.",
                 )}
-                accentClassName="text-gold"
+                accentClassName="text-electric"
               />
             </p>
           </div>
@@ -649,7 +652,7 @@ function AboutPage() {
           >
             {fieldParagraphs(closing, "body", [CLOSING_QUOTE]).map((paragraph, i) => (
               <p key={i} className="type-h3 mx-auto max-w-3xl text-foreground">
-                <StyledText text={paragraph} accentClassName="text-gold" />
+                <StyledText text={paragraph} accentClassName="text-electric" />
               </p>
             ))}
             <div className="mt-8 flex items-center gap-5">

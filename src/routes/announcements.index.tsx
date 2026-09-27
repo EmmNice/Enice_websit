@@ -45,14 +45,14 @@ function AnnouncementCard({ item }: { item: PublicSummary }) {
           <span className="type-meta tnum">{formatPublishedDate(item.publishedAt)}</span>
         </div>
 
-        <h2 className="mb-1.5 text-base leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-gold">
+        <h2 className="mb-1.5 text-base leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-electric">
           {item.title}
         </h2>
         <p className="line-clamp-2 text-sm leading-relaxed text-bone-soft">{item.excerpt}</p>
 
         {/* Visible rather than hover-revealed: the card is one link, and a touch user never
             produces the hover state the affordance used to depend on. */}
-        <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-bone-faint transition-colors group-hover:text-gold">
+        <span className="mt-3 inline-flex items-center gap-1 text-xs font-semibold text-bone-faint transition-colors group-hover:text-electric">
           Read the announcement <ArrowUpRight aria-hidden className="h-3 w-3" />
         </span>
       </div>
@@ -122,7 +122,7 @@ function AnnouncementsPage() {
           <Panel tone="quiet" className="flex flex-col items-center px-8 py-20 text-center">
             <span
               aria-hidden
-              className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-gold/20 bg-gold/[0.07] text-gold"
+              className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-electric/20 bg-electric/[0.07] text-electric"
             >
               <Megaphone className="h-6 w-6" strokeWidth={1.75} />
             </span>

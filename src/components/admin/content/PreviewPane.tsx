@@ -54,7 +54,7 @@ export function PreviewPane({
       </div>
 
       {/* The dark canvas mirrors the public blog's shell. The inner frame is the device width. */}
-      <div className="flex-1 overflow-y-auto rounded-xl bg-[#09090b] p-4 sm:p-8">
+      <div className="flex-1 overflow-y-auto rounded-xl bg-[#05070d] p-4 sm:p-8">
         <div
           className="mx-auto transition-[max-width] duration-300"
           style={{ maxWidth: device === "mobile" ? 390 : 680 }}

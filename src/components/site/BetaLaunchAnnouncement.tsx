@@ -69,7 +69,7 @@ export function BetaLaunchAnnouncement() {
           className="w-[calc(100vw-2rem)] max-w-md gap-0 overflow-hidden border-none bg-transparent p-0 shadow-none duration-300 sm:max-w-lg"
         >
           <div className="panel-raised relative overflow-hidden">
-            {/* Ambient warm lighting and the technical grid — decorative, never in reading order. */}
+            {/* Ambient blue lighting and the technical grid — decorative, never in reading order. */}
             <div aria-hidden className="mesh-glow-center" />
             <div aria-hidden className="tech-grid" />
 
@@ -83,7 +83,7 @@ export function BetaLaunchAnnouncement() {
 
             <div className="relative px-6 pb-8 pt-9 sm:px-9 sm:pb-10 sm:pt-11">
               {/* Badge */}
-              <Tag tone="warm" className="max-w-full">
+              <Tag tone="accent" className="max-w-full">
                 <Sparkles aria-hidden className="h-3 w-3 shrink-0" strokeWidth={2} />
                 <span className="whitespace-nowrap">PulseAssist Beta Launch</span>
               </Tag>
@@ -105,9 +105,9 @@ export function BetaLaunchAnnouncement() {
 
               {/* Timeline card */}
               <div className="panel-quiet mt-7 flex items-center gap-3 px-4 py-3.5">
-                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
+                <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-electric" />
                 <div>
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-gold">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-electric">
                     September 2026 · Beta Phase
                   </div>
                   <div className="mt-0.5 text-[12.5px] text-bone-soft">

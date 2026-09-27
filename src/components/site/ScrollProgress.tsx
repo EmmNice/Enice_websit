@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
  *
  * Scroll work is rAF-throttled: the previous version wrote state on every scroll event, which on
  * a long page meant a React render per event and a layout read (`scrollHeight`) inside it. The
- * bar is also warm rather than the old navy, and is scaled rather than re-widthed so the browser
+ * bar is also the brand blue rather than the old navy, and is scaled rather than re-widthed so the browser
  * can keep it on the compositor.
  */
 export function ScrollProgress() {
@@ -41,7 +41,7 @@ export function ScrollProgress() {
         className="h-full origin-left"
         style={{
           transform: `scaleX(${progress})`,
-          background: "linear-gradient(to right, #a8702f, #d8a45c)",
+          background: "linear-gradient(to right, #0048ed, #6b98ff)",
         }}
       />
     </div>

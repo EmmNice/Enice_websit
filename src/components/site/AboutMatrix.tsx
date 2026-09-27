@@ -122,12 +122,12 @@ export function AboutMatrix() {
                 <li className="group border-t border-border py-8 first:border-t-0 first:pt-0">
                   <div className="flex items-baseline justify-between gap-4">
                     <h3 className="type-h3 text-foreground">
-                      <StyledText text={p.title} accentClassName="text-gold" />
+                      <StyledText text={p.title} accentClassName="text-electric" />
                     </h3>
                     <CardIndex value={i + 1} />
                   </div>
                   <p className="type-body mt-3 max-w-2xl">
-                    <StyledText text={p.body} accentClassName="text-gold" />
+                    <StyledText text={p.body} accentClassName="text-electric" />
                   </p>
                 </li>
               </Reveal>

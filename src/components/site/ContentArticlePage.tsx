@@ -79,7 +79,7 @@ function Related({
                 {entry.category.toUpperCase()}
               </span>
             )}
-            <h3 className="text-sm leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-gold">
+            <h3 className="text-sm leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-electric">
               {entry.title}
             </h3>
             <p className="type-meta tnum mt-1.5 mb-2">{formatPublishedDate(entry.publishedAt)}</p>

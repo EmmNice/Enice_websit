@@ -743,9 +743,21 @@ export interface DesignSettings {
   buttonStyle: string;
 }
 
+/**
+ * The selectable brand palettes, as swatches in Website → Design.
+ *
+ * The keys are persisted identifiers, not colour names. `enice-navy` is the stored default
+ * (`api-src/lib/repo/website.ts`) and is validated with `palette in BRAND_PALETTES`, so renaming a
+ * key would orphan every row that already holds it — which is why the default key still says
+ * "navy" while its value is the electric blue the brand actually uses. Change the values here, not
+ * the keys.
+ *
+ * `primary` on the default entry is `#0048ED`, the mark blue — the same literal as `--enice-blue`
+ * in `styles.css` and the `E` in `public/brand/enice-mark.svg`.
+ */
 export const BRAND_PALETTES: Record<string, { label: string; primary: string; accent: string }> = {
-  "enice-navy": { label: "ENICE Navy (default)", primary: "#1E3A8A", accent: "#334155" },
-  "enice-midnight": { label: "ENICE Midnight", primary: "#0F172A", accent: "#1E3A8A" },
+  "enice-navy": { label: "ENICE Electric (default)", primary: "#0048ED", accent: "#6B98FF" },
+  "enice-midnight": { label: "ENICE Midnight", primary: "#001F6B", accent: "#0048ED" },
   "enice-slate": { label: "ENICE Slate", primary: "#334155", accent: "#475569" },
   "enice-indigo": { label: "ENICE Indigo", primary: "#3730A3", accent: "#4F46E5" },
 };

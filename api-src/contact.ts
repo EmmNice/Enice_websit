@@ -75,7 +75,7 @@ function acknowledgementHtml(name: string): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
   <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
     <tr><td style="padding:0 0 24px;">
-      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#1e3a8a;font-weight:700;">ENICE Group</p>
+      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#0048ed;font-weight:700;">ENICE Group</p>
       <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#111827;">We received your message, ${firstName}.</h1>
     </td></tr>
     <tr><td>
@@ -122,7 +122,7 @@ function notificationHtml(fields: Submission, updates: UpdatesOutcome): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:32px 24px;"><tr><td align="center">
   <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
     <tr><td style="padding:0 0 24px;">
-      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#1e3a8a;font-weight:700;">ENICE Group &middot; Contact</p>
+      <p style="margin:0;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#0048ed;font-weight:700;">ENICE Group &middot; Contact</p>
       <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;letter-spacing:-0.02em;color:#111827;">New message from ${escapeHtml(fields.name)}</h1>
       <p style="margin:10px 0 0;font-size:13px;color:#6b7280;">Reply to this email to respond directly to the sender.</p>
     </td></tr>

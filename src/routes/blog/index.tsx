@@ -64,7 +64,7 @@ function PostCard({ post }: { post: PublicSummary }) {
       )}
 
       {/* `h2`, one level below the page title — the card grid is the page's only content level. */}
-      <h2 className="text-base leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-gold">
+      <h2 className="text-base leading-snug font-semibold tracking-tight text-foreground transition-colors group-hover:text-electric">
         {post.title}
       </h2>
 
@@ -80,7 +80,7 @@ function PostCard({ post }: { post: PublicSummary }) {
 
       <p className="line-clamp-2 flex-1 text-sm leading-relaxed text-bone-soft">{post.excerpt}</p>
 
-      <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-bone-faint transition-colors group-hover:text-gold">
+      <span className="mt-5 inline-flex items-center gap-1.5 text-[13px] font-semibold text-bone-faint transition-colors group-hover:text-electric">
         Read article
         <ArrowUpRight
           aria-hidden
@@ -102,7 +102,7 @@ function EmptyState() {
     <Panel tone="quiet" className="flex flex-col items-center px-8 py-20 text-center">
       <span
         aria-hidden
-        className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-gold/20 bg-gold/[0.07] text-gold"
+        className="mb-5 grid h-14 w-14 place-items-center rounded-xl border border-electric/20 bg-electric/[0.07] text-electric"
       >
         <Rss className="h-6 w-6" strokeWidth={1.75} />
       </span>
@@ -193,7 +193,7 @@ function BlogPage() {
                       "shrink-0 rounded-full border px-4 py-1.5",
                       "text-[11px] font-semibold uppercase tracking-[0.16em] transition-colors",
                       active
-                        ? "border-gold/25 bg-gold/[0.08] text-gold"
+                        ? "border-electric/25 bg-electric/[0.08] text-electric"
                         : "border-transparent text-bone-soft hover:text-foreground",
                     )}
                   >
