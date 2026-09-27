@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   BookOpen,
   Database,
@@ -10,11 +10,9 @@ import {
   Sparkles,
   StickyNote,
   Trash2,
-  Upload,
 } from "lucide-react";
 import type { KnowledgeEntry, KnowledgeStatus } from "@/lib/cms/types";
-import { KNOWLEDGE_PDF_MAX_BYTES } from "@/lib/cms/types";
-import { knowledge, uploadKnowledgePdf, CmsError } from "@/lib/cms/admin-client";
+import { knowledge, CmsError } from "@/lib/cms/admin-client";
 import { formatShortDate } from "@/lib/cms/public-client";
 import { AdminShell, describeError } from "@/components/admin/AdminShell";
 import { useAdmin } from "@/components/admin/AdminContext";
@@ -80,8 +78,6 @@ function KnowledgeScreen() {
 
   const [editor, setEditor] = useState<EditorState | null>(null);
   const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState<{ name: string; progress: number } | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -138,42 +134,6 @@ function KnowledgeScreen() {
     }
   };
 
-  const uploadPdf = async (files: FileList | null) => {
-    const file = files?.[0];
-    if (inputRef.current) inputRef.current.value = "";
-    if (!file) return;
-    if (file.type !== "application/pdf") {
-      toast.error("Not a PDF", "Only PDF files can be added this way.");
-      return;
-    }
-    if (file.size > KNOWLEDGE_PDF_MAX_BYTES) {
-      toast.error(
-        "Too large",
-        `PDFs must be under ${Math.round(KNOWLEDGE_PDF_MAX_BYTES / 1024 / 1024)} MB.`,
-      );
-      return;
-    }
-
-    setUploading({ name: file.name, progress: 0 });
-    try {
-      const result = await uploadKnowledgePdf(file, {
-        onProgress: (fraction) => setUploading({ name: file.name, progress: fraction }),
-      });
-      toast.success(
-        "PDF added",
-        `Read ${result.pages} page(s) into the knowledge base${result.truncated ? " (truncated to the size limit)" : ""}.`,
-      );
-      load();
-    } catch (caught) {
-      toast.error(
-        "Could not add that PDF",
-        caught instanceof CmsError ? caught.message : "The upload failed.",
-      );
-    } finally {
-      setUploading(null);
-    }
-  };
-
   const toggleStatus = async (entry: KnowledgeEntry) => {
     const next: KnowledgeStatus = entry.status === "active" ? "disabled" : "active";
     try {
@@ -216,7 +176,7 @@ function KnowledgeScreen() {
       <>
         <PageHeader
           title="Assistant knowledge"
-          description="Teach the website chatbot facts it should know, and upload PDFs to train it further."
+          description="Teach the website chatbot facts it should know."
         />
         <NotConfiguredNotice title="A database is required">
           The knowledge base is stored in the Website Manager database. Set{" "}
@@ -231,30 +191,12 @@ function KnowledgeScreen() {
     <>
       <PageHeader
         title="Assistant knowledge"
-        description="Everything here is fed to the website chatbot so it can answer from facts you control. Type a note, or upload a PDF and its text is extracted automatically."
+        description="Everything here is fed to the website chatbot so it can answer from facts you control."
         actions={
           canWrite ? (
-            <>
-              <input
-                ref={inputRef}
-                type="file"
-                accept="application/pdf"
-                className="hidden"
-                onChange={(e) => uploadPdf(e.target.files)}
-              />
-              <Button
-                variant="outline"
-                icon={Upload}
-                disabled={!config.mediaStorageConfigured || Boolean(uploading)}
-                loading={Boolean(uploading)}
-                onClick={() => inputRef.current?.click()}
-              >
-                {uploading ? `Uploading ${Math.round(uploading.progress * 100)}%` : "Upload PDF"}
-              </Button>
-              <Button icon={Plus} onClick={() => setEditor({ ...EMPTY_EDITOR })}>
-                Add note
-              </Button>
-            </>
+            <Button icon={Plus} onClick={() => setEditor({ ...EMPTY_EDITOR })}>
+              Add note
+            </Button>
           ) : undefined
         }
       />
@@ -264,13 +206,6 @@ function KnowledgeScreen() {
         <Metric label="Used by the assistant" value={stats.active} icon={Sparkles} tone="success" />
         <Metric label="Disabled" value={disabledCount} icon={Database} tone="neutral" />
       </div>
-
-      {canWrite && !config.mediaStorageConfigured && (
-        <NotConfiguredNotice title="PDF upload needs file storage" className="mb-6">
-          You can add typed notes right now. To upload PDFs, connect a Vercel Blob store (or set the{" "}
-          <code>MEDIA_S3_*</code> variables) and redeploy — the same storage the media library uses.
-        </NotConfiguredNotice>
-      )}
 
       <Toolbar className="mb-4">
         <div className="relative min-w-0 flex-1">

@@ -305,44 +305,65 @@ function SecondFactorForm() {
 function UnavailableScreen({ reason }: { reason: string | null }) {
   return (
     <main className="bg-secondary/40 flex min-h-dvh items-center justify-center px-5 py-12">
-      <div className="w-full max-w-lg text-center">
-        <span className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-100 text-amber-700">
-          <ServerCrash className="h-5 w-5" aria-hidden="true" />
-        </span>
+      <div className="w-full max-w-lg">
+        <div className="text-center">
+          <span className="bg-primary/[0.08] text-primary mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-xl">
+            <ServerCrash className="h-5 w-5" aria-hidden="true" />
+          </span>
 
-        <h1 className="text-foreground text-[18px] font-bold tracking-tight">
-          The Website Manager is not ready yet
-        </h1>
-        <p className="text-muted-foreground mx-auto mt-2 max-w-md text-[13px] leading-relaxed">
-          {reason ??
-            "The administration API could not be reached. This is a configuration or connectivity problem rather than a sign-in problem."}
-        </p>
-
-        <div className="border-border bg-card mt-6 rounded-xl border p-5 text-left">
-          <p className="text-foreground mb-3 text-[12.5px] font-semibold">
-            Required environment variables
+          <h1 className="text-foreground text-[18px] font-bold tracking-tight">
+            The Website Manager is not ready yet
+          </h1>
+          <p className="text-muted-foreground mx-auto mt-2 max-w-md text-[13px] leading-relaxed">
+            {reason ??
+              "The administration API could not be reached. This is a configuration or connectivity problem rather than a sign-in problem."}
           </p>
-          <dl className="space-y-2.5 text-[12px]">
-            {[
-              ["DATABASE_URL", "A Postgres connection string. A pooled endpoint is recommended."],
-              ["CMS_SECRET", "At least 32 random characters: openssl rand -base64 48"],
-              ["CMS_OWNER_EMAIL", "The first Owner account, created on first sign-in."],
-              [
-                "CMS_OWNER_PASSWORD",
-                "That account's initial password. Change it after signing in.",
-              ],
-            ].map(([name, description]) => (
-              <div key={name}>
-                <dt className="text-foreground font-mono text-[11.5px] font-semibold">{name}</dt>
-                <dd className="text-muted-foreground mt-0.5 leading-relaxed">{description}</dd>
-              </div>
-            ))}
-          </dl>
         </div>
 
-        <Button variant="outline" className="mt-6" onClick={() => window.location.reload()}>
-          Try again
-        </Button>
+        <div className="border-border bg-card mt-6 overflow-hidden rounded-xl border text-left">
+          <div className="border-border bg-secondary/50 border-b px-5 py-3">
+            <p className="text-foreground text-[12.5px] font-semibold">
+              Set these four, then redeploy
+            </p>
+            <p className="text-muted-foreground mt-0.5 text-[11.5px] leading-relaxed">
+              This is the whole list. The manager needs a database and a secret; the other two
+              create your first account.
+            </p>
+          </div>
+
+          <ol className="divide-border divide-y">
+            {[
+              [
+                "DATABASE_URL",
+                "A Postgres connection string — Neon, Supabase, Vercel Postgres or RDS. Use the pooled endpoint. Tables are created automatically on the first request.",
+              ],
+              [
+                "CMS_SECRET",
+                "At least 32 random characters. Generate one with: openssl rand -base64 48",
+              ],
+              ["CMS_OWNER_EMAIL", "The first Owner account, created on your first sign-in."],
+              ["CMS_OWNER_PASSWORD", "That account's initial password. Change it once you are in."],
+            ].map(([name, description], index) => (
+              <li key={name} className="flex gap-3 px-5 py-3">
+                <span className="bg-primary/[0.08] text-primary mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[10.5px] font-bold tabular-nums">
+                  {index + 1}
+                </span>
+                <div className="min-w-0">
+                  <p className="text-foreground font-mono text-[11.5px] font-semibold">{name}</p>
+                  <p className="text-muted-foreground mt-0.5 text-[12px] leading-relaxed">
+                    {description}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="mt-6 text-center">
+          <Button variant="outline" onClick={() => window.location.reload()}>
+            Try again
+          </Button>
+        </div>
       </div>
     </main>
   );

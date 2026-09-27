@@ -56,7 +56,6 @@ var MEDIA_LIMITS = {
     maxBytes: 25 * 1024 * 1024
   }
 };
-var KNOWLEDGE_PDF_MAX_BYTES = 25 * 1024 * 1024;
 
 // src/lib/site.ts
 var SITE_URL = "https://enicehq.com";

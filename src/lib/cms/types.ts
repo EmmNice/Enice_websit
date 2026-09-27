@@ -1062,9 +1062,8 @@ export interface DashboardSnapshot {
     drafts: number;
     scheduled: number;
     archived: number;
-    media: number;
-    pages: number;
-    admins: number;
+    /** Active assistant-knowledge entries. */
+    knowledge: number;
   };
   byKind: Record<ContentKind, { published: number; drafts: number; scheduled: number }>;
   recentContent: ContentSummary[];
@@ -1072,13 +1071,10 @@ export interface DashboardSnapshot {
   recentUpdates: ContentSummary[];
   upcoming: ContentSummary[];
   activity: ActivityEntry[];
-  pendingAiReviews: number;
   site: {
     /** Whether the public site's API dependencies are answering. */
     apiHealthy: boolean;
     databaseConfigured: boolean;
-    mediaStorageConfigured: boolean;
-    aiConfigured: boolean;
     lastPublishedAt: string | null;
   };
 }
@@ -1088,7 +1084,7 @@ export interface DashboardSnapshot {
 export interface SearchHit {
   id: string;
   /** Which area the hit belongs to, used for grouping and the route. */
-  type: "content" | "page" | "section" | "media" | "admin";
+  type: "content" | "knowledge";
   kind: string;
   title: string;
   subtitle: string;
@@ -1132,9 +1128,6 @@ export interface KnowledgeEntry {
   createdAt: string;
   updatedAt: string;
 }
-
-/** The largest PDF the knowledge base will accept, mirroring the media document ceiling. */
-export const KNOWLEDGE_PDF_MAX_BYTES = 25 * 1024 * 1024;
 
 /**
  * Upper bound on the text stored per entry.

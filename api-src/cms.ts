@@ -28,23 +28,8 @@
  */
 
 import type { ContentKind } from "../src/lib/cms/types";
-import {
-  CONTENT_KINDS,
-  CONTENT_STATUSES,
-  SECTION_SCHEMAS,
-  BRAND_PALETTES,
-  BUTTON_STYLES,
-  TYPE_PAIRINGS,
-  KNOWLEDGE_PDF_MAX_BYTES,
-} from "../src/lib/cms/types";
-import {
-  ADMIN_ROLES,
-  PERMISSION_META,
-  ROLE_META,
-  ROLE_PERMISSIONS,
-  assignableRoles,
-  type Permission,
-} from "../src/lib/cms/permissions";
+import { CONTENT_KINDS, CONTENT_STATUSES } from "../src/lib/cms/types";
+import { ROLE_PERMISSIONS, type Permission } from "../src/lib/cms/permissions";
 import { errorRef, type ApiRequest, type ApiResponse } from "./lib/http";
 import {
   DatabaseNotConfiguredError,
@@ -84,15 +69,7 @@ import {
   totpUri,
   verifyTotp,
 } from "./lib/crypto";
-import { listActivity, recordActivity } from "./lib/audit";
-import {
-  deleteObject,
-  getObject,
-  headObject,
-  isMediaStorageConfigured,
-  presignUpload as presignStorageUpload,
-} from "./lib/storage";
-import { extractPdfText } from "./lib/pdf";
+import { recordActivity } from "./lib/audit";
 import {
   HttpError,
   Router,
@@ -101,8 +78,6 @@ import {
   enumValue,
   intParam,
   notFound,
-  optionalString,
-  requiredString,
   resolveRequestPath,
 } from "./lib/router";
 import {
@@ -119,44 +94,14 @@ import {
   updateContent,
   uniqueSlug,
 } from "./lib/repo/content";
+import { seedWebsiteDefaults } from "./lib/repo/website";
 import {
-  SETTINGS_KEYS,
-  createPage,
-  deletePage,
-  getPage,
-  getSection,
-  listPages,
-  listSections,
-  seedWebsiteDefaults,
-  transitionPage,
-  updatePage,
-  updateSection,
-  updateSettings,
-  getSettings,
-  type SettingsKey,
-} from "./lib/repo/website";
-import {
-  confirmUpload,
-  deleteMedia,
-  findMediaUsage,
-  getMedia,
-  listMedia,
-  requestUpload,
-  updateMedia,
-} from "./lib/repo/media";
-import {
-  acceptInvite,
   changeOwnPassword,
-  deleteAdmin,
-  inviteAdmin,
-  listAdmins,
-  reissueInvite,
   twoFactorStatus,
-  updateAdmin,
   updateOwnProfile,
   verifyOwnPassword,
 } from "./lib/repo/admins";
-import { dashboardSnapshot, globalSearch, publishingQueues } from "./lib/repo/insights";
+import { dashboardSnapshot, globalSearch } from "./lib/repo/insights";
 import {
   createKnowledge,
   deleteKnowledge,
@@ -165,19 +110,6 @@ import {
   listKnowledge,
   updateKnowledge,
 } from "./lib/repo/knowledge";
-import {
-  applyChangeRequest,
-  approveChangeRequest,
-  createChangeRequest,
-  getChangeRequest,
-  isAiConfigured,
-  isCodeDeliveryConfigured,
-  listChangeRequests,
-  openPullRequest,
-  rejectChangeRequest,
-  requestChanges,
-  rollbackChangeRequest,
-} from "./lib/ai-manager";
 import { db } from "./lib/db";
 
 // ─── Route declaration ───────────────────────────────────────────────────────
@@ -188,7 +120,6 @@ const PUBLIC_ROUTES = new Set([
   "POST /auth/mfa",
   "POST /auth/logout",
   "GET /auth/session",
-  "POST /invite/accept",
 ]);
 
 /**
@@ -207,54 +138,12 @@ const ROUTE_PERMISSIONS: Record<string, Permission> = {
   "POST /content/:id/duplicate": "content.write",
   "GET /content/:id/revisions": "content.read",
   "POST /content/:id/revert": "content.write",
-  "GET /publishing": "content.read",
   "GET /taxonomies": "content.read",
 
-  "GET /pages": "pages.read",
-  "POST /pages": "pages.write",
-  "GET /pages/:id": "pages.read",
-  "PATCH /pages/:id": "pages.write",
-  "DELETE /pages/:id": "pages.delete",
-  "POST /pages/:id/transition": "pages.publish",
-
-  "GET /sections": "sections.read",
-  "GET /sections/:key": "sections.read",
-  "PATCH /sections/:key": "sections.write",
-
-  "GET /settings": "settings.read",
-  "PATCH /settings/:key": "settings.write",
-
-  "GET /media": "media.read",
-  "POST /media/presign": "media.write",
-  "POST /media/confirm": "media.write",
-  "GET /media/:id/usage": "media.read",
-  "PATCH /media/:id": "media.write",
-  "DELETE /media/:id": "media.delete",
-
-  "GET /admins": "admins.read",
-  "POST /admins": "admins.write",
-  "PATCH /admins/:id": "admins.read",
-  "DELETE /admins/:id": "admins.write",
-  "POST /admins/:id/reissue-invite": "admins.write",
-  "GET /roles": "admins.read",
-
-  "GET /activity": "activity.read",
   "GET /search": "content.read",
-
-  "GET /ai/requests": "ai.read",
-  "POST /ai/requests": "ai.request",
-  "GET /ai/requests/:id": "ai.read",
-  "POST /ai/requests/:id/approve": "ai.approve",
-  "POST /ai/requests/:id/reject": "ai.approve",
-  "POST /ai/requests/:id/request-changes": "ai.approve",
-  "POST /ai/requests/:id/apply": "ai.approve",
-  "POST /ai/requests/:id/rollback": "ai.approve",
-  "POST /ai/requests/:id/pull-request": "ai.deploy",
 
   "GET /knowledge": "ai.knowledge.read",
   "POST /knowledge": "ai.knowledge.write",
-  "POST /knowledge/upload-url": "ai.knowledge.write",
-  "POST /knowledge/ingest": "ai.knowledge.write",
   "GET /knowledge/:id": "ai.knowledge.read",
   "PATCH /knowledge/:id": "ai.knowledge.write",
   "DELETE /knowledge/:id": "ai.knowledge.write",
@@ -390,17 +279,6 @@ router.add("GET /auth/session", async ({ req, res }) => {
   };
 });
 
-router.add("POST /invite/accept", async ({ req, body }) => {
-  const admin = await acceptInvite(body.token, body.password);
-  await recordActivity(req, { email: admin.email, name: admin.name }, "password.changed", {
-    entityType: "admin",
-    entityId: admin.id,
-    entityLabel: admin.email,
-    metadata: { via: "invitation" },
-  });
-  return { accepted: true, email: admin.email };
-});
-
 // ─── Account ─────────────────────────────────────────────────────────────────
 
 router.add("GET /account", async ({ identity }) => ({
@@ -526,7 +404,7 @@ router.add("POST /account/2fa/recovery-codes", async ({ body, identity }) => {
   return { recoveryCodes: codes };
 });
 
-// ─── Dashboard, search, publishing ───────────────────────────────────────────
+// ─── Dashboard and search ────────────────────────────────────────────────────
 
 router.add("GET /dashboard", async () => {
   await seedWebsiteDefaults();
@@ -536,8 +414,6 @@ router.add("GET /dashboard", async () => {
 router.add("GET /search", async ({ query }) => ({
   results: await globalSearch(query.get("q") ?? "", intParam(query, "limit", 30, 60) || 30),
 }));
-
-router.add("GET /publishing", async () => publishingQueues());
 
 router.add("GET /taxonomies", async ({ query }) => {
   const kind = query.get("kind");
@@ -686,178 +562,6 @@ router.add("POST /content/:id/revert", async ({ req, params, body, identity }) =
   return { item };
 });
 
-// ─── Pages ───────────────────────────────────────────────────────────────────
-
-router.add("GET /pages", async () => {
-  await seedWebsiteDefaults();
-  return { pages: await listPages() };
-});
-
-router.add("POST /pages", async ({ req, body, identity }) => {
-  const page = await createPage(body, identity);
-  await recordActivity(req, identity, "page.created", {
-    entityType: "page",
-    entityId: page.id,
-    entityLabel: page.path,
-  });
-  return { page };
-});
-
-router.add("GET /pages/:id", async ({ params }) => {
-  const page = await getPage(params.id);
-  if (!page) throw notFound("That page");
-  return { page, schemas: SECTION_SCHEMAS };
-});
-
-router.add("PATCH /pages/:id", async ({ req, params, body, identity }) => {
-  const page = await updatePage(
-    params.id,
-    body,
-    identity,
-    typeof body.revision === "number" ? body.revision : undefined,
-  );
-  await recordActivity(req, identity, "page.updated", {
-    entityType: "page",
-    entityId: page.id,
-    entityLabel: page.path,
-  });
-  return { page };
-});
-
-router.add("POST /pages/:id/transition", async ({ req, params, body, identity }) => {
-  const status = enumValue(body.status, CONTENT_STATUSES, "Status");
-  const page = await transitionPage(
-    params.id,
-    status,
-    typeof body.scheduledFor === "string" ? body.scheduledFor : null,
-    identity,
-  );
-  await recordActivity(
-    req,
-    identity,
-    status === "published"
-      ? "page.published"
-      : status === "archived"
-        ? "page.archived"
-        : "page.unpublished",
-    { entityType: "page", entityId: page.id, entityLabel: page.path, metadata: { status } },
-  );
-  return { page };
-});
-
-router.add("DELETE /pages/:id", async ({ req, params, identity }) => {
-  const page = await deletePage(params.id);
-  await recordActivity(req, identity, "page.deleted", {
-    entityType: "page",
-    entityId: page.id,
-    entityLabel: page.path,
-  });
-  return { deleted: true, id: page.id };
-});
-
-// ─── Sections ────────────────────────────────────────────────────────────────
-
-router.add("GET /sections", async () => {
-  await seedWebsiteDefaults();
-  return { sections: await listSections(), schemas: SECTION_SCHEMAS };
-});
-
-router.add("GET /sections/:key", async ({ params }) => {
-  const section = await getSection(params.key);
-  if (!section) throw notFound("That section");
-  return { section, schema: SECTION_SCHEMAS[section.type] };
-});
-
-router.add("PATCH /sections/:key", async ({ req, params, body, identity }) => {
-  const section = await updateSection(params.key, body, identity);
-  await recordActivity(req, identity, "section.updated", {
-    entityType: "section",
-    entityId: section.key,
-    entityLabel: section.label,
-    metadata: { visible: section.visible },
-  });
-  return { section };
-});
-
-// ─── Settings and design ─────────────────────────────────────────────────────
-
-router.add("GET /settings", async () => {
-  await seedWebsiteDefaults();
-  return {
-    settings: await getSettings(),
-    // Shipped alongside so the design screen renders the real preset options rather than
-    // duplicating the catalogue in the client.
-    options: { palettes: BRAND_PALETTES, typography: TYPE_PAIRINGS, buttonStyles: BUTTON_STYLES },
-  };
-});
-
-router.add("PATCH /settings/:key", async ({ req, params, body, identity }) => {
-  const key = enumValue(params.key, SETTINGS_KEYS, "Settings section") as SettingsKey;
-  // Design is separately grantable, so an Editor can be allowed brand assets without being able
-  // to rewrite navigation or SEO defaults.
-  if (key === "design") requirePermission(identity, "design.write");
-
-  const settings = await updateSettings(key, body.value ?? body, identity);
-  await recordActivity(req, identity, key === "design" ? "design.updated" : "settings.updated", {
-    entityType: "settings",
-    entityId: key,
-    entityLabel: key,
-  });
-  return { settings };
-});
-
-// ─── Media ───────────────────────────────────────────────────────────────────
-
-router.add("GET /media", async ({ query }) => {
-  const result = await listMedia({
-    search: query.get("search") ?? undefined,
-    folder: query.get("folder") ?? undefined,
-    category: query.get("category") ?? undefined,
-    limit: intParam(query, "limit", 60, 200) || 60,
-    offset: intParam(query, "offset", 0, 100_000),
-  });
-  return { ...result, storageConfigured: isMediaStorageConfigured() };
-});
-
-router.add("POST /media/presign", async ({ body }) => ({ upload: await requestUpload(body) }));
-
-router.add("POST /media/confirm", async ({ req, body, identity }) => {
-  const asset = await confirmUpload(body, identity);
-  await recordActivity(req, identity, "media.uploaded", {
-    entityType: "media",
-    entityId: asset.id,
-    entityLabel: asset.filename,
-    metadata: { sizeBytes: asset.sizeBytes, mimeType: asset.mimeType },
-  });
-  return { asset };
-});
-
-router.add("GET /media/:id/usage", async ({ params }) => {
-  const asset = await getMedia(params.id);
-  if (!asset) throw notFound("That file");
-  return { usage: await findMediaUsage(asset.url) };
-});
-
-router.add("PATCH /media/:id", async ({ req, params, body, identity }) => {
-  const asset = await updateMedia(params.id, body, identity);
-  await recordActivity(req, identity, "media.updated", {
-    entityType: "media",
-    entityId: asset.id,
-    entityLabel: asset.filename,
-  });
-  return { asset };
-});
-
-router.add("DELETE /media/:id", async ({ req, params, identity }) => {
-  const asset = await deleteMedia(params.id);
-  await recordActivity(req, identity, "media.deleted", {
-    entityType: "media",
-    entityId: asset.id,
-    entityLabel: asset.filename,
-  });
-  return { deleted: true, id: asset.id };
-});
-
 // ─── AI assistant knowledge base ─────────────────────────────────────────────
 
 router.add("GET /knowledge", async ({ query }) => {
@@ -868,11 +572,7 @@ router.add("GET /knowledge", async ({ query }) => {
     limit: intParam(query, "limit", 50, 200) || 50,
     offset: intParam(query, "offset", 0, 100_000),
   });
-  return {
-    ...result,
-    stats: await knowledgeStats(),
-    storageConfigured: isMediaStorageConfigured(),
-  };
+  return { ...result, stats: await knowledgeStats() };
 });
 
 router.add("POST /knowledge", async ({ req, body, identity }) => {
@@ -884,85 +584,6 @@ router.add("POST /knowledge", async ({ req, body, identity }) => {
     metadata: { sourceKind: "note", characters: entry.characters },
   });
   return { entry };
-});
-
-// Signs a browser-direct PDF upload. The knowledge base only ever ingests PDFs, so the type is
-// pinned here rather than left to the caller — the signature then physically cannot authorise
-// anything else.
-router.add("POST /knowledge/upload-url", async ({ body }) => {
-  if (!isMediaStorageConfigured()) {
-    throw badRequest(
-      "File storage is not configured yet, so PDFs cannot be uploaded. Connect a Vercel Blob " +
-        "store (or the MEDIA_S3_* variables), or paste the text directly instead.",
-    );
-  }
-  const filename = requiredString(body, "filename");
-  const mimeType = optionalString(body, "mimeType") ?? "application/pdf";
-  if (mimeType !== "application/pdf") {
-    throw badRequest("Only PDF files can be added to the knowledge base.");
-  }
-  const sizeBytes = Number(body.sizeBytes);
-  if (Number.isFinite(sizeBytes) && sizeBytes > KNOWLEDGE_PDF_MAX_BYTES) {
-    throw badRequest(
-      `That PDF exceeds the ${Math.round(KNOWLEDGE_PDF_MAX_BYTES / (1024 * 1024))} MB limit.`,
-    );
-  }
-
-  const upload = await presignStorageUpload({
-    filename,
-    mimeType,
-    sizeBytes: Number.isFinite(sizeBytes) && sizeBytes > 0 ? sizeBytes : undefined,
-    folder: "knowledge",
-  });
-  return { upload };
-});
-
-// After the browser has PUT the bytes, pull them back, extract the text, and store it. The PDF's
-// bytes are never persisted in the row — only the text the assistant can actually read.
-router.add("POST /knowledge/ingest", async ({ req, body, identity }) => {
-  const storageKey = requiredString(body, "storageKey");
-  const filename = optionalString(body, "filename") ?? "document.pdf";
-  const title = optionalString(body, "title") ?? filename.replace(/\.pdf$/i, "");
-
-  const head = await headObject(storageKey);
-  if (!head.exists) {
-    throw badRequest("That upload did not complete. Please try uploading the PDF again.");
-  }
-
-  let extraction;
-  try {
-    extraction = await extractPdfText(await getObject(storageKey));
-  } catch {
-    await deleteObject(storageKey).catch(() => {});
-    throw badRequest("That file could not be read as a PDF. Please check it and try again.");
-  }
-
-  if (!extraction.text) {
-    await deleteObject(storageKey).catch(() => {});
-    throw badRequest(
-      "No text could be extracted — the PDF looks like scanned images rather than selectable " +
-        "text. Type the key facts in as a note instead.",
-    );
-  }
-
-  const entry = await createKnowledge(
-    {
-      title,
-      body: extraction.text,
-      sourceKind: "pdf",
-      sourceName: filename,
-      sourceUrl: head.url,
-      storageKey,
-    },
-    identity,
-  );
-  await recordActivity(req, identity, "knowledge.created", {
-    entityType: "knowledge",
-    entityId: entry.id,
-    entityLabel: entry.title || filename,
-    metadata: { sourceKind: "pdf", pages: extraction.pages, characters: entry.characters },
-  });
-  return { entry, pages: extraction.pages, truncated: extraction.truncated };
 });
 
 router.add("GET /knowledge/:id", async ({ params }) => {
@@ -983,183 +604,13 @@ router.add("PATCH /knowledge/:id", async ({ req, params, body, identity }) => {
 });
 
 router.add("DELETE /knowledge/:id", async ({ req, params, identity }) => {
-  const { entry, storageKey } = await deleteKnowledge(params.id);
-  // A PDF-sourced entry owns its uploaded file; remove it too so deleting the entry does not
-  // leave an orphaned object behind. Best-effort — a failed cleanup must not fail the delete.
-  if (storageKey) {
-    await deleteObject(storageKey).catch(() => {});
-  }
+  const { entry } = await deleteKnowledge(params.id);
   await recordActivity(req, identity, "knowledge.deleted", {
     entityType: "knowledge",
     entityId: entry.id,
     entityLabel: entry.title || "Untitled entry",
   });
   return { deleted: true, id: entry.id };
-});
-
-// ─── Administrators and roles ────────────────────────────────────────────────
-
-router.add("GET /admins", async ({ identity }) => ({
-  admins: await listAdmins(),
-  assignableRoles: assignableRoles(identity.role),
-}));
-
-router.add("POST /admins", async ({ req, body, identity }) => {
-  const result = await inviteAdmin(body, identity);
-  await recordActivity(req, identity, "admin.invited", {
-    entityType: "admin",
-    entityId: result.admin.id,
-    entityLabel: result.admin.email,
-    metadata: { role: result.admin.role },
-  });
-  // The token is returned once. Delivery is deliberately out of band — the inviting
-  // administrator passes on the link, so no working credential is ever emailed by the system.
-  return result;
-});
-
-router.add("PATCH /admins/:id", async ({ req, params, body, identity }) => {
-  // Editing one's own profile needs no admins.write; editing anyone else does.
-  if (params.id !== identity.id) requirePermission(identity, "admins.write");
-
-  const admin = await updateAdmin(params.id, body, identity);
-  await recordActivity(
-    req,
-    identity,
-    admin.status === "suspended" ? "admin.suspended" : "admin.updated",
-    {
-      entityType: "admin",
-      entityId: admin.id,
-      entityLabel: admin.email,
-      metadata: { role: admin.role, status: admin.status },
-    },
-  );
-  return { admin };
-});
-
-router.add("POST /admins/:id/reissue-invite", async ({ req, params, identity }) => {
-  const result = await reissueInvite(params.id, identity);
-  await recordActivity(req, identity, "admin.updated", {
-    entityType: "admin",
-    entityId: result.admin.id,
-    entityLabel: result.admin.email,
-    metadata: { action: "invitation reissued" },
-  });
-  return result;
-});
-
-router.add("DELETE /admins/:id", async ({ req, params, identity }) => {
-  const admin = await deleteAdmin(params.id, identity);
-  await recordActivity(req, identity, "admin.removed", {
-    entityType: "admin",
-    entityId: admin.id,
-    entityLabel: admin.email,
-  });
-  return { deleted: true, id: admin.id };
-});
-
-/** The role catalogue, so the Roles screen renders from the server's matrix, not a copy. */
-router.add("GET /roles", async ({ identity }) => ({
-  roles: ADMIN_ROLES.map((role) => ({
-    role,
-    ...ROLE_META[role],
-    permissions: ROLE_PERMISSIONS[role],
-  })),
-  permissions: PERMISSION_META,
-  assignableRoles: assignableRoles(identity.role),
-}));
-
-// ─── Activity ────────────────────────────────────────────────────────────────
-
-router.add("GET /activity", async ({ query }) =>
-  listActivity({
-    limit: intParam(query, "limit", 50, 200) || 50,
-    offset: intParam(query, "offset", 0, 100_000),
-    action: query.get("action") ?? undefined,
-    actorEmail: query.get("actor") ?? undefined,
-    entityId: query.get("entityId") ?? undefined,
-    search: query.get("search") ?? undefined,
-  }),
-);
-
-// ─── AI Website Manager ──────────────────────────────────────────────────────
-
-router.add("GET /ai/requests", async () => ({
-  requests: await listChangeRequests(50),
-  codeDeliveryConfigured: isCodeDeliveryConfigured(),
-}));
-
-router.add("POST /ai/requests", async ({ req, body, identity }) => {
-  const request = await createChangeRequest(body.prompt, identity);
-  await recordActivity(req, identity, "ai.requested", {
-    entityType: "ai_request",
-    entityId: request.id,
-    entityLabel: request.summary.slice(0, 120) || "AI request",
-    metadata: { kind: request.kind, status: request.status },
-  });
-  return { request };
-});
-
-router.add("GET /ai/requests/:id", async ({ params }) => {
-  const request = await getChangeRequest(params.id);
-  if (!request) throw notFound("That AI request");
-  return { request, codeDeliveryConfigured: isCodeDeliveryConfigured() };
-});
-
-router.add("POST /ai/requests/:id/approve", async ({ req, params, identity }) => {
-  const request = await approveChangeRequest(params.id, identity);
-  await recordActivity(req, identity, "ai.approved", {
-    entityType: "ai_request",
-    entityId: request.id,
-    entityLabel: request.summary.slice(0, 120),
-    metadata: { kind: request.kind },
-  });
-  return { request };
-});
-
-router.add("POST /ai/requests/:id/reject", async ({ req, params, body, identity }) => {
-  const request = await rejectChangeRequest(params.id, body.note, identity);
-  await recordActivity(req, identity, "ai.rejected", {
-    entityType: "ai_request",
-    entityId: request.id,
-    entityLabel: request.summary.slice(0, 120),
-  });
-  return { request };
-});
-
-router.add("POST /ai/requests/:id/request-changes", async ({ params, body, identity }) => ({
-  request: await requestChanges(params.id, body.note, identity),
-}));
-
-router.add("POST /ai/requests/:id/apply", async ({ req, params, identity }) => {
-  const request = await applyChangeRequest(params.id, identity);
-  await recordActivity(req, identity, "ai.applied", {
-    entityType: "ai_request",
-    entityId: request.id,
-    entityLabel: request.summary.slice(0, 120),
-    metadata: { edits: request.contentEdits.length },
-  });
-  return { request };
-});
-
-router.add("POST /ai/requests/:id/rollback", async ({ req, params, identity }) => {
-  const request = await rollbackChangeRequest(params.id, identity);
-  await recordActivity(req, identity, "content.restored", {
-    entityType: "ai_request",
-    entityId: request.id,
-    entityLabel: `Reverted: ${request.summary.slice(0, 100)}`,
-  });
-  return { request };
-});
-
-router.add("POST /ai/requests/:id/pull-request", async ({ req, params, identity }) => {
-  const request = await openPullRequest(params.id, identity);
-  await recordActivity(req, identity, "ai.deployed", {
-    entityType: "ai_request",
-    entityId: request.id,
-    entityLabel: request.summary.slice(0, 120),
-    metadata: { pullRequestUrl: request.pullRequestUrl, branch: request.branch },
-  });
-  return { request };
 });
 
 // ─── Shared response shaping ─────────────────────────────────────────────────
@@ -1190,9 +641,6 @@ function configFlags() {
   return {
     databaseConfigured: isDatabaseConfigured(),
     secretConfigured: isSecretConfigured(),
-    mediaStorageConfigured: isMediaStorageConfigured(),
-    codeDeliveryConfigured: isCodeDeliveryConfigured(),
-    aiConfigured: isAiConfigured(),
   };
 }
 

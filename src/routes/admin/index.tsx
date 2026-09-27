@@ -3,22 +3,17 @@ import { useCallback, useEffect, useState } from "react";
 import {
   Archive,
   CalendarClock,
-  Database,
+  CheckCircle2,
   ExternalLink,
   FileText,
-  Globe,
-  HardDrive,
-  Image as ImageIcon,
-  LayoutTemplate,
   Megaphone,
   Newspaper,
   PencilLine,
   Plus,
   Sparkles,
-  Users,
   Zap,
 } from "lucide-react";
-import type { DashboardSnapshot } from "@/lib/cms/types";
+import type { ContentSummary, DashboardSnapshot } from "@/lib/cms/types";
 import { CONTENT_KIND_META, CONTENT_STATUS_META } from "@/lib/cms/types";
 import { insights } from "@/lib/cms/admin-client";
 import { formatRelativeTime } from "@/lib/cms/public-client";
@@ -31,6 +26,7 @@ import {
   EmptyState,
   ErrorState,
   Metric,
+  NotConfiguredNotice,
   PageHeader,
   Skeleton,
   StatusPill,
@@ -40,10 +36,23 @@ import { ACTIVITY_LABELS } from "@/components/admin/activity-labels";
 /**
  * The dashboard.
  *
- * Answers the four questions an administrator opens the panel with: what is live, what is waiting,
- * what changed recently, and is anything wrong. Everything comes from a single
- * `GET /api/cms/dashboard` — see `dashboardSnapshot()` for why it is one request rather than eight.
+ * Answers the three questions an administrator opens the panel with: what is live, what is waiting
+ * to go out, and what changed recently. Everything comes from a single `GET /api/cms/dashboard` —
+ * see `dashboardSnapshot()` for why it is one request rather than eight.
+ *
+ * It used to also report media storage, page counts, administrator counts and the AI review queue.
+ * Those screens are gone, and a tile reporting a subsystem you cannot open is just noise, so the
+ * panel now reports only what it can act on. That is also what let `repo/insights.ts` stop importing
+ * half the API.
  */
+
+const KIND_ICONS = {
+  blog: FileText,
+  announcement: Megaphone,
+  update: Zap,
+  news: Newspaper,
+} as const;
+
 function DashboardPage() {
   const { can, config } = useAdmin();
   const navigate = useNavigate();
@@ -63,11 +72,23 @@ function DashboardPage() {
 
   useEffect(load, [load]);
 
+  if (!config.databaseConfigured) {
+    return (
+      <>
+        <PageHeader title="Dashboard" description="Publishing activity for the ENICE website." />
+        <NotConfiguredNotice title="A database is required">
+          The Website Manager stores everything it publishes in Postgres. Set{" "}
+          <code>DATABASE_URL</code> and <code>CMS_SECRET</code>, then redeploy.
+        </NotConfiguredNotice>
+      </>
+    );
+  }
+
   return (
     <>
       <PageHeader
         title="Dashboard"
-        description="Publishing activity, upcoming releases and the state of the ENICE website."
+        description="Publishing activity and what is queued to go out."
         actions={
           <>
             <Button
@@ -96,73 +117,139 @@ function DashboardPage() {
         <DashboardSkeleton />
       ) : (
         <div className="space-y-6">
-          <QuickActions />
-
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <Metric
               label="Published"
               value={snapshot.counts.published}
+              icon={CheckCircle2}
+              tone="success"
               hint={
                 snapshot.site.lastPublishedAt
-                  ? `Last published ${formatRelativeTime(snapshot.site.lastPublishedAt)}`
+                  ? `Last ${formatRelativeTime(snapshot.site.lastPublishedAt)}`
                   : "Nothing published yet"
               }
-              icon={Globe}
-              tone="success"
             />
-            <Metric
-              label="Drafts"
-              value={snapshot.counts.drafts}
-              hint="Not visible publicly"
-              icon={PencilLine}
-              tone="neutral"
-            />
+            <Metric label="Drafts" value={snapshot.counts.drafts} icon={PencilLine} />
             <Metric
               label="Scheduled"
               value={snapshot.counts.scheduled}
-              hint={
-                snapshot.upcoming.length > 0
-                  ? `Next: ${formatRelativeTime(snapshot.upcoming[0].scheduledFor)}`
-                  : "Nothing queued"
-              }
               icon={CalendarClock}
-              tone="info"
+              tone={snapshot.counts.scheduled > 0 ? "warning" : undefined}
             />
+            <Metric label="Archived" value={snapshot.counts.archived} icon={Archive} />
             <Metric
-              label="Archived"
-              value={snapshot.counts.archived}
-              hint="Kept on record"
-              icon={Archive}
-              tone="warning"
+              label="Assistant knowledge"
+              value={snapshot.counts.knowledge}
+              icon={Sparkles}
+              hint="Active entries"
             />
+          </div>
+
+          {/* Per-kind counts double as the primary navigation into each library. */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {(Object.keys(KIND_ICONS) as (keyof typeof KIND_ICONS)[]).map((kind) => {
+              const meta = CONTENT_KIND_META[kind];
+              const counts = snapshot.byKind[kind];
+              const Icon = KIND_ICONS[kind];
+              return (
+                <Link
+                  key={kind}
+                  to={meta.route}
+                  className="border-border bg-card hover:border-primary/40 group rounded-xl border p-4 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="bg-primary/[0.08] text-primary flex h-8 w-8 items-center justify-center rounded-lg">
+                      <Icon className="h-4 w-4" aria-hidden="true" />
+                    </span>
+                    <span className="text-foreground text-[13px] font-semibold">{meta.plural}</span>
+                  </div>
+                  <dl className="text-muted-foreground mt-3 flex items-center gap-3 text-[12px]">
+                    <div>
+                      <dt className="sr-only">Published</dt>
+                      <dd className="text-foreground tabular-nums font-semibold">
+                        {counts.published}
+                      </dd>
+                      <dd>live</dd>
+                    </div>
+                    <div>
+                      <dt className="sr-only">Drafts</dt>
+                      <dd className="text-foreground tabular-nums font-semibold">
+                        {counts.drafts}
+                      </dd>
+                      <dd>draft</dd>
+                    </div>
+                    <div>
+                      <dt className="sr-only">Scheduled</dt>
+                      <dd className="text-foreground tabular-nums font-semibold">
+                        {counts.scheduled}
+                      </dd>
+                      <dd>queued</dd>
+                    </div>
+                  </dl>
+                </Link>
+              );
+            })}
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">
             <div className="space-y-6 lg:col-span-2">
-              <ContentByKind snapshot={snapshot} />
-              <RecentContent snapshot={snapshot} />
-              <div className="grid gap-6 md:grid-cols-2">
-                <RecentList
-                  title="Recent announcements"
+              <Card>
+                <CardHeader
+                  title="Recently edited"
+                  description="Across every content type."
+                  icon={FileText}
+                />
+                <ContentRows
+                  items={snapshot.recentContent}
+                  empty="Nothing yet. Create your first post and it will appear here."
+                />
+              </Card>
+
+              <Card>
+                <CardHeader
+                  title="Announcements"
+                  description="The newest first."
                   icon={Megaphone}
-                  items={snapshot.recentAnnouncements}
-                  emptyLabel="No announcements yet"
-                  href="/admin/content/announcements"
                 />
-                <RecentList
-                  title="Recent updates"
-                  icon={Zap}
-                  items={snapshot.recentUpdates}
-                  emptyLabel="No updates yet"
-                  href="/admin/content/updates"
-                />
-              </div>
+                <ContentRows items={snapshot.recentAnnouncements} empty="No announcements yet." />
+              </Card>
             </div>
 
             <div className="space-y-6">
-              <WebsiteStatus snapshot={snapshot} config={config} />
-              {snapshot.upcoming.length > 0 && <Upcoming snapshot={snapshot} />}
-              <RecentActivity snapshot={snapshot} />
+              <Card>
+                <CardHeader
+                  title="Going out next"
+                  description="Scheduled posts publish themselves."
+                  icon={CalendarClock}
+                />
+                <ContentRows items={snapshot.upcoming} empty="Nothing scheduled." showSchedule />
+              </Card>
+
+              <Card>
+                <CardHeader title="Recent activity" icon={PencilLine} />
+                {snapshot.activity.length === 0 ? (
+                  <p className="text-muted-foreground px-4 pb-4 text-[12.5px]">
+                    No activity recorded yet.
+                  </p>
+                ) : (
+                  <ul className="divide-border divide-y">
+                    {snapshot.activity.map((entry) => (
+                      <li key={entry.id} className="px-4 py-2.5">
+                        <p className="text-foreground text-[12.5px]">
+                          {ACTIVITY_LABELS[entry.action] ?? entry.action}
+                          {entry.entityLabel ? (
+                            <span className="text-muted-foreground"> · {entry.entityLabel}</span>
+                          ) : null}
+                        </p>
+                        <p className="text-muted-foreground mt-0.5 text-[11.5px]">
+                          {entry.actorName || entry.actorEmail} ·{" "}
+                          {formatRelativeTime(entry.createdAt)}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
             </div>
           </div>
         </div>
@@ -171,389 +258,68 @@ function DashboardPage() {
   );
 }
 
-/**
- * The quick actions band.
- *
- * Filtered by permission, so an Editor sees the four content actions and not "Manage website".
- * A row of buttons that refuse to work would be worse than a shorter row.
- */
-function QuickActions() {
-  const { can } = useAdmin();
-
-  const actions = [
-    {
-      label: "Create blog post",
-      to: "/admin/content/blog/new",
-      icon: FileText,
-      permission: "content.write",
-    },
-    {
-      label: "Create announcement",
-      to: "/admin/content/announcements/new",
-      icon: Megaphone,
-      permission: "content.write",
-    },
-    {
-      label: "Create update",
-      to: "/admin/content/updates/new",
-      icon: Zap,
-      permission: "content.write",
-    },
-    {
-      label: "Create news entry",
-      to: "/admin/content/news/new",
-      icon: Newspaper,
-      permission: "content.write",
-    },
-    {
-      label: "Manage pages",
-      to: "/admin/website/pages",
-      icon: LayoutTemplate,
-      permission: "pages.read",
-    },
-    { label: "Media library", to: "/admin/media", icon: ImageIcon, permission: "media.read" },
-    { label: "AI Website Manager", to: "/admin/ai", icon: Sparkles, permission: "ai.read" },
-  ] as const;
-
-  const visible = actions.filter((action) => can(action.permission));
-  if (visible.length === 0) return null;
-
-  return (
-    <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-7">
-      {visible.map((action) => (
-        <Link
-          key={action.to}
-          to={action.to}
-          className="border-border bg-card hover:border-primary/30 hover:bg-secondary/40 group flex flex-col items-start gap-2.5 rounded-xl border p-3.5 transition-all"
-        >
-          <span className="bg-secondary text-muted-foreground group-hover:bg-primary/[0.08] group-hover:text-primary flex h-8 w-8 items-center justify-center rounded-lg transition-colors">
-            <action.icon className="h-4 w-4" aria-hidden="true" />
-          </span>
-          <span className="text-foreground text-[12px] leading-tight font-semibold">
-            {action.label}
-          </span>
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-function ContentByKind({ snapshot }: { snapshot: DashboardSnapshot }) {
-  const icons = { blog: FileText, announcement: Megaphone, update: Zap, news: Newspaper };
-
-  return (
-    <Card>
-      <CardHeader title="Content by type" description="Published, drafts and scheduled per area." />
-      <div className="divide-border divide-y">
-        {Object.entries(snapshot.byKind).map(([kind, counts]) => {
-          const meta = CONTENT_KIND_META[kind as keyof typeof CONTENT_KIND_META];
-          const Icon = icons[kind as keyof typeof icons];
-
-          return (
-            <Link
-              key={kind}
-              to={meta.route}
-              className="hover:bg-secondary/40 flex items-center gap-4 px-5 py-3 transition-colors"
-            >
-              <span className="bg-secondary text-muted-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
-                <Icon className="h-4 w-4" aria-hidden="true" />
-              </span>
-              <span className="min-w-0 flex-1">
-                <span className="text-foreground block text-[13px] font-semibold">
-                  {meta.plural}
-                </span>
-                <span className="text-muted-foreground block truncate text-[11.5px]">
-                  {meta.description}
-                </span>
-              </span>
-              <span className="flex shrink-0 items-center gap-3 text-[12px] tabular-nums">
-                <span className="text-emerald-700" title="Published">
-                  {counts.published}
-                </span>
-                <span className="text-muted-foreground" title="Drafts">
-                  {counts.drafts}
-                </span>
-                <span className="text-blue-700" title="Scheduled">
-                  {counts.scheduled}
-                </span>
-              </span>
-            </Link>
-          );
-        })}
-      </div>
-    </Card>
-  );
-}
-
-function RecentContent({ snapshot }: { snapshot: DashboardSnapshot }) {
-  if (snapshot.recentContent.length === 0) {
-    return (
-      <Card>
-        <CardHeader title="Recently edited" />
-        <div className="p-5">
-          <EmptyState
-            icon={FileText}
-            title="No content yet"
-            description="Create your first blog post, announcement, update or news entry to see it here."
-            action={
-              <Button variant="primary" icon={Plus} onClick={() => undefined}>
-                <Link to="/admin/content/blog/new">New blog post</Link>
-              </Button>
-            }
-            className="border-0 py-8"
-          />
-        </div>
-      </Card>
-    );
+/** A compact list of content rows, linking straight into the editor. */
+function ContentRows({
+  items,
+  empty,
+  showSchedule = false,
+}: {
+  items: ContentSummary[];
+  empty: string;
+  showSchedule?: boolean;
+}) {
+  if (items.length === 0) {
+    return <EmptyState icon={FileText} title={empty} className="border-0 px-4 pb-4" />;
   }
 
   return (
-    <Card>
-      <CardHeader
-        title="Recently edited"
-        description="The last few things anyone changed."
-        actions={
-          <Link
-            to="/admin/publishing/drafts"
-            className="text-primary text-[12px] font-semibold hover:underline"
-          >
-            View all
-          </Link>
-        }
-      />
-      <ul className="divide-border divide-y">
-        {snapshot.recentContent.map((item) => {
-          const meta = CONTENT_KIND_META[item.kind];
-          const status = CONTENT_STATUS_META[item.status];
-
-          return (
-            <li key={item.id}>
-              <Link
-                to={`${meta.route}/${item.id}`}
-                className="hover:bg-secondary/40 flex items-center gap-3 px-5 py-3 transition-colors"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="text-foreground block truncate text-[13px] font-medium">
-                    {item.title || "Untitled"}
-                  </span>
-                  <span className="text-muted-foreground block truncate text-[11.5px]">
-                    {meta.singular} · edited {formatRelativeTime(item.updatedAt)}
-                    {item.updatedByEmail ? ` by ${item.updatedByEmail}` : ""}
-                  </span>
-                </span>
-                <StatusPill tone={status.tone}>{status.label}</StatusPill>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-    </Card>
-  );
-}
-
-function RecentList({
-  title,
-  icon: Icon,
-  items,
-  emptyLabel,
-  href,
-}: {
-  title: string;
-  icon: typeof Megaphone;
-  items: DashboardSnapshot["recentAnnouncements"];
-  emptyLabel: string;
-  href: string;
-}) {
-  return (
-    <Card>
-      <CardHeader
-        title={title}
-        icon={Icon}
-        actions={
-          <Link to={href} className="text-primary text-[12px] font-semibold hover:underline">
-            All
-          </Link>
-        }
-      />
-      {items.length === 0 ? (
-        <p className="text-muted-foreground px-5 py-6 text-center text-[12.5px]">{emptyLabel}</p>
-      ) : (
-        <ul className="divide-border divide-y">
-          {items.map((item) => (
-            <li key={item.id} className="px-5 py-2.5">
-              <Link
-                to={`${CONTENT_KIND_META[item.kind].route}/${item.id}`}
-                className="hover:text-primary block"
-              >
-                <span className="text-foreground block truncate text-[12.5px] font-medium">
-                  {item.title || "Untitled"}
-                </span>
-                <span className="text-muted-foreground block text-[11px]">
-                  {CONTENT_STATUS_META[item.status].label} ·{" "}
-                  {formatRelativeTime(item.publishedAt ?? item.updatedAt)}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
-  );
-}
-
-function Upcoming({ snapshot }: { snapshot: DashboardSnapshot }) {
-  return (
-    <Card>
-      <CardHeader title="Publishing next" icon={CalendarClock} />
-      <ul className="divide-border divide-y">
-        {snapshot.upcoming.map((item) => (
-          <li key={item.id} className="px-5 py-3">
+    <ul className="divide-border divide-y">
+      {items.map((item) => {
+        const meta = CONTENT_KIND_META[item.kind];
+        const status = CONTENT_STATUS_META[item.status];
+        return (
+          <li key={item.id}>
             <Link
-              to={`${CONTENT_KIND_META[item.kind].route}/${item.id}`}
-              className="hover:text-primary block"
+              to={`${meta.route}/${item.id}`}
+              className="hover:bg-secondary/60 flex items-center gap-3 px-4 py-2.5 transition-colors"
             >
-              <span className="text-foreground block truncate text-[12.5px] font-medium">
-                {item.title || "Untitled"}
-              </span>
-              <span className="text-muted-foreground mt-0.5 block text-[11px]">
-                {item.scheduledFor
-                  ? new Date(item.scheduledFor).toLocaleString(undefined, {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    })
-                  : "—"}
-              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-foreground truncate text-[13px] font-medium">
+                  {item.title || "(untitled)"}
+                </p>
+                <p className="text-muted-foreground mt-0.5 truncate text-[11.5px]">
+                  {meta.singular} ·{" "}
+                  {showSchedule && item.scheduledFor
+                    ? `publishes ${formatRelativeTime(item.scheduledFor)}`
+                    : formatRelativeTime(item.updatedAt)}
+                </p>
+              </div>
+              <StatusPill tone={status.tone}>{status.label}</StatusPill>
             </Link>
           </li>
-        ))}
-      </ul>
-    </Card>
-  );
-}
-
-/**
- * Website and integration status.
- *
- * Each row is a real check rather than a decorative green tick: the flags come from the server's
- * view of its own configuration, so "Media storage — not configured" is trustworthy and actionable.
- */
-function WebsiteStatus({
-  snapshot,
-  config,
-}: {
-  snapshot: DashboardSnapshot;
-  config: {
-    mediaStorageConfigured: boolean;
-    aiConfigured: boolean;
-    codeDeliveryConfigured: boolean;
-  };
-}) {
-  const rows = [
-    { label: "Website API", ok: snapshot.site.apiHealthy, icon: Globe, required: true },
-    { label: "Database", ok: snapshot.site.databaseConfigured, icon: Database, required: true },
-    { label: "Media storage", ok: config.mediaStorageConfigured, icon: HardDrive, required: false },
-    { label: "AI manager", ok: config.aiConfigured, icon: Sparkles, required: false },
-  ];
-
-  return (
-    <Card>
-      <CardHeader title="Website status" />
-      <ul className="divide-border divide-y">
-        {rows.map((row) => (
-          <li key={row.label} className="flex items-center justify-between gap-3 px-5 py-2.5">
-            <span className="text-foreground flex items-center gap-2 text-[12.5px]">
-              <row.icon className="text-muted-foreground h-3.5 w-3.5" aria-hidden="true" />
-              {row.label}
-            </span>
-            <StatusPill tone={row.ok ? "success" : row.required ? "danger" : "warning"}>
-              {row.ok ? "Ready" : row.required ? "Unavailable" : "Not configured"}
-            </StatusPill>
-          </li>
-        ))}
-      </ul>
-
-      {snapshot.pendingAiReviews > 0 && (
-        <div className="border-border border-t p-4">
-          <Link
-            to="/admin/ai"
-            className="border-primary/20 bg-primary/[0.04] hover:bg-primary/[0.07] flex items-center gap-2.5 rounded-lg border px-3 py-2.5 transition-colors"
-          >
-            <Sparkles className="text-primary h-4 w-4 shrink-0" aria-hidden="true" />
-            <span className="text-foreground text-[12px] font-medium">
-              {snapshot.pendingAiReviews} AI{" "}
-              {snapshot.pendingAiReviews === 1 ? "proposal" : "proposals"} awaiting review
-            </span>
-          </Link>
-        </div>
-      )}
-    </Card>
-  );
-}
-
-function RecentActivity({ snapshot }: { snapshot: DashboardSnapshot }) {
-  const { can } = useAdmin();
-
-  return (
-    <Card>
-      <CardHeader
-        title="Recent activity"
-        icon={Users}
-        actions={
-          can("activity.read") ? (
-            <Link
-              to="/admin/administration/activity"
-              className="text-primary text-[12px] font-semibold hover:underline"
-            >
-              All
-            </Link>
-          ) : undefined
-        }
-      />
-      {snapshot.activity.length === 0 ? (
-        <p className="text-muted-foreground px-5 py-6 text-center text-[12.5px]">
-          Nothing recorded yet.
-        </p>
-      ) : (
-        <ul className="divide-border divide-y">
-          {snapshot.activity.map((entry) => (
-            <li key={entry.id} className="px-5 py-2.5">
-              <p className="text-foreground text-[12px] leading-snug">
-                <span className="font-medium">
-                  {entry.actorName || entry.actorEmail || "System"}
-                </span>{" "}
-                <span className="text-muted-foreground">
-                  {ACTIVITY_LABELS[entry.action] ?? entry.action}
-                </span>{" "}
-                {entry.entityLabel && <span className="font-medium">{entry.entityLabel}</span>}
-              </p>
-              <p className="text-muted-foreground mt-0.5 text-[11px]">
-                {formatRelativeTime(entry.createdAt)}
-              </p>
-            </li>
-          ))}
-        </ul>
-      )}
-    </Card>
+        );
+      })}
+    </ul>
   );
 }
 
 function DashboardSkeleton() {
   return (
-    <div className="space-y-6" role="status" aria-label="Loading the dashboard">
-      <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-7">
-        {Array.from({ length: 7 }, (_, index) => (
-          <Skeleton key={index} className="h-[86px]" />
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {Array.from({ length: 5 }, (_, index) => (
+          <Skeleton key={index} className="h-[104px]" />
         ))}
       </div>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <Skeleton key={index} className="h-[104px]" />
+          <Skeleton key={index} className="h-[96px]" />
         ))}
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           <Skeleton className="h-[260px]" />
-          <Skeleton className="h-[280px]" />
+          <Skeleton className="h-[240px]" />
         </div>
         <div className="space-y-6">
           <Skeleton className="h-[200px]" />

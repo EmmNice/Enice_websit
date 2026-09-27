@@ -19,8 +19,6 @@
  */
 
 import type {
-  ActivityEntry,
-  AiChangeRequest,
   ContentItem,
   ContentKind,
   ContentStatus,
@@ -28,13 +26,7 @@ import type {
   DashboardSnapshot,
   KnowledgeEntry,
   KnowledgeStatus,
-  ManagedPage,
-  MediaAsset,
   SearchHit,
-  SectionSchema,
-  SectionType,
-  SiteSectionRecord,
-  SiteSettings,
 } from "./types";
 import type { AdminRole, Permission } from "./permissions";
 
@@ -210,9 +202,6 @@ export interface AdminProfile {
 export interface ConfigFlags {
   databaseConfigured: boolean;
   secretConfigured: boolean;
-  mediaStorageConfigured: boolean;
-  codeDeliveryConfigured: boolean;
-  aiConfigured: boolean;
 }
 
 export interface SessionState {
@@ -295,21 +284,13 @@ export const account = {
     post<{ recoveryCodes: string[] }>("/account/2fa/recovery-codes", { password }),
 };
 
-// ─── Dashboard, search, publishing ───────────────────────────────────────────
+// ─── Dashboard and search ────────────────────────────────────────────────────
 
 export const insights = {
   dashboard: () => get<DashboardSnapshot>("/dashboard"),
 
   search: (term: string, limit = 30) =>
     get<{ results: SearchHit[] }>(`/search${query({ q: term, limit })}`),
-
-  publishing: () =>
-    get<{
-      drafts: ContentSummary[];
-      scheduled: ContentSummary[];
-      published: ContentSummary[];
-      archived: ContentSummary[];
-    }>("/publishing"),
 };
 
 // ─── Content ─────────────────────────────────────────────────────────────────
@@ -384,298 +365,6 @@ export const content = {
     get<{ categories: string[]; tags: string[] }>(`/taxonomies${query({ kind })}`),
 };
 
-// ─── Website: pages, sections, settings ──────────────────────────────────────
-
-export const website = {
-  pages: () => get<{ pages: ManagedPage[] }>("/pages"),
-
-  page: (id: string) =>
-    get<{ page: ManagedPage; schemas: Record<SectionType, SectionSchema> }>(`/pages/${id}`),
-
-  createPage: (input: { title: string; path?: string; summary?: string }) =>
-    post<{ page: ManagedPage }>("/pages", input),
-
-  updatePage: (
-    id: string,
-    input: {
-      title?: string;
-      path?: string;
-      summary?: string;
-      sections?: unknown;
-      seo?: unknown;
-      revision?: number;
-    },
-  ) => patch<{ page: ManagedPage }>(`/pages/${id}`, input),
-
-  transitionPage: (id: string, status: ContentStatus, scheduledFor?: string | null) =>
-    post<{ page: ManagedPage }>(`/pages/${id}/transition`, { status, scheduledFor }),
-
-  removePage: (id: string) => remove<{ deleted: boolean; id: string }>(`/pages/${id}`),
-
-  sections: () =>
-    get<{ sections: SiteSectionRecord[]; schemas: Record<SectionType, SectionSchema> }>(
-      "/sections",
-    ),
-
-  section: (key: string) =>
-    get<{ section: SiteSectionRecord; schema: SectionSchema }>(
-      `/sections/${encodeURIComponent(key)}`,
-    ),
-
-  updateSection: (
-    key: string,
-    input: { fields?: unknown; visible?: boolean; status?: ContentStatus; label?: string },
-  ) => patch<{ section: SiteSectionRecord }>(`/sections/${encodeURIComponent(key)}`, input),
-
-  settings: () =>
-    get<{
-      settings: SiteSettings;
-      options: {
-        palettes: Record<string, { label: string; primary: string; accent: string }>;
-        typography: Record<string, { label: string; display: string; body: string }>;
-        buttonStyles: Record<string, { label: string; radius: string }>;
-      };
-    }>("/settings"),
-
-  updateSettings: (key: "design" | "header" | "footer" | "seo" | "general", value: unknown) =>
-    patch<{ settings: SiteSettings }>(`/settings/${key}`, { value }),
-};
-
-// ─── Media ───────────────────────────────────────────────────────────────────
-
-export interface PresignedUpload {
-  uploadUrl: string;
-  headers: Record<string, string>;
-  storageKey: string;
-  publicUrl: string;
-  expiresInSeconds: number;
-}
-
-export const media = {
-  list: (
-    params: {
-      search?: string;
-      folder?: string;
-      category?: string;
-      limit?: number;
-      offset?: number;
-    } = {},
-  ) =>
-    get<{
-      assets: MediaAsset[];
-      total: number;
-      folders: string[];
-      storageConfigured: boolean;
-    }>(`/media${query({ ...params })}`),
-
-  presign: (input: { filename: string; mimeType: string; sizeBytes: number; folder?: string }) =>
-    post<{ upload: PresignedUpload }>("/media/presign", input),
-
-  confirm: (input: {
-    storageKey: string;
-    filename: string;
-    mimeType: string;
-    alt?: string;
-    folder?: string;
-    width?: number;
-    height?: number;
-  }) => post<{ asset: MediaAsset }>("/media/confirm", input),
-
-  update: (id: string, input: { filename?: string; alt?: string; folder?: string }) =>
-    patch<{ asset: MediaAsset }>(`/media/${id}`, input),
-
-  usage: (id: string) => get<{ usage: { type: string; label: string }[] }>(`/media/${id}/usage`),
-
-  remove: (id: string) => remove<{ deleted: boolean; id: string }>(`/media/${id}`),
-};
-
-/**
- * Uploads a file end to end: presign, PUT the bytes, then record the asset.
- *
- * The `Content-Type` header must be exactly what was signed — the bucket rejects the upload
- * otherwise — so the presign response's headers are passed through verbatim rather than rebuilt.
- *
- * `XMLHttpRequest` is used instead of `fetch` for one reason: it reports upload progress, and a
- * 200 MB video with no progress indicator is indistinguishable from a hung page.
- */
-export async function uploadFile(
-  file: File,
-  options: { folder?: string; alt?: string; onProgress?: (fraction: number) => void } = {},
-): Promise<MediaAsset> {
-  const { upload } = await media.presign({
-    filename: file.name,
-    mimeType: file.type || "application/octet-stream",
-    sizeBytes: file.size,
-    folder: options.folder,
-  });
-
-  await new Promise<void>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", upload.uploadUrl, true);
-    for (const [name, value] of Object.entries(upload.headers)) xhr.setRequestHeader(name, value);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) options.onProgress?.(event.loaded / event.total);
-    };
-    xhr.onload = () =>
-      xhr.status >= 200 && xhr.status < 300
-        ? resolve()
-        : reject(
-            new CmsError(
-              xhr.status,
-              `Object storage rejected the upload (${xhr.status}). Check the bucket's CORS policy allows PUT from this origin.`,
-              "upload_failed",
-            ),
-          );
-    xhr.onerror = () =>
-      reject(
-        new CmsError(
-          0,
-          "The upload failed. This is usually the bucket's CORS policy — it must allow PUT from this origin.",
-          "upload_failed",
-        ),
-      );
-    xhr.onabort = () => reject(new CmsError(0, "The upload was cancelled.", "upload_aborted"));
-    xhr.send(file);
-  });
-
-  // Reading the intrinsic dimensions is best-effort: a failure must not lose the upload.
-  const dimensions = await readImageDimensions(file).catch(() => null);
-
-  return (
-    await media.confirm({
-      storageKey: upload.storageKey,
-      filename: file.name,
-      mimeType: file.type || "application/octet-stream",
-      alt: options.alt,
-      folder: options.folder,
-      width: dimensions?.width,
-      height: dimensions?.height,
-    })
-  ).asset;
-}
-
-/** Intrinsic pixel dimensions of an image file, or null for anything that is not an image. */
-function readImageDimensions(file: File): Promise<{ width: number; height: number } | null> {
-  if (!file.type.startsWith("image/")) return Promise.resolve(null);
-
-  return new Promise((resolve) => {
-    const url = URL.createObjectURL(file);
-    const image = new Image();
-    image.onload = () => {
-      resolve({ width: image.naturalWidth, height: image.naturalHeight });
-      URL.revokeObjectURL(url);
-    };
-    image.onerror = () => {
-      resolve(null);
-      URL.revokeObjectURL(url);
-    };
-    image.src = url;
-  });
-}
-
-// ─── Administrators, roles, activity ─────────────────────────────────────────
-
-export interface AdminSummary {
-  id: string;
-  email: string;
-  name: string;
-  title: string;
-  avatarUrl: string | null;
-  role: AdminRole;
-  status: "active" | "invited" | "suspended";
-  twoFactorEnabled: boolean;
-  lastLoginAt: string | null;
-  createdAt: string;
-  invitePending: boolean;
-}
-
-export interface RoleDescriptor {
-  role: AdminRole;
-  label: string;
-  description: string;
-  rank: number;
-  permissions: Permission[];
-}
-
-export const admins = {
-  list: () => get<{ admins: AdminSummary[]; assignableRoles: AdminRole[] }>("/admins"),
-
-  invite: (input: { email: string; name?: string; title?: string; role: AdminRole }) =>
-    post<{ admin: AdminSummary; inviteToken: string; expiresAt: string }>("/admins", input),
-
-  update: (
-    id: string,
-    input: {
-      name?: string;
-      title?: string;
-      role?: AdminRole;
-      status?: "active" | "suspended";
-      avatarUrl?: string | null;
-    },
-  ) => patch<{ admin: AdminSummary }>(`/admins/${id}`, input),
-
-  reissueInvite: (id: string) =>
-    post<{ admin: AdminSummary; inviteToken: string; expiresAt: string }>(
-      `/admins/${id}/reissue-invite`,
-    ),
-
-  remove: (id: string) => remove<{ deleted: boolean; id: string }>(`/admins/${id}`),
-
-  roles: () =>
-    get<{
-      roles: RoleDescriptor[];
-      permissions: Record<string, { label: string; group: string; sensitive?: boolean }>;
-      assignableRoles: AdminRole[];
-    }>("/roles"),
-};
-
-export const activity = {
-  list: (
-    params: {
-      limit?: number;
-      offset?: number;
-      action?: string;
-      actor?: string;
-      entityId?: string;
-      search?: string;
-    } = {},
-  ) => get<{ entries: ActivityEntry[]; total: number }>(`/activity${query({ ...params })}`),
-};
-
-// ─── AI Website Manager ──────────────────────────────────────────────────────
-
-export const ai = {
-  list: () => get<{ requests: AiChangeRequest[]; codeDeliveryConfigured: boolean }>("/ai/requests"),
-
-  read: (id: string) =>
-    get<{ request: AiChangeRequest; codeDeliveryConfigured: boolean }>(`/ai/requests/${id}`),
-
-  /** The model call happens server-side, so this can take a while. */
-  create: (prompt: string) =>
-    request<{ request: AiChangeRequest }>(
-      "POST",
-      "/ai/requests",
-      { prompt },
-      { timeoutMs: 120_000 },
-    ),
-
-  approve: (id: string) => post<{ request: AiChangeRequest }>(`/ai/requests/${id}/approve`),
-
-  reject: (id: string, note: string) =>
-    post<{ request: AiChangeRequest }>(`/ai/requests/${id}/reject`, { note }),
-
-  requestChanges: (id: string, note: string) =>
-    post<{ request: AiChangeRequest }>(`/ai/requests/${id}/request-changes`, { note }),
-
-  apply: (id: string) => post<{ request: AiChangeRequest }>(`/ai/requests/${id}/apply`),
-
-  rollback: (id: string) => post<{ request: AiChangeRequest }>(`/ai/requests/${id}/rollback`),
-
-  openPullRequest: (id: string) =>
-    post<{ request: AiChangeRequest }>(`/ai/requests/${id}/pull-request`),
-};
-
 // ─── AI assistant knowledge base ─────────────────────────────────────────────
 
 export interface KnowledgeStats {
@@ -687,12 +376,9 @@ export const knowledge = {
   list: (
     params: { search?: string; status?: KnowledgeStatus; limit?: number; offset?: number } = {},
   ) =>
-    get<{
-      entries: KnowledgeEntry[];
-      total: number;
-      stats: KnowledgeStats;
-      storageConfigured: boolean;
-    }>(`/knowledge${query({ ...params })}`),
+    get<{ entries: KnowledgeEntry[]; total: number; stats: KnowledgeStats }>(
+      `/knowledge${query({ ...params })}`,
+    ),
 
   read: (id: string) => get<{ entry: KnowledgeEntry }>(`/knowledge/${id}`),
 
@@ -706,60 +392,3 @@ export const knowledge = {
 
   remove: (id: string) => remove<{ deleted: boolean; id: string }>(`/knowledge/${id}`),
 };
-
-/**
- * Adds a PDF to the knowledge base end to end: sign an upload, PUT the bytes straight to storage,
- * then ask the server to extract the text and store it as an entry.
- *
- * Mirrors `uploadFile`, but the file never becomes a media-library asset — it exists only to be
- * read once for its text. Extraction can take a moment for a large document, so the ingest call
- * is given a longer timeout than a normal request.
- */
-export async function uploadKnowledgePdf(
-  file: File,
-  options: { title?: string; onProgress?: (fraction: number) => void } = {},
-): Promise<{ entry: KnowledgeEntry; pages: number; truncated: boolean }> {
-  const { upload } = await post<{ upload: PresignedUpload }>("/knowledge/upload-url", {
-    filename: file.name,
-    mimeType: file.type || "application/pdf",
-    sizeBytes: file.size,
-  });
-
-  await new Promise<void>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("PUT", upload.uploadUrl, true);
-    for (const [name, value] of Object.entries(upload.headers)) xhr.setRequestHeader(name, value);
-
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) options.onProgress?.(event.loaded / event.total);
-    };
-    xhr.onload = () =>
-      xhr.status >= 200 && xhr.status < 300
-        ? resolve()
-        : reject(
-            new CmsError(
-              xhr.status,
-              `Storage rejected the upload (${xhr.status}). Check the bucket's CORS policy allows PUT from this origin.`,
-              "upload_failed",
-            ),
-          );
-    xhr.onerror = () =>
-      reject(
-        new CmsError(
-          0,
-          "The upload failed. This is usually the bucket's CORS policy — it must allow PUT from this origin.",
-          "upload_failed",
-        ),
-      );
-    xhr.onabort = () => reject(new CmsError(0, "The upload was cancelled.", "upload_aborted"));
-    xhr.send(file);
-  });
-
-  // Extraction reads the whole document server-side, so allow well beyond the default timeout.
-  return request<{ entry: KnowledgeEntry; pages: number; truncated: boolean }>(
-    "POST",
-    "/knowledge/ingest",
-    { storageKey: upload.storageKey, filename: file.name, title: options.title },
-    { timeoutMs: 120_000 },
-  );
-}
