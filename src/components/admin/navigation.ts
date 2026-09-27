@@ -44,7 +44,7 @@ export const NAV_GROUPS: NavGroup[] = [
         label: "Dashboard",
         to: "/admin",
         icon: "LayoutDashboard",
-        description: "Publishing activity and website status",
+        description: "Publishing activity and what is queued to go out",
         keywords: ["home", "overview", "start"],
       },
     ],

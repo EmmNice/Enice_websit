@@ -190,24 +190,24 @@ account needs an Email plan that includes API access.
 
 See `.env.example` for the full list. Server-side only:
 
-| Variable                         | Required           | Purpose                                               |
-| -------------------------------- | ------------------ | ----------------------------------------------------- |
-| `DATABASE_URL`                   | Website Manager    | Postgres connection string (pooled endpoint)          |
-| `CMS_SECRET`                     | Website Manager    | ≥32 random chars; encrypts 2FA secrets, signs CSRF    |
-| `CMS_OWNER_EMAIL` / `_PASSWORD`  | first deploy       | Bootstraps the first Owner; ignored once one exists   |
-| `MEDIA_S3_*`                     | media uploads      | S3-compatible bucket (or connect a Vercel Blob store) |
-| `GITHUB_TOKEN` / `_REPOSITORY`   | AI code changes    | Lets the AI manager open pull requests                |
-| `RESEND_API_KEY`                 | production         | All email, plus early-access storage                  |
-| `ADMIN_PASSWORD`                 | early-access page  | Gates the legacy `/admin/early-access` screen         |
-| `RESEND_EARLY_ACCESS_SEGMENT_ID` | no                 | Pin a specific segment instead of lookup-by-name      |
-| `AI_PROVIDER`                    | assistant          | `bedrock` (default), `openai`, `anthropic`, …         |
-| `AI_API_KEY` / `AI_API_SECRET`   | assistant + AI CMS | Provider credentials; Bedrock needs both              |
-| `AI_REGION`                      | Bedrock            | Defaults to `us-east-1`                               |
+| Variable                        | Required          | Purpose                                             |
+| ------------------------------- | ----------------- | --------------------------------------------------- |
+| `DATABASE_URL`                  | Website Manager   | Postgres connection string (pooled endpoint)        |
+| `CMS_SECRET`                    | Website Manager   | ≥32 random chars; encrypts 2FA secrets, signs CSRF  |
+| `CMS_OWNER_EMAIL` / `_PASSWORD` | first deploy      | Bootstraps the first Owner; ignored once one exists |
+| `PULSEASSIST_API_KEY`           | production        | All email, plus early-access storage                |
+| `EMAIL_FROM_DOMAIN`             | production        | Must be verified with the active email provider     |
+| `RESEND_API_KEY`                | only if switching | Used when `EMAIL_PROVIDER=resend`                   |
+| `VITE_PULSEASSIST_WIDGET_ID`    | no                | Chat widget id; public by definition                |
 
-The Website Manager degrades safely: with no `DATABASE_URL` it shows a setup screen (naming the
-missing variables) rather than crashing, and the public site keeps working with empty content
-collections. `ADMIN_PASSWORD` (the legacy early-access screen) is compared in constant time and
-guarded by a failed-attempt limiter.
+**Those first four are the entire Website Manager requirement.** It has no media library, no AI
+proposal workflow and no PDF ingestion, so there is nothing here for object storage, model
+credentials or a GitHub token — see `docs/website-manager.md` for why each was removed rather than
+left as a permanently disabled screen.
+
+The Website Manager degrades safely: with no `DATABASE_URL` it shows a setup screen naming the
+missing variables rather than crashing, and the public site keeps working from its in-code content
+fallbacks.
 
 #### Database attached under a prefix
 
