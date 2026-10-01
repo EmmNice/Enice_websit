@@ -19,20 +19,20 @@ import { PRODUCTS } from "@/components/site/navigation";
 import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
-export const Route = createFileRoute("/portfolio/pulsex")({
+export const Route = createFileRoute("/portfolio/pride")({
   head: () =>
-    pageHead("/portfolio/pulsex", [
+    pageHead("/portfolio/pride", [
       breadcrumbJsonLd([
         { name: "Products", path: "/portfolio" },
-        { name: "PulseX", path: "/portfolio/pulsex" },
+        { name: "PRIDE", path: "/portfolio/pride" },
       ]),
       {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        name: "PulseX",
+        name: "PRIDE",
         description:
           "ENICE Group's digital asset platform for cryptocurrency trading, secure custody, and cross-ecosystem digital finance. Launching Q3 2027.",
-        url: `${SITE_URL}/portfolio/pulsex`,
+        url: `${SITE_URL}/portfolio/pride`,
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web, iOS, Android",
         releaseNotes: "Expected Q3 2027",
@@ -44,17 +44,17 @@ export const Route = createFileRoute("/portfolio/pulsex")({
         },
       },
     ]),
-  component: PulseXPage,
+  component: PridePage,
 });
 
-const WAITLIST_MAILTO = "mailto:corporate@enicehq.com?subject=Join%20the%20PulseX%20waitlist";
+const WAITLIST_MAILTO = "mailto:corporate@enicehq.com?subject=Join%20the%20PRIDE%20waitlist";
 
 // ─── The decorative markets panel ─────────────────────────────────────────────
 //
 // This is an illustration of the product's shape, not a data display, and it is `aria-hidden`
 // throughout. Two things were removed rather than retoned:
 //
-//   * A "Live Preview" pill with a green dot. PulseX does not exist yet, so nothing was live and
+//   * A "Live Preview" pill with a green dot. PRIDE does not exist yet, so nothing was live and
 //     nothing was previewing; a green dot beside the words is read as telemetry.
 //   * Hardcoded market figures — "$67,420.00", "+2.41%", a per-row price and percentage change.
 //     They were invented numbers for an unlaunched platform presented in the typography of real
@@ -173,7 +173,7 @@ function MarketsPanel() {
       <div className="flex items-center justify-between border-b border-border px-5 py-3">
         <span className="flex items-center gap-2">
           <Bitcoin className="h-4 w-4 text-electric" strokeWidth={1.5} />
-          <span className="text-[12px] font-semibold text-bone-strong">PulseX Markets</span>
+          <span className="text-[12px] font-semibold text-bone-strong">PRIDE Markets</span>
         </span>
         <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-bone-faint">
           Digital Assets
@@ -218,7 +218,7 @@ function MarketsPanel() {
 // ─── Fallback content ─────────────────────────────────────────────────────────
 //
 // The two blocks below are the *fallbacks* for the page's CMS sections, not its only source of
-// content. Each band reads `portfolio.pulsex.*` and overlays whatever an administrator has
+// content. Each band reads `portfolio.pride.*` and overlays whatever an administrator has
 // published, so the copy here is what paints before the CMS answers and what survives an outage —
 // `useSectionFields` treats a degraded bootstrap as "not loaded" on purpose. See
 // `src/lib/cms/use-section.ts`.
@@ -278,7 +278,7 @@ const HIGHLIGHTS = [
   {
     icon: Layers,
     title: "Ecosystem-native",
-    desc: "Move between PulseX, PulsePay, and ePulse without leaving the ENICE stack: one account, every service.",
+    desc: "Move between PRIDE and PulsePay without leaving the ENICE stack: one account, every service.",
   },
   {
     icon: Globe,
@@ -300,13 +300,13 @@ const HIGHLIGHTS = [
 /**
  * The ecosystem strip, read from the shared product registry.
  *
- * The three cards used to be a hand-written copy of `PRODUCTS` — label, one-line description and
+ * The cards used to be a hand-written copy of `PRODUCTS` — label, one-line description and
  * link, maintained in this file — which is exactly the kind of duplicate that drifts away from the
- * header, the footer and the product pages themselves. The strip now names the same three routes
+ * header, the footer and the product pages themselves. The strip now names the routes
  * and takes their labels, descriptions and lifecycle stage from `navigation.ts`, so there is one
  * place a product is described.
  */
-const ECOSYSTEM_ROUTES = ["/portfolio/pulsepay", "/portfolio/epulse", "/portfolio/pulsex"];
+const ECOSYSTEM_ROUTES = ["/portfolio/pulsepay", "/portfolio/pride"];
 
 const ECOSYSTEM = ECOSYSTEM_ROUTES.map((route) => PRODUCTS.find((p) => p.to === route)).filter(
   (p): p is (typeof PRODUCTS)[number] => p !== undefined,
@@ -314,11 +314,11 @@ const ECOSYSTEM = ECOSYSTEM_ROUTES.map((route) => PRODUCTS.find((p) => p.to === 
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-function PulseXPage() {
-  // Page header, editable through the `portfolio.pulsex` section.
-  const header = useSectionFields("portfolio.pulsex");
-  const factsSection = useSectionFields("portfolio.pulsex.facts");
-  const highlightsSection = useSectionFields("portfolio.pulsex.highlights");
+function PridePage() {
+  // Page header, editable through the `portfolio.pride` section.
+  const header = useSectionFields("portfolio.pride");
+  const factsSection = useSectionFields("portfolio.pride.facts");
+  const highlightsSection = useSectionFields("portfolio.pride.highlights");
 
   // Launch facts. Rows without a value are skipped rather than rendered blank; the first row takes
   // the accent, see `LAUNCH_FACTS`.
@@ -342,7 +342,7 @@ function PulseXPage() {
   return (
     <SiteShell>
       {/* ═══ HERO ═════════════════════════════════════════════════════════════ */}
-      <Section spacing="loose" glow="spread" grid aria-labelledby="pulsex-heading">
+      <Section spacing="loose" glow="spread" grid aria-labelledby="pride-heading">
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
           {/* ── Copy ── */}
           <div data-allow-select>
@@ -354,7 +354,7 @@ function PulseXPage() {
               is the one thing the accent is not for, so the highlight resolves to bone and the
               electric stays where it belongs — the eyebrow, the icons and the hairlines.
             */}
-            <h1 id="pulsex-heading" className="type-display mt-8 text-foreground">
+            <h1 id="pride-heading" className="type-display mt-8 text-foreground">
               <StyledText
                 text={fieldText(header, "heading", "Pulse[[X]]")}
                 accentClassName="text-foreground"
@@ -366,7 +366,7 @@ function PulseXPage() {
                 text={fieldText(
                   header,
                   "subheading",
-                  "PulseX is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
+                  "PRIDE is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
                 )}
                 accentClassName="text-electric"
                 boldClassName="font-semibold text-foreground"
@@ -406,10 +406,10 @@ function PulseXPage() {
       </Section>
 
       {/* ═══ WHAT TO EXPECT ═══════════════════════════════════════════════════ */}
-      <Section tone="recessed" divider aria-labelledby="pulsex-capabilities-heading">
+      <Section tone="recessed" divider aria-labelledby="pride-capabilities-heading">
         <Reveal>
           <SectionIntro
-            id="pulsex-capabilities-heading"
+            id="pride-capabilities-heading"
             align="center"
             eyebrow={fieldText(highlightsSection, "eyebrow", "Platform Capabilities")}
             heading={fieldText(
@@ -420,7 +420,7 @@ function PulseXPage() {
             lead={fieldText(
               highlightsSection,
               "subheading",
-              "PulseX will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
+              "PRIDE will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
             )}
           />
         </Reveal>
@@ -442,23 +442,18 @@ function PulseXPage() {
       </Section>
 
       {/* ═══ ECOSYSTEM ════════════════════════════════════════════════════════ */}
-      <Section
-        spacing="tight"
-        container="narrow"
-        divider
-        aria-labelledby="pulsex-ecosystem-heading"
-      >
+      <Section spacing="tight" container="narrow" divider aria-labelledby="pride-ecosystem-heading">
         <Reveal>
           <SectionIntro
-            id="pulsex-ecosystem-heading"
+            id="pride-ecosystem-heading"
             align="center"
             eyebrow="ENICE Ecosystem"
             heading="One ecosystem. Every financial need."
-            lead="PulseX is deeply integrated with PulsePay and ePulse. Move between crypto and traditional finance from a single account."
+            lead="PRIDE is built into the same ecosystem as PulsePay. Move between crypto and traditional finance from a single account."
           />
         </Reveal>
 
-        <ul className="mt-10 grid gap-4 sm:grid-cols-3">
+        <ul className="mt-10 grid gap-4 sm:grid-cols-2">
           {ECOSYSTEM.map((p) => (
             <li key={p.to} className="flex">
               {/* `PRODUCTS.to` is a plain string; TanStack validates `to` against the route tree,
@@ -483,14 +478,14 @@ function PulseXPage() {
       </Section>
 
       {/* ═══ WAITLIST ═════════════════════════════════════════════════════════ */}
-      <Section container="narrow" divider glow="center" aria-labelledby="pulsex-waitlist-heading">
+      <Section container="narrow" divider glow="center" aria-labelledby="pride-waitlist-heading">
         <Reveal>
           <SectionIntro
-            id="pulsex-waitlist-heading"
+            id="pride-waitlist-heading"
             align="center"
             eyebrow="Be First In Line"
             heading="Get early access when we launch."
-            lead="Join the PulseX waitlist to receive launch updates, early access opportunities, and priority onboarding when the platform goes live in Q3 2027."
+            lead="Join the PRIDE waitlist to receive launch updates, early access opportunities, and priority onboarding when the platform goes live in Q3 2027."
           />
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Cta to={WAITLIST_MAILTO} size="lg" icon="external">

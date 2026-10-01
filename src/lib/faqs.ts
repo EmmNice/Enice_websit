@@ -16,7 +16,7 @@ export const FAQS: readonly { q: string; a: string }[] = [
   },
   {
     q: "Which problems are ENICE products built to solve?",
-    a: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, and ePulse and PulseX extend the ecosystem into digital banking and digital assets.",
+    a: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.",
   },
   {
     q: "What does the ENICE Core provide?",

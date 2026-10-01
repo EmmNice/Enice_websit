@@ -40,16 +40,16 @@ export const Route = createFileRoute("/portfolio/devapay")({
         "@type": "SoftwareApplication",
         name: "DevaPay",
         description:
-          "ENICE Group's upcoming payment infrastructure for businesses: accept and manage customer payments through a single API, with real time updates and webhook notifications. Launching Q1 2027.",
+          "ENICE Group's upcoming payment infrastructure for businesses: accept and manage customer payments through a single API, with real time updates and webhook notifications. Launching in 2028.",
         url: `${SITE_URL}/portfolio/devapay`,
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web",
-        releaseNotes: "Expected Q1 2027",
+        releaseNotes: "Expected 2028",
         author: ORGANIZATION_REF,
         offers: {
           "@type": "Offer",
           availability: "https://schema.org/PreOrder",
-          description: "Waitlist available. Platform launching Q1 2027.",
+          description: "Waitlist available. Platform launching in 2028.",
         },
         featureList: [
           "Payment collection through a unified API",
@@ -172,7 +172,7 @@ const CAPABILITIES = [
  */
 const LAUNCH_FACTS = [
   { label: "Status", value: "Planned" },
-  { label: "Launch", value: "Q1 2027" },
+  { label: "Launch", value: "2028" },
   { label: "Category", value: "Payments" },
 ];
 
@@ -274,7 +274,7 @@ function PaymentCollectionPage() {
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           {/* ── Copy ── */}
           <div data-allow-select>
-            <Tag tone="accent">Coming Q1 2027</Tag>
+            <Tag tone="accent">Coming 2028</Tag>
 
             <SectionIntro
               id="payments-heading"
@@ -400,7 +400,7 @@ function PaymentCollectionPage() {
             align="center"
             eyebrow="Be First In Line"
             heading="Get notified when we launch."
-            lead="Join the waitlist to receive launch updates and early access when DevaPay goes live in Q1 2027."
+            lead="Join the waitlist to receive launch updates and early access when DevaPay goes live in 2028."
           />
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Cta to={WAITLIST_MAILTO} size="lg" icon="external">

@@ -1866,6 +1866,137 @@ WHERE key = 'about.acronym'
   AND fields->'items' @> '[{"title":"Empower"}]'::jsonb;
 `,
   },
+  {
+    id: 22,
+    name: "drop_epulse_rename_pulsex_to_pride_devapay_2028",
+    sql: /* sql */ `
+-- Three product changes, applied to existing databases so the CMS cannot serve the old state over
+-- the new code (the same reason migration 17 exists for the DevaPay rename):
+--
+--   * ePulse is discontinued. Its page, sections, roadmap entry and nav/footer links are removed,
+--     and /portfolio/epulse redirects to /portfolio in vercel.json.
+--   * PulseX is now PRIDE, at /portfolio/pride (with a 308 from /portfolio/pulsex).
+--   * DevaPay's launch moves from Q1 2027 to 2028.
+--
+-- Also clears the homepage "Products in the ecosystem" figure, which the site no longer shows.
+--
+-- Every statement is guarded on the old state still being present, so a re-run is a no-op and
+-- an administrator's own later edit is left alone.
+
+-- ePulse: page sections and the managed page record.
+DELETE FROM site_sections WHERE key = 'portfolio.epulse' OR key LIKE 'portfolio.epulse.%';
+DELETE FROM cms_pages WHERE path = '/portfolio/epulse';
+
+-- PulseX -> PRIDE: section keys are renamed rather than re-inserted, so edited copy moves across.
+UPDATE site_sections SET key = 'portfolio.pride', label = 'PRIDE page', updated_at = now()
+WHERE key = 'portfolio.pulsex'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.pride');
+UPDATE site_sections SET key = 'portfolio.pride.facts', label = 'PRIDE launch facts', updated_at = now()
+WHERE key = 'portfolio.pulsex.facts'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.pride.facts');
+UPDATE site_sections SET key = 'portfolio.pride.highlights', label = 'PRIDE highlights', updated_at = now()
+WHERE key = 'portfolio.pulsex.highlights'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.pride.highlights');
+
+UPDATE cms_pages SET path = '/portfolio/pride', title = 'PRIDE', updated_at = now()
+WHERE path = '/portfolio/pulsex'
+  AND NOT EXISTS (SELECT 1 FROM cms_pages WHERE path = '/portfolio/pride');
+
+-- Copy that names the products. ePulse's sentence fragments go first so the PulseX replacement
+-- does not leave "PRIDE, PulsePay, and ePulse" behind.
+UPDATE site_sections
+SET fields = replace(replace(replace(replace(fields::text,
+      'PulseX, PulsePay, and ePulse', 'PRIDE and PulsePay'),
+      'deeply integrated with PulsePay and ePulse', 'built into the same ecosystem as PulsePay'),
+      'and ePulse and PulseX extend the ecosystem into digital banking and digital assets',
+      'DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets'),
+      'PulseX', 'PRIDE')::jsonb,
+    updated_at = now()
+WHERE position('PulseX' in fields::text) > 0 OR position('ePulse' in fields::text) > 0;
+
+-- Roadmap: drop the ePulse milestone, move DevaPay to 2028.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN item->>'title' = 'DevaPay Launch'
+                    THEN jsonb_set(item, '{description}',
+                           to_jsonb(replace(item->>'description', 'when: Q1 2027', 'when: 2028')))
+                    ELSE item END
+               ORDER BY (item->>'title' = 'DevaPay Launch'), ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE position('product: ePulse' in COALESCE(item->>'description', '')) = 0
+    )),
+    updated_at = now()
+WHERE fields->'items' @> '[{"title":"DevaPay Launch"}]'::jsonb
+  AND (position('product: ePulse' in fields::text) > 0 OR position('when: Q1 2027' in fields::text) > 0);
+
+-- DevaPay's other launch figures: the facts strip and the homepage product tile.
+-- In these two sections "Q1 2027" only ever appears as DevaPay's launch, so the value itself is
+-- replaced rather than a serialised object (whose key order is Postgres's choice, not ours).
+-- The homepage product tiles live under 'home.portfolio'.
+UPDATE site_sections
+SET fields = replace(fields::text, 'Q1 2027', '2028')::jsonb,
+    updated_at = now()
+WHERE key IN ('portfolio.devapay.facts', 'home.portfolio')
+  AND position('Q1 2027' in fields::text) > 0;
+
+-- Homepage statistics: the product count is no longer shown.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[]'::jsonb), updated_at = now()
+WHERE key = 'home.statistics'
+  AND fields->'items' @> '[{"label":"Products in the ecosystem"}]'::jsonb;
+
+-- Header: drop ePulse from every menu's children, then rename PulseX. Structured rather than a
+-- text replace, because removing an object from a jsonb array by string surgery depends on the
+-- key order Postgres chose when it stored it.
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                    THEN jsonb_set(item, '{children}', (
+                           SELECT COALESCE(jsonb_agg(child ORDER BY cord), '[]'::jsonb)
+                           FROM jsonb_array_elements(item->'children') WITH ORDINALITY AS c(child, cord)
+                           WHERE child->>'url' IS DISTINCT FROM '/portfolio/epulse'))
+                    ELSE item END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE item->>'url' IS DISTINCT FROM '/portfolio/epulse'
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND position('/portfolio/epulse' in value::text) > 0;
+
+-- Footer: the same, one level down in each column's links.
+UPDATE site_settings
+SET value = jsonb_set(value, '{columns}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(col->'links') = 'array'
+                    THEN jsonb_set(col, '{links}', (
+                           SELECT COALESCE(jsonb_agg(link ORDER BY lord), '[]'::jsonb)
+                           FROM jsonb_array_elements(col->'links') WITH ORDINALITY AS l(link, lord)
+                           WHERE link->>'url' IS DISTINCT FROM '/portfolio/epulse'))
+                    ELSE col END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'columns') WITH ORDINALITY AS t(col, ord)
+    )),
+    updated_at = now()
+WHERE key = 'footer'
+  AND jsonb_typeof(value->'columns') = 'array'
+  AND position('/portfolio/epulse' in value::text) > 0;
+
+-- Both: PulseX's label and address. A plain replace is safe here — it rewrites values in place
+-- without adding or removing anything.
+UPDATE site_settings
+SET value = replace(replace(replace(value::text,
+      '/portfolio/pulsex', '/portfolio/pride'),
+      '-pulsex"', '-pride"'),
+      'PulseX', 'PRIDE')::jsonb,
+    updated_at = now()
+WHERE key IN ('header', 'footer')
+  AND (position('pulsex' in value::text) > 0 OR position('PulseX' in value::text) > 0);
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

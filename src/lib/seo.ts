@@ -94,12 +94,7 @@ export function organizationJsonLd() {
       },
       {
         "@type": "FinancialProduct",
-        name: "ePulse",
-        description: "Digital banking infrastructure.",
-      },
-      {
-        "@type": "FinancialProduct",
-        name: "PulseX",
+        name: "PRIDE",
         description: "Global digital asset trading exchange.",
       },
       {
@@ -167,7 +162,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/portfolio": {
     title: "Products | ENICE Group",
     description:
-      "PulsePay, PulseAssist, DevaPay, ePulse, and PulseX: the products built and operated by ENICE Group.",
+      "PulsePay, PulseAssist, DevaPay, and PRIDE: the products built and operated by ENICE Group.",
   },
   "/portfolio/pulsepay": {
     title: "PulsePay | Virtual Payment Platform by ENICE Group",
@@ -184,20 +179,15 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     description:
       "PulseAssist Email sends and receives mail on your own verified domain: inbound routing, templates, automations, suppression handling and delivery analytics, from a console and a REST API.",
   },
-  "/portfolio/epulse": {
-    title: "ePulse | Global Financial Platform by ENICE Group",
+  "/portfolio/pride": {
+    title: "PRIDE | Digital Asset Platform by ENICE Group",
     description:
-      "ePulse is ENICE Group's upcoming global financial platform built for freelancers, remote workers, creators, and global businesses. Multi-currency accounts, international transfers, gift cards, and lifestyle services.",
-  },
-  "/portfolio/pulsex": {
-    title: "PulseX | Digital Asset Platform by ENICE Group",
-    description:
-      "PulseX is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem.",
+      "PRIDE is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem.",
   },
   "/portfolio/devapay": {
     title: "DevaPay | ENICE Group",
     description:
-      "DevaPay is ENICE Group's upcoming payment infrastructure for businesses, launching Q1 2027. Accept and manage customer payments through a single, developer friendly API.",
+      "DevaPay is ENICE Group's upcoming payment infrastructure for businesses, launching in 2028. Accept and manage customer payments through a single, developer friendly API.",
   },
   "/about-pulseassist-beta": {
     title: "About the PulseAssist Beta | ENICE Group",
@@ -207,7 +197,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/roadmap": {
     title: "Product Roadmap | ENICE Group",
     description:
-      "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist live, and what we are building next, including ePulse, PulseX, and the ENICE Core.",
+      "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist live, and what we are building next, including PRIDE, DevaPay, and the ENICE Core.",
   },
   "/blog/": {
     title: "Blog and Updates | ENICE Group",

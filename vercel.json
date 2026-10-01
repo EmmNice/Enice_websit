@@ -90,6 +90,16 @@
       "source": "/portfolio/payment-collection",
       "destination": "/portfolio/devapay",
       "permanent": true
+    },
+    {
+      "source": "/portfolio/pulsex",
+      "destination": "/portfolio/pride",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/epulse",
+      "destination": "/portfolio",
+      "permanent": true
     }
   ],
   "rewrites": [
