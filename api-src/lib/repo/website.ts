@@ -721,8 +721,7 @@ export function defaultSettings(): SiteSettings {
               url: "/portfolio/devapay",
               visible: true,
             },
-            { id: "nav-epulse", label: "ePulse", url: "/portfolio/epulse", visible: true },
-            { id: "nav-pulsex", label: "PulseX", url: "/portfolio/pulsex", visible: true },
+            { id: "nav-pride", label: "PRIDE", url: "/portfolio/pride", visible: true },
           ],
         },
         { id: "nav-company", label: "Company", url: "/about", visible: true },
@@ -770,8 +769,7 @@ export function defaultSettings(): SiteSettings {
               url: "/portfolio/devapay",
               visible: true,
             },
-            { id: "f-epulse", label: "ePulse", url: "/portfolio/epulse", visible: true },
-            { id: "f-pulsex", label: "PulseX", url: "/portfolio/pulsex", visible: true },
+            { id: "f-pride", label: "PRIDE", url: "/portfolio/pride", visible: true },
             { id: "f-all-products", label: "All products", url: "/portfolio", visible: true },
           ],
         },
@@ -889,7 +887,7 @@ const DEFAULT_SECTIONS: {
        * wrong (4 for five products), which is why the code derives it from the product registry
        * rather than storing it.
        */
-      items: [{ value: "6", label: "Products in the ecosystem" }],
+      items: [],
     },
   },
   {
@@ -1036,7 +1034,7 @@ const DEFAULT_SECTIONS: {
           title: "DevaPay",
           description:
             "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
-          bullets: "Launch: Q1 2027\nIntegration: One API",
+          bullets: "Launch: 2028\nIntegration: One API",
           url: "/portfolio/devapay",
         },
       ],
@@ -1322,7 +1320,7 @@ const DEFAULT_SECTIONS: {
         {
           question: "Which problems are ENICE products built to solve?",
           answer:
-            "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, and ePulse and PulseX extend the ecosystem into digital banking and digital assets.",
+            "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.",
         },
         {
           question: "What does the ENICE Core provide?",
@@ -1469,24 +1467,19 @@ const DEFAULT_SECTIONS: {
             "when: Q3 2026\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Multi-Currency, Treasury\n\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform.",
         },
         {
-          title: "DevaPay Launch",
-          description:
-            "when: Q1 2027\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nDevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
-        },
-        {
           title: "Global Digital Asset Exchange Private Beta",
           description:
-            "when: Q3 2027\nstatus: planned\nproduct: PulseX\ntags: Crypto, Exchange, Global\n\nPulseX opens to institutional and qualified retail participants, with support for major digital asset pairs, custody, and compliance reporting.",
-        },
-        {
-          title: "Digital Banking Infrastructure Closed Alpha",
-          description:
-            "when: Q4 2027\nstatus: planned\nproduct: ePulse\ntags: Banking, Alpha\n\nePulse begins closed alpha with select institutional partners: digital banking core, account management, and statement APIs.",
+            "when: Q3 2027\nstatus: planned\nproduct: PRIDE\ntags: Crypto, Exchange, Global\n\nPRIDE opens to institutional and qualified retail participants, with support for major digital asset pairs, custody, and compliance reporting.",
         },
         {
           title: "Universal Financial Hub",
           description:
             "when: 2027\nstatus: planned\nproduct: ENICE Core\ntags: Infrastructure, Global, Liquidity\n\nA global virtual-dollar and asset infrastructure layer connecting institutional liquidity across markets through a single API.",
+        },
+        {
+          title: "DevaPay Launch",
+          description:
+            "when: 2028\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nDevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
         },
       ],
     },
@@ -1824,27 +1817,15 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.epulse",
-    label: "ePulse page",
-    group: "Portfolio",
-    type: "hero",
-    order: 230,
-    fields: {
-      heading: "e[[Pulse]]",
-      subheading:
-        "ePulse is ENICE Group's upcoming global financial platform, built for people who **earn, send, and spend money across borders**. Designed for freelancers, remote workers, creators, and global businesses, ePulse aims to make international finance *simple and accessible*.",
-    },
-  },
-  {
-    key: "portfolio.pulsex",
-    label: "PulseX page",
+    key: "portfolio.pride",
+    label: "PRIDE page",
     group: "Portfolio",
     type: "hero",
     order: 240,
     fields: {
       heading: "Pulse[[X]]",
       subheading:
-        "PulseX is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
+        "PRIDE is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
     },
   },
   {
@@ -1870,8 +1851,8 @@ const DEFAULT_SECTIONS: {
    * existing databases.
    *
    * `sort_order` follows the order the bands appear on their page, inside the block already
-   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse, 240 PulseX,
-   * 250 DevaPay).
+   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse — since removed — 240 PRIDE, formerly
+   * PulseX, 250 DevaPay).
    */
   {
     key: "portfolio.pulsepay.stats",
@@ -2068,113 +2049,13 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.epulse.facts",
-    label: "ePulse launch facts",
-    group: "Portfolio",
-    type: "statistics",
-    order: 231,
-    fields: {
-      heading: "ePulse launch framing",
-      // The accent on the first row is styling, derived by position in the component, so it is not
-      // stored here. See `LAUNCH_FACTS` in src/routes/portfolio.epulse.tsx.
-      items: [
-        { value: "In Development", label: "Status" },
-        { value: "To Be Announced", label: "Expected Launch" },
-      ],
-    },
-  },
-  {
-    key: "portfolio.epulse.audience",
-    label: "ePulse audience",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 232,
-    fields: {
-      eyebrow: "Built For",
-      heading: "People who live and work globally.",
-      items: [
-        {
-          icon: "Briefcase",
-          title: "Freelancers",
-          description: "Get paid in USD, GBP, or EUR directly from international clients.",
-        },
-        {
-          icon: "Users",
-          title: "Remote Workers",
-          description: "Receive your salary, save in multiple currencies, spend globally.",
-        },
-        {
-          icon: "CreditCard",
-          title: "Creators",
-          description: "Monetise your content globally and manage earnings in one place.",
-        },
-        {
-          icon: "Globe2",
-          title: "Global Businesses",
-          description: "Pay international suppliers and accept payments from anywhere.",
-        },
-      ],
-    },
-  },
-  {
-    key: "portfolio.epulse.vision",
-    label: "ePulse vision",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 233,
-    fields: {
-      eyebrow: "The Vision",
-      heading: "International finance, made simple.",
-      subheading:
-        "The ePulse platform includes everything you need to live your financial life without borders, from day-to-day spending to long-distance transfers to lifestyle services.",
-      items: [
-        {
-          icon: "Wallet",
-          title: "Multi-currency accounts",
-          description:
-            "Hold and manage balances in the currencies that matter to you: NGN, USD, GBP, EUR and more, from a single account.",
-        },
-        {
-          icon: "Building2",
-          title: "Dedicated receiving accounts",
-          description:
-            "Local account details for supported countries, including the US, UK, and Europe. Get paid like a local from anywhere.",
-        },
-        {
-          icon: "Send",
-          title: "Fast international transfers",
-          description:
-            "Send money across borders with predictable timing, transparent fees, and clear pricing. No surprises.",
-        },
-        {
-          icon: "Globe2",
-          title: "Global payment solutions",
-          description:
-            "Pay and get paid anywhere your work takes you, from client invoices to vendor payments across continents.",
-        },
-        {
-          icon: "Gift",
-          title: "Gift card marketplace",
-          description:
-            "Buy and redeem gift cards from trusted global and local brands, all within the ePulse platform.",
-        },
-        {
-          icon: "Plane",
-          title: "Lifestyle services",
-          description:
-            "Book hotels, plan travel, and access premium experiences. Good finance should make life easier too.",
-        },
-      ],
-    },
-  },
-  {
-    key: "portfolio.pulsex.facts",
-    label: "PulseX launch facts",
+    key: "portfolio.pride.facts",
+    label: "PRIDE launch facts",
     group: "Portfolio",
     type: "statistics",
     order: 241,
     fields: {
-      heading: "PulseX launch framing",
+      heading: "PRIDE launch framing",
       items: [
         { value: "Planned Project", label: "Status" },
         { value: "Q3 2027", label: "Launch" },
@@ -2183,8 +2064,8 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.pulsex.highlights",
-    label: "PulseX capabilities",
+    key: "portfolio.pride.highlights",
+    label: "PRIDE capabilities",
     group: "Portfolio",
     type: "featureGrid",
     order: 242,
@@ -2192,7 +2073,7 @@ const DEFAULT_SECTIONS: {
       eyebrow: "Platform Capabilities",
       heading: "Digital assets, without the friction.",
       subheading:
-        "PulseX will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
+        "PRIDE will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
       items: [
         {
           icon: "BarChart3",
@@ -2210,7 +2091,7 @@ const DEFAULT_SECTIONS: {
           icon: "Layers",
           title: "Ecosystem-native",
           description:
-            "Move between PulseX, PulsePay, and ePulse without leaving the ENICE stack: one account, every service.",
+            "Move between PRIDE and PulsePay without leaving the ENICE stack: one account, every service.",
         },
         {
           icon: "Globe",
@@ -2243,7 +2124,7 @@ const DEFAULT_SECTIONS: {
       heading: "DevaPay launch framing",
       items: [
         { value: "Planned", label: "Status" },
-        { value: "Q1 2027", label: "Launch" },
+        { value: "2028", label: "Launch" },
         { value: "Payments", label: "Category" },
       ],
     },
@@ -2368,8 +2249,7 @@ const SYSTEM_PAGES: { path: string; title: string; summary: string }[] = [
     title: "PulseAssist Email",
     summary: "Transactional and marketing email on a verified domain.",
   },
-  { path: "/portfolio/epulse", title: "ePulse", summary: "Global financial platform." },
-  { path: "/portfolio/pulsex", title: "PulseX", summary: "Digital asset platform." },
+  { path: "/portfolio/pride", title: "PRIDE", summary: "Digital asset platform." },
   {
     path: "/portfolio/devapay",
     title: "DevaPay",

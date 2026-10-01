@@ -24,7 +24,6 @@ import { FAQSection } from "@/components/site/FAQSection";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { StyledText } from "@/components/site/StyledText";
-import { ContactSection } from "@/components/site/ContactSection";
 import {
   CardIndex,
   Container,
@@ -38,7 +37,6 @@ import {
   Tag,
   TextLink,
 } from "@/components/site/primitives";
-import { PRODUCTS } from "@/components/site/navigation";
 import { useSectionFields, fieldText, fieldItems, fieldParagraphs } from "@/lib/cms/use-section";
 import { organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
 
@@ -62,9 +60,14 @@ export const Route = createFileRoute("/")({
  * Standard`. Three of those four were invented: there is no uptime SLA, no published latency
  * benchmark, and naming an encryption standard as a headline metric says nothing a visitor can
  * act on. The fourth was simply wrong — there are five products, not four, which is exactly the
- * failure mode of writing a count by hand, so the count is now derived from the product registry.
+ * failure mode of writing a count by hand.
+ *
+ * The derived product count that replaced it is gone too. A count of products is not a figure a
+ * visitor can do anything with, and it read oddly as the only number on the band. The strip now
+ * renders nothing by default; it only appears if an editor publishes real figures into the
+ * `home.statistics` section, so there is no empty bordered band left behind.
  */
-const HERO_STATS = [{ value: String(PRODUCTS.length), label: "Products in the ecosystem" }];
+const HERO_STATS: { value: string; label: string }[] = [];
 
 /**
  * Icons an editor may name on a CMS-managed card.
@@ -177,7 +180,7 @@ const PORTFOLIO_PREVIEW = [
     title: "DevaPay",
     desc: "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
     facts: [
-      { label: "Launch", value: "Q1 2027" },
+      { label: "Launch", value: "2028" },
       { label: "Integration", value: "One API" },
     ],
     to: "/portfolio/devapay",
@@ -449,26 +452,28 @@ function Landing() {
             Laid out as a wrapping flex row rather than a 4-column grid. The grid was sized for
             four figures and there are two, which left half the band empty — and the count is
             editable, so any fixed column count is wrong for some valid content. */}
-        <div className="relative border-t border-border">
-          <Container>
-            <dl className="flex flex-wrap gap-x-16 gap-y-8 py-8 sm:gap-x-24">
-              {stats.map((s, i) => (
-                <div
-                  key={`${s.label}-${i}`}
-                  className="animate-hero-up"
-                  style={{ animationDelay: `${340 + i * 70}ms` }}
-                >
-                  <dd className="tnum text-3xl font-semibold tracking-tight text-foreground">
-                    {s.value}
-                  </dd>
-                  <dt className="mt-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-bone-faint">
-                    {s.label}
-                  </dt>
-                </div>
-              ))}
-            </dl>
-          </Container>
-        </div>
+        {stats.length > 0 && (
+          <div className="relative border-t border-border">
+            <Container>
+              <dl className="flex flex-wrap gap-x-16 gap-y-8 py-8 sm:gap-x-24">
+                {stats.map((s, i) => (
+                  <div
+                    key={`${s.label}-${i}`}
+                    className="animate-hero-up"
+                    style={{ animationDelay: `${340 + i * 70}ms` }}
+                  >
+                    <dd className="tnum text-3xl font-semibold tracking-tight text-foreground">
+                      {s.value}
+                    </dd>
+                    <dt className="mt-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-bone-faint">
+                      {s.label}
+                    </dt>
+                  </div>
+                ))}
+              </dl>
+            </Container>
+          </div>
+        )}
       </section>
 
       <PartnersStrip />
@@ -707,7 +712,6 @@ function Landing() {
 
       <FAQSection />
       <Careers />
-      <ContactSection />
     </SiteShell>
   );
 }

@@ -4483,6 +4483,140 @@ WHERE key = 'about.acronym'
   AND fields->'items' @> '[{"title":"Empower"}]'::jsonb;
 `
     )
+  },
+  {
+    id: 22,
+    name: "drop_epulse_rename_pulsex_to_pride_devapay_2028",
+    sql: (
+      /* sql */
+      `
+-- Three product changes, applied to existing databases so the CMS cannot serve the old state over
+-- the new code (the same reason migration 17 exists for the DevaPay rename):
+--
+--   * ePulse is discontinued. Its page, sections, roadmap entry and nav/footer links are removed,
+--     and /portfolio/epulse redirects to /portfolio in vercel.json.
+--   * PulseX is now PRIDE, at /portfolio/pride (with a 308 from /portfolio/pulsex).
+--   * DevaPay's launch moves from Q1 2027 to 2028.
+--
+-- Also clears the homepage "Products in the ecosystem" figure, which the site no longer shows.
+--
+-- Every statement is guarded on the old state still being present, so a re-run is a no-op and
+-- an administrator's own later edit is left alone.
+
+-- ePulse: page sections and the managed page record.
+DELETE FROM site_sections WHERE key = 'portfolio.epulse' OR key LIKE 'portfolio.epulse.%';
+DELETE FROM cms_pages WHERE path = '/portfolio/epulse';
+
+-- PulseX -> PRIDE: section keys are renamed rather than re-inserted, so edited copy moves across.
+UPDATE site_sections SET key = 'portfolio.pride', label = 'PRIDE page', updated_at = now()
+WHERE key = 'portfolio.pulsex'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.pride');
+UPDATE site_sections SET key = 'portfolio.pride.facts', label = 'PRIDE launch facts', updated_at = now()
+WHERE key = 'portfolio.pulsex.facts'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.pride.facts');
+UPDATE site_sections SET key = 'portfolio.pride.highlights', label = 'PRIDE highlights', updated_at = now()
+WHERE key = 'portfolio.pulsex.highlights'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.pride.highlights');
+
+UPDATE cms_pages SET path = '/portfolio/pride', title = 'PRIDE', updated_at = now()
+WHERE path = '/portfolio/pulsex'
+  AND NOT EXISTS (SELECT 1 FROM cms_pages WHERE path = '/portfolio/pride');
+
+-- Copy that names the products. ePulse's sentence fragments go first so the PulseX replacement
+-- does not leave "PRIDE, PulsePay, and ePulse" behind.
+UPDATE site_sections
+SET fields = replace(replace(replace(replace(fields::text,
+      'PulseX, PulsePay, and ePulse', 'PRIDE and PulsePay'),
+      'deeply integrated with PulsePay and ePulse', 'built into the same ecosystem as PulsePay'),
+      'and ePulse and PulseX extend the ecosystem into digital banking and digital assets',
+      'DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets'),
+      'PulseX', 'PRIDE')::jsonb,
+    updated_at = now()
+WHERE position('PulseX' in fields::text) > 0 OR position('ePulse' in fields::text) > 0;
+
+-- Roadmap: drop the ePulse milestone, move DevaPay to 2028.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN item->>'title' = 'DevaPay Launch'
+                    THEN jsonb_set(item, '{description}',
+                           to_jsonb(replace(item->>'description', 'when: Q1 2027', 'when: 2028')))
+                    ELSE item END
+               ORDER BY (item->>'title' = 'DevaPay Launch'), ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE position('product: ePulse' in COALESCE(item->>'description', '')) = 0
+    )),
+    updated_at = now()
+WHERE fields->'items' @> '[{"title":"DevaPay Launch"}]'::jsonb
+  AND (position('product: ePulse' in fields::text) > 0 OR position('when: Q1 2027' in fields::text) > 0);
+
+-- DevaPay's other launch figures: the facts strip and the homepage product tile.
+-- In these two sections "Q1 2027" only ever appears as DevaPay's launch, so the value itself is
+-- replaced rather than a serialised object (whose key order is Postgres's choice, not ours).
+-- The homepage product tiles live under 'home.portfolio'.
+UPDATE site_sections
+SET fields = replace(fields::text, 'Q1 2027', '2028')::jsonb,
+    updated_at = now()
+WHERE key IN ('portfolio.devapay.facts', 'home.portfolio')
+  AND position('Q1 2027' in fields::text) > 0;
+
+-- Homepage statistics: the product count is no longer shown.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', '[]'::jsonb), updated_at = now()
+WHERE key = 'home.statistics'
+  AND fields->'items' @> '[{"label":"Products in the ecosystem"}]'::jsonb;
+
+-- Header: drop ePulse from every menu's children, then rename PulseX. Structured rather than a
+-- text replace, because removing an object from a jsonb array by string surgery depends on the
+-- key order Postgres chose when it stored it.
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                    THEN jsonb_set(item, '{children}', (
+                           SELECT COALESCE(jsonb_agg(child ORDER BY cord), '[]'::jsonb)
+                           FROM jsonb_array_elements(item->'children') WITH ORDINALITY AS c(child, cord)
+                           WHERE child->>'url' IS DISTINCT FROM '/portfolio/epulse'))
+                    ELSE item END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE item->>'url' IS DISTINCT FROM '/portfolio/epulse'
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND position('/portfolio/epulse' in value::text) > 0;
+
+-- Footer: the same, one level down in each column's links.
+UPDATE site_settings
+SET value = jsonb_set(value, '{columns}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(col->'links') = 'array'
+                    THEN jsonb_set(col, '{links}', (
+                           SELECT COALESCE(jsonb_agg(link ORDER BY lord), '[]'::jsonb)
+                           FROM jsonb_array_elements(col->'links') WITH ORDINALITY AS l(link, lord)
+                           WHERE link->>'url' IS DISTINCT FROM '/portfolio/epulse'))
+                    ELSE col END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'columns') WITH ORDINALITY AS t(col, ord)
+    )),
+    updated_at = now()
+WHERE key = 'footer'
+  AND jsonb_typeof(value->'columns') = 'array'
+  AND position('/portfolio/epulse' in value::text) > 0;
+
+-- Both: PulseX's label and address. A plain replace is safe here \u2014 it rewrites values in place
+-- without adding or removing anything.
+UPDATE site_settings
+SET value = replace(replace(replace(value::text,
+      '/portfolio/pulsex', '/portfolio/pride'),
+      '-pulsex"', '-pride"'),
+      'PulseX', 'PRIDE')::jsonb,
+    updated_at = now()
+WHERE key IN ('header', 'footer')
+  AND (position('pulsex' in value::text) > 0 OR position('PulseX' in value::text) > 0);
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (
@@ -6420,8 +6554,7 @@ function defaultSettings() {
               url: "/portfolio/devapay",
               visible: true
             },
-            { id: "nav-epulse", label: "ePulse", url: "/portfolio/epulse", visible: true },
-            { id: "nav-pulsex", label: "PulseX", url: "/portfolio/pulsex", visible: true }
+            { id: "nav-pride", label: "PRIDE", url: "/portfolio/pride", visible: true }
           ]
         },
         { id: "nav-company", label: "Company", url: "/about", visible: true },
@@ -6469,8 +6602,7 @@ function defaultSettings() {
               url: "/portfolio/devapay",
               visible: true
             },
-            { id: "f-epulse", label: "ePulse", url: "/portfolio/epulse", visible: true },
-            { id: "f-pulsex", label: "PulseX", url: "/portfolio/pulsex", visible: true },
+            { id: "f-pride", label: "PRIDE", url: "/portfolio/pride", visible: true },
             { id: "f-all-products", label: "All products", url: "/portfolio", visible: true }
           ]
         },
@@ -6571,7 +6703,7 @@ var DEFAULT_SECTIONS = [
        * wrong (4 for five products), which is why the code derives it from the product registry
        * rather than storing it.
        */
-      items: [{ value: "6", label: "Products in the ecosystem" }]
+      items: []
     }
   },
   {
@@ -6710,7 +6842,7 @@ var DEFAULT_SECTIONS = [
           kicker: "Fintech infrastructure",
           title: "DevaPay",
           description: "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
-          bullets: "Launch: Q1 2027\nIntegration: One API",
+          bullets: "Launch: 2028\nIntegration: One API",
           url: "/portfolio/devapay"
         }
       ]
@@ -6964,7 +7096,7 @@ var DEFAULT_SECTIONS = [
         },
         {
           question: "Which problems are ENICE products built to solve?",
-          answer: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, and ePulse and PulseX extend the ecosystem into digital banking and digital assets."
+          answer: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets."
         },
         {
           question: "What does the ENICE Core provide?",
@@ -7101,20 +7233,16 @@ var DEFAULT_SECTIONS = [
           description: "when: Q3 2026\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Multi-Currency, Treasury\n\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform."
         },
         {
-          title: "DevaPay Launch",
-          description: "when: Q1 2027\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nDevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications."
-        },
-        {
           title: "Global Digital Asset Exchange Private Beta",
-          description: "when: Q3 2027\nstatus: planned\nproduct: PulseX\ntags: Crypto, Exchange, Global\n\nPulseX opens to institutional and qualified retail participants, with support for major digital asset pairs, custody, and compliance reporting."
-        },
-        {
-          title: "Digital Banking Infrastructure Closed Alpha",
-          description: "when: Q4 2027\nstatus: planned\nproduct: ePulse\ntags: Banking, Alpha\n\nePulse begins closed alpha with select institutional partners: digital banking core, account management, and statement APIs."
+          description: "when: Q3 2027\nstatus: planned\nproduct: PRIDE\ntags: Crypto, Exchange, Global\n\nPRIDE opens to institutional and qualified retail participants, with support for major digital asset pairs, custody, and compliance reporting."
         },
         {
           title: "Universal Financial Hub",
           description: "when: 2027\nstatus: planned\nproduct: ENICE Core\ntags: Infrastructure, Global, Liquidity\n\nA global virtual-dollar and asset infrastructure layer connecting institutional liquidity across markets through a single API."
+        },
+        {
+          title: "DevaPay Launch",
+          description: "when: 2028\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nDevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications."
         }
       ]
     }
@@ -7434,25 +7562,14 @@ var DEFAULT_SECTIONS = [
     }
   },
   {
-    key: "portfolio.epulse",
-    label: "ePulse page",
-    group: "Portfolio",
-    type: "hero",
-    order: 230,
-    fields: {
-      heading: "e[[Pulse]]",
-      subheading: "ePulse is ENICE Group's upcoming global financial platform, built for people who **earn, send, and spend money across borders**. Designed for freelancers, remote workers, creators, and global businesses, ePulse aims to make international finance *simple and accessible*."
-    }
-  },
-  {
-    key: "portfolio.pulsex",
-    label: "PulseX page",
+    key: "portfolio.pride",
+    label: "PRIDE page",
     group: "Portfolio",
     type: "hero",
     order: 240,
     fields: {
       heading: "Pulse[[X]]",
-      subheading: "PulseX is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem."
+      subheading: "PRIDE is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem."
     }
   },
   {
@@ -7477,8 +7594,8 @@ var DEFAULT_SECTIONS = [
    * existing databases.
    *
    * `sort_order` follows the order the bands appear on their page, inside the block already
-   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse, 240 PulseX,
-   * 250 DevaPay).
+   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse — since removed — 240 PRIDE, formerly
+   * PulseX, 250 DevaPay).
    */
   {
     key: "portfolio.pulsepay.stats",
@@ -7663,106 +7780,13 @@ var DEFAULT_SECTIONS = [
     }
   },
   {
-    key: "portfolio.epulse.facts",
-    label: "ePulse launch facts",
-    group: "Portfolio",
-    type: "statistics",
-    order: 231,
-    fields: {
-      heading: "ePulse launch framing",
-      // The accent on the first row is styling, derived by position in the component, so it is not
-      // stored here. See `LAUNCH_FACTS` in src/routes/portfolio.epulse.tsx.
-      items: [
-        { value: "In Development", label: "Status" },
-        { value: "To Be Announced", label: "Expected Launch" }
-      ]
-    }
-  },
-  {
-    key: "portfolio.epulse.audience",
-    label: "ePulse audience",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 232,
-    fields: {
-      eyebrow: "Built For",
-      heading: "People who live and work globally.",
-      items: [
-        {
-          icon: "Briefcase",
-          title: "Freelancers",
-          description: "Get paid in USD, GBP, or EUR directly from international clients."
-        },
-        {
-          icon: "Users",
-          title: "Remote Workers",
-          description: "Receive your salary, save in multiple currencies, spend globally."
-        },
-        {
-          icon: "CreditCard",
-          title: "Creators",
-          description: "Monetise your content globally and manage earnings in one place."
-        },
-        {
-          icon: "Globe2",
-          title: "Global Businesses",
-          description: "Pay international suppliers and accept payments from anywhere."
-        }
-      ]
-    }
-  },
-  {
-    key: "portfolio.epulse.vision",
-    label: "ePulse vision",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 233,
-    fields: {
-      eyebrow: "The Vision",
-      heading: "International finance, made simple.",
-      subheading: "The ePulse platform includes everything you need to live your financial life without borders, from day-to-day spending to long-distance transfers to lifestyle services.",
-      items: [
-        {
-          icon: "Wallet",
-          title: "Multi-currency accounts",
-          description: "Hold and manage balances in the currencies that matter to you: NGN, USD, GBP, EUR and more, from a single account."
-        },
-        {
-          icon: "Building2",
-          title: "Dedicated receiving accounts",
-          description: "Local account details for supported countries, including the US, UK, and Europe. Get paid like a local from anywhere."
-        },
-        {
-          icon: "Send",
-          title: "Fast international transfers",
-          description: "Send money across borders with predictable timing, transparent fees, and clear pricing. No surprises."
-        },
-        {
-          icon: "Globe2",
-          title: "Global payment solutions",
-          description: "Pay and get paid anywhere your work takes you, from client invoices to vendor payments across continents."
-        },
-        {
-          icon: "Gift",
-          title: "Gift card marketplace",
-          description: "Buy and redeem gift cards from trusted global and local brands, all within the ePulse platform."
-        },
-        {
-          icon: "Plane",
-          title: "Lifestyle services",
-          description: "Book hotels, plan travel, and access premium experiences. Good finance should make life easier too."
-        }
-      ]
-    }
-  },
-  {
-    key: "portfolio.pulsex.facts",
-    label: "PulseX launch facts",
+    key: "portfolio.pride.facts",
+    label: "PRIDE launch facts",
     group: "Portfolio",
     type: "statistics",
     order: 241,
     fields: {
-      heading: "PulseX launch framing",
+      heading: "PRIDE launch framing",
       items: [
         { value: "Planned Project", label: "Status" },
         { value: "Q3 2027", label: "Launch" },
@@ -7771,15 +7795,15 @@ var DEFAULT_SECTIONS = [
     }
   },
   {
-    key: "portfolio.pulsex.highlights",
-    label: "PulseX capabilities",
+    key: "portfolio.pride.highlights",
+    label: "PRIDE capabilities",
     group: "Portfolio",
     type: "featureGrid",
     order: 242,
     fields: {
       eyebrow: "Platform Capabilities",
       heading: "Digital assets, without the friction.",
-      subheading: "PulseX will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
+      subheading: "PRIDE will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
       items: [
         {
           icon: "BarChart3",
@@ -7794,7 +7818,7 @@ var DEFAULT_SECTIONS = [
         {
           icon: "Layers",
           title: "Ecosystem-native",
-          description: "Move between PulseX, PulsePay, and ePulse without leaving the ENICE stack: one account, every service."
+          description: "Move between PRIDE and PulsePay without leaving the ENICE stack: one account, every service."
         },
         {
           icon: "Globe",
@@ -7824,7 +7848,7 @@ var DEFAULT_SECTIONS = [
       heading: "DevaPay launch framing",
       items: [
         { value: "Planned", label: "Status" },
-        { value: "Q1 2027", label: "Launch" },
+        { value: "2028", label: "Launch" },
         { value: "Payments", label: "Category" }
       ]
     }
@@ -7936,8 +7960,7 @@ var SYSTEM_PAGES = [
     title: "PulseAssist Email",
     summary: "Transactional and marketing email on a verified domain."
   },
-  { path: "/portfolio/epulse", title: "ePulse", summary: "Global financial platform." },
-  { path: "/portfolio/pulsex", title: "PulseX", summary: "Digital asset platform." },
+  { path: "/portfolio/pride", title: "PRIDE", summary: "Digital asset platform." },
   {
     path: "/portfolio/devapay",
     title: "DevaPay",

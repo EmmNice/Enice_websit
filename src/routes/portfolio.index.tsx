@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { SITE_URL } from "@/lib/site";
-import { Wifi, CreditCard, BrainCircuit, Wallet, Bitcoin, CheckCircle2, Mail } from "lucide-react";
+import { Wifi, CreditCard, BrainCircuit, Bitcoin, CheckCircle2, Mail } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { Cta, Eyebrow, Panel, Section, SectionIntro, Tag } from "@/components/site/primitives";
@@ -44,14 +44,8 @@ export const Route = createFileRoute("/portfolio/")({
           },
           {
             "@type": "SoftwareApplication",
-            name: "PulseX",
-            url: `${SITE_URL}/portfolio/pulsex`,
-            applicationCategory: "FinanceApplication",
-          },
-          {
-            "@type": "SoftwareApplication",
-            name: "ePulse",
-            url: `${SITE_URL}/portfolio/epulse`,
+            name: "PRIDE",
+            url: `${SITE_URL}/portfolio/pride`,
             applicationCategory: "FinanceApplication",
           },
         ],
@@ -74,11 +68,11 @@ const QUEUE_ROWS = [
 ];
 
 /**
- * The asset pairs PulseX intends to list — names only.
+ * The asset pairs PRIDE intends to list — names only.
  *
  * This was `{ symbol: "BTC", price: "67,420.00", change: "+2.41%" }`. Those were invented numbers
  * for a platform launching in 2027, typeset in the vocabulary of real market data, and they would
- * have been wrong the day after they were written. The same figures were removed from the PulseX
+ * have been wrong the day after they were written. The same figures were removed from the PRIDE
  * page itself; leaving them here would have put them back on the page that links to it.
  */
 const TICKERS = [
@@ -88,15 +82,6 @@ const TICKERS = [
 ];
 
 const COLLECTION_STEPS = ["Customer pays", "Payment processed", "Business receives funds"];
-
-/**
- * Currency codes, without flag emoji.
- *
- * These were `"🇺🇸 USD"` and friends. Regional-indicator pairs have no glyph in the system font on
- * Windows — Chrome and Edge there render two empty boxes — and the codes already say everything
- * the flags did.
- */
-const EPULSE_CURRENCIES = ["USD", "GBP", "EUR", "NGN"];
 
 /**
  * The payment-card mock, retoned onto the surface ramp.
@@ -343,9 +328,10 @@ function PortfolioIndexPage() {
           lead="Platforms being built and planned, including PulsePay, which is in pilot ahead of general availability."
         />
 
-        {/* Four cards, two up: an even 2x2 rather than a three-up row with one card orphaned
-            beside an empty cell. */}
-        <div className="mt-14 grid gap-6 lg:grid-cols-2">
+        {/* Three cards, three up. This was a 2x2 while there were four; at three, two-up would
+            orphan the last card beside an empty cell, and a single row is the even layout. If a
+            fourth product joins, go back to two-up rather than leaving one card alone on a row. */}
+        <div className="mt-14 grid gap-6 lg:grid-cols-3">
           {/* ── PulsePay ── */}
           <ProductCard
             visual={
@@ -476,7 +462,7 @@ function PortfolioIndexPage() {
           >
             <div className="flex flex-wrap items-center gap-3">
               <LifecycleTag to="/portfolio/devapay" />
-              <span className="type-meta">Launch: Q1 2027</span>
+              <span className="type-meta">Launch: 2028</span>
             </div>
             <h3 className="type-h3 mt-4 text-foreground">DevaPay</h3>
             <p className="type-body mt-4">
@@ -493,7 +479,7 @@ function PortfolioIndexPage() {
                 View Details
               </Cta>
               <Cta
-                to="mailto:corporate@enicehq.com?subject=Join%20the%20Payment%20Collection%20waitlist"
+                to="mailto:corporate@enicehq.com?subject=Join%20the%20DevaPay%20waitlist"
                 variant="secondary"
                 size="sm"
                 icon="external"
@@ -503,7 +489,7 @@ function PortfolioIndexPage() {
             </div>
           </ProductCard>
 
-          {/* ── PulseX ── */}
+          {/* ── PRIDE ── */}
           <ProductCard
             visual={
               <CardVisual className="h-56 sm:h-64">
@@ -515,7 +501,7 @@ function PortfolioIndexPage() {
                       <Bitcoin className="h-5 w-5" strokeWidth={1.5} />
                     </span>
                     <div className="text-xl font-bold tracking-tight text-foreground">
-                      Pulse<span className="text-electric">X</span>
+                      PR<span className="text-electric">IDE</span>
                     </div>
                   </div>
                   <div className="w-full max-w-xs space-y-1.5">
@@ -537,88 +523,20 @@ function PortfolioIndexPage() {
             }
           >
             <div className="flex flex-wrap items-center gap-3">
-              <LifecycleTag to="/portfolio/pulsex" />
+              <LifecycleTag to="/portfolio/pride" />
               <span className="type-meta">Launch: Q3 2027</span>
             </div>
-            <h3 className="type-h3 mt-4 text-foreground">PulseX</h3>
+            <h3 className="type-h3 mt-4 text-foreground">PRIDE</h3>
             <p className="type-body mt-4">
               ENICE Group's digital asset platform, designed to make cryptocurrency and digital
               finance simple, secure, and accessible within the ENICE ecosystem.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Cta
-                to="/portfolio/pulsex"
-                size="sm"
-                icon="arrow"
-                aria-label="Learn more about PulseX"
-              >
+              <Cta to="/portfolio/pride" size="sm" icon="arrow" aria-label="Learn more about PRIDE">
                 View Details
               </Cta>
               <Cta
-                to="mailto:corporate@enicehq.com?subject=Join%20the%20PulseX%20waitlist"
-                variant="secondary"
-                size="sm"
-                icon="external"
-              >
-                Join Waitlist
-              </Cta>
-            </div>
-          </ProductCard>
-
-          {/* ── ePulse ── */}
-          <ProductCard
-            visual={
-              <CardVisual className="h-56 sm:h-64">
-                <div className="mesh-glow-center" />
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8">
-                  <div className="flex items-center gap-3">
-                    <span className="grid h-14 w-14 place-items-center rounded-2xl border border-electric/25 bg-electric/[0.08] text-electric">
-                      <Wallet className="h-7 w-7" strokeWidth={1.5} />
-                    </span>
-                    <div className="text-left">
-                      <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
-                        Global Finance
-                      </div>
-                      <div className="text-xl font-bold tracking-tight text-foreground">
-                        e<span className="text-electric">Pulse</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex w-full max-w-xs flex-wrap justify-center gap-2">
-                    {EPULSE_CURRENCIES.map((c) => (
-                      <span
-                        key={c}
-                        className="rounded-md border border-border bg-surface-2 px-3 py-1 text-[11px] font-semibold text-bone-strong"
-                      >
-                        {c}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="type-meta">Multi-currency · Cross-border · Lifestyle</div>
-                </div>
-              </CardVisual>
-            }
-          >
-            <div className="flex flex-wrap items-center gap-3">
-              <LifecycleTag to="/portfolio/epulse" />
-              <span className="type-meta">Launch: TBA</span>
-            </div>
-            <h3 className="type-h3 mt-4 text-foreground">ePulse</h3>
-            <p className="type-body mt-4">
-              ENICE Group's upcoming global financial platform, built for freelancers, remote
-              workers, creators, and global businesses who earn, send, and spend across borders.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Cta
-                to="/portfolio/epulse"
-                size="sm"
-                icon="arrow"
-                aria-label="Learn more about ePulse"
-              >
-                View Details
-              </Cta>
-              <Cta
-                to="mailto:corporate@enicehq.com?subject=Join%20the%20ePulse%20waitlist"
+                to="mailto:corporate@enicehq.com?subject=Join%20the%20PRIDE%20waitlist"
                 variant="secondary"
                 size="sm"
                 icon="external"

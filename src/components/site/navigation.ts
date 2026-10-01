@@ -80,14 +80,8 @@ export const PRODUCTS: NavItem[] = [
     stage: "building",
   },
   {
-    label: "ePulse",
-    to: "/portfolio/epulse",
-    description: "Multi-currency accounts and international transfers for global work.",
-    stage: "building",
-  },
-  {
-    label: "PulseX",
-    to: "/portfolio/pulsex",
+    label: "PRIDE",
+    to: "/portfolio/pride",
     description: "Digital asset trading and custody, integrated with the ecosystem.",
     stage: "building",
   },
