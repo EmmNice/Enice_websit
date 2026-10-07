@@ -6602,10 +6602,10 @@ function sendingDomain() {
   return process.env.EMAIL_FROM_DOMAIN?.trim() || DEFAULT_SENDING_DOMAIN;
 }
 function contactFormSender() {
-  return { name: "ENICE Contact", localPart: "noreply", domain: sendingDomain() };
+  return { name: "ENICE Contact", localPart: "corporate", domain: sendingDomain() };
 }
 function groupSender() {
-  return { name: "ENICE Group", localPart: "noreply", domain: sendingDomain() };
+  return { name: "ENICE Group", localPart: "corporate", domain: sendingDomain() };
 }
 var INTERNAL_RECIPIENT = "corporate@enicehq.com";
 
@@ -6785,7 +6785,7 @@ async function handler(req, res) {
         console.error(`[api/contact:${ref}] email provider is not configured:`, err.message);
         res.status(503).json({
           ok: false,
-          error: "Our contact form is temporarily unavailable. Please email corporate@enicehq.com.",
+          error: "Our contact form is temporarily unavailable.",
           ref
         });
         return;
@@ -6793,7 +6793,7 @@ async function handler(req, res) {
       console.error(`[api/contact:${ref}] the provider rejected the notification:`, err);
       res.status(502).json({
         ok: false,
-        error: "We could not deliver your message. Please email corporate@enicehq.com directly.",
+        error: "We could not deliver your message right now.",
         ref
       });
       return;
@@ -6847,7 +6847,7 @@ async function handler(req, res) {
     if (!res.headersSent) {
       res.status(500).json({
         ok: false,
-        error: "Unexpected error. Please email corporate@enicehq.com directly.",
+        error: "Unexpected error. Please try again later.",
         ref
       });
     }
