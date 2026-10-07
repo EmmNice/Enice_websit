@@ -6585,7 +6585,7 @@ function sendingDomain() {
   return process.env.EMAIL_FROM_DOMAIN?.trim() || DEFAULT_SENDING_DOMAIN;
 }
 function groupSender() {
-  return { name: "ENICE Group", localPart: "corporate", domain: sendingDomain() };
+  return { name: "ENICE Group", localPart: "noreply", domain: sendingDomain() };
 }
 var INTERNAL_RECIPIENT = "corporate@enicehq.com";
 

@@ -25,11 +25,11 @@ function sendingDomain(): string {
  * changed environment variable should take effect on the next invocation.
  */
 export function contactFormSender(): Sender {
-  return { name: "ENICE Contact", localPart: "corporate", domain: sendingDomain() };
+  return { name: "ENICE Contact", localPart: "noreply", domain: sendingDomain() };
 }
 
 export function groupSender(): Sender {
-  return { name: "ENICE Group", localPart: "corporate", domain: sendingDomain() };
+  return { name: "ENICE Group", localPart: "noreply", domain: sendingDomain() };
 }
 
 /** Where internal notifications go. Not a sender, but it belongs with the addressing config. */
