@@ -261,7 +261,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
         console.error(`[api/contact:${ref}] email provider is not configured:`, err.message);
         res.status(503).json({
           ok: false,
-          error: "Our contact form is temporarily unavailable. Please email corporate@enicehq.com.",
+          error: "Our contact form is temporarily unavailable.",
           ref,
         });
         return;
@@ -269,7 +269,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
       console.error(`[api/contact:${ref}] the provider rejected the notification:`, err);
       res.status(502).json({
         ok: false,
-        error: "We could not deliver your message. Please email corporate@enicehq.com directly.",
+        error: "We could not deliver your message right now.",
         ref,
       });
       return;
@@ -327,7 +327,7 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     if (!res.headersSent) {
       res.status(500).json({
         ok: false,
-        error: "Unexpected error. Please email corporate@enicehq.com directly.",
+        error: "Unexpected error. Please try again later.",
         ref,
       });
     }

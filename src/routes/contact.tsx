@@ -288,7 +288,7 @@ function ContactPage() {
                   <AlertCircle aria-hidden className="mt-0.5 h-4 w-4 shrink-0" />
                   <p className="min-w-0 flex-1 break-words">
                     {formError} You can also email us directly at{" "}
-                    <a href="mailto:corporate@enicehq.com" className="break-all underline">
+                    <a href="mailto:corporate@enicehq.com" className="break-words underline">
                       corporate@enicehq.com
                     </a>
                     .
