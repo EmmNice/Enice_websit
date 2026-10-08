@@ -45,6 +45,7 @@ import {
 import { sanitizeMultilineText, sanitizeText, sanitizeUrl } from "../../../src/lib/cms/sanitize";
 import { db, isoOrNull, iso, json, newId, parseDate } from "../db";
 import { badRequest, conflict, notFound } from "../router";
+import { notifySearchEngines, publicContentPath } from "../search-discovery";
 
 // ─── Row shape ───────────────────────────────────────────────────────────────
 
@@ -157,17 +158,25 @@ function mapSummary(
  * publication date through an unpublish-and-reschedule cycle.
  */
 export async function publishDueContent(): Promise<string[]> {
-  const rows = await db()<{ id: string; title: string; kind: string }[]>`
+  const rows = await db()<
+    { id: string; title: string; kind: string; slug: string; seo: SeoFields | null }[]
+  >`
     UPDATE content_items
     SET status = 'published',
         published_at = COALESCE(published_at, scheduled_for, now()),
         scheduled_for = NULL,
         updated_at = now()
     WHERE status = 'scheduled' AND scheduled_for IS NOT NULL AND scheduled_for <= now()
-    RETURNING id, title, kind
+    RETURNING id, title, kind, slug, seo
   `;
   if (rows.length > 0) {
     console.log(`[cms] auto-published ${rows.length} scheduled item(s)`);
+    await notifySearchEngines(
+      rows
+        .filter((row) => row.seo?.index !== false)
+        .map((row) => publicContentPath(toKind(row.kind), row.slug)),
+      "scheduled-publish",
+    );
   }
   return rows.map((row) => row.id);
 }
@@ -369,7 +378,7 @@ export async function listContent(
   await publishDueContent();
 
   const sql = db();
-  const limit = Math.min(Math.max(query.limit ?? 50, 1), 200);
+  const limit = Math.min(Math.max(query.limit ?? 50, 1), 500);
   const offset = Math.max(query.offset ?? 0, 0);
   const search = query.search?.trim();
 
@@ -557,6 +566,17 @@ export async function updateContent(
 
   const updated = await getContent(id);
   if (!updated) throw notFound("That content");
+
+  if (existing.status === "published") {
+    await notifySearchEngines(
+      [
+        publicContentPath(existing.kind, existing.slug),
+        publicContentPath(updated.kind, updated.slug),
+      ],
+      "content-update",
+    );
+  }
+
   return updated;
 }
 
@@ -616,6 +636,11 @@ export async function transitionContent(
 
   const updated = await getContent(id);
   if (!updated) throw notFound("That content");
+
+  if (existing.status === "published" || status === "published") {
+    await notifySearchEngines([publicContentPath(updated.kind, updated.slug)], `content-${status}`);
+  }
+
   return updated;
 }
 
@@ -654,6 +679,9 @@ export async function deleteContent(id: string): Promise<ContentItem> {
   if (!existing) throw notFound("That content");
   // Revisions cascade via the foreign key.
   await db()`DELETE FROM content_items WHERE id = ${id}`;
+  if (existing.status === "published") {
+    await notifySearchEngines([publicContentPath(existing.kind, existing.slug)], "content-delete");
+  }
   return existing;
 }
 

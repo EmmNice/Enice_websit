@@ -23,7 +23,7 @@
  */
 
 import type { ContentKind } from "../src/lib/cms/types";
-import { CONTENT_KINDS, CONTENT_KIND_META } from "../src/lib/cms/types";
+import { CONTENT_KINDS } from "../src/lib/cms/types";
 import { SITE_URL } from "../src/lib/site";
 import { PAGE_SEO, canonicalUrl } from "../src/lib/seo";
 import { resolveSeo, FALLBACK_SEO_DEFAULTS } from "../src/lib/cms/seo-resolve";
@@ -39,6 +39,7 @@ import {
   HttpError,
 } from "./lib/router";
 import { getContentBySlug, listContent } from "./lib/repo/content";
+import { publicContentPath as publicPath } from "./lib/search-discovery";
 import {
   getPageByPath,
   getSettings,
@@ -75,13 +76,6 @@ async function seoContext() {
 
 function kindParam(value: string): ContentKind {
   return enumValue(value, CONTENT_KINDS, "Content type");
-}
-
-/** The public path for an item, used for canonical URLs and links. */
-function publicPath(kind: ContentKind, slug: string): string {
-  const prefix = CONTENT_KIND_META[kind].publicPrefix;
-  // Updates have no page of their own; they surface inside the news feed.
-  return prefix ? `${prefix}/${slug}` : `/news#${slug}`;
 }
 
 // ─── Bootstrap ───────────────────────────────────────────────────────────────
@@ -353,6 +347,7 @@ async function buildSitemap(): Promise<string> {
   if (isDatabaseConfigured()) {
     try {
       await ensureMigrated();
+      await publishDuePages();
       const [content, pages, settings] = await Promise.all([
         Promise.all(
           (["blog", "news", "announcement"] as const).map((kind) =>
@@ -400,7 +395,7 @@ async function buildSitemap(): Promise<string> {
   return renderSitemap(entries);
 }
 
-/** XML-escapes a URL. Ampersands in a query string would otherwise break the document. */
+/** XML-escapes text before placing it in a sitemap or RSS document. */
 function escapeXml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -408,6 +403,103 @@ function escapeXml(value: string): string {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
+}
+
+interface RssEntry {
+  id: string;
+  kind: ContentKind;
+  title: string;
+  description: string;
+  path: string;
+  category: string | null;
+  publishedAt: string | null;
+  updatedAt: string;
+}
+
+/** Standards-based feed for crawlers, feed readers, and content-discovery services. */
+function renderRssFeed(entries: readonly RssEntry[]): string {
+  const newest = entries[0]?.updatedAt ?? entries[0]?.publishedAt;
+  const lastBuildDate = newest
+    ? `    <lastBuildDate>${escapeXml(new Date(newest).toUTCString())}</lastBuildDate>`
+    : null;
+
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    "  <channel>",
+    "    <title>ENICE Group updates</title>",
+    `    <link>${SITE_URL}/news/</link>`,
+    "    <description>News, announcements, product updates, and articles from ENICE Group.</description>",
+    "    <language>en</language>",
+    `    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />`,
+    ...(lastBuildDate ? [lastBuildDate] : []),
+    ...entries.map((entry) => {
+      const url = canonicalUrl(entry.path);
+      const published = entry.publishedAt ?? entry.updatedAt;
+      const guid =
+        entry.kind === "update"
+          ? `<guid isPermaLink="false">enice:${entry.kind}:${escapeXml(entry.id)}</guid>`
+          : `<guid isPermaLink="true">${escapeXml(url)}</guid>`;
+      const category = entry.category
+        ? `\n      <category>${escapeXml(entry.category)}</category>`
+        : "";
+
+      return [
+        "    <item>",
+        `      <title>${escapeXml(entry.title)}</title>`,
+        `      <link>${escapeXml(url)}</link>`,
+        `      ${guid}`,
+        `      <description>${escapeXml(entry.description)}</description>`,
+        `      <pubDate>${escapeXml(new Date(published).toUTCString())}</pubDate>${category}`,
+        "    </item>",
+      ].join("\n");
+    }),
+    "  </channel>",
+    "</rss>",
+    "",
+  ].join("\n");
+}
+
+async function buildRssFeed(): Promise<string> {
+  if (!isDatabaseConfigured()) return renderRssFeed([]);
+
+  await ensureMigrated();
+  const [collections, settings] = await Promise.all([
+    Promise.all(
+      CONTENT_KINDS.map((kind) =>
+        listContent({ kind, status: "published", limit: 50, sort: "published" }),
+      ),
+    ),
+    getSettings(),
+  ]);
+  const context = { siteUrl: SITE_URL, defaults: settings.seo };
+
+  const entries = collections
+    .flatMap((collection) => collection.items)
+    .filter((item) => {
+      const path = publicPath(item.kind, item.slug);
+      return resolveSeo(
+        item.seo,
+        { title: item.title, excerpt: item.excerpt, image: item.coverImageUrl, path },
+        context,
+      ).index;
+    })
+    .map<RssEntry>((item) => ({
+      id: item.id,
+      kind: item.kind,
+      title: item.title,
+      description: item.excerpt,
+      path: publicPath(item.kind, item.slug),
+      category: item.category,
+      publishedAt: item.publishedAt,
+      updatedAt: item.updatedAt,
+    }))
+    .sort(
+      (a, b) => Date.parse(b.publishedAt ?? b.updatedAt) - Date.parse(a.publishedAt ?? a.updatedAt),
+    )
+    .slice(0, 100);
+
+  return renderRssFeed(entries);
 }
 
 router.add("GET /urls", async ({ res }) => {
@@ -492,6 +584,20 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
     } catch (error) {
       console.error(`[api/site:${ref}] sitemap fell back to static routes:`, error);
       body = staticSitemap();
+    }
+    res.status(200).end(body);
+    return;
+  }
+
+  if (path === "/rss") {
+    res.setHeader("Content-Type", "application/rss+xml; charset=utf-8");
+    res.setHeader("Cache-Control", CACHE_CONTENT);
+    let body: string;
+    try {
+      body = await buildRssFeed();
+    } catch (error) {
+      console.error(`[api/site:${ref}] RSS feed fell back to an empty channel:`, error);
+      body = renderRssFeed([]);
     }
     res.status(200).end(body);
     return;

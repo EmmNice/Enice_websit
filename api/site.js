@@ -4616,6 +4616,66 @@ function normalizePath2(value) {
   return segments.length === 0 ? "/" : `/${segments.join("/")}`;
 }
 
+// api-src/lib/search-discovery.ts
+var INDEXNOW_KEY = "67be4fa08925c8ad447fb92b3774d1ac";
+var INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
+var INDEXNOW_KEY_LOCATION = `${SITE_URL}/${INDEXNOW_KEY}.txt`;
+var REQUEST_TIMEOUT_MS = 2500;
+var MAX_URLS_PER_REQUEST = 1e4;
+function publicContentPath(kind, slug) {
+  const prefix = CONTENT_KIND_META[kind].publicPrefix;
+  return prefix ? `${prefix}/${slug}` : `/news#${slug}`;
+}
+function ownedUrls(values2) {
+  const expectedOrigin = new URL(SITE_URL).origin;
+  const urls = /* @__PURE__ */ new Set();
+  for (const value of values2) {
+    try {
+      const url = new URL(value, `${SITE_URL}/`);
+      if (url.origin !== expectedOrigin) continue;
+      url.hash = "";
+      urls.add(url.href);
+    } catch {
+    }
+  }
+  return [...urls];
+}
+async function notifySearchEngines(values2, event) {
+  if (process.env.VERCEL_ENV !== "production") return;
+  const urls = ownedUrls(values2);
+  if (urls.length === 0) return;
+  for (let offset = 0; offset < urls.length; offset += MAX_URLS_PER_REQUEST) {
+    const urlList = urls.slice(offset, offset + MAX_URLS_PER_REQUEST);
+    try {
+      const response = await fetch(INDEXNOW_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({
+          host: new URL(SITE_URL).host,
+          key: INDEXNOW_KEY,
+          keyLocation: INDEXNOW_KEY_LOCATION,
+          urlList
+        }),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+      });
+      if (!response.ok) {
+        console.warn(
+          `[search-discovery] IndexNow ${event} notification returned ${response.status} for ${urlList.length} URL(s)`
+        );
+        continue;
+      }
+      console.log(
+        `[search-discovery] IndexNow accepted ${urlList.length} ${event} URL notification(s)`
+      );
+    } catch (error) {
+      const reason = error instanceof Error ? error.name : "UnknownError";
+      console.warn(
+        `[search-discovery] IndexNow ${event} notification failed for ${urlList.length} URL(s): ${reason}`
+      );
+    }
+  }
+}
+
 // api-src/lib/repo/content.ts
 var FULL_COLUMNS = `
   id, kind, status, title, slug, excerpt, body, cover_image_url, author, category, tags,
@@ -4686,17 +4746,21 @@ async function publishDueContent() {
         scheduled_for = NULL,
         updated_at = now()
     WHERE status = 'scheduled' AND scheduled_for IS NOT NULL AND scheduled_for <= now()
-    RETURNING id, title, kind
+    RETURNING id, title, kind, slug, seo
   `;
   if (rows.length > 0) {
     console.log(`[cms] auto-published ${rows.length} scheduled item(s)`);
+    await notifySearchEngines(
+      rows.filter((row) => row.seo?.index !== false).map((row) => publicContentPath(toKind(row.kind), row.slug)),
+      "scheduled-publish"
+    );
   }
   return rows.map((row) => row.id);
 }
 async function listContent(query = {}) {
   await publishDueContent();
   const sql = db();
-  const limit = Math.min(Math.max(query.limit ?? 50, 1), 200);
+  const limit = Math.min(Math.max(query.limit ?? 50, 1), 500);
   const offset = Math.max(query.offset ?? 0, 0);
   const search = query.search?.trim();
   const where = [
@@ -4999,10 +5063,6 @@ async function seoContext() {
 function kindParam(value) {
   return enumValue(value, CONTENT_KINDS, "Content type");
 }
-function publicPath(kind, slug) {
-  const prefix = CONTENT_KIND_META[kind].publicPrefix;
-  return prefix ? `${prefix}/${slug}` : `/news#${slug}`;
-}
 router.add("GET /bootstrap", async ({ res }) => {
   res.setHeader("Cache-Control", CACHE_SETTINGS);
   const [settings, sections] = await Promise.all([getSettings(), listSections()]);
@@ -5040,7 +5100,7 @@ router.add("GET /bootstrap", async ({ res }) => {
       title: item.title,
       excerpt: item.excerpt,
       slug: item.slug,
-      url: publicPath("announcement", item.slug),
+      url: publicContentPath("announcement", item.slug),
       cta: item.extras.cta ?? null,
       coverImageUrl: item.coverImageUrl,
       publishedAt: item.publishedAt
@@ -5060,7 +5120,7 @@ router.add("GET /content/:kind", async ({ res, params, query }) => {
     sort: "published"
   });
   return {
-    items: items.map((item) => ({ ...item, url: publicPath(kind, item.slug) })),
+    items: items.map((item) => ({ ...item, url: publicContentPath(kind, item.slug) })),
     total,
     // Derived from what is actually published, so a filter bar never offers an empty category.
     categories: [...new Set(items.map((item) => item.category).filter(Boolean))]
@@ -5080,7 +5140,7 @@ router.add("GET /feed", async ({ res, query }) => {
     title: item.title,
     excerpt: item.excerpt,
     slug: item.slug,
-    url: publicPath(item.kind, item.slug),
+    url: publicContentPath(item.kind, item.slug),
     category: item.category,
     coverImageUrl: item.coverImageUrl,
     icon: item.extras.icon ?? null,
@@ -5099,7 +5159,7 @@ router.add("GET /content/:kind/:slug", async ({ res, params }) => {
   const kind = kindParam(params.kind);
   const item = await getContentBySlug(kind, params.slug, true);
   if (!item) throw notFound("That article");
-  const path = publicPath(kind, item.slug);
+  const path = publicContentPath(kind, item.slug);
   const seo = resolveSeo(
     item.seo,
     { title: item.title, excerpt: item.excerpt, image: item.coverImageUrl, path },
@@ -5115,7 +5175,7 @@ router.add("GET /content/:kind/:slug", async ({ res, params }) => {
   return {
     item: { ...item, url: path },
     seo,
-    related: related.items.filter((candidate) => candidate.id !== item.id).slice(0, 3).map((candidate) => ({ ...candidate, url: publicPath(kind, candidate.slug) }))
+    related: related.items.filter((candidate) => candidate.id !== item.id).slice(0, 3).map((candidate) => ({ ...candidate, url: publicContentPath(kind, candidate.slug) }))
   };
 });
 router.add("GET /page", async ({ res, query }) => {
@@ -5174,6 +5234,7 @@ async function buildSitemap() {
   if (isDatabaseConfigured()) {
     try {
       await ensureMigrated();
+      await publishDuePages();
       const [content, pages, settings] = await Promise.all([
         Promise.all(
           ["blog", "news", "announcement"].map(
@@ -5185,7 +5246,7 @@ async function buildSitemap() {
       ]);
       const context = { siteUrl: SITE_URL, defaults: settings.seo };
       for (const item of content.flatMap((result) => result.items)) {
-        const path = publicPath(item.kind, item.slug);
+        const path = publicContentPath(item.kind, item.slug);
         const seo = resolveSeo(
           item.seo,
           { title: item.title, excerpt: item.excerpt, image: item.coverImageUrl, path },
@@ -5216,6 +5277,73 @@ async function buildSitemap() {
 function escapeXml(value) {
   return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
+function renderRssFeed(entries) {
+  const newest = entries[0]?.updatedAt ?? entries[0]?.publishedAt;
+  const lastBuildDate = newest ? `    <lastBuildDate>${escapeXml(new Date(newest).toUTCString())}</lastBuildDate>` : null;
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
+    "  <channel>",
+    "    <title>ENICE Group updates</title>",
+    `    <link>${SITE_URL}/news/</link>`,
+    "    <description>News, announcements, product updates, and articles from ENICE Group.</description>",
+    "    <language>en</language>",
+    `    <atom:link href="${SITE_URL}/feed.xml" rel="self" type="application/rss+xml" />`,
+    ...lastBuildDate ? [lastBuildDate] : [],
+    ...entries.map((entry) => {
+      const url = canonicalUrl(entry.path);
+      const published = entry.publishedAt ?? entry.updatedAt;
+      const guid = entry.kind === "update" ? `<guid isPermaLink="false">enice:${entry.kind}:${escapeXml(entry.id)}</guid>` : `<guid isPermaLink="true">${escapeXml(url)}</guid>`;
+      const category = entry.category ? `
+      <category>${escapeXml(entry.category)}</category>` : "";
+      return [
+        "    <item>",
+        `      <title>${escapeXml(entry.title)}</title>`,
+        `      <link>${escapeXml(url)}</link>`,
+        `      ${guid}`,
+        `      <description>${escapeXml(entry.description)}</description>`,
+        `      <pubDate>${escapeXml(new Date(published).toUTCString())}</pubDate>${category}`,
+        "    </item>"
+      ].join("\n");
+    }),
+    "  </channel>",
+    "</rss>",
+    ""
+  ].join("\n");
+}
+async function buildRssFeed() {
+  if (!isDatabaseConfigured()) return renderRssFeed([]);
+  await ensureMigrated();
+  const [collections, settings] = await Promise.all([
+    Promise.all(
+      CONTENT_KINDS.map(
+        (kind) => listContent({ kind, status: "published", limit: 50, sort: "published" })
+      )
+    ),
+    getSettings()
+  ]);
+  const context = { siteUrl: SITE_URL, defaults: settings.seo };
+  const entries = collections.flatMap((collection) => collection.items).filter((item) => {
+    const path = publicContentPath(item.kind, item.slug);
+    return resolveSeo(
+      item.seo,
+      { title: item.title, excerpt: item.excerpt, image: item.coverImageUrl, path },
+      context
+    ).index;
+  }).map((item) => ({
+    id: item.id,
+    kind: item.kind,
+    title: item.title,
+    description: item.excerpt,
+    path: publicContentPath(item.kind, item.slug),
+    category: item.category,
+    publishedAt: item.publishedAt,
+    updatedAt: item.updatedAt
+  })).sort(
+    (a, b2) => Date.parse(b2.publishedAt ?? b2.updatedAt) - Date.parse(a.publishedAt ?? a.updatedAt)
+  ).slice(0, 100);
+  return renderRssFeed(entries);
+}
 router.add("GET /urls", async ({ res }) => {
   res.setHeader("Cache-Control", CACHE_SETTINGS);
   const [blog, news, announcements, pagesSettings] = await Promise.all([
@@ -5226,7 +5354,7 @@ router.add("GET /urls", async ({ res }) => {
   ]);
   const context = { siteUrl: SITE_URL, defaults: pagesSettings.seo };
   const entries = [...blog.items, ...news.items, ...announcements.items].map((item) => {
-    const path = publicPath(item.kind, item.slug);
+    const path = publicContentPath(item.kind, item.slug);
     const seo = resolveSeo(
       item.seo,
       { title: item.title, excerpt: item.excerpt, image: item.coverImageUrl, path },
@@ -5275,6 +5403,19 @@ async function handler(req, res) {
     } catch (error) {
       console.error(`[api/site:${ref}] sitemap fell back to static routes:`, error);
       body = staticSitemap();
+    }
+    res.status(200).end(body);
+    return;
+  }
+  if (path === "/rss") {
+    res.setHeader("Content-Type", "application/rss+xml; charset=utf-8");
+    res.setHeader("Cache-Control", CACHE_CONTENT);
+    let body;
+    try {
+      body = await buildRssFeed();
+    } catch (error) {
+      console.error(`[api/site:${ref}] RSS feed fell back to an empty channel:`, error);
+      body = renderRssFeed([]);
     }
     res.status(200).end(body);
     return;
