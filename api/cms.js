@@ -6020,6 +6020,69 @@ function slugify(value) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 96).replace(/-+$/g, "");
 }
 
+// src/lib/site.ts
+var SITE_URL = "https://enicehq.com";
+
+// api-src/lib/search-discovery.ts
+var INDEXNOW_KEY = "67be4fa08925c8ad447fb92b3774d1ac";
+var INDEXNOW_ENDPOINT = "https://api.indexnow.org/indexnow";
+var INDEXNOW_KEY_LOCATION = `${SITE_URL}/${INDEXNOW_KEY}.txt`;
+var REQUEST_TIMEOUT_MS = 2500;
+var MAX_URLS_PER_REQUEST = 1e4;
+function publicContentPath(kind, slug) {
+  const prefix = CONTENT_KIND_META[kind].publicPrefix;
+  return prefix ? `${prefix}/${slug}` : `/news#${slug}`;
+}
+function ownedUrls(values2) {
+  const expectedOrigin = new URL(SITE_URL).origin;
+  const urls = /* @__PURE__ */ new Set();
+  for (const value of values2) {
+    try {
+      const url = new URL(value, `${SITE_URL}/`);
+      if (url.origin !== expectedOrigin) continue;
+      url.hash = "";
+      urls.add(url.href);
+    } catch {
+    }
+  }
+  return [...urls];
+}
+async function notifySearchEngines(values2, event) {
+  if (process.env.VERCEL_ENV !== "production") return;
+  const urls = ownedUrls(values2);
+  if (urls.length === 0) return;
+  for (let offset = 0; offset < urls.length; offset += MAX_URLS_PER_REQUEST) {
+    const urlList = urls.slice(offset, offset + MAX_URLS_PER_REQUEST);
+    try {
+      const response = await fetch(INDEXNOW_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json; charset=utf-8" },
+        body: JSON.stringify({
+          host: new URL(SITE_URL).host,
+          key: INDEXNOW_KEY,
+          keyLocation: INDEXNOW_KEY_LOCATION,
+          urlList
+        }),
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS)
+      });
+      if (!response.ok) {
+        console.warn(
+          `[search-discovery] IndexNow ${event} notification returned ${response.status} for ${urlList.length} URL(s)`
+        );
+        continue;
+      }
+      console.log(
+        `[search-discovery] IndexNow accepted ${urlList.length} ${event} URL notification(s)`
+      );
+    } catch (error) {
+      const reason = error instanceof Error ? error.name : "UnknownError";
+      console.warn(
+        `[search-discovery] IndexNow ${event} notification failed for ${urlList.length} URL(s): ${reason}`
+      );
+    }
+  }
+}
+
 // api-src/lib/repo/content.ts
 var FULL_COLUMNS = `
   id, kind, status, title, slug, excerpt, body, cover_image_url, author, category, tags,
@@ -6090,10 +6153,14 @@ async function publishDueContent() {
         scheduled_for = NULL,
         updated_at = now()
     WHERE status = 'scheduled' AND scheduled_for IS NOT NULL AND scheduled_for <= now()
-    RETURNING id, title, kind
+    RETURNING id, title, kind, slug, seo
   `;
   if (rows.length > 0) {
     console.log(`[cms] auto-published ${rows.length} scheduled item(s)`);
+    await notifySearchEngines(
+      rows.filter((row) => row.seo?.index !== false).map((row) => publicContentPath(toKind(row.kind), row.slug)),
+      "scheduled-publish"
+    );
   }
   return rows.map((row) => row.id);
 }
@@ -6199,7 +6266,7 @@ function normalizeInput(input, existing) {
 async function listContent(query = {}) {
   await publishDueContent();
   const sql = db();
-  const limit = Math.min(Math.max(query.limit ?? 50, 1), 200);
+  const limit = Math.min(Math.max(query.limit ?? 50, 1), 500);
   const offset = Math.max(query.offset ?? 0, 0);
   const search = query.search?.trim();
   const where = [
@@ -6310,6 +6377,15 @@ async function updateContent(id, input, actor, expectedRevision) {
   await recordTaxonomies(existing.kind, normalized.category, normalized.tags);
   const updated = await getContent(id);
   if (!updated) throw notFound("That content");
+  if (existing.status === "published") {
+    await notifySearchEngines(
+      [
+        publicContentPath(existing.kind, existing.slug),
+        publicContentPath(updated.kind, updated.slug)
+      ],
+      "content-update"
+    );
+  }
   return updated;
 }
 async function transitionContent(id, status, scheduledFor, actor) {
@@ -6342,6 +6418,9 @@ async function transitionContent(id, status, scheduledFor, actor) {
   `;
   const updated = await getContent(id);
   if (!updated) throw notFound("That content");
+  if (existing.status === "published" || status === "published") {
+    await notifySearchEngines([publicContentPath(updated.kind, updated.slug)], `content-${status}`);
+  }
   return updated;
 }
 async function duplicateContent(id, actor) {
@@ -6370,6 +6449,9 @@ async function deleteContent(id) {
   const existing = await getContent(id);
   if (!existing) throw notFound("That content");
   await db()`DELETE FROM content_items WHERE id = ${id}`;
+  if (existing.status === "published") {
+    await notifySearchEngines([publicContentPath(existing.kind, existing.slug)], "content-delete");
+  }
   return existing;
 }
 async function snapshotRevision(item, byEmail, note) {
