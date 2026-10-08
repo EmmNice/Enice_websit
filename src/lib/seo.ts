@@ -16,6 +16,7 @@
 import { SITE_URL } from "./site";
 
 export const SITE_NAME = "ENICE Group";
+export const LEGAL_NAME = "ENICE Technology Limited";
 export const TWITTER_HANDLE = "@ENICEHQ";
 export const DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
 export const CORPORATE_EMAIL = "corporate@enicehq.com";
@@ -47,12 +48,12 @@ export function organizationJsonLd() {
     "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
     alternateName: "ENICE",
+    legalName: LEGAL_NAME,
     url: `${SITE_URL}/`,
     logo: {
       "@type": "ImageObject",
-      url: `${SITE_URL}/favicon.png`,
-      width: 256,
-      height: 256,
+      url: `${SITE_URL}/brand/enice-mark.svg`,
+      contentUrl: `${SITE_URL}/brand/enice-mark.svg`,
     },
     image: DEFAULT_OG_IMAGE,
     description:
@@ -74,36 +75,6 @@ export function organizationJsonLd() {
       },
     ],
     sameAs: SOCIAL_PROFILES.map((p) => p.href),
-    subOrganization: [
-      {
-        "@type": "FinancialProduct",
-        name: "PulsePay",
-        description: "Virtual card issuance, programmable wallets, and embedded treasury.",
-      },
-      {
-        "@type": "Organization",
-        name: "PulseAssist",
-        description:
-          "AI customer support across WhatsApp, web chat, email, SMS and voice, from one shared inbox.",
-      },
-      {
-        "@type": "Organization",
-        name: "PulseAssist Email",
-        description:
-          "Transactional and marketing email on a verified sending domain, with inbound routing and a REST API.",
-      },
-      {
-        "@type": "FinancialProduct",
-        name: "PRIDE",
-        description: "Global digital asset trading exchange.",
-      },
-      {
-        "@type": "FinancialProduct",
-        name: "DevaPay",
-        description:
-          "Payment infrastructure for businesses to accept and manage customer payments.",
-      },
-    ],
   };
 }
 
@@ -145,9 +116,9 @@ export type PageSeo = {
  */
 export const PAGE_SEO: Record<string, PageSeo> = {
   "/": {
-    title: "ENICE Group | Technology Products for Africa",
+    title: "ENICE Group | AI, Email Infrastructure & Digital Technology",
     description:
-      "ENICE Group builds, owns, and operates products for financial services, commerce, and business communication.",
+      "ENICE Group, the technology brand of ENICE Technology Limited, builds AI, email infrastructure, financial technology, and digital products.",
   },
   "/about": {
     title: "About ENICE Group | A Technology Company Building African Infrastructure",
@@ -286,9 +257,7 @@ export function buildMeta(seo: PageSeo, url: string): MetaTag[] {
 export function pageHead(pathname: string, jsonLd: unknown[] = []) {
   const seo = PAGE_SEO[pathname];
   if (!seo) {
-    throw new Error(
-      `No SEO entry for "${pathname}". Add it to PAGE_SEO in src/lib/seo.ts and to public/sitemap.xml.`,
-    );
+    throw new Error(`No SEO entry for "${pathname}". Add it to PAGE_SEO in src/lib/seo.ts.`);
   }
   const url = canonicalUrl(pathname);
 

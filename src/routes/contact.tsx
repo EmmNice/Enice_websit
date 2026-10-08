@@ -5,7 +5,7 @@ import { AlertCircle, ArrowRight, Check, Loader2, Mail, MapPin } from "lucide-re
 import { SiteShell } from "@/components/site/SiteShell";
 import { Eyebrow, Panel, Section, SectionIntro } from "@/components/site/primitives";
 import { useSectionFields, fieldText } from "@/lib/cms/use-section";
-import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
+import { breadcrumbJsonLd, ORGANIZATION_REF, pageHead } from "@/lib/seo";
 import {
   EMPTY_CONTACT,
   FIELD_LIMITS,
@@ -27,17 +27,7 @@ export const Route = createFileRoute("/contact")({
         description:
           "Reach ENICE Group about product access, platform integration, licensing, and partnerships.",
         url: `${SITE_URL}/contact`,
-        publisher: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-          email: "corporate@enicehq.com",
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Abuja",
-            addressCountry: "NG",
-          },
-        },
+        publisher: ORGANIZATION_REF,
       },
     ]),
   component: ContactPage,

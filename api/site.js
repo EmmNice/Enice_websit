@@ -64,8 +64,8 @@ var SITE_URL = "https://enicehq.com";
 var DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
 var PAGE_SEO = {
   "/": {
-    title: "ENICE Group | Technology Products for Africa",
-    description: "ENICE Group builds, owns, and operates products for financial services, commerce, and business communication."
+    title: "ENICE Group | AI, Email Infrastructure & Digital Technology",
+    description: "ENICE Group, the technology brand of ENICE Technology Limited, builds AI, email infrastructure, financial technology, and digital products."
   },
   "/about": {
     title: "About ENICE Group | A Technology Company Building African Infrastructure",
@@ -4368,6 +4368,26 @@ WHERE key IN ('header', 'footer')
   AND (position('pulsex' in value::text) > 0 OR position('PulseX' in value::text) > 0);
 `
     )
+  },
+  {
+    id: 23,
+    name: "use_legal_entity_in_default_footer_copyright",
+    sql: (
+      /* sql */
+      `
+-- ENICE Group is the public brand; copyright belongs to ENICE Technology Limited. Update only
+-- untouched generated copyright strings so an administrator's custom legal wording is preserved.
+UPDATE site_settings
+SET value = jsonb_set(
+      value,
+      '{copyright}',
+      to_jsonb(replace(value->>'copyright', 'ENICE Group', 'ENICE Technology Limited'))
+    ),
+    updated_at = now()
+WHERE key = 'footer'
+  AND value->>'copyright' ~ '^\xA9 [0-9]{4} ENICE Group\\. All rights reserved\\.$';
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (
@@ -4959,7 +4979,7 @@ function defaultSettings() {
         }
       ],
       tagline: "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
-      copyright: `\xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} ENICE Group. All rights reserved.`,
+      copyright: `\xA9 ${(/* @__PURE__ */ new Date()).getFullYear()} ENICE Technology Limited. All rights reserved.`,
       showSocials: true
     },
     seo: FALLBACK_SEO_DEFAULTS,
@@ -5179,6 +5199,12 @@ async function buildSitemap() {
       }
       for (const page of pages) {
         if (page.status !== "published" || page.systemRoute) continue;
+        const seo = resolveSeo(
+          page.seo,
+          { title: page.title, excerpt: page.summary, path: page.path },
+          context
+        );
+        if (!seo.index) continue;
         entries.push({ url: canonicalUrl(page.path), lastmod: page.updatedAt ?? void 0 });
       }
     } catch (error) {

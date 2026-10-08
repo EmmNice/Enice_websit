@@ -817,7 +817,7 @@ export function defaultSettings(): SiteSettings {
       ],
       tagline:
         "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
-      copyright: `© ${new Date().getFullYear()} ENICE Group. All rights reserved.`,
+      copyright: `© ${new Date().getFullYear()} ENICE Technology Limited. All rights reserved.`,
       showSocials: true,
     },
     seo: FALLBACK_SEO_DEFAULTS,

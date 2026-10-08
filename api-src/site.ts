@@ -383,6 +383,13 @@ async function buildSitemap(): Promise<string> {
       // Managed pages the administrator created, which have no entry in PAGE_SEO.
       for (const page of pages) {
         if (page.status !== "published" || page.systemRoute) continue;
+        const seo = resolveSeo(
+          page.seo,
+          { title: page.title, excerpt: page.summary, path: page.path },
+          context,
+        );
+        // Match the page's own robots metadata, including the site-wide indexing switch.
+        if (!seo.index) continue;
         entries.push({ url: canonicalUrl(page.path), lastmod: page.updatedAt ?? undefined });
       }
     } catch (error) {
