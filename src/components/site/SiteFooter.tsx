@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Mail, MapPin } from "lucide-react";
 import { Logo } from "./Logo";
-import { CORPORATE_EMAIL, SOCIAL_PROFILES } from "@/lib/seo";
+import { CORPORATE_EMAIL, LEGAL_NAME, SOCIAL_PROFILES } from "@/lib/seo";
 import { useSiteChrome, visibleNavItems } from "@/lib/cms/use-chrome";
 
 function XIcon({ className }: { className?: string }) {
@@ -120,7 +120,7 @@ export function SiteFooter() {
 
   const cols = columns && columns.length > 0 ? columns : FOOTER_COLS;
   const tagline = footer?.tagline?.trim() || DEFAULT_TAGLINE;
-  const copyright = footer?.copyright?.trim() || `© ${year} ENICE Group. All rights reserved.`;
+  const copyright = footer?.copyright?.trim() || `© ${year} ${LEGAL_NAME}. All rights reserved.`;
   const showSocials = footer?.showSocials !== false;
 
   return (
@@ -240,7 +240,9 @@ export function SiteFooter() {
           style={{ ["--safe-pad" as string]: "6rem" }}
         >
           <p className="type-meta">{copyright}</p>
-          <p className="type-meta">Registered in the Federal Republic of Nigeria.</p>
+          <p className="type-meta">
+            ENICE Technology Limited is registered in the Federal Republic of Nigeria.
+          </p>
         </div>
       </div>
     </footer>

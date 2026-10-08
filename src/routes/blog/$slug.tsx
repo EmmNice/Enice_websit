@@ -3,6 +3,7 @@ import { ArrowUpRight } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { ArticleView } from "@/components/site/ArticleView";
 import { Section } from "@/components/site/primitives";
+import { ORGANIZATION_REF } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import {
   categoryBadgeClasses,
@@ -162,12 +163,7 @@ export const Route = createFileRoute("/blog/$slug")({
             ...(loaderData?.item.author?.name
               ? { author: { "@type": "Person", name: loaderData.item.author.name } }
               : {}),
-            publisher: {
-              "@type": "Organization",
-              name: "ENICE Group",
-              url: SITE_URL,
-              logo: `${SITE_URL}/favicon.png`,
-            },
+            publisher: ORGANIZATION_REF,
           }),
         },
         {

@@ -6,10 +6,10 @@ export const Route = createFileRoute("/terms")({
   head: () => pageHead("/terms"),
   component: () => (
     <LegalPage
-      lastUpdated="July 16, 2026"
+      lastUpdated="October 8, 2026"
       kicker="Legal · Service Agreement"
       title="Terms of Service"
-      intro="By accessing or using the websites, infrastructure, or commerce platforms operated by ENICE Group, you agree to be bound by these Terms of Service. If you do not agree, please discontinue use immediately."
+      intro="These websites, infrastructure services, and commerce platforms are operated by ENICE Technology Limited under its public brand, ENICE Group. By accessing or using them, you agree to be bound by these Terms of Service. If you do not agree, please discontinue use immediately."
       sections={[
         {
           heading: "Eligibility and Accounts",
@@ -28,8 +28,8 @@ export const Route = createFileRoute("/terms")({
             <p>
               Unless otherwise indicated, all platforms, software builds, architecture, code,
               designs, text, and trademarks on our services are the proprietary property of ENICE
-              Group and are protected by applicable intellectual property laws. No license is
-              granted except as expressly stated in a signed enterprise agreement.
+              Technology Limited and are protected by applicable intellectual property laws. No
+              license is granted except as expressly stated in a signed enterprise agreement.
             </p>
           ),
         },
@@ -39,7 +39,7 @@ export const Route = createFileRoute("/terms")({
             <ul className="list-disc space-y-2 pl-5">
               <li>
                 Reverse engineer, decompile, or disrupt any full-stack infrastructure or networks
-                managed by ENICE Group.
+                managed by ENICE Technology Limited.
               </li>
               <li>
                 Use our commerce platforms for fraudulent, unlawful, or unauthorized financial
@@ -56,10 +56,10 @@ export const Route = createFileRoute("/terms")({
           heading: "Limitation of Liability",
           body: (
             <p>
-              To the maximum extent permitted by law, ENICE Group, its subsidiaries, and its
-              directors shall not be liable for any indirect, incidental, special, or consequential
-              damages arising out of your use or inability to use our infrastructure platforms.
-              Services are provided on an "AS IS" and "AS AVAILABLE" basis.
+              To the maximum extent permitted by law, ENICE Technology Limited, its subsidiaries,
+              and its directors shall not be liable for any indirect, incidental, special, or
+              consequential damages arising out of your use or inability to use our infrastructure
+              platforms. Services are provided on an "AS IS" and "AS AVAILABLE" basis.
             </p>
           ),
         },

@@ -4,7 +4,7 @@ import { ArrowUpRight, Rss } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Reveal } from "@/components/site/Reveal";
 import { Container, Panel, Section, SectionIntro } from "@/components/site/primitives";
-import { pageHead } from "@/lib/seo";
+import { ORGANIZATION_REF, pageHead } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import {
   categoryBadgeClasses,
@@ -234,12 +234,7 @@ export const Route = createFileRoute("/blog/")({
         name: "ENICE Group Blog",
         description: "Product updates, changelog entries, and announcements from ENICE Group.",
         url: `${SITE_URL}/blog`,
-        publisher: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-          logo: `${SITE_URL}/favicon.png`,
-        },
+        publisher: ORGANIZATION_REF,
       },
       {
         "@context": "https://schema.org",

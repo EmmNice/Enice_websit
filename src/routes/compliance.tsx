@@ -6,10 +6,10 @@ export const Route = createFileRoute("/compliance")({
   head: () => pageHead("/compliance"),
   component: () => (
     <LegalPage
-      lastUpdated="July 16, 2026"
+      lastUpdated="October 8, 2026"
       kicker="Compliance · Regulatory Posture"
       title="Regulatory Compliance"
-      intro="ENICE Group operates with transparency, integrity, and full adherence to global and local statutory frameworks. As a product-driven technology company, our compliance program covers the platforms we build and operate."
+      intro="ENICE Technology Limited operates publicly as ENICE Group with transparency, integrity, and full adherence to applicable global and local statutory frameworks. As a product-driven technology company, our compliance program covers the platforms we build and operate."
       sections={[
         {
           // Deliberately no RC number and no entity class ("Business Name", "Limited by Shares").
@@ -20,9 +20,10 @@ export const Route = createFileRoute("/compliance")({
           heading: "Corporate and Enterprise Registration",
           body: (
             <p>
-              ENICE Group is registered with the Corporate Affairs Commission (CAC) of Nigeria, and
-              meets all local operational, reporting, and statutory requirements that apply to
-              registered Nigerian businesses.
+              ENICE Technology Limited is registered with the Corporate Affairs Commission (CAC) of
+              Nigeria and operates publicly under the ENICE Group brand. The company meets all local
+              operational, reporting, and statutory requirements that apply to registered Nigerian
+              businesses.
             </p>
           ),
         },

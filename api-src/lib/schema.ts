@@ -1997,6 +1997,23 @@ WHERE key IN ('header', 'footer')
   AND (position('pulsex' in value::text) > 0 OR position('PulseX' in value::text) > 0);
 `,
   },
+  {
+    id: 23,
+    name: "use_legal_entity_in_default_footer_copyright",
+    sql: /* sql */ `
+-- ENICE Group is the public brand; copyright belongs to ENICE Technology Limited. Update only
+-- untouched generated copyright strings so an administrator's custom legal wording is preserved.
+UPDATE site_settings
+SET value = jsonb_set(
+      value,
+      '{copyright}',
+      to_jsonb(replace(value->>'copyright', 'ENICE Group', 'ENICE Technology Limited'))
+    ),
+    updated_at = now()
+WHERE key = 'footer'
+  AND value->>'copyright' ~ '^© [0-9]{4} ENICE Group\\. All rights reserved\\.$';
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

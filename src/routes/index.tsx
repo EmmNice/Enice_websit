@@ -396,6 +396,12 @@ function Landing() {
                     accentClassName="text-electric"
                   />
                 </p>
+                <p
+                  className="animate-hero-up mt-4 max-w-xl text-[12px] leading-relaxed text-bone-faint"
+                  style={{ animationDelay: "150ms" }}
+                >
+                  ENICE Group is the technology brand of ENICE Technology Limited.
+                </p>
 
                 {/* `btn-stack` makes these full-width equal-height targets below 40rem. Sized to
                     their labels, the primary and secondary CTAs ended up different widths on a

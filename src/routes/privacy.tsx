@@ -6,10 +6,10 @@ export const Route = createFileRoute("/privacy")({
   head: () => pageHead("/privacy"),
   component: () => (
     <LegalPage
-      lastUpdated="July 16, 2026"
+      lastUpdated="October 8, 2026"
       kicker="Legal · Data Protection"
       title="Privacy Policy"
-      intro="ENICE Group is committed to the highest standards of data protection across our product ecosystem. This policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our commerce platforms, or interact with our infrastructure."
+      intro="ENICE Technology Limited, operating publicly as ENICE Group, is committed to the highest standards of data protection across our product ecosystem. This policy explains how we collect, use, disclose, and safeguard your information when you visit our website, use our commerce platforms, or interact with our infrastructure."
       sections={[
         {
           heading: "Information We Collect",

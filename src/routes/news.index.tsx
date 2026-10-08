@@ -4,7 +4,7 @@ import { ArrowUpRight, Megaphone, Newspaper, Sparkles, Zap } from "lucide-react"
 import { SiteShell } from "@/components/site/SiteShell";
 import { Reveal } from "@/components/site/Reveal";
 import { IconTile, Panel, Section, SectionIntro, Tag } from "@/components/site/primitives";
-import { pageHead } from "@/lib/seo";
+import { ORGANIZATION_REF, pageHead } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import {
   categoryBadgeClasses,
@@ -201,12 +201,7 @@ export const Route = createFileRoute("/news/")({
         description:
           "Announcements, new services, partnerships, milestones, and platform updates from ENICE Group.",
         url: `${SITE_URL}/news/`,
-        publisher: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-          logo: `${SITE_URL}/favicon.png`,
-        },
+        publisher: ORGANIZATION_REF,
       },
       {
         "@context": "https://schema.org",

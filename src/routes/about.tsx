@@ -13,7 +13,7 @@ import {
   SectionIntro,
 } from "@/components/site/primitives";
 import { useSectionFields, fieldText, fieldItems, fieldParagraphs } from "@/lib/cms/use-section";
-import { breadcrumbJsonLd, pageHead } from "@/lib/seo";
+import { breadcrumbJsonLd, ORGANIZATION_REF, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
   head: () =>
@@ -26,18 +26,7 @@ export const Route = createFileRoute("/about")({
         description:
           "ENICE Group builds and operates software platforms for financial services, enterprise AI, and digital commerce.",
         url: `${SITE_URL}/about`,
-        publisher: {
-          "@type": "Organization",
-          name: "ENICE Group",
-          url: SITE_URL,
-          logo: `${SITE_URL}/favicon.png`,
-          foundingDate: "2026",
-          address: {
-            "@type": "PostalAddress",
-            addressLocality: "Abuja",
-            addressCountry: "NG",
-          },
-        },
+        publisher: ORGANIZATION_REF,
       },
     ]),
   component: AboutPage,
