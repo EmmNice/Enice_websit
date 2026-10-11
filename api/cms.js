@@ -4823,14 +4823,17 @@ SET fields = jsonb_set(fields, '{items}', (
 WHERE key = 'home.products'
   AND fields->'items' @> '[{"title":"Financial Infrastructure Systems"}]'::jsonb;
 
--- Apply the supplied company positioning while preserving its editable pillar cards.
+-- Apply the supplied company positioning and remove the retired pillar-card block.
 UPDATE site_sections
 SET fields = jsonb_set(
       jsonb_set(
-        jsonb_set(fields, '{eyebrow}', '"THE COMPANY"'::jsonb),
-        '{heading}', '"ENICE Group builds digital products."'::jsonb),
-      '{subheading}',
-      '"We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them."'::jsonb
+        jsonb_set(
+          jsonb_set(fields, '{eyebrow}', '"THE COMPANY"'::jsonb),
+          '{heading}', '"ENICE Group builds digital products."'::jsonb),
+        '{subheading}',
+        '"We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them."'::jsonb
+      ),
+      '{items}', '[]'::jsonb
     ),
     updated_at = now()
 WHERE key = 'home.company';
@@ -7217,24 +7220,7 @@ var DEFAULT_SECTIONS = [
       eyebrow: "THE COMPANY",
       heading: "ENICE Group builds digital products.",
       subheading: "We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them.",
-      items: [
-        {
-          title: "We start from the friction",
-          description: "Every product traces back to something that failed in ordinary use: a payment that should have been simple, a support queue nobody answered. We build from the specific problem outward, not from a category we want to be in."
-        },
-        {
-          title: "One core, many products",
-          description: "Ledgers, identity, AI orchestration and compliance are solved once and shared. A new product inherits that foundation on its first day instead of rebuilding it, which is what makes a small team's output look like a much larger one."
-        },
-        {
-          title: "We operate what we ship",
-          description: "We own the products end to end: engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it."
-        },
-        {
-          title: "Built to still be here",
-          description: "We design for the version of these systems that exists in ten years: versioned APIs, documented internals, and infrastructure choices made for reliability rather than novelty. Regulated markets do not reward clever."
-        }
-      ]
+      items: []
     }
   },
   {

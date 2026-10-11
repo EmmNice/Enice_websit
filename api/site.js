@@ -4574,14 +4574,17 @@ SET fields = jsonb_set(fields, '{items}', (
 WHERE key = 'home.products'
   AND fields->'items' @> '[{"title":"Financial Infrastructure Systems"}]'::jsonb;
 
--- Apply the supplied company positioning while preserving its editable pillar cards.
+-- Apply the supplied company positioning and remove the retired pillar-card block.
 UPDATE site_sections
 SET fields = jsonb_set(
       jsonb_set(
-        jsonb_set(fields, '{eyebrow}', '"THE COMPANY"'::jsonb),
-        '{heading}', '"ENICE Group builds digital products."'::jsonb),
-      '{subheading}',
-      '"We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them."'::jsonb
+        jsonb_set(
+          jsonb_set(fields, '{eyebrow}', '"THE COMPANY"'::jsonb),
+          '{heading}', '"ENICE Group builds digital products."'::jsonb),
+        '{subheading}',
+        '"We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them."'::jsonb
+      ),
+      '{items}', '[]'::jsonb
     ),
     updated_at = now()
 WHERE key = 'home.company';
