@@ -195,6 +195,13 @@ const PORTFOLIO_PREVIEW = [
   },
 ];
 
+const PRODUCT_ACCENT_BY_PATH: Partial<Record<string, string>> = {
+  // Text-safe colors sampled from each product's live brand palette.
+  "/portfolio/pulsepay": "#d76550",
+  "/portfolio/pulseassist": "#a78bfa",
+  "/portfolio/pride": "#fcc82c",
+};
+
 /**
  * Mechanisms that exist, not certifications that do not.
  *
@@ -590,7 +597,12 @@ function Landing() {
               <Panel
                 as="article"
                 interactive
-                className="grid gap-8 p-8 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-12 xl:p-10"
+                style={
+                  PRODUCT_ACCENT_BY_PATH[p.to]
+                    ? { ["--electric" as string]: PRODUCT_ACCENT_BY_PATH[p.to] }
+                    : undefined
+                }
+                className="product-accent-card grid gap-8 p-8 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-12 xl:p-10"
               >
                 <div>
                   <div className="flex items-center gap-3">

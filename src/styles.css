@@ -523,6 +523,38 @@
     border-color: var(--hairline-strong);
   }
 
+  /* Homepage product cards inherit a product-specific, text-safe `--electric` value. The color
+     stays on the existing accent details rather than replacing the shared surface/text system. */
+  .product-accent-card {
+    overflow: hidden;
+    border-color: color-mix(in srgb, var(--electric) 24%, var(--color-border));
+    background-image: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--electric) 7%, transparent),
+      transparent 42%
+    );
+  }
+
+  .product-accent-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    background: linear-gradient(90deg, var(--electric), transparent 68%);
+  }
+
+  .product-accent-card.panel-interactive:hover {
+    border-color: color-mix(in srgb, var(--electric) 45%, var(--color-border));
+  }
+
+  .product-accent-card .btn-secondary {
+    border-color: color-mix(in srgb, var(--electric) 32%, var(--color-border));
+  }
+
+  .product-accent-card .btn-secondary:hover {
+    border-color: color-mix(in srgb, var(--electric) 62%, var(--color-border));
+  }
+
   /* Hairline-divided grid: children sit on the border colour and paint their own
      background, which is how the 1px rules between cards stay exactly 1px. */
   .grid-hairline {
