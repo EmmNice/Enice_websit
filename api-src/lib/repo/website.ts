@@ -1051,33 +1051,33 @@ const DEFAULT_SECTIONS: {
   },
   {
     key: "home.core",
-    label: "The ENICE Core",
+    label: "The ENICE Engine",
     group: "Home",
     type: "featureGrid",
     order: 34,
     fields: {
-      eyebrow: "What powers our products",
-      heading: "The ENICE Core.",
+      eyebrow: "WHAT POWERS OUR PRODUCTS",
+      heading: "The ENICE Engine",
       subheading:
-        "Every product we operate runs on a shared infrastructure core, so the software customers use inherits scale, compliance, and reliability from the ground up.",
+        "All of our apps share the same underlying technology—making every product faster, more reliable, and secure right out of the box.",
       items: [
         {
           icon: "Cpu",
-          title: "Unified AI and Automation Pipeline",
+          title: "AI & Automation",
           description:
-            "Centralized LLM orchestration and vector search routing that powers products like PulseAssist across every tenant.",
+            "Centralized AI tools and smart workflows that power products like PulseAssist to handle customer support and communication seamlessly.",
         },
         {
           icon: "Database",
-          title: "High-Velocity Ledger and Payment Core",
+          title: "Fast Payments & Ledgers",
           description:
-            "A fast transaction engine and virtual account infrastructure that anchors PulsePay and the financial products we build next.",
+            "A reliable transaction engine and virtual account system that powers PulsePay and future financial tools we build.",
         },
         {
           icon: "FileCheck2",
-          title: "Automated Compliance and KYC Layer",
+          title: "Built-In Compliance & KYC",
           description:
-            "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
+            "Identity verification, fraud checks, and security screening running automatically in real time across all our products.",
         },
       ],
     },
@@ -1302,9 +1302,9 @@ const DEFAULT_SECTIONS: {
             "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, Faga provides transactional and marketing email infrastructure, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.",
         },
         {
-          question: "What does the ENICE Core provide?",
+          question: "What does the ENICE Engine provide?",
           answer:
-            "A shared AI and automation pipeline, a fast ledger and payment core, and an automated KYC and compliance layer. Every product inherits the same scale, security, and observability from day one.",
+            "Shared AI and automation, fast payments and ledgers, and built-in compliance and KYC. Every product starts with the same reliable, secure foundation.",
         },
         {
           question: "How does ENICE Group approach security and compliance?",
@@ -1334,59 +1334,9 @@ const DEFAULT_SECTIONS: {
     },
   },
   /*
-   * The platform-capabilities band and the roadmap, previously hardcoded in their components.
-   *
-   * Both describe things that change on their own schedule — a mechanism the platform gains, a
-   * milestone that ships or slips — and neither needed source code to say so. Migration 13 seeds
-   * the same two rows into existing databases.
+   * The roadmap was hardcoded until now. It changes on its own schedule and should not require
+   * source code to update, so migration 13 seeds the same row into existing databases.
    */
-  {
-    key: "home.capabilities",
-    label: "Platform capabilities",
-    group: "Home",
-    type: "featureGrid",
-    order: 35,
-    fields: {
-      eyebrow: "Platform capabilities",
-      heading: "How the platform is built.",
-      subheading:
-        "Mechanisms in place across every product. Current availability is reported on the status page.",
-      // `kicker` is the small uppercase label, `title` the figure beneath it, `description` the
-      // supporting line. See src/components/site/NetworkMetrics.tsx.
-      items: [
-        {
-          icon: "Gauge",
-          kicker: "API delivery",
-          title: "Edge",
-          description: "Multi-region, served from the nearest edge",
-        },
-        {
-          icon: "Activity",
-          kicker: "Tenant isolation",
-          title: "Row-level",
-          description: "Enforced in the database, not the application",
-        },
-        {
-          icon: "ShieldCheck",
-          kicker: "Data encryption",
-          title: "TLS + at rest",
-          description: "Managed database and object storage",
-        },
-        {
-          icon: "Zap",
-          kicker: "Card issuance",
-          title: "< 5s",
-          description: "Virtual card provisioning",
-        },
-        {
-          icon: "Lock",
-          kicker: "KYC verification",
-          title: "Real-time",
-          description: "Automated compliance checks",
-        },
-      ],
-    },
-  },
   {
     key: "home.roadmap",
     label: "Strategic roadmap",
@@ -1506,9 +1456,9 @@ const DEFAULT_SECTIONS: {
     order: 33,
     fields: {
       // Admin-facing only; the band renders the sentence and the pills, with no heading.
-      heading: "Platform mechanisms",
+      heading: "ENICE Engine safeguards",
       subheading:
-        "Regulated in the Federal Republic of Nigeria. These are mechanisms the platform implements, not certifications we hold.",
+        "Built in compliance with applicable standards in the Federal Republic of Nigeria. Our products operate with enterprise-grade data protection, strict privacy controls, and end-to-end security architecture across all systems.",
       /*
        * `title` is the pill's label and `icon` its glyph.
        *
@@ -1517,10 +1467,10 @@ const DEFAULT_SECTIONS: {
        * text field to hold them. See `COMPLIANCE_BADGES` in src/routes/index.tsx.
        */
       items: [
-        { icon: "ShieldCheck", title: "Row-level security" },
-        { icon: "Lock", title: "Per-tenant isolation" },
-        { icon: "Check", title: "Audit logging" },
-        { icon: "Wifi", title: "Encrypted in transit and at rest" },
+        { icon: "ShieldCheck", title: "ROW-LEVEL SECURITY" },
+        { icon: "Lock", title: "PER-TENANT ISOLATION" },
+        { icon: "Check", title: "AUDIT LOGGING" },
+        { icon: "Wifi", title: "ENCRYPTED IN TRANSIT AND AT REST" },
       ],
     },
   },
