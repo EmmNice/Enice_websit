@@ -32,9 +32,9 @@ import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
 import { Route as PortfolioDevapayRouteImport } from './routes/portfolio.devapay'
+import { Route as PortfolioFagaRouteImport } from './routes/portfolio.faga'
 import { Route as PortfolioPrideRouteImport } from './routes/portfolio.pride'
 import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pulseassist'
-import { Route as PortfolioPulseassistEmailRouteImport } from './routes/portfolio.pulseassist-email'
 import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
 import { Route as AdminAdministrationSettingsRouteImport } from './routes/admin/administration.settings'
 import { Route as AdminContentKindIndexRouteImport } from './routes/admin/content.$kind.index'
@@ -155,6 +155,11 @@ const PortfolioDevapayRoute = PortfolioDevapayRouteImport.update({
   path: '/devapay',
   getParentRoute: () => PortfolioRoute,
 } as any)
+const PortfolioFagaRoute = PortfolioFagaRouteImport.update({
+  id: '/faga',
+  path: '/faga',
+  getParentRoute: () => PortfolioRoute,
+} as any)
 const PortfolioPrideRoute = PortfolioPrideRouteImport.update({
   id: '/pride',
   path: '/pride',
@@ -165,12 +170,6 @@ const PortfolioPulseassistRoute = PortfolioPulseassistRouteImport.update({
   path: '/pulseassist',
   getParentRoute: () => PortfolioRoute,
 } as any)
-const PortfolioPulseassistEmailRoute =
-  PortfolioPulseassistEmailRouteImport.update({
-    id: '/pulseassist-email',
-    path: '/pulseassist-email',
-    getParentRoute: () => PortfolioRoute,
-  } as any)
 const PortfolioPulsepayRoute = PortfolioPulsepayRouteImport.update({
   id: '/pulsepay',
   path: '/pulsepay',
@@ -212,9 +211,9 @@ export interface FileRoutesByFullPath {
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
   '/portfolio/devapay': typeof PortfolioDevapayRoute
+  '/portfolio/faga': typeof PortfolioFagaRoute
   '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
-  '/portfolio/pulseassist-email': typeof PortfolioPulseassistEmailRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/admin/': typeof AdminIndexRoute
   '/announcements/': typeof AnnouncementsIndexRoute
@@ -242,9 +241,9 @@ export interface FileRoutesByTo {
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
   '/portfolio/devapay': typeof PortfolioDevapayRoute
+  '/portfolio/faga': typeof PortfolioFagaRoute
   '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
-  '/portfolio/pulseassist-email': typeof PortfolioPulseassistEmailRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/admin': typeof AdminIndexRoute
   '/announcements': typeof AnnouncementsIndexRoute
@@ -275,9 +274,9 @@ export interface FileRoutesById {
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
   '/portfolio/devapay': typeof PortfolioDevapayRoute
+  '/portfolio/faga': typeof PortfolioFagaRoute
   '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
-  '/portfolio/pulseassist-email': typeof PortfolioPulseassistEmailRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/admin/': typeof AdminIndexRoute
   '/announcements/': typeof AnnouncementsIndexRoute
@@ -309,9 +308,9 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/news/$slug'
     | '/portfolio/devapay'
+    | '/portfolio/faga'
     | '/portfolio/pride'
     | '/portfolio/pulseassist'
-    | '/portfolio/pulseassist-email'
     | '/portfolio/pulsepay'
     | '/admin/'
     | '/announcements/'
@@ -339,9 +338,9 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/news/$slug'
     | '/portfolio/devapay'
+    | '/portfolio/faga'
     | '/portfolio/pride'
     | '/portfolio/pulseassist'
-    | '/portfolio/pulseassist-email'
     | '/portfolio/pulsepay'
     | '/admin'
     | '/announcements'
@@ -371,9 +370,9 @@ export interface FileRouteTypes {
     | '/blog/$slug'
     | '/news/$slug'
     | '/portfolio/devapay'
+    | '/portfolio/faga'
     | '/portfolio/pride'
     | '/portfolio/pulseassist'
-    | '/portfolio/pulseassist-email'
     | '/portfolio/pulsepay'
     | '/admin/'
     | '/announcements/'
@@ -570,6 +569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioDevapayRouteImport
       parentRoute: typeof PortfolioRoute
     }
+    '/portfolio/faga': {
+      id: '/portfolio/faga'
+      path: '/faga'
+      fullPath: '/portfolio/faga'
+      preLoaderRoute: typeof PortfolioFagaRouteImport
+      parentRoute: typeof PortfolioRoute
+    }
     '/portfolio/pride': {
       id: '/portfolio/pride'
       path: '/pride'
@@ -582,13 +588,6 @@ declare module '@tanstack/react-router' {
       path: '/pulseassist'
       fullPath: '/portfolio/pulseassist'
       preLoaderRoute: typeof PortfolioPulseassistRouteImport
-      parentRoute: typeof PortfolioRoute
-    }
-    '/portfolio/pulseassist-email': {
-      id: '/portfolio/pulseassist-email'
-      path: '/pulseassist-email'
-      fullPath: '/portfolio/pulseassist-email'
-      preLoaderRoute: typeof PortfolioPulseassistEmailRouteImport
       parentRoute: typeof PortfolioRoute
     }
     '/portfolio/pulsepay': {
@@ -642,18 +641,18 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PortfolioRouteChildren {
   PortfolioDevapayRoute: typeof PortfolioDevapayRoute
+  PortfolioFagaRoute: typeof PortfolioFagaRoute
   PortfolioPrideRoute: typeof PortfolioPrideRoute
   PortfolioPulseassistRoute: typeof PortfolioPulseassistRoute
-  PortfolioPulseassistEmailRoute: typeof PortfolioPulseassistEmailRoute
   PortfolioPulsepayRoute: typeof PortfolioPulsepayRoute
   PortfolioIndexRoute: typeof PortfolioIndexRoute
 }
 
 const PortfolioRouteChildren: PortfolioRouteChildren = {
   PortfolioDevapayRoute: PortfolioDevapayRoute,
+  PortfolioFagaRoute: PortfolioFagaRoute,
   PortfolioPrideRoute: PortfolioPrideRoute,
   PortfolioPulseassistRoute: PortfolioPulseassistRoute,
-  PortfolioPulseassistEmailRoute: PortfolioPulseassistEmailRoute,
   PortfolioPulsepayRoute: PortfolioPulsepayRoute,
   PortfolioIndexRoute: PortfolioIndexRoute,
 }

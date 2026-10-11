@@ -898,20 +898,22 @@ function toRecipientArray(to) {
   return Array.isArray(to) ? to : [to];
 }
 
-// src/lib/email/provider-pulseassist.server.ts
+// src/lib/email/provider-faga.server.ts
 var DEFAULT_BASE_URL = "https://getpulseassist.com";
 function config() {
-  const apiKey = process.env.PULSEASSIST_API_KEY;
+  const apiKey = process.env.FAGA_API_KEY || process.env.PULSEASSIST_API_KEY;
   if (!apiKey) {
-    throw new EmailProviderConfigError("PULSEASSIST_API_KEY is not configured.");
+    throw new EmailProviderConfigError(
+      "FAGA_API_KEY is not configured (PULSEASSIST_API_KEY is accepted as a legacy fallback)."
+    );
   }
   const fromDomain = process.env.EMAIL_FROM_DOMAIN;
   if (!fromDomain) {
     throw new EmailProviderConfigError(
-      "EMAIL_FROM_DOMAIN is not configured. It must be a domain verified in PulseAssist Email."
+      "EMAIL_FROM_DOMAIN is not configured. It must be a domain verified in Faga."
     );
   }
-  const baseUrl = (process.env.PULSEASSIST_API_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
+  const baseUrl = (process.env.FAGA_API_URL || process.env.PULSEASSIST_API_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
   return { apiKey, baseUrl, fromDomain };
 }
 async function call(path, init = {}) {
@@ -934,7 +936,7 @@ async function call(path, init = {}) {
       ok: false,
       status: 0,
       data: null,
-      error: `Could not reach PulseAssist at ${baseUrl}: ${String(err)}`,
+      error: `Could not reach Faga at ${baseUrl}: ${String(err)}`,
       code: null
     };
   }
@@ -949,7 +951,7 @@ async function call(path, init = {}) {
   }
   if (!res.ok) {
     const p = parsed ?? {};
-    const detail = typeof p.detail === "string" && p.detail || typeof p.title === "string" && p.title || typeof p.error === "string" && p.error || `PulseAssist returned ${res.status}`;
+    const detail = typeof p.detail === "string" && p.detail || typeof p.title === "string" && p.title || typeof p.error === "string" && p.error || `Faga returned ${res.status}`;
     const code = typeof p.code === "string" ? p.code : null;
     return { ok: false, status: res.status, data: null, error: detail, code };
   }
@@ -970,7 +972,7 @@ async function callWithRetry(label, path, init = {}, attempts = 3) {
     if (!retryable) return last;
     if (i < attempts - 1) {
       const backoff = 400 * 2 ** i;
-      console.warn(`[pulseassist] ${label} failed (${last.status}); retrying in ${backoff}ms`);
+      console.warn(`[faga] ${label} failed (${last.status}); retrying in ${backoff}ms`);
       await sleep(backoff);
     }
   }
@@ -984,19 +986,21 @@ function isConfigRefusal(res) {
 }
 var listIdCache = /* @__PURE__ */ new Map();
 async function resolveListId(audience) {
-  const pinEnvVar = audience.idEnvVars?.pulseassist;
-  const pinned = pinEnvVar ? process.env[pinEnvVar] : void 0;
+  const pinEnvVars = [audience.idEnvVars?.faga, audience.idEnvVars?.pulseassist].filter(
+    (name) => Boolean(name)
+  );
+  const pinned = pinEnvVars.map((name) => process.env[name]).find(Boolean);
   if (pinned && /^\d+$/.test(pinned.trim())) return Number(pinned.trim());
   const cached = listIdCache.get(audience.name);
   if (cached) return cached;
   const existing = await callWithRetry("lists.list", "/email/lists");
   if (!existing.ok) {
     if (isConfigRefusal(existing))
-      throw new EmailProviderConfigError(existing.error ?? "PulseAssist refused the API key.");
+      throw new EmailProviderConfigError(existing.error ?? "Faga refused the API key.");
     throw new EmailSendError(
       `Could not list audiences: ${existing.error}`,
       existing.status,
-      "pulseassist"
+      "faga"
     );
   }
   const found = (existing.data?.lists ?? []).find((l) => l.name === audience.name);
@@ -1018,7 +1022,7 @@ async function resolveListId(audience) {
     throw new EmailSendError(
       `Could not create the "${audience.name}" audience: ${created.error}`,
       created.status,
-      "pulseassist"
+      "faga"
     );
   }
   listIdCache.set(audience.name, created.data.list.id);
@@ -1042,22 +1046,18 @@ async function fetchContact(email) {
   );
   if (!res.ok) {
     if (isConfigRefusal(res))
-      throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
-    throw new EmailSendError(
-      `Could not look up the contact: ${res.error}`,
-      res.status,
-      "pulseassist"
-    );
+      throw new EmailProviderConfigError(res.error ?? "Faga refused the API key.");
+    throw new EmailSendError(`Could not look up the contact: ${res.error}`, res.status, "faga");
   }
   return (res.data?.contacts ?? []).find((c) => c.email.trim().toLowerCase() === target) ?? null;
 }
-var pulseAssistProvider = {
-  name: "pulseassist",
+var fagaProvider = {
+  name: "faga",
   async send(message) {
     const { fromDomain } = config();
     if (message.from.domain.toLowerCase() !== fromDomain.toLowerCase()) {
       throw new EmailProviderConfigError(
-        `Refusing to send as "${message.from.localPart}@${message.from.domain}": PulseAssist sends from the account's verified domain, which is configured as "${fromDomain}". Verify the domain in PulseAssist Email and set EMAIL_FROM_DOMAIN to match.`
+        `Refusing to send as "${message.from.localPart}@${message.from.domain}": Faga sends from the account's verified domain, which is configured as "${fromDomain}". Verify the domain in Faga and set EMAIL_FROM_DOMAIN to match.`
       );
     }
     const recipients = toRecipientArray(message.to);
@@ -1072,7 +1072,7 @@ var pulseAssistProvider = {
          * Without this the API composes a bare `noreply@enicehq.com` and every message the site
          * sends arrives showing a raw address — which the recipient's inbox lists as though it were
          * machine-generated. ENICE's own team read contact-form enquiries that way: an automated
-         * notice rather than a person writing in. PulseAssist sanitises the value server-side, so a
+         * notice rather than a person writing in. Faga sanitises the value server-side, so a
          * visitor's typed name cannot forge a header through it.
          */
         ...message.from.name ? { fromName: message.from.name } : {},
@@ -1087,15 +1087,11 @@ var pulseAssistProvider = {
     });
     if (!res.ok) {
       if (isConfigRefusal(res)) {
-        throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
+        throw new EmailProviderConfigError(res.error ?? "Faga refused the API key.");
       }
-      throw new EmailSendError(
-        res.error ?? "PulseAssist refused the message.",
-        res.status,
-        "pulseassist"
-      );
+      throw new EmailSendError(res.error ?? "Faga refused the message.", res.status, "faga");
     }
-    return { id: res.data?.id ?? res.data?.sendId ?? null, provider: "pulseassist" };
+    return { id: res.data?.id ?? res.data?.sendId ?? null, provider: "faga" };
   },
   async findContact(email) {
     const contact = await fetchContact(email);
@@ -1116,7 +1112,7 @@ var pulseAssistProvider = {
         throw new EmailSendError(
           `Could not update the contact: ${updated.error}`,
           updated.status,
-          "pulseassist"
+          "faga"
         );
       }
       await addToList(listId, existing.id);
@@ -1137,12 +1133,12 @@ var pulseAssistProvider = {
     );
     if (!created.ok || !created.data?.contact?.id) {
       if (isConfigRefusal(created)) {
-        throw new EmailProviderConfigError(created.error ?? "PulseAssist refused the API key.");
+        throw new EmailProviderConfigError(created.error ?? "Faga refused the API key.");
       }
       throw new EmailSendError(
         `Could not create the contact: ${created.error}`,
         created.status,
-        "pulseassist"
+        "faga"
       );
     }
     await addToList(listId, created.data.contact.id);
@@ -1158,11 +1154,7 @@ var pulseAssistProvider = {
       { method: "PATCH", body: { attributes: merged } }
     );
     if (!res.ok) {
-      throw new EmailSendError(
-        `Could not update the contact: ${res.error}`,
-        res.status,
-        "pulseassist"
-      );
+      throw new EmailSendError(`Could not update the contact: ${res.error}`, res.status, "faga");
     }
     return true;
   },
@@ -1175,12 +1167,8 @@ var pulseAssistProvider = {
     );
     if (!res.ok) {
       if (isConfigRefusal(res))
-        throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
-      throw new EmailSendError(
-        `Could not list the audience: ${res.error}`,
-        res.status,
-        "pulseassist"
-      );
+        throw new EmailProviderConfigError(res.error ?? "Faga refused the API key.");
+      throw new EmailSendError(`Could not list the audience: ${res.error}`, res.status, "faga");
     }
     const contacts = (res.data?.contacts ?? []).map(toAudienceContact);
     return { contacts, hasMore: Boolean(res.data?.nextAfterId) };
@@ -1195,7 +1183,7 @@ async function addToList(listId, contactId) {
     throw new EmailSendError(
       `Could not add the contact to the audience: ${res.error}`,
       res.status,
-      "pulseassist"
+      "faga"
     );
   }
 }
@@ -6515,10 +6503,12 @@ var resendProvider = {
 
 // src/lib/email/index.server.ts
 var PROVIDERS = {
-  pulseassist: pulseAssistProvider,
+  faga: fagaProvider,
+  // Keep the old selector working while deployed environments migrate to EMAIL_PROVIDER=faga.
+  pulseassist: fagaProvider,
   resend: resendProvider
 };
-var DEFAULT_PROVIDER = "pulseassist";
+var DEFAULT_PROVIDER = "faga";
 function configuredProviderName() {
   const raw = process.env.EMAIL_PROVIDER?.trim().toLowerCase();
   if (!raw) return DEFAULT_PROVIDER;
@@ -6540,6 +6530,7 @@ var EARLY_ACCESS_AUDIENCE = {
   name: SEGMENT_NAME,
   idEnvVars: {
     resend: "RESEND_EARLY_ACCESS_SEGMENT_ID",
+    faga: "FAGA_EARLY_ACCESS_LIST_ID",
     pulseassist: "PULSEASSIST_EARLY_ACCESS_LIST_ID"
   }
 };

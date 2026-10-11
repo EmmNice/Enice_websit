@@ -35,49 +35,30 @@ import { CORPORATE_EMAIL, ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@
 import { SITE_URL } from "@/lib/site";
 
 /**
- * PulseAssist Email.
+ * Faga is ENICE Group's standalone email delivery platform.
  *
- * ## Why this page exists
- *
- * PulseAssist Email is a real, shipping ENICE product that had no presence on the company's own
- * website — while the site's own transactional mail has been sent through it since #31
- * (`EMAIL_PROVIDER=pulseassist`, see `src/lib/email/provider-pulseassist.server.ts`). A product the
- * company runs, sells and depends on, absent from its own portfolio, is a gap rather than a
- * decision.
- *
- * ## Where the copy comes from
- *
- * Everything below is drawn from the product's own page at getpulseassist.com/email and condensed —
- * nothing here is invented, and no figure is quoted that the product does not state about itself.
- * That page presents it as "part of the PulseAssist platform", which is how it is framed here too:
- * a PulseAssist product, the same way DevaPay is a PulsePay product.
- *
- * Every band reads its own `portfolio.pulseassist-email.*` section and falls back to the copy here,
- * so the page is editable without a deploy and still renders during an outage.
+ * It carries the email infrastructure that was previously presented under PulseAssist. PulseAssist
+ * remains the AI customer-operations platform; Faga has its own product identity and route. The
+ * page uses CMS-backed sections with local fallbacks so it remains editable and resilient.
  */
 
-export const Route = createFileRoute("/portfolio/pulseassist-email")({
+export const Route = createFileRoute("/portfolio/faga")({
   head: () =>
-    pageHead("/portfolio/pulseassist-email", [
+    pageHead("/portfolio/faga", [
       breadcrumbJsonLd([
         { name: "Products", path: "/portfolio" },
-        { name: "PulseAssist Email", path: "/portfolio/pulseassist-email" },
+        { name: "Faga", path: "/portfolio/faga" },
       ]),
       {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        name: "PulseAssist Email",
+        name: "Faga",
         description:
           "Transactional and marketing email on your own domain: verified sending domains, inbound routing, templates, automations, suppression handling and delivery analytics, from a console and a REST API.",
-        url: `${SITE_URL}/portfolio/pulseassist-email`,
+        url: `${SITE_URL}/portfolio/faga`,
         applicationCategory: "BusinessApplication",
         operatingSystem: "Web",
         author: ORGANIZATION_REF,
-        isPartOf: {
-          "@type": "SoftwareApplication",
-          name: "PulseAssist",
-          url: `${SITE_URL}/portfolio/pulseassist`,
-        },
         offers: {
           "@type": "Offer",
           availability: "https://schema.org/InStock",
@@ -96,7 +77,7 @@ export const Route = createFileRoute("/portfolio/pulseassist-email")({
         ],
       },
     ]),
-  component: PulseAssistEmailPage,
+  component: FagaPage,
 });
 
 /** Icons an editor may name on a CMS-managed capability card. Curated, not all of lucide. */
@@ -183,7 +164,7 @@ const CAPABILITIES = [
   {
     icon: BrainCircuit,
     title: "AI drafting and classification",
-    desc: "Draft, rewrite, summarise and classify mail using the same AI that answers support in PulseAssist. It draws on its own credit pool, so ordinary sending never consumes it.",
+    desc: "Draft, rewrite, summarise and classify mail with AI-assisted tools while keeping ordinary sending independent from AI usage.",
   },
   {
     icon: Code2,
@@ -218,13 +199,13 @@ const SETUP = [
   },
 ];
 
-const ACCESS_MAILTO = `mailto:${CORPORATE_EMAIL}?subject=PulseAssist%20Email%20Access%20Request`;
+const ACCESS_MAILTO = `mailto:${CORPORATE_EMAIL}?subject=Faga%20Access%20Request`;
 
-function PulseAssistEmailPage() {
-  const header = useSectionFields("portfolio.pulseassist-email");
-  const capabilities = useSectionFields("portfolio.pulseassist-email.capabilities");
-  const setup = useSectionFields("portfolio.pulseassist-email.setup");
-  const facts = useSectionFields("portfolio.pulseassist-email.facts");
+function FagaPage() {
+  const header = useSectionFields("portfolio.faga");
+  const capabilities = useSectionFields("portfolio.faga.capabilities");
+  const setup = useSectionFields("portfolio.faga.setup");
+  const facts = useSectionFields("portfolio.faga.facts");
 
   const factList = fieldItems(facts, "items", FACTS, (row) => {
     const value = typeof row.value === "string" ? row.value.trim() : "";
@@ -251,27 +232,27 @@ function PulseAssistEmailPage() {
   return (
     <SiteShell>
       {/* ═══ HERO ═══════════════════════════════════════════════════════════ */}
-      <Section spacing="loose" grid glow="spread" aria-labelledby="pae-heading">
+      <Section spacing="loose" grid glow="spread" aria-labelledby="faga-heading">
         <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <Tag tone="positive">Available</Tag>
               <Tag>
                 <Mail aria-hidden className="h-3 w-3 shrink-0" />
-                Part of the PulseAssist platform
+                Email API &amp; delivery platform
               </Tag>
             </div>
 
             <SectionIntro
-              id="pae-heading"
+              id="faga-heading"
               level={1}
               className="mt-8"
-              eyebrow={fieldText(header, "eyebrow", "PulseAssist Email")}
+              eyebrow={fieldText(header, "eyebrow", "Faga")}
               heading={fieldText(header, "heading", "Professional email, on your own domain.")}
               lead={fieldText(
                 header,
                 "subheading",
-                "Send and receive email from the domain your customers already know. Mailboxes, templates, campaigns and automations in one console, with a REST API, signed webhooks and delivery analytics when you would rather run it from your own systems.",
+                "Faga is an email delivery platform for transactional and marketing messages—the same category of platform as SendGrid and Resend. Send and receive from your own domain, manage templates and campaigns, or integrate through the REST API and signed webhooks.",
               )}
             />
 
@@ -279,8 +260,8 @@ function PulseAssistEmailPage() {
               <Cta to={ACCESS_MAILTO} size="lg" icon="external">
                 Request access
               </Cta>
-              <Cta to="/portfolio/pulseassist" variant="secondary" size="lg">
-                See PulseAssist
+              <Cta to="/portfolio" variant="secondary" size="lg">
+                View all products
               </Cta>
             </div>
           </div>
@@ -335,10 +316,10 @@ function PulseAssistEmailPage() {
       </Section>
 
       {/* ═══ CAPABILITIES ═══════════════════════════════════════════════════ */}
-      <Section tone="recessed" divider aria-labelledby="pae-capabilities-heading">
+      <Section tone="recessed" divider aria-labelledby="faga-capabilities-heading">
         <Reveal>
           <SectionIntro
-            id="pae-capabilities-heading"
+            id="faga-capabilities-heading"
             eyebrow={fieldText(capabilities, "eyebrow", "What you get")}
             heading={fieldText(capabilities, "heading", "Everything the product actually does.")}
             lead={fieldText(
@@ -366,10 +347,10 @@ function PulseAssistEmailPage() {
       </Section>
 
       {/* ═══ GETTING CONNECTED ══════════════════════════════════════════════ */}
-      <Section container="narrow" divider glow="center" aria-labelledby="pae-setup-heading">
+      <Section container="narrow" divider glow="center" aria-labelledby="faga-setup-heading">
         <Reveal>
           <SectionIntro
-            id="pae-setup-heading"
+            id="faga-setup-heading"
             eyebrow={fieldText(setup, "eyebrow", "Getting connected")}
             heading={fieldText(
               setup,
@@ -405,9 +386,9 @@ function PulseAssistEmailPage() {
       </Section>
 
       {/* ═══ CTA ════════════════════════════════════════════════════════════ */}
-      <Section container="prose" divider glow="center" aria-labelledby="pae-cta-heading">
+      <Section container="prose" divider glow="center" aria-labelledby="faga-cta-heading">
         <SectionIntro
-          id="pae-cta-heading"
+          id="faga-cta-heading"
           align="center"
           eyebrow="Get started"
           heading="Put your email on your own domain."
@@ -424,8 +405,8 @@ function PulseAssistEmailPage() {
 
         {/*
           A first-party fact, not a testimonial: this website's own transactional email — contact
-          replies, early-access confirmations — is sent through PulseAssist Email. It is stated
-          because it is checkable in this repository (`EMAIL_PROVIDER=pulseassist`), which is more
+          replies, early-access confirmations — is sent through Faga. It is stated
+          because it is checkable in this repository (`EMAIL_PROVIDER=faga`), which is more
           than most "trusted by" lines can say.
         */}
         <Reveal>
@@ -434,8 +415,8 @@ function PulseAssistEmailPage() {
               In production
             </Eyebrow>
             <p className="type-body mt-2.5">
-              This website sends its own transactional email through PulseAssist Email — every
-              contact reply and early-access confirmation from enicehq.com goes out on it.
+              This website sends its own transactional email through Faga — every contact reply and
+              early-access confirmation from enicehq.com goes out on it.
             </p>
           </Panel>
         </Reveal>

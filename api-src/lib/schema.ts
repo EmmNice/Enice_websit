@@ -2014,6 +2014,148 @@ WHERE key = 'footer'
   AND value->>'copyright' ~ '^© [0-9]{4} ENICE Group\\. All rights reserved\\.$';
 `,
   },
+  {
+    id: 24,
+    name: "separate_faga_from_pulseassist",
+    sql: /* sql */ `
+-- Faga is now the standalone email delivery platform. PulseAssist remains the AI customer-
+-- operations platform. Move existing CMS content and navigation rather than leaving production
+-- data on the retired PulseAssist Email identity.
+
+UPDATE site_sections SET key = 'portfolio.faga', label = 'Faga page', updated_at = now()
+WHERE key = 'portfolio.pulseassist-email'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.faga');
+UPDATE site_sections SET key = 'portfolio.faga.facts', label = 'Faga facts strip', updated_at = now()
+WHERE key = 'portfolio.pulseassist-email.facts'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.faga.facts');
+UPDATE site_sections SET key = 'portfolio.faga.capabilities', label = 'Faga capabilities', updated_at = now()
+WHERE key = 'portfolio.pulseassist-email.capabilities'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.faga.capabilities');
+UPDATE site_sections SET key = 'portfolio.faga.setup', label = 'Faga setup steps', updated_at = now()
+WHERE key = 'portfolio.pulseassist-email.setup'
+  AND NOT EXISTS (SELECT 1 FROM site_sections WHERE key = 'portfolio.faga.setup');
+
+-- If a Faga destination was already seeded, remove only the superseded duplicate rows.
+DELETE FROM site_sections
+WHERE key = 'portfolio.pulseassist-email' OR key LIKE 'portfolio.pulseassist-email.%';
+
+UPDATE site_sections
+SET fields = replace(
+      replace(fields::text, 'PulseAssist Email', 'Faga'),
+      'Draft, rewrite, summarise and classify mail using the same AI that answers support in PulseAssist. It draws on its own credit pool, so ordinary sending never consumes it.',
+      'Draft, rewrite, summarise and classify mail with AI-assisted tools while keeping ordinary sending independent from AI usage.')::jsonb,
+    updated_at = now()
+WHERE key = 'portfolio.faga' OR key LIKE 'portfolio.faga.%';
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{subheading}',
+      '"Faga is an email delivery platform for transactional and marketing messages—the same category of platform as SendGrid and Resend. Send and receive from your own domain, manage templates and campaigns, or integrate through the REST API and signed webhooks."'::jsonb),
+    updated_at = now()
+WHERE key = 'portfolio.faga'
+  AND fields->>'subheading' = 'Send and receive email from the domain your customers already know. Mailboxes, templates, campaigns and automations in one console, with a REST API, signed webhooks and delivery analytics when you would rather run it from your own systems.';
+
+-- Email delivery is no longer a PulseAssist capability card. Email remains one support channel in
+-- its shared inbox, but the delivery platform itself belongs to Faga.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(COALESCE(fields->'items', '[]'::jsonb))
+           WITH ORDINALITY AS t(item, ord)
+      WHERE item->>'title' IS DISTINCT FROM 'Email on your own domain'
+    )),
+    updated_at = now()
+WHERE key = 'portfolio.pulseassist.features'
+  AND fields->'items' @> '[{"title":"Email on your own domain"}]'::jsonb;
+
+UPDATE cms_pages
+SET path = '/portfolio/faga', title = 'Faga',
+    summary = 'Email delivery infrastructure for transactional and marketing messages.',
+    seo = replace(
+      replace(COALESCE(seo, '{}'::jsonb)::text, 'PulseAssist Email', 'Faga'),
+      '/portfolio/pulseassist-email', '/portfolio/faga')::jsonb,
+    updated_at = now()
+WHERE path = '/portfolio/pulseassist-email'
+  AND NOT EXISTS (SELECT 1 FROM cms_pages WHERE path = '/portfolio/faga');
+DELETE FROM cms_pages
+WHERE path = '/portfolio/pulseassist-email'
+  AND EXISTS (SELECT 1 FROM cms_pages WHERE path = '/portfolio/faga');
+
+UPDATE site_settings
+SET value = replace(
+      replace(
+        replace(value::text, '/portfolio/pulseassist-email', '/portfolio/faga'),
+        'pulseassist-email', 'faga'),
+      'PulseAssist Email', 'Faga')::jsonb,
+    updated_at = now()
+WHERE key IN ('header', 'footer')
+  AND (position('pulseassist-email' in value::text) > 0
+       OR position('PulseAssist Email' in value::text) > 0);
+
+-- Keep PulseAssist's infrastructure label AI-only in existing CMS data.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN item->>'name' = 'PulseAssist'
+                    THEN jsonb_set(item, '{tagline}', '"AI Customer Operations"'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'home.partners'
+  AND fields->'items' @> '[{"name":"PulseAssist"}]'::jsonb;
+
+-- Feature Faga on the homepage without disturbing the order or copy of existing cards.
+UPDATE site_sections
+SET fields = jsonb_set(
+      fields,
+      '{items}',
+      COALESCE(fields->'items', '[]'::jsonb) || '[{
+        "icon":"Mail",
+        "kicker":"Email infrastructure",
+        "title":"Faga",
+        "description":"Faga handles the same email delivery work businesses use SendGrid or Resend for: transactional and marketing messages, verified domains, templates, webhooks, analytics, and API-driven sending.",
+        "bullets":"Delivery: Transactional & marketing\\nIntegration: REST API & webhooks",
+        "url":"/portfolio/faga"
+      }]'::jsonb
+    ),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND position('/portfolio/faga' in fields::text) = 0;
+
+-- Apply the updated FINTECH category copy to the existing production CMS row.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN item->>'title' = 'Financial Infrastructure Systems'
+                    THEN '{
+                      "icon":"Banknote",
+                      "kicker":"FINTECH",
+                      "title":"Financial Solutions & Payments",
+                      "description":"Flexible credit, transaction networks, and virtual card infrastructure built for Nigeria''s digital economy, with room to expand across the region.",
+                      "bullets":"Virtual Card Issuance\\nTreasury and Ledger\\nKYC and Compliance Tooling"
+                    }'::jsonb
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'home.products'
+  AND fields->'items' @> '[{"title":"Financial Infrastructure Systems"}]'::jsonb;
+
+UPDATE site_sections
+SET fields = replace(
+      replace(fields::text,
+        'PulsePay is our digital financial platform. PulseAssist handles AI-powered business communication and customer support.',
+        'PulsePay is our digital financial platform, PulseAssist is our AI customer-operations platform, and Faga provides email delivery infrastructure.'),
+      'PulseAssist covers business communication and customer support, DevaPay covers payment collection',
+      'PulseAssist provides AI customer operations, Faga provides transactional and marketing email infrastructure, DevaPay covers payment collection')::jsonb,
+    updated_at = now()
+WHERE key = 'home.faq'
+  AND (position('PulseAssist handles AI-powered business communication' in fields::text) > 0
+       OR position('PulseAssist covers business communication' in fields::text) > 0);
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

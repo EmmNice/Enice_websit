@@ -14,7 +14,7 @@ contact form, the AI assistant, and PulseAssist early-access registrations.
 | Build             | Vite 7                                                       |
 | Styling           | Tailwind CSS v4 — configured in CSS, no `tailwind.config.js` |
 | Content + CMS     | ENICE Website Manager — our own CMS, backed by Postgres      |
-| Email + form data | Pluggable provider, PulseAssist Email by default             |
+| Email + form data | Pluggable provider, Faga by default                          |
 | AI assistant      | Pluggable provider, AWS Bedrock by default                   |
 | Hosting           | Vercel (`dist/` + `api/`)                                    |
 
@@ -163,28 +163,30 @@ All email — transactional sends and the contact/audience storage behind early 
 product-updates list — goes through one interface in `src/lib/email`. Call sites express intent
 (`send`, `upsertContact`); every provider-specific detail lives in an adapter.
 
-| Provider                    | `EMAIL_PROVIDER` | Needs                                      |
-| --------------------------- | ---------------- | ------------------------------------------ |
-| PulseAssist Email (default) | `pulseassist`    | `PULSEASSIST_API_KEY`, `EMAIL_FROM_DOMAIN` |
-| Resend                      | `resend`         | `RESEND_API_KEY`                           |
+| Provider            | `EMAIL_PROVIDER` | Needs                                |
+| ------------------- | ---------------- | ------------------------------------ |
+| Faga (default)      | `faga`           | `FAGA_API_KEY`, `EMAIL_FROM_DOMAIN`  |
+| Faga (legacy alias) | `pulseassist`    | `PULSEASSIST_API_KEY`, same endpoint |
+| Resend              | `resend`         | `RESEND_API_KEY`                     |
 
 Switching is that variable plus credentials, and a redeploy. No code changes.
 
 Two differences the abstraction absorbs, worth knowing when reading the adapters:
 
-- **From addresses.** PulseAssist accepts only the sender's _local part_ and appends the
+- **From addresses.** Faga accepts only the sender's _local part_ and appends the
   account's verified sending domain, so a caller cannot send as a domain the account has not
   proven it owns. Resend takes a full `Name <box@domain>`. Senders are therefore defined in
   parts in `src/lib/email/senders.ts`, not as formatted strings.
-- **Custom fields.** PulseAssist attributes are free-form, and its contact list response
+- **Custom fields.** Faga attributes are free-form, and its contact list response
   includes them — so listing an audience is one request. Resend requires every property key to
   be provisioned before use (it silently drops values for unknown keys) and omits properties
   from list responses, costing one extra request per row. Both quirks are handled in the Resend
   adapter alone.
 
-Before PulseAssist will send anything, `EMAIL_FROM_DOMAIN` must be added under **Domains** in
-the PulseAssist Email console and its DKIM/SPF records published at the registrar, and the
-account needs an Email plan that includes API access.
+Before Faga will send anything, `EMAIL_FROM_DOMAIN` must be added under **Domains** in its console
+and its DKIM/SPF records published at the registrar. The account also needs an Email plan that
+includes API access. New deployments use `FAGA_*`; existing `PULSEASSIST_*` values remain accepted
+as migration fallbacks.
 
 ## Environment
 
@@ -195,7 +197,8 @@ See `.env.example` for the full list. Server-side only:
 | `DATABASE_URL`                  | Website Manager   | Postgres connection string (pooled endpoint)        |
 | `CMS_SECRET`                    | Website Manager   | ≥32 random chars; encrypts 2FA secrets, signs CSRF  |
 | `CMS_OWNER_EMAIL` / `_PASSWORD` | first deploy      | Bootstraps the first Owner; ignored once one exists |
-| `PULSEASSIST_API_KEY`           | production        | All email, plus early-access storage                |
+| `FAGA_API_KEY`                  | production        | All email, plus early-access storage                |
+| `FAGA_API_URL`                  | production        | Standalone Faga API origin                          |
 | `EMAIL_FROM_DOMAIN`             | production        | Must be verified with the active email provider     |
 | `RESEND_API_KEY`                | only if switching | Used when `EMAIL_PROVIDER=resend`                   |
 | `VITE_PULSEASSIST_WIDGET_ID`    | no                | Chat widget id; public by definition                |
@@ -226,8 +229,9 @@ the value).
 ### Local testing without sending real email
 
 Point the active provider at a local stub to exercise the real handlers without touching a live
-account or sending anything: `PULSEASSIST_API_URL` for PulseAssist, or `RESEND_BASE_URL` (read
-by the Resend SDK) with `EMAIL_PROVIDER=resend`.
+account or sending anything: `FAGA_API_URL` for Faga, or `RESEND_BASE_URL` (read by the Resend SDK)
+with `EMAIL_PROVIDER=resend`. The legacy `PULSEASSIST_API_URL` fallback remains available during
+migration.
 
 ## Routing
 

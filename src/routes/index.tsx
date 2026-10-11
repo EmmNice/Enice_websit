@@ -15,6 +15,7 @@ import {
   CreditCard,
   Wallet,
   Bitcoin,
+  Mail,
 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { AboutMatrix } from "@/components/site/AboutMatrix";
@@ -91,6 +92,7 @@ const CARD_ICONS: Record<string, LucideIcon> = {
   Lock,
   Wallet,
   Bitcoin,
+  Mail,
 };
 
 function cardIcon(name: string): LucideIcon {
@@ -100,9 +102,9 @@ function cardIcon(name: string): LucideIcon {
 const VERTICALS = [
   {
     icon: Banknote,
-    kicker: "Fintech",
-    title: "Financial Infrastructure Systems",
-    desc: "Transaction networks, ledger databases, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
+    kicker: "FINTECH",
+    title: "Financial Solutions & Payments",
+    desc: "Flexible credit, transaction networks, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
     bullets: ["Virtual Card Issuance", "Treasury and Ledger", "KYC and Compliance Tooling"],
   },
   {
@@ -145,7 +147,7 @@ const CORE_MODULES = [
 ];
 
 /**
- * The three products the homepage leads with.
+ * The four products the homepage leads with.
  *
  * `facts` are the two or three checkable specifics that turn a card from a feature blurb into a
  * product: what it issues, who it is for, when it ships. In the CMS these are the `bullets`
@@ -173,6 +175,17 @@ const PORTFOLIO_PREVIEW = [
       { label: "Tenancy", value: "Multi-tenant" },
     ],
     to: "/portfolio/pulseassist",
+  },
+  {
+    icon: Mail,
+    kicker: "Email infrastructure",
+    title: "Faga",
+    desc: "Faga handles the same email delivery work businesses use SendGrid or Resend for: transactional and marketing messages, verified domains, templates, webhooks, analytics, and API-driven sending.",
+    facts: [
+      { label: "Delivery", value: "Transactional & marketing" },
+      { label: "Integration", value: "REST API & webhooks" },
+    ],
+    to: "/portfolio/faga",
   },
   {
     icon: Banknote,

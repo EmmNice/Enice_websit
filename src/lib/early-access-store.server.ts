@@ -33,13 +33,13 @@ export const INITIAL_STATUS: EarlyAccessStatus = "EARLY_ACCESS";
 /**
  * The audience holding early-access applicants.
  *
- * `idEnvVars` keeps the original `RESEND_EARLY_ACCESS_SEGMENT_ID` working so switching back to
- * Resend still pins the same segment, and adds a PulseAssist equivalent for the new list.
+ * `idEnvVars` keeps the original provider-specific ids working while adding a Faga-native name.
  */
 export const EARLY_ACCESS_AUDIENCE: AudienceRef = {
   name: SEGMENT_NAME,
   idEnvVars: {
     resend: "RESEND_EARLY_ACCESS_SEGMENT_ID",
+    faga: "FAGA_EARLY_ACCESS_LIST_ID",
     pulseassist: "PULSEASSIST_EARLY_ACCESS_LIST_ID",
   },
 };

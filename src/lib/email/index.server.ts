@@ -7,15 +7,16 @@
  *
  * Set `EMAIL_PROVIDER`:
  *
- *   pulseassist   (default) ENICE's own product. Needs `PULSEASSIST_API_KEY` and
- *                 `EMAIL_FROM_DOMAIN` set to a domain verified in PulseAssist Email.
- *   resend        The previous provider. Needs `RESEND_API_KEY`.
+ *   faga          (default) ENICE's email platform. Needs `FAGA_API_KEY` and
+ *                 `EMAIL_FROM_DOMAIN` set to a domain verified in Faga.
+ *   pulseassist   Legacy alias for Faga during configuration migration.
+ *   resend        The previous external provider. Needs `RESEND_API_KEY`.
  *
  * Nothing else in the codebase changes. That is the whole point: the call sites in `api-src/`
  * and the audience stores talk to the port in `./types`, so a switch is one environment
  * variable and a redeploy, not a refactor.
  *
- * ## Why the default is PulseAssist and not "whichever key is present"
+ * ## Why the default is explicit instead of "whichever key is present"
  *
  * Inferring the provider from which API key happens to be set sounds convenient and is a trap:
  * both keys will be present during the migration, so the site's sending provider would be
@@ -25,15 +26,17 @@
  * than a silent fallback.
  */
 import { type EmailProvider, type ProviderName, EmailProviderConfigError } from "./types";
-import { pulseAssistProvider } from "./provider-pulseassist.server";
+import { fagaProvider } from "./provider-faga.server";
 import { resendProvider } from "./provider-resend.server";
 
 const PROVIDERS: Record<ProviderName, EmailProvider> = {
-  pulseassist: pulseAssistProvider,
+  faga: fagaProvider,
+  // Keep the old selector working while deployed environments migrate to EMAIL_PROVIDER=faga.
+  pulseassist: fagaProvider,
   resend: resendProvider,
 };
 
-export const DEFAULT_PROVIDER: ProviderName = "pulseassist";
+export const DEFAULT_PROVIDER: ProviderName = "faga";
 
 /** The configured provider name, validated. */
 export function configuredProviderName(): ProviderName {

@@ -9,16 +9,16 @@
  * The site previously imported the Resend SDK in six places, which meant the provider was not a
  * decision the project could revisit — it was a dependency spread across the call sites. Email
  * delivery is exactly the kind of thing that gets re-tendered: pricing changes, deliverability
- * changes, and here the company is moving to its own product (PulseAssist Email) and wants to be
+ * changes, and here the company is moving to its own product (Faga) and wants to be
  * able to move again without a rewrite.
  *
  * So every provider-specific fact lives behind this port:
  *
- *   - how a From address is spelled (Resend wants `Name <box@domain>`, PulseAssist wants the
+ *   - how a From address is spelled (Resend wants `Name <box@domain>`, Faga wants the
  *     local part and resolves the domain from the workspace's verified sending identity);
  *   - whether custom fields must be provisioned before use (Resend: yes, silently dropped
- *     otherwise; PulseAssist: no, attributes are free-form);
- *   - what an audience is called (Resend "segments", PulseAssist "lists");
+ *     otherwise; Faga: no, attributes are free-form);
+ *   - what an audience is called (Resend "segments", Faga "lists");
  *   - error and retry shapes.
  *
  * Callers express INTENT — "send this", "put this person on that list" — and never a provider's
@@ -31,7 +31,7 @@
  * A sender identity, held in parts rather than as a formatted string.
  *
  * This is the load-bearing piece of the abstraction. A pre-formatted
- * `"ENICE Group <noreply@enicehq.com>"` is a Resend-shaped value: PulseAssist takes only the
+ * `"ENICE Group <noreply@enicehq.com>"` is a Resend-shaped value: Faga takes only the
  * local part (`noreply`) and appends the workspace's verified sending domain, because the
  * domain is a property of the account's proven DNS rather than of the message. Keeping the
  * parts separate lets each provider spell it its own way, and means switching provider does
@@ -60,7 +60,7 @@ const MAX_DISPLAY_NAME = 120;
  * that it shows WHO wrote in rather than a bare noreply address. A name containing CR or LF would
  * otherwise let a visitor append their own headers to mail the site sends.
  *
- * The PulseAssist path sanitises server-side as well; this is the Resend path's equivalent, and
+ * The Faga path sanitises server-side as well; this is the Resend path's equivalent, and
  * belongs here regardless so no future caller has to remember.
  */
 function displayName(raw: string): string {
@@ -93,14 +93,14 @@ export type OutboundEmail = {
   html: string;
   text?: string;
   /**
-   * Makes a retried send safe. PulseAssist honours it natively via `Idempotency-Key`; providers
+   * Makes a retried send safe. Faga honours it natively via `Idempotency-Key`; providers
    * without the concept ignore it, which is why it is optional rather than assumed.
    */
   idempotencyKey?: string;
   /**
    * Extra MIME headers. Used for the RFC 3834 auto-reply markers — see `AUTO_REPLY_HEADERS`.
    *
-   * Both providers forward these; PulseAssist refuses the headers a caller must not set (From, Bcc,
+   * Both providers forward these; Faga refuses the headers a caller must not set (From, Bcc,
    * DKIM-Signature and so on) with a 400 rather than dropping them silently.
    */
   headers?: Record<string, string>;
@@ -148,7 +148,7 @@ export type SendResult = {
 // ── Audience (contacts + lists) ───────────────────────────────────────────────
 
 /**
- * A named audience. Resend calls these segments, PulseAssist calls them lists; the port names
+ * A named audience. Resend calls these segments, Faga calls them lists; the port names
  * the CONCEPT and each adapter resolves it to an id, creating it if absent so a deploy never
  * depends on someone having clicked through a dashboard first.
  */
@@ -159,7 +159,7 @@ export type AudienceRef = {
    * Optional per-provider env var holding a pre-existing id to pin instead of resolving by name.
    *
    * Keyed BY PROVIDER because an audience id is provider-specific — a Resend segment id is a
-   * uuid, a PulseAssist list id is an integer. A single shared variable would hand one provider
+   * uuid, a Faga list id is an integer. A single shared variable would hand one provider
    * the other's id after a switch, which either 404s or, worse, resolves to an unrelated
    * audience. Pinning is optional; absent one, the adapter resolves by name and creates it.
    */
@@ -194,7 +194,7 @@ export type ListContactsResult = {
 
 // ── The port ──────────────────────────────────────────────────────────────────
 
-export type ProviderName = "pulseassist" | "resend";
+export type ProviderName = "faga" | "pulseassist" | "resend";
 
 export interface EmailProvider {
   readonly name: ProviderName;
