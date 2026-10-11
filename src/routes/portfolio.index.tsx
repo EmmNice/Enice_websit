@@ -10,7 +10,7 @@ import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { cn } from "@/lib/utils";
 import { SHADOW_CARD, SHADOW_FLOAT, SURFACE_1, SURFACE_2, SURFACE_3 } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
-import { PRODUCT_ACCENT_BY_PATH } from "@/lib/product-brand";
+import { PRODUCT_ACCENT_BY_PATH, PRODUCT_DEEP_ACCENT_BY_PATH } from "@/lib/product-brand";
 
 export const Route = createFileRoute("/portfolio/")({
   head: () =>
@@ -123,14 +123,33 @@ function LifecycleTag({ to }: { to: string }) {
 
 // ─── Card shell ───────────────────────────────────────────────────────────────
 
-/** The illustration well at the top of a product card. Decorative: hidden from AT. */
-function CardVisual({ className, children }: { className?: string; children: ReactNode }) {
+/** A consistent enterprise preview frame for every product illustration. */
+function CardVisual({
+  label,
+  className,
+  children,
+}: {
+  label: string;
+  className?: string;
+  children: ReactNode;
+}) {
   return (
     <div
       aria-hidden
-      className={cn("relative overflow-hidden border-b border-border bg-surface-1", className)}
+      className={cn(
+        "portfolio-product-visual relative flex flex-col overflow-hidden border-b border-border",
+        className,
+      )}
     >
-      {children}
+      <div className="relative z-20 flex shrink-0 items-center justify-between gap-3 border-b border-border bg-background/75 px-4 py-2.5 backdrop-blur-sm">
+        <span className="truncate font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-bone-soft">
+          {label}
+        </span>
+        <span className="shrink-0 rounded-full border border-electric/25 bg-electric/[0.08] px-2 py-1 text-[8px] font-semibold uppercase tracking-[0.12em] text-electric">
+          Interface preview
+        </span>
+      </div>
+      <div className="relative min-h-0 flex-1">{children}</div>
     </div>
   );
 }
@@ -145,14 +164,23 @@ function ProductCard({
   to: string;
 }) {
   const accent = PRODUCT_ACCENT_BY_PATH[to];
+  const deepAccent = PRODUCT_DEEP_ACCENT_BY_PATH[to];
 
   return (
     <Panel
       as="article"
-      className="product-accent-card flex flex-col overflow-hidden"
+      interactive
+      className="portfolio-product-card product-accent-card flex flex-col overflow-hidden"
       style={{
         boxShadow: SHADOW_CARD,
-        ...(accent ? { ["--electric" as string]: accent } : {}),
+        ...(accent
+          ? {
+              ["--electric" as string]: accent,
+              ["--electric-deep" as string]: deepAccent ?? accent,
+              ["--primary" as string]: accent,
+              ["--ring" as string]: accent,
+            }
+          : {}),
       }}
     >
       {visual}
@@ -208,7 +236,7 @@ function PortfolioIndexPage() {
           <ProductCard
             to="/portfolio/pulseassist"
             visual={
-              <CardVisual className="h-56 sm:h-64">
+              <CardVisual label="PulseAssist support console" className="h-56 sm:h-64">
                 <div className="tech-grid tech-grid-flat" />
                 <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="w-full max-w-sm space-y-2.5">
@@ -271,7 +299,7 @@ function PortfolioIndexPage() {
           <ProductCard
             to="/portfolio/faga"
             visual={
-              <CardVisual className="h-56 sm:h-64">
+              <CardVisual label="Faga delivery console" className="h-56 sm:h-64">
                 <div className="tech-grid tech-grid-flat" />
                 <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="panel w-full max-w-sm" style={{ boxShadow: SHADOW_CARD }}>
@@ -358,7 +386,7 @@ function PortfolioIndexPage() {
           <ProductCard
             to="/portfolio/pulsepay"
             visual={
-              <CardVisual className="h-56 sm:h-64">
+              <CardVisual label="PulsePay wallet and cards" className="h-56 sm:h-64">
                 <div className="tech-grid tech-grid-flat" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   {/* Card peeking from behind */}
@@ -444,7 +472,7 @@ function PortfolioIndexPage() {
           <ProductCard
             to="/portfolio/devapay"
             visual={
-              <CardVisual className="h-56 sm:h-64">
+              <CardVisual label="DevaPay payment flow" className="h-56 sm:h-64">
                 <div className="mesh-glow-center" />
                 <div className="absolute inset-0 flex items-center justify-center p-6">
                   <div
@@ -517,7 +545,7 @@ function PortfolioIndexPage() {
           <ProductCard
             to="/portfolio/pride"
             visual={
-              <CardVisual className="h-56 sm:h-64">
+              <CardVisual label="PRIDE digital assets" className="h-56 sm:h-64">
                 <div className="mesh-glow-center" />
                 <div className="tech-grid tech-grid-flat" />
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6">

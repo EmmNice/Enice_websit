@@ -571,6 +571,7 @@
   .product-accent-card::before {
     content: "";
     position: absolute;
+    z-index: 30;
     inset: 0 0 auto;
     height: 2px;
     background: linear-gradient(90deg, var(--electric), transparent 68%);
@@ -586,6 +587,43 @@
 
   .product-accent-card .btn-secondary:hover {
     border-color: color-mix(in srgb, var(--electric) 62%, var(--color-border));
+  }
+
+  /* Portfolio cards use the same enterprise shell while making each product palette unmistakable
+     inside its interface preview and primary action. */
+  .portfolio-product-card {
+    border-color: color-mix(in srgb, var(--electric) 36%, var(--color-border));
+  }
+
+  .portfolio-product-card.panel-interactive:hover {
+    border-color: color-mix(in srgb, var(--electric) 58%, var(--color-border));
+  }
+
+  .portfolio-product-card .btn-primary {
+    border-color: var(--electric);
+    background-color: var(--electric);
+    color: var(--background);
+  }
+
+  .portfolio-product-card .btn-primary:hover {
+    border-color: color-mix(in srgb, var(--electric) 82%, white);
+    background-color: color-mix(in srgb, var(--electric) 88%, white);
+  }
+
+  .portfolio-product-visual {
+    background-color: var(--surface-1);
+    background-image:
+      radial-gradient(
+        24rem 13rem at 50% 55%,
+        color-mix(in srgb, var(--electric) 18%, transparent),
+        transparent 72%
+      ),
+      linear-gradient(180deg, color-mix(in srgb, var(--electric) 7%, transparent), transparent 48%);
+  }
+
+  .portfolio-product-visual .panel {
+    border-color: color-mix(in srgb, var(--electric) 26%, var(--color-border));
+    box-shadow: inset 0 1px 0 color-mix(in srgb, var(--electric) 18%, transparent);
   }
 
   /* Hairline-divided grid: children sit on the border colour and paint their own
