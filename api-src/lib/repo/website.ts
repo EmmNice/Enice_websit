@@ -952,22 +952,10 @@ const DEFAULT_SECTIONS: {
           url: "https://supabase.com",
         },
         {
-          name: "Vercel",
-          tagline: "Edge Delivery",
-          logo: "/partners/vercel.svg",
-          url: "https://vercel.com",
-        },
-        {
           name: "PulseAssist",
           tagline: "AI Customer Operations",
           logo: "/partners/pulseassist.svg",
           url: "https://getpulseassist.com",
-        },
-        {
-          name: "Railway",
-          tagline: "Application & Database Hosting",
-          logo: "/partners/railway.svg",
-          url: "https://railway.com",
         },
       ],
     },
