@@ -269,6 +269,8 @@
 
 .product-theme-pulsepay {
   --electric: var(--pulsepay-accent);
+  --electric-deep: #d0472f;
+  --electric-shadow: #6f2116;
   --primary: var(--pulsepay-accent);
   --accent: var(--pulsepay-accent);
   --ring: var(--pulsepay-accent);
@@ -276,6 +278,8 @@
 
 .product-theme-pulseassist {
   --electric: var(--pulseassist-accent);
+  --electric-deep: #7c3aed;
+  --electric-shadow: #3b167a;
   --primary: var(--pulseassist-accent);
   --accent: var(--pulseassist-accent);
   --ring: var(--pulseassist-accent);
@@ -283,6 +287,8 @@
 
 .product-theme-pride {
   --electric: var(--pride-accent);
+  --electric-deep: #e6a100;
+  --electric-shadow: #6b4700;
   --primary: var(--pride-accent);
   --accent: var(--pride-accent);
   --ring: var(--pride-accent);
