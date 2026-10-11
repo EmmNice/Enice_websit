@@ -67,19 +67,19 @@ export function AboutMatrix() {
           <div className="lg:sticky lg:top-28">
             <SectionIntro
               id="about-heading"
-              eyebrow={fieldText(company, "eyebrow", "The company")}
-              heading={fieldText(company, "heading", "ENICE Group is a product company.")}
+              eyebrow={fieldText(company, "eyebrow", "THE COMPANY")}
+              heading={fieldText(company, "heading", "ENICE Group builds digital products.")}
               lead={fieldText(
                 company,
                 "subheading",
-                "We are the parent company behind a growing set of software platforms. We find real problems in financial services, commerce, and business communication, then build and run the products that solve them.",
+                "We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them.",
               )}
             />
 
             {/* The ecosystem as a reference list, not a third product pitch. */}
             <div className="mt-10 border-t border-border pt-7">
               <Eyebrow muted as="h3" className="text-[10px]">
-                The ecosystem
+                THE ECOSYSTEM
               </Eyebrow>
               <ul className="mt-4 space-y-2.5">
                 {PRODUCTS.map((p) => (

@@ -1089,10 +1089,10 @@ const DEFAULT_SECTIONS: {
     type: "featureGrid",
     order: 38,
     fields: {
-      eyebrow: "The company",
-      heading: "ENICE Group is a product company.",
+      eyebrow: "THE COMPANY",
+      heading: "ENICE Group builds digital products.",
       subheading:
-        "We are the parent company behind a growing set of software platforms. We find real problems in financial services, commerce, and business communication, then build and run the products that solve them.",
+        "We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them.",
       items: [
         {
           title: "We start from the friction",

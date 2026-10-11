@@ -4823,6 +4823,18 @@ SET fields = jsonb_set(fields, '{items}', (
 WHERE key = 'home.products'
   AND fields->'items' @> '[{"title":"Financial Infrastructure Systems"}]'::jsonb;
 
+-- Apply the supplied company positioning while preserving its editable pillar cards.
+UPDATE site_sections
+SET fields = jsonb_set(
+      jsonb_set(
+        jsonb_set(fields, '{eyebrow}', '"THE COMPANY"'::jsonb),
+        '{heading}', '"ENICE Group builds digital products."'::jsonb),
+      '{subheading}',
+      '"We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them."'::jsonb
+    ),
+    updated_at = now()
+WHERE key = 'home.company';
+
 UPDATE site_sections
 SET fields = replace(
       replace(fields::text,
@@ -7202,9 +7214,9 @@ var DEFAULT_SECTIONS = [
     type: "featureGrid",
     order: 38,
     fields: {
-      eyebrow: "The company",
-      heading: "ENICE Group is a product company.",
-      subheading: "We are the parent company behind a growing set of software platforms. We find real problems in financial services, commerce, and business communication, then build and run the products that solve them.",
+      eyebrow: "THE COMPANY",
+      heading: "ENICE Group builds digital products.",
+      subheading: "We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them.",
       items: [
         {
           title: "We start from the friction",
