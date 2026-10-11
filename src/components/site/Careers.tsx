@@ -15,6 +15,7 @@ export function Careers() {
   return (
     <Section
       id="careers"
+      spacing="tight"
       glow="center"
       divider
       container="narrow"
@@ -22,11 +23,11 @@ export function Careers() {
     >
       <div className="mx-auto max-w-2xl text-center">
         <Eyebrow className="justify-center">
-          {fieldText(careers, "eyebrow", "Join the builders")}
+          {fieldText(careers, "eyebrow", "Work with us")}
         </Eyebrow>
         <h2 id="careers-heading" className="type-h2 mt-5 text-foreground">
           <StyledText
-            text={fieldText(careers, "heading", "Build products that matter.")}
+            text={fieldText(careers, "heading", "Build useful products.")}
             accentClassName="text-electric"
           />
         </h2>
@@ -35,7 +36,7 @@ export function Careers() {
             text={fieldText(
               careers,
               "subheading",
-              "We work with people who care about product quality, solid engineering, and technology that holds up at real scale. If that sounds like you, we want to hear from you.",
+              "We work with engineers and product builders who care about clear thinking, solid work, and reliable software.",
             )}
             accentClassName="text-electric"
           />
@@ -46,7 +47,7 @@ export function Careers() {
           className="mt-9"
           data-cta="careers"
         >
-          {fieldText(careers, "ctaLabel", "Meet the team")}
+          {fieldText(careers, "ctaLabel", "Contact the team")}
         </Cta>
       </div>
     </Section>

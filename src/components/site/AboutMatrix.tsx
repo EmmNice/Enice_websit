@@ -13,7 +13,7 @@ export function AboutMatrix() {
   const company = useSectionFields("home.company");
 
   return (
-    <Section id="about" divider aria-labelledby="about-heading">
+    <Section id="about" spacing="tight" divider aria-labelledby="about-heading">
       <div className="max-w-3xl">
         <Reveal>
           <div>

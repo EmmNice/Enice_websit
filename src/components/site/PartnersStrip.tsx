@@ -1,5 +1,5 @@
 /**
- * PartnersStrip — infinite marquee of ecosystem & infrastructure partners.
+ * PartnersStrip — compact grid of ecosystem and infrastructure providers.
  *
  * Content comes from the CMS section `home.partners` (admin → Website → Website Sections →
  * Partners strip). Each partner has a name, an optional sub-line (tagline), an optional uploaded
@@ -72,7 +72,7 @@ const DEFAULT_PARTNERS: Partner[] = [
   },
 ];
 
-const DEFAULT_HEADING = "Built on trusted infrastructure partners";
+const DEFAULT_HEADING = "Infrastructure and platform providers";
 
 function readPartners(fields: Record<string, unknown> | null): Partner[] {
   const items = fields?.items;
@@ -95,17 +95,6 @@ function monogram(name: string): string {
   const words = name.split(/\s+/).filter(Boolean);
   if (words.length >= 2) return (words[0][0] + words[1][0]).toUpperCase();
   return name.slice(0, 2).toUpperCase();
-}
-
-/**
- * Repeats the source list until there are enough tiles for a smooth loop, then doubles it so the
- * marquee wraps seamlessly. Without this, one or two partners would leave large gaps.
- */
-function buildTrack(items: Partner[]): Partner[] {
-  if (items.length === 0) return [];
-  const filled = [...items];
-  while (filled.length < 8) filled.push(...items);
-  return [...filled, ...filled];
 }
 
 export function PartnersStrip() {
@@ -140,37 +129,22 @@ export function PartnersStrip() {
   // The owner has deliberately removed every partner: respect that and render nothing.
   if (partners.length === 0) return null;
 
-  const track = buildTrack(partners);
-
   return (
-    <section aria-labelledby="partners-heading" className="overflow-hidden border-y border-border">
+    <section aria-labelledby="partners-heading" className="border-y border-border">
       <Container>
-        <h2
-          id="partners-heading"
-          className="eyebrow eyebrow-muted justify-center py-9 text-center"
-          style={{ display: "flex" }}
-        >
-          {heading}
-        </h2>
-      </Container>
-
-      <div className="edge-fade relative pb-12">
-        {/* The duplicated half of the track is decorative: announcing every partner twice to a
-            screen reader is noise, so only the first pass is exposed. */}
-        <div className="flex animate-marquee gap-10 whitespace-nowrap">
-          {track.map((partner, i) => {
-            const duplicate = i >= track.length / 2;
-            return (
-              <PartnerTile
-                key={i}
-                partner={partner}
-                aria-hidden={duplicate || undefined}
-                tabIndex={duplicate ? -1 : undefined}
-              />
-            );
-          })}
+        <div className="py-6 sm:py-8">
+          <h2 id="partners-heading" className="eyebrow eyebrow-muted">
+            {heading}
+          </h2>
+          <ul className="mt-5 grid grid-cols-1 gap-px overflow-hidden rounded-xl border border-border bg-border min-[420px]:grid-cols-2 sm:grid-cols-3 lg:grid-cols-6">
+            {partners.map((partner) => (
+              <li key={partner.name} className="min-w-0 bg-background p-4">
+                <PartnerTile partner={partner} />
+              </li>
+            ))}
+          </ul>
         </div>
-      </div>
+      </Container>
     </section>
   );
 }
@@ -204,12 +178,12 @@ function PartnerTile({
           {monogram(partner.name)}
         </span>
       )}
-      <span className="text-left">
-        <span className="block text-[13px] font-medium leading-none text-bone-strong transition-colors group-hover:text-foreground">
+      <span className="min-w-0 text-left">
+        <span className="block text-[13px] font-medium leading-snug text-bone-strong transition-colors group-hover:text-foreground">
           {partner.name}
         </span>
         {partner.tagline && (
-          <span className="mt-1 block text-[10px] font-medium uppercase tracking-[0.14em] text-bone-faint">
+          <span className="mt-1 block whitespace-normal text-[10px] font-medium uppercase leading-relaxed tracking-[0.12em] text-bone-faint">
             {partner.tagline}
           </span>
         )}
@@ -217,7 +191,7 @@ function PartnerTile({
     </>
   );
 
-  const shell = "group inline-flex shrink-0 items-center gap-3";
+  const shell = "group flex min-w-0 items-center gap-3";
 
   return partner.url ? (
     <a href={partner.url} target="_blank" rel="noopener noreferrer" className={shell} {...rest}>
