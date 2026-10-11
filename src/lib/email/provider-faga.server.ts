@@ -1,13 +1,13 @@
 /**
- * The PulseAssist Email provider — ENICE's own product, used by ENICE.
+ * The Faga provider — ENICE's own product, used by ENICE.
  *
- * SERVER ONLY. Reads `PULSEASSIST_API_KEY`. Talks to the public `/v1/email` API over plain
- * `fetch` — deliberately no SDK, because the whole point of this module is that the site depends
+ * SERVER ONLY. Reads `FAGA_API_KEY` with a temporary `PULSEASSIST_API_KEY` fallback. Talks to the
+ * public `/v1/email` API over plain `fetch` — deliberately no SDK, because the whole point of this
  * on an HTTP contract it controls rather than on a vendor package.
  *
  * ## Authentication and scope
  *
- * `Authorization: Bearer <key>` with a key minted in the PulseAssist Email console (API keys
+ * `Authorization: Bearer <key>` with a key minted in the Faga console (API keys
  * screen). The key needs the `send` scope; the account needs an Email plan that includes the
  * `email_api` capability — the free plan does not, and the API answers 403
  * `EMAIL_CAPABILITY_REQUIRED` when it is missing, which is surfaced here as a config error
@@ -19,7 +19,7 @@
  * resolved server-side from the workspace's verified sending identity, so a caller cannot send
  * as a domain the account has not proven it owns via DKIM/SPF. That is a deliberate security
  * property of the product, and it is why `Sender` in the port carries parts rather than a formatted
- * string. `EMAIL_FROM_DOMAIN` must therefore match a domain verified in PulseAssist, and this
+ * string. `EMAIL_FROM_DOMAIN` must therefore match a domain verified in Faga, and this
  * adapter checks the two agree instead of letting a mismatch fail as a confusing 409 later.
  *
  * ## Acceptance is not delivery
@@ -30,7 +30,7 @@
  *
  * ## Audiences
  *
- * PulseAssist lists are the audience primitive, and contact `attributes` are free-form JSON —
+ * Faga lists are the audience primitive, and contact `attributes` are free-form JSON —
  * so unlike Resend there is NO key provisioning step and no risk of values being silently
  * dropped for an unknown key. That whole class of bug does not exist here.
  */
@@ -51,16 +51,11 @@ import {
 } from "./types";
 
 /**
- * The PulseAssist API base.
+ * The Faga API base.
  *
- * `https://getpulseassist.com` — NOT `api.getpulseassist.com`, which does not exist. That
- * subdomain was this module's original default and is an NXDOMAIN: it looks like the obvious
- * hostname for an API, so it was written without being resolved. The failure it produced was
- * quietly misleading rather than loud — `fetch` rejects, the adapter reports a transport failure
- * with no HTTP status, and the site answered "we could not deliver your message" as though the
- * provider had refused the mail. The API had never been contacted at all.
- *
- * `PULSEASSIST_API_URL` still overrides this for staging.
+ * The legacy API remains the compatibility default so existing production deployments keep
+ * sending during the product split. New Faga deployments should set `FAGA_API_URL` to the
+ * standalone service origin; `PULSEASSIST_API_URL` remains a temporary fallback.
  */
 const DEFAULT_BASE_URL = "https://getpulseassist.com";
 
@@ -77,17 +72,23 @@ type ApiResponse<T> = {
 };
 
 function config(): { apiKey: string; baseUrl: string; fromDomain: string } {
-  const apiKey = process.env.PULSEASSIST_API_KEY;
+  const apiKey = process.env.FAGA_API_KEY || process.env.PULSEASSIST_API_KEY;
   if (!apiKey) {
-    throw new EmailProviderConfigError("PULSEASSIST_API_KEY is not configured.");
+    throw new EmailProviderConfigError(
+      "FAGA_API_KEY is not configured (PULSEASSIST_API_KEY is accepted as a legacy fallback).",
+    );
   }
   const fromDomain = process.env.EMAIL_FROM_DOMAIN;
   if (!fromDomain) {
     throw new EmailProviderConfigError(
-      "EMAIL_FROM_DOMAIN is not configured. It must be a domain verified in PulseAssist Email.",
+      "EMAIL_FROM_DOMAIN is not configured. It must be a domain verified in Faga.",
     );
   }
-  const baseUrl = (process.env.PULSEASSIST_API_URL || DEFAULT_BASE_URL).replace(/\/+$/, "");
+  const baseUrl = (
+    process.env.FAGA_API_URL ||
+    process.env.PULSEASSIST_API_URL ||
+    DEFAULT_BASE_URL
+  ).replace(/\/+$/, "");
   return { apiKey, baseUrl, fromDomain };
 }
 
@@ -117,7 +118,7 @@ async function call<T>(
      * refusal by the provider.
      *
      * The URL is named in the message deliberately. When this module defaulted to a hostname that
-     * did not resolve, the log read "Could not reach PulseAssist: TypeError: fetch failed" — true,
+     * did not resolve, the log read "Could not reach Faga: TypeError: fetch failed" — true,
      * useless, and consistent with a dozen unrelated causes. Naming the host it actually tried makes
      * a wrong base URL or an NXDOMAIN obvious at a glance instead of something to bisect.
      */
@@ -125,7 +126,7 @@ async function call<T>(
       ok: false,
       status: 0,
       data: null,
-      error: `Could not reach PulseAssist at ${baseUrl}: ${String(err)}`,
+      error: `Could not reach Faga at ${baseUrl}: ${String(err)}`,
       code: null,
     };
   }
@@ -146,7 +147,7 @@ async function call<T>(
       (typeof p.detail === "string" && p.detail) ||
       (typeof p.title === "string" && p.title) ||
       (typeof p.error === "string" && p.error) ||
-      `PulseAssist returned ${res.status}`;
+      `Faga returned ${res.status}`;
     const code = typeof p.code === "string" ? p.code : null;
     return { ok: false, status: res.status, data: null, error: detail, code };
   }
@@ -180,7 +181,7 @@ async function callWithRetry<T>(
     if (!retryable) return last;
     if (i < attempts - 1) {
       const backoff = 400 * 2 ** i;
-      console.warn(`[pulseassist] ${label} failed (${last.status}); retrying in ${backoff}ms`);
+      console.warn(`[faga] ${label} failed (${last.status}); retrying in ${backoff}ms`);
       await sleep(backoff);
     }
   }
@@ -209,9 +210,11 @@ type ApiList = { id: number; name: string };
 const listIdCache = new Map<string, number>();
 
 async function resolveListId(audience: AudienceRef): Promise<number> {
-  const pinEnvVar = audience.idEnvVars?.pulseassist;
-  const pinned = pinEnvVar ? process.env[pinEnvVar] : undefined;
-  // A PulseAssist list id is an integer; anything else is ignored rather than sent as garbage.
+  const pinEnvVars = [audience.idEnvVars?.faga, audience.idEnvVars?.pulseassist].filter(
+    (name): name is string => Boolean(name),
+  );
+  const pinned = pinEnvVars.map((name) => process.env[name]).find(Boolean);
+  // A Faga list id is an integer; anything else is ignored rather than sent as garbage.
   if (pinned && /^\d+$/.test(pinned.trim())) return Number(pinned.trim());
 
   const cached = listIdCache.get(audience.name);
@@ -220,11 +223,11 @@ async function resolveListId(audience: AudienceRef): Promise<number> {
   const existing = await callWithRetry<{ lists: ApiList[] }>("lists.list", "/email/lists");
   if (!existing.ok) {
     if (isConfigRefusal(existing))
-      throw new EmailProviderConfigError(existing.error ?? "PulseAssist refused the API key.");
+      throw new EmailProviderConfigError(existing.error ?? "Faga refused the API key.");
     throw new EmailSendError(
       `Could not list audiences: ${existing.error}`,
       existing.status,
-      "pulseassist",
+      "faga",
     );
   }
   const found = (existing.data?.lists ?? []).find((l) => l.name === audience.name);
@@ -249,7 +252,7 @@ async function resolveListId(audience: AudienceRef): Promise<number> {
     throw new EmailSendError(
       `Could not create the "${audience.name}" audience: ${created.error}`,
       created.status,
-      "pulseassist",
+      "faga",
     );
   }
   listIdCache.set(audience.name, created.data.list.id);
@@ -292,20 +295,16 @@ async function fetchContact(email: string): Promise<ApiContact | null> {
   );
   if (!res.ok) {
     if (isConfigRefusal(res))
-      throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
-    throw new EmailSendError(
-      `Could not look up the contact: ${res.error}`,
-      res.status,
-      "pulseassist",
-    );
+      throw new EmailProviderConfigError(res.error ?? "Faga refused the API key.");
+    throw new EmailSendError(`Could not look up the contact: ${res.error}`, res.status, "faga");
   }
   return (res.data?.contacts ?? []).find((c) => c.email.trim().toLowerCase() === target) ?? null;
 }
 
 // ── The provider ─────────────────────────────────────────────────────────────
 
-export const pulseAssistProvider: EmailProvider = {
-  name: "pulseassist",
+export const fagaProvider: EmailProvider = {
+  name: "faga",
 
   async send(message: OutboundEmail): Promise<SendResult> {
     const { fromDomain } = config();
@@ -313,16 +312,16 @@ export const pulseAssistProvider: EmailProvider = {
     /*
      * The From domain is checked against the configured sending domain before the call.
      *
-     * PulseAssist takes only the local part and appends the workspace's verified domain, so a
+     * Faga takes only the local part and appends the workspace's verified domain, so a
      * caller asking to send from a different domain would silently have it rewritten. Failing
      * here names the real problem ("this domain is not the configured sending domain") instead
      * of delivering mail from an address nobody expected.
      */
     if (message.from.domain.toLowerCase() !== fromDomain.toLowerCase()) {
       throw new EmailProviderConfigError(
-        `Refusing to send as "${message.from.localPart}@${message.from.domain}": PulseAssist sends from ` +
+        `Refusing to send as "${message.from.localPart}@${message.from.domain}": Faga sends from ` +
           `the account's verified domain, which is configured as "${fromDomain}". Verify the domain in ` +
-          `PulseAssist Email and set EMAIL_FROM_DOMAIN to match.`,
+          `Faga and set EMAIL_FROM_DOMAIN to match.`,
       );
     }
 
@@ -338,7 +337,7 @@ export const pulseAssistProvider: EmailProvider = {
          * Without this the API composes a bare `noreply@enicehq.com` and every message the site
          * sends arrives showing a raw address — which the recipient's inbox lists as though it were
          * machine-generated. ENICE's own team read contact-form enquiries that way: an automated
-         * notice rather than a person writing in. PulseAssist sanitises the value server-side, so a
+         * notice rather than a person writing in. Faga sanitises the value server-side, so a
          * visitor's typed name cannot forge a header through it.
          */
         ...(message.from.name ? { fromName: message.from.name } : {}),
@@ -356,18 +355,14 @@ export const pulseAssistProvider: EmailProvider = {
 
     if (!res.ok) {
       if (isConfigRefusal(res)) {
-        throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
+        throw new EmailProviderConfigError(res.error ?? "Faga refused the API key.");
       }
-      throw new EmailSendError(
-        res.error ?? "PulseAssist refused the message.",
-        res.status,
-        "pulseassist",
-      );
+      throw new EmailSendError(res.error ?? "Faga refused the message.", res.status, "faga");
     }
 
     // 202 Accepted. The id is whatever the API called it; both spellings are tolerated so a
     // field rename upstream degrades to "no id" rather than throwing on a successful send.
-    return { id: res.data?.id ?? res.data?.sendId ?? null, provider: "pulseassist" };
+    return { id: res.data?.id ?? res.data?.sendId ?? null, provider: "faga" };
   },
 
   async findContact(email: string): Promise<AudienceContact | null> {
@@ -396,7 +391,7 @@ export const pulseAssistProvider: EmailProvider = {
         throw new EmailSendError(
           `Could not update the contact: ${updated.error}`,
           updated.status,
-          "pulseassist",
+          "faga",
         );
       }
       await addToList(listId, existing.id);
@@ -418,12 +413,12 @@ export const pulseAssistProvider: EmailProvider = {
     );
     if (!created.ok || !created.data?.contact?.id) {
       if (isConfigRefusal(created)) {
-        throw new EmailProviderConfigError(created.error ?? "PulseAssist refused the API key.");
+        throw new EmailProviderConfigError(created.error ?? "Faga refused the API key.");
       }
       throw new EmailSendError(
         `Could not create the contact: ${created.error}`,
         created.status,
-        "pulseassist",
+        "faga",
       );
     }
     await addToList(listId, created.data.contact.id);
@@ -443,11 +438,7 @@ export const pulseAssistProvider: EmailProvider = {
       { method: "PATCH", body: { attributes: merged } },
     );
     if (!res.ok) {
-      throw new EmailSendError(
-        `Could not update the contact: ${res.error}`,
-        res.status,
-        "pulseassist",
-      );
+      throw new EmailSendError(`Could not update the contact: ${res.error}`, res.status, "faga");
     }
     return true;
   },
@@ -469,12 +460,8 @@ export const pulseAssistProvider: EmailProvider = {
     );
     if (!res.ok) {
       if (isConfigRefusal(res))
-        throw new EmailProviderConfigError(res.error ?? "PulseAssist refused the API key.");
-      throw new EmailSendError(
-        `Could not list the audience: ${res.error}`,
-        res.status,
-        "pulseassist",
-      );
+        throw new EmailProviderConfigError(res.error ?? "Faga refused the API key.");
+      throw new EmailSendError(`Could not list the audience: ${res.error}`, res.status, "faga");
     }
 
     const contacts = (res.data?.contacts ?? []).map(toAudienceContact);
@@ -492,12 +479,12 @@ async function addToList(listId: number, contactId: number | string): Promise<vo
     throw new EmailSendError(
       `Could not add the contact to the audience: ${res.error}`,
       res.status,
-      "pulseassist",
+      "faga",
     );
   }
 }
 
 /** Test seam: clears the per-instance audience id cache. */
-export function __resetPulseAssistCaches(): void {
+export function __resetFagaCaches(): void {
   listIdCache.clear();
 }

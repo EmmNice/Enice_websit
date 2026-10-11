@@ -73,7 +73,6 @@ export const Route = createFileRoute("/portfolio/pulseassist")({
           "Real-time handoff to live agents",
           "API-driven account management",
           "Multi-tenant architecture for enterprises",
-          "Transactional and marketing email on a verified domain",
         ],
       },
     ]),
@@ -152,14 +151,6 @@ const FEATURES = [
     icon: Network,
     title: "Multi-tenant architecture",
     desc: "Enterprise-grade isolation between clients with dedicated model and routing configs.",
-  },
-  {
-    // PulseAssist is two platforms under one roof: the AI support layer above, and PulseAssist
-    // Email. The page described only the first, so the email platform is named here and gets its
-    // own page at /portfolio/pulseassist-email.
-    icon: Mail,
-    title: "Email on your own domain",
-    desc: "PulseAssist Email sends transactional and marketing email from your own verified domain, with deliverability and sending reputation managed for you.",
   },
 ];
 

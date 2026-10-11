@@ -15,6 +15,7 @@ import {
   CreditCard,
   Wallet,
   Bitcoin,
+  Mail,
 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { AboutMatrix } from "@/components/site/AboutMatrix";
@@ -91,6 +92,7 @@ const CARD_ICONS: Record<string, LucideIcon> = {
   Lock,
   Wallet,
   Bitcoin,
+  Mail,
 };
 
 function cardIcon(name: string): LucideIcon {
@@ -100,9 +102,9 @@ function cardIcon(name: string): LucideIcon {
 const VERTICALS = [
   {
     icon: Banknote,
-    kicker: "Fintech",
-    title: "Financial Infrastructure Systems",
-    desc: "Transaction networks, ledger databases, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
+    kicker: "FINTECH",
+    title: "Financial Solutions & Payments",
+    desc: "Flexible credit, transaction networks, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
     bullets: ["Virtual Card Issuance", "Treasury and Ledger", "KYC and Compliance Tooling"],
   },
   {
@@ -137,15 +139,10 @@ const CORE_MODULES = [
     title: "Automated Compliance and KYC Layer",
     desc: "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
   },
-  {
-    icon: Globe,
-    title: "Global Cloud Grid",
-    desc: "Managed database clustering and serverless edge delivery, so the same infrastructure serves every product without each one reinventing it.",
-  },
 ];
 
 /**
- * The three products the homepage leads with.
+ * The four products the homepage leads with.
  *
  * `facts` are the two or three checkable specifics that turn a card from a feature blurb into a
  * product: what it issues, who it is for, when it ships. In the CMS these are the `bullets`
@@ -154,9 +151,9 @@ const CORE_MODULES = [
 const PORTFOLIO_PREVIEW = [
   {
     icon: CreditCard,
-    kicker: "Fintech infrastructure",
+    kicker: "DIGITAL PAYMENTS",
     title: "PulsePay",
-    desc: "A virtual payment platform for modern commerce: instant Naira card issuance, programmable wallets, embedded KYC, and peer-to-peer transfers built for Nigerian institutions.",
+    desc: "A virtual payment platform for modern commerce: instant Naira and USD card issuance, programmable wallets, embedded KYC, and fast peer-to-peer transfers built for businesses and individuals.",
     facts: [
       { label: "Cards", value: "Naira & USD" },
       { label: "Market", value: "Nigeria" },
@@ -165,14 +162,25 @@ const PORTFOLIO_PREVIEW = [
   },
   {
     icon: BrainCircuit,
-    kicker: "Enterprise AI",
+    kicker: "CUSTOMER SUPPORT AI",
     title: "PulseAssist",
-    desc: "An AI operations platform for banking, fintech, and telecoms, with automated queue handling, live agent handoff, and policy-bound workflow automation.",
+    desc: "An AI support platform built for growing businesses, startups, and digital teams, with automated queue handling, live agent handoff, and smart customer workflow tools.",
     facts: [
-      { label: "Channels", value: "WhatsApp, web, email, SMS, voice" },
+      { label: "Channels and more.", value: "WhatsApp, web, Telegram, SMS, voice" },
       { label: "Tenancy", value: "Multi-tenant" },
     ],
     to: "/portfolio/pulseassist",
+  },
+  {
+    icon: Mail,
+    kicker: "Email infrastructure",
+    title: "Faga",
+    desc: "Faga handles the same email delivery work businesses use SendGrid or Resend for: transactional and marketing messages, verified domains, templates, webhooks, analytics, and API-driven sending.",
+    facts: [
+      { label: "Delivery", value: "Transactional & marketing" },
+      { label: "Integration", value: "REST API & webhooks" },
+    ],
+    to: "/portfolio/faga",
   },
   {
     icon: Banknote,

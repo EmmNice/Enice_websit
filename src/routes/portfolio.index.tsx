@@ -38,6 +38,12 @@ export const Route = createFileRoute("/portfolio/")({
           },
           {
             "@type": "SoftwareApplication",
+            name: "Faga",
+            url: `${SITE_URL}/portfolio/faga`,
+            applicationCategory: "BusinessApplication",
+          },
+          {
+            "@type": "SoftwareApplication",
             name: "DevaPay",
             url: `${SITE_URL}/portfolio/devapay`,
             applicationCategory: "FinanceApplication",
@@ -246,7 +252,7 @@ function PortfolioIndexPage() {
             </div>
           </ProductCard>
 
-          {/* ── PulseAssist Email ── */}
+          {/* ── Faga ── */}
           <ProductCard
             visual={
               <CardVisual className="h-56 sm:h-64">
@@ -289,25 +295,25 @@ function PortfolioIndexPage() {
                 <Mail aria-hidden className="h-3.5 w-3.5" />
                 Email Infrastructure
               </Eyebrow>
-              <LifecycleTag to="/portfolio/pulseassist-email" />
+              <LifecycleTag to="/portfolio/faga" />
             </div>
-            <h3 className="type-h3 mt-4 text-foreground">PulseAssist Email</h3>
+            <h3 className="type-h3 mt-4 text-foreground">Faga</h3>
             <p className="type-body mt-4">
-              Transactional and marketing email on your own verified domain, with inbound routing,
-              templates, automations, suppression handling and delivery analytics, from a console or
-              a REST API. Part of the PulseAssist platform.
+              Faga is an email delivery platform for the same work businesses use SendGrid or Resend
+              for: transactional and marketing messages, verified domains, templates, webhooks,
+              analytics, and API-driven sending.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta
-                to="/portfolio/pulseassist-email"
+                to="/portfolio/faga"
                 size="sm"
                 icon="arrow"
-                aria-label="View PulseAssist Email platform details"
+                aria-label="View Faga email platform details"
               >
                 View Platform
               </Cta>
               <Cta
-                to="mailto:corporate@enicehq.com?subject=PulseAssist%20Email%20Access%20Request"
+                to="mailto:corporate@enicehq.com?subject=Faga%20Access%20Request"
                 variant="secondary"
                 size="sm"
                 icon="external"

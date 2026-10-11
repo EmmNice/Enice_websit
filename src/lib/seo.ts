@@ -133,7 +133,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/portfolio": {
     title: "Products | ENICE Group",
     description:
-      "PulsePay, PulseAssist, DevaPay, and PRIDE: the products built and operated by ENICE Group.",
+      "PulsePay, PulseAssist, Faga, DevaPay, and PRIDE: the products built and operated by ENICE Group.",
   },
   "/portfolio/pulsepay": {
     title: "PulsePay | Virtual Payment Platform by ENICE Group",
@@ -145,10 +145,10 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     description:
       "PulseAssist by ENICE Group answers customers across WhatsApp, web chat, email, SMS and voice from one shared inbox, hands off to a human when it matters, and keeps compliance-ready audit trails.",
   },
-  "/portfolio/pulseassist-email": {
-    title: "PulseAssist Email | Transactional and Marketing Email by ENICE Group",
+  "/portfolio/faga": {
+    title: "Faga | Email Delivery Platform by ENICE Group",
     description:
-      "PulseAssist Email sends and receives mail on your own verified domain: inbound routing, templates, automations, suppression handling and delivery analytics, from a console and a REST API.",
+      "Faga provides transactional and marketing email delivery with verified domains, inbound routing, templates, automations, suppression handling, analytics, webhooks, and a REST API.",
   },
   "/portfolio/pride": {
     title: "PRIDE | Digital Asset Platform by ENICE Group",

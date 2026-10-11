@@ -29,14 +29,9 @@ interface Partner {
  * Shown before the CMS section has loaded, and if it can't be reached, so the homepage is never
  * blank. Mirrors the seeded section content, so the common case has no visible change on load.
  *
- * Only providers the platform genuinely runs on. Resend is gone (PulseAssist Email replaced it in
- * #31) and so is AWS Activate: a startup credits programme is not infrastructure, and listing it
- * beside AWS itself read as two partnerships where there is one.
- *
- * PulseAssist is in the list because this site genuinely runs on it: its transactional email goes
- * out through PulseAssist Email (`EMAIL_PROVIDER=pulseassist`, see #31) and the site assistant is
- * the PulseAssist widget. It being an ENICE product does not make it less of a dependency — the
- * strip is about what the platform is built on, and this is part of that.
+ * PulseAssist remains in the list because the site assistant runs on its AI platform. Email
+ * delivery is now a separate ENICE product, Faga, and is presented in the product portfolio rather
+ * than folded into PulseAssist's infrastructure label.
  */
 const DEFAULT_PARTNERS: Partner[] = [
   {
@@ -65,7 +60,7 @@ const DEFAULT_PARTNERS: Partner[] = [
   },
   {
     name: "PulseAssist",
-    tagline: "Support & Email Infrastructure",
+    tagline: "AI Customer Operations",
     logo: "/partners/pulseassist.svg",
     url: "https://getpulseassist.com",
   },

@@ -22,13 +22,13 @@ export const UPDATES_SEGMENT_NAME = "Product Updates";
 /**
  * The audience holding product-updates subscribers.
  *
- * As with early access, the original `RESEND_UPDATES_SEGMENT_ID` still pins the Resend segment so
- * switching back is lossless, with a PulseAssist equivalent alongside it.
+ * Faga uses its own list id; both previous provider-specific names remain compatibility fallbacks.
  */
 export const UPDATES_AUDIENCE: AudienceRef = {
   name: UPDATES_SEGMENT_NAME,
   idEnvVars: {
     resend: "RESEND_UPDATES_SEGMENT_ID",
+    faga: "FAGA_UPDATES_LIST_ID",
     pulseassist: "PULSEASSIST_UPDATES_LIST_ID",
   },
 };

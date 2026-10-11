@@ -710,9 +710,9 @@ export function defaultSettings(): SiteSettings {
               visible: true,
             },
             {
-              id: "nav-pulseassist-email",
-              label: "PulseAssist Email",
-              url: "/portfolio/pulseassist-email",
+              id: "nav-faga",
+              label: "Faga",
+              url: "/portfolio/faga",
               visible: true,
             },
             {
@@ -758,9 +758,9 @@ export function defaultSettings(): SiteSettings {
               visible: true,
             },
             {
-              id: "f-pulseassist-email",
-              label: "PulseAssist Email",
-              url: "/portfolio/pulseassist-email",
+              id: "f-faga",
+              label: "Faga",
+              url: "/portfolio/faga",
               visible: true,
             },
             {
@@ -906,10 +906,10 @@ const DEFAULT_SECTIONS: {
       items: [
         {
           icon: "Banknote",
-          kicker: "Fintech",
-          title: "Financial Infrastructure Systems",
+          kicker: "FINTECH",
+          title: "Financial Solutions & Payments",
           description:
-            "Transaction networks, ledger databases, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
+            "Flexible credit, transaction networks, and virtual card infrastructure built for Nigeria's digital economy, with room to expand across the region.",
           bullets: "Virtual Card Issuance\nTreasury and Ledger\nKYC and Compliance Tooling",
         },
         {
@@ -969,7 +969,7 @@ const DEFAULT_SECTIONS: {
         },
         {
           name: "PulseAssist",
-          tagline: "Support & Email Infrastructure",
+          tagline: "AI Customer Operations",
           logo: "/partners/pulseassist.svg",
           url: "https://getpulseassist.com",
         },
@@ -1012,21 +1012,30 @@ const DEFAULT_SECTIONS: {
       items: [
         {
           icon: "CreditCard",
-          kicker: "Fintech infrastructure",
+          kicker: "DIGITAL PAYMENTS",
           title: "PulsePay",
           description:
-            "A virtual payment platform for modern commerce: instant Naira card issuance, programmable wallets, embedded KYC, and peer-to-peer transfers built for Nigerian institutions.",
+            "A virtual payment platform for modern commerce: instant Naira and USD card issuance, programmable wallets, embedded KYC, and fast peer-to-peer transfers built for businesses and individuals.",
           bullets: "Cards: Naira & USD\nMarket: Nigeria",
           url: "/portfolio/pulsepay",
         },
         {
           icon: "BrainCircuit",
-          kicker: "Enterprise AI",
+          kicker: "CUSTOMER SUPPORT AI",
           title: "PulseAssist",
           description:
-            "An AI operations platform for banking, fintech, and telecoms, with automated queue handling, live agent handoff, and policy-bound workflow automation.",
-          bullets: "Channels: WhatsApp, web, email, SMS, voice\nTenancy: Multi-tenant",
+            "An AI support platform built for growing businesses, startups, and digital teams, with automated queue handling, live agent handoff, and smart customer workflow tools.",
+          bullets: "Channels and more.: WhatsApp, web, Telegram, SMS, voice\nTenancy: Multi-tenant",
           url: "/portfolio/pulseassist",
+        },
+        {
+          icon: "Mail",
+          kicker: "Email infrastructure",
+          title: "Faga",
+          description:
+            "Faga handles the same email delivery work businesses use SendGrid or Resend for: transactional and marketing messages, verified domains, templates, webhooks, analytics, and API-driven sending.",
+          bullets: "Delivery: Transactional & marketing\nIntegration: REST API & webhooks",
+          url: "/portfolio/faga",
         },
         {
           icon: "Banknote",
@@ -1070,12 +1079,6 @@ const DEFAULT_SECTIONS: {
           description:
             "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
         },
-        {
-          icon: "Globe",
-          title: "Global Cloud Grid",
-          description:
-            "Managed database clustering and serverless edge delivery, so the same infrastructure serves every product without each one reinventing it.",
-        },
       ],
     },
   },
@@ -1086,32 +1089,11 @@ const DEFAULT_SECTIONS: {
     type: "featureGrid",
     order: 38,
     fields: {
-      eyebrow: "The company",
-      heading: "ENICE Group is a product company.",
+      eyebrow: "THE COMPANY",
+      heading: "ENICE Group builds digital products.",
       subheading:
-        "We are the parent company behind a growing set of software platforms. We find real problems in financial services, commerce, and business communication, then build and run the products that solve them.",
-      items: [
-        {
-          title: "We start from the friction",
-          description:
-            "Every product traces back to something that failed in ordinary use: a payment that should have been simple, a support queue nobody answered. We build from the specific problem outward, not from a category we want to be in.",
-        },
-        {
-          title: "One core, many products",
-          description:
-            "Ledgers, identity, AI orchestration and compliance are solved once and shared. A new product inherits that foundation on its first day instead of rebuilding it, which is what makes a small team's output look like a much larger one.",
-        },
-        {
-          title: "We operate what we ship",
-          description:
-            "We own the products end to end: engineering, launch, and the day-to-day running of them. Nothing is handed to someone else to keep alive, which keeps the cost of a bad decision with the people who made it.",
-        },
-        {
-          title: "Built to still be here",
-          description:
-            "We design for the version of these systems that exists in ten years: versioned APIs, documented internals, and infrastructure choices made for reliability rather than novelty. Regulated markets do not reward clever.",
-        },
-      ],
+        "We are the parent company behind a growing suite of software platforms. We identify real challenges across financial services, commerce, and communication, then design, launch, and operate the products that solve them.",
+      items: [],
     },
   },
   {
@@ -1144,34 +1126,31 @@ const DEFAULT_SECTIONS: {
     },
   },
   /*
-   * PulseAssist Email.
-   *
-   * A shipping ENICE product that had no page on the company's own site, while this site's
-   * transactional mail has been sent through it since #31. Copy is condensed from the product's own
-   * page at getpulseassist.com/email; it is framed as a PulseAssist product because that page
-   * presents it as part of the PulseAssist platform.
+   * Faga is the standalone email delivery platform previously presented under PulseAssist.
+   * These sections back its product page while PulseAssist remains focused on AI customer
+   * operations.
    */
   {
-    key: "portfolio.pulseassist-email",
-    label: "PulseAssist Email page",
+    key: "portfolio.faga",
+    label: "Faga page",
     group: "Portfolio",
     type: "hero",
     order: 225,
     fields: {
-      eyebrow: "PulseAssist Email",
+      eyebrow: "Faga",
       heading: "Professional email, on your own domain.",
       subheading:
-        "Send and receive email from the domain your customers already know. Mailboxes, templates, campaigns and automations in one console, with a REST API, signed webhooks and delivery analytics when you would rather run it from your own systems.",
+        "Faga is an email delivery platform for transactional and marketing messages—the same category of platform as SendGrid and Resend. Send and receive from your own domain, manage templates and campaigns, or integrate through the REST API and signed webhooks.",
     },
   },
   {
-    key: "portfolio.pulseassist-email.facts",
-    label: "PulseAssist Email facts strip",
+    key: "portfolio.faga.facts",
+    label: "Faga facts strip",
     group: "Portfolio",
     type: "statistics",
     order: 226,
     fields: {
-      heading: "PulseAssist Email at a glance",
+      heading: "Faga at a glance",
       items: [
         { value: "Your domain", label: "Verified in live DNS" },
         { value: "Send + receive", label: "Inbound routing included" },
@@ -1181,8 +1160,8 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.pulseassist-email.capabilities",
-    label: "PulseAssist Email capabilities",
+    key: "portfolio.faga.capabilities",
+    label: "Faga capabilities",
     group: "Portfolio",
     type: "featureGrid",
     order: 227,
@@ -1256,7 +1235,7 @@ const DEFAULT_SECTIONS: {
           icon: "BrainCircuit",
           title: "AI drafting and classification",
           description:
-            "Draft, rewrite, summarise and classify mail using the same AI that answers support in PulseAssist. It draws on its own credit pool, so ordinary sending never consumes it.",
+            "Draft, rewrite, summarise and classify mail with AI-assisted tools while keeping ordinary sending independent from AI usage.",
         },
         {
           icon: "Code2",
@@ -1268,8 +1247,8 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.pulseassist-email.setup",
-    label: "PulseAssist Email setup steps",
+    key: "portfolio.faga.setup",
+    label: "Faga setup steps",
     group: "Portfolio",
     type: "steps",
     order: 228,
@@ -1315,17 +1294,17 @@ const DEFAULT_SECTIONS: {
         {
           question: "What does ENICE Group build?",
           answer:
-            "ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform. PulseAssist handles AI-powered business communication and customer support.",
+            "ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform, PulseAssist is our AI customer-operations platform, and Faga provides email delivery infrastructure.",
         },
         {
           question: "Which problems are ENICE products built to solve?",
           answer:
-            "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist covers business communication and customer support, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.",
+            "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, Faga provides transactional and marketing email infrastructure, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.",
         },
         {
           question: "What does the ENICE Core provide?",
           answer:
-            "A shared AI and automation pipeline, a fast ledger and payment core, an automated KYC and compliance layer, and a global cloud grid. Every product inherits the same scale, security, and observability from day one.",
+            "A shared AI and automation pipeline, a fast ledger and payment core, and an automated KYC and compliance layer. Every product inherits the same scale, security, and observability from day one.",
         },
         {
           question: "How does ENICE Group approach security and compliance?",
@@ -2001,12 +1980,6 @@ const DEFAULT_SECTIONS: {
           description:
             "Enterprise-grade isolation between clients with dedicated model and routing configs.",
         },
-        {
-          icon: "Mail",
-          title: "Email on your own domain",
-          description:
-            "PulseAssist Email sends transactional and marketing email from your own verified domain, with deliverability and sending reputation managed for you.",
-        },
       ],
     },
   },
@@ -2245,8 +2218,8 @@ const SYSTEM_PAGES: { path: string; title: string; summary: string }[] = [
     summary: "Enterprise AI operations platform.",
   },
   {
-    path: "/portfolio/pulseassist-email",
-    title: "PulseAssist Email",
+    path: "/portfolio/faga",
+    title: "Faga",
     summary: "Transactional and marketing email on a verified domain.",
   },
   { path: "/portfolio/pride", title: "PRIDE", summary: "Digital asset platform." },

@@ -3,7 +3,7 @@
  *
  * SERVER ONLY. Reads `RESEND_API_KEY`.
  *
- * ENICE has moved to PulseAssist Email, so this is no longer the default. It is retained rather
+ * ENICE has moved to Faga, so this is no longer the default. It is retained rather
  * than deleted for two reasons: a provider you cannot switch back to is not really switchable,
  * and the existing Resend audience data is still reachable through it while anything is migrated.
  * `EMAIL_PROVIDER=resend` restores the previous behaviour exactly.
