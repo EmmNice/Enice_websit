@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { AboutMatrix } from "@/components/site/AboutMatrix";
-import { NetworkMetrics } from "@/components/site/NetworkMetrics";
 import { Careers } from "@/components/site/Careers";
 import { FAQSection } from "@/components/site/FAQSection";
 import { Reveal } from "@/components/site/Reveal";
@@ -126,18 +125,18 @@ const VERTICALS = [
 const CORE_MODULES = [
   {
     icon: Cpu,
-    title: "Unified AI and Automation Pipeline",
-    desc: "Centralized LLM orchestration and vector search routing that powers products like PulseAssist across every tenant.",
+    title: "AI & Automation",
+    desc: "Centralized AI tools and smart workflows that power products like PulseAssist to handle customer support and communication seamlessly.",
   },
   {
     icon: Database,
-    title: "High-Velocity Ledger and Payment Core",
-    desc: "A fast transaction engine and virtual account infrastructure that anchors PulsePay and the financial products we build next.",
+    title: "Fast Payments & Ledgers",
+    desc: "A reliable transaction engine and virtual account system that powers PulsePay and future financial tools we build.",
   },
   {
     icon: FileCheck2,
-    title: "Automated Compliance and KYC Layer",
-    desc: "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
+    title: "Built-In Compliance & KYC",
+    desc: "Identity verification, fraud checks, and security screening running automatically in real time across all our products.",
   },
 ];
 
@@ -221,10 +220,10 @@ const PRODUCT_ACCENT_BY_PATH: Partial<Record<string, string>> = {
 const HERO_MECHANISMS = 3;
 
 const COMPLIANCE_BADGES = [
-  { icon: ShieldCheck, label: "Row-level security" },
-  { icon: Lock, label: "Per-tenant isolation" },
-  { icon: Check, label: "Audit logging" },
-  { icon: Wifi, label: "Encrypted in transit and at rest" },
+  { icon: ShieldCheck, label: "ROW-LEVEL SECURITY" },
+  { icon: Lock, label: "PER-TENANT ISOLATION" },
+  { icon: Check, label: "AUDIT LOGGING" },
+  { icon: Wifi, label: "ENCRYPTED IN TRANSIT AND AT REST" },
 ];
 
 const FOUNDERS_LETTER = [
@@ -642,22 +641,22 @@ function Landing() {
         </div>
       </Section>
 
-      {/* ═══ THE ENICE CORE ═════════════════════════════════════════════════ */}
+      {/* ═══ THE ENICE ENGINE ══════════════════════════════════════════════ */}
       <Section glow="center" divider aria-labelledby="core-heading">
         <Reveal>
           <SectionIntro
             id="core-heading"
-            eyebrow={fieldText(core, "eyebrow", "What powers our products")}
-            heading={fieldText(core, "heading", "The ENICE Core.")}
+            eyebrow={fieldText(core, "eyebrow", "WHAT POWERS OUR PRODUCTS")}
+            heading={fieldText(core, "heading", "The ENICE Engine")}
             lead={fieldText(
               core,
               "subheading",
-              "Every product we operate runs on a shared infrastructure core, so the software customers use inherits scale, compliance, and reliability from the ground up.",
+              "All of our apps share the same underlying technology—making every product faster, more reliable, and secure right out of the box.",
             )}
           />
         </Reveal>
 
-        <HairlineGrid columns={2} className="mt-14">
+        <HairlineGrid columns={3} className="mt-14">
           {coreModules.map((c, i) => (
             <Reveal key={c.title} delay={i * 70} className="flex">
               <div className="panel-interactive flex h-full flex-col p-8 xl:p-10">
@@ -676,15 +675,14 @@ function Landing() {
           ))}
         </HairlineGrid>
 
-        {/* The mechanisms the Core actually implements. Previously a separate full-width
-            "credibility bar" band that repeated the same four claims a screen later. */}
+        {/* Safeguards shared by the ENICE Engine and every product built on it. */}
         <Reveal>
           <div className="mt-12 flex flex-col gap-5 border-t border-border pt-8 lg:flex-row lg:items-center lg:justify-between">
             <p className="max-w-md text-[13px] leading-relaxed text-bone-soft">
               {fieldText(
                 mechanisms,
                 "subheading",
-                "Regulated in the Federal Republic of Nigeria. These are mechanisms the platform implements, not certifications we hold.",
+                "Built in compliance with applicable standards in the Federal Republic of Nigeria. Our products operate with enterprise-grade data protection, strict privacy controls, and end-to-end security architecture across all systems.",
               )}
             </p>
             <ul className="flex flex-wrap gap-2">
@@ -705,7 +703,6 @@ function Landing() {
         </Reveal>
       </Section>
 
-      <NetworkMetrics />
       <AboutMatrix />
 
       {/* ═══ FROM THE FOUNDERS ══════════════════════════════════════════════ */}

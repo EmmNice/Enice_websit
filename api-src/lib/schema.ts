@@ -2262,6 +2262,68 @@ WHERE key = 'home.portfolio'
   AND fields->'items' @> '[{"url":"/portfolio/devapay"}]'::jsonb;
 `,
   },
+  {
+    id: 26,
+    name: "replace_capabilities_with_enice_engine",
+    sql: /* sql */ `
+-- Remove the retired Platform Capabilities band and replace the homepage Core presentation with
+-- the ENICE Engine copy. Migrations 12-14 seeded these rows, so production data must be updated
+-- explicitly rather than relying on changed defaults.
+DELETE FROM site_sections WHERE key = 'home.capabilities';
+
+UPDATE site_sections
+SET label = 'The ENICE Engine',
+    fields = '{
+      "eyebrow":"WHAT POWERS OUR PRODUCTS",
+      "heading":"The ENICE Engine",
+      "subheading":"All of our apps share the same underlying technology—making every product faster, more reliable, and secure right out of the box.",
+      "items":[
+        {
+          "icon":"Cpu",
+          "title":"AI & Automation",
+          "description":"Centralized AI tools and smart workflows that power products like PulseAssist to handle customer support and communication seamlessly."
+        },
+        {
+          "icon":"Database",
+          "title":"Fast Payments & Ledgers",
+          "description":"A reliable transaction engine and virtual account system that powers PulsePay and future financial tools we build."
+        },
+        {
+          "icon":"FileCheck2",
+          "title":"Built-In Compliance & KYC",
+          "description":"Identity verification, fraud checks, and security screening running automatically in real time across all our products."
+        }
+      ]
+    }'::jsonb,
+    updated_at = now()
+WHERE key = 'home.core';
+
+UPDATE site_sections
+SET fields = '{
+      "heading":"ENICE Engine safeguards",
+      "subheading":"Built in compliance with applicable standards in the Federal Republic of Nigeria. Our products operate with enterprise-grade data protection, strict privacy controls, and end-to-end security architecture across all systems.",
+      "items":[
+        {"icon":"ShieldCheck","title":"ROW-LEVEL SECURITY"},
+        {"icon":"Lock","title":"PER-TENANT ISOLATION"},
+        {"icon":"Check","title":"AUDIT LOGGING"},
+        {"icon":"Wifi","title":"ENCRYPTED IN TRANSIT AND AT REST"}
+      ]
+    }'::jsonb,
+    updated_at = now()
+WHERE key = 'home.mechanisms';
+
+UPDATE site_sections
+SET fields = replace(
+      replace(fields::text,
+        'What does the ENICE Core provide?',
+        'What does the ENICE Engine provide?'),
+      'A shared AI and automation pipeline, a fast ledger and payment core, and an automated KYC and compliance layer. Every product inherits the same scale, security, and observability from day one.',
+      'Shared AI and automation, fast payments and ledgers, and built-in compliance and KYC. Every product starts with the same reliable, secure foundation.')::jsonb,
+    updated_at = now()
+WHERE key = 'home.faq'
+  AND position('ENICE Core' in fields::text) > 0;
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

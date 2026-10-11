@@ -19,8 +19,8 @@ export const FAQS: readonly { q: string; a: string }[] = [
     a: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, Faga provides transactional and marketing email infrastructure, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.",
   },
   {
-    q: "What does the ENICE Core provide?",
-    a: "A shared AI and automation pipeline, a fast ledger and payment core, and an automated KYC and compliance layer. Every product inherits the same scale, security, and observability from day one.",
+    q: "What does the ENICE Engine provide?",
+    a: "Shared AI and automation, fast payments and ledgers, and built-in compliance and KYC. Every product starts with the same reliable, secure foundation.",
   },
   {
     q: "How does ENICE Group approach security and compliance?",
