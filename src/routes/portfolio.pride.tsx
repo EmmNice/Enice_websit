@@ -340,7 +340,7 @@ function PridePage() {
   });
 
   return (
-    <SiteShell>
+    <SiteShell className="product-theme-pride">
       {/* ═══ HERO ═════════════════════════════════════════════════════════════ */}
       <Section spacing="loose" glow="spread" grid aria-labelledby="pride-heading">
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
@@ -348,15 +348,10 @@ function PridePage() {
           <div data-allow-select>
             <Tag tone="accent">Coming Q3 2027</Tag>
 
-            {/*
-              Hand-built rather than `SectionIntro`: the editable heading is `Pulse[[X]]`, and
-              `SectionIntro` paints a `[[highlight]]` electric. A display-size word in the accent colour
-              is the one thing the accent is not for, so the highlight resolves to bone and the
-              electric stays where it belongs — the eyebrow, the icons and the hairlines.
-            */}
+            {/* PRIDE keeps the same display treatment as the rest of the product family. */}
             <h1 id="pride-heading" className="type-display mt-8 text-foreground">
               <StyledText
-                text={fieldText(header, "heading", "Pulse[[X]]")}
+                text={fieldText(header, "heading", "PRIDE")}
                 accentClassName="text-foreground"
               />
             </h1>

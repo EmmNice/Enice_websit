@@ -1752,7 +1752,7 @@ const DEFAULT_SECTIONS: {
     type: "hero",
     order: 240,
     fields: {
-      heading: "Pulse[[X]]",
+      heading: "PRIDE",
       subheading:
         "PRIDE is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
     },
@@ -1780,8 +1780,7 @@ const DEFAULT_SECTIONS: {
    * existing databases.
    *
    * `sort_order` follows the order the bands appear on their page, inside the block already
-   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse — since removed — 240 PRIDE, formerly
-   * PulseX, 250 DevaPay).
+   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse — since removed — 240 PRIDE, 250 DevaPay).
    */
   {
     key: "portfolio.pulsepay.stats",

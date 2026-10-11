@@ -198,7 +198,7 @@ function PulsePayPage() {
   );
 
   return (
-    <SiteShell>
+    <SiteShell className="product-theme-pulsepay">
       {/* ═══ HERO ═══════════════════════════════════════════════════════════ */}
       <Section spacing="loose" grid glow="spread" aria-labelledby="pulsepay-heading">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">

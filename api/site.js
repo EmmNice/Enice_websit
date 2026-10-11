@@ -4707,6 +4707,22 @@ WHERE key = 'home.faq'
   AND position('ENICE Core' in fields::text) > 0;
 `
     )
+  },
+  {
+    id: 27,
+    name: "use_pride_name_everywhere",
+    sql: (
+      /* sql */
+      `
+-- The digital asset product is PRIDE. Correct the remaining live hero heading while preserving
+-- any administrator-authored replacement and keeping historical redirects/migration matches.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"PRIDE"'::jsonb),
+    updated_at = now()
+WHERE key = 'portfolio.pride'
+  AND fields->>'heading' = 'Pulse[[X]]';
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (
