@@ -4749,6 +4749,27 @@ SET fields = jsonb_set(
 WHERE key = 'home.portfolio'
   AND position('/portfolio/faga' in fields::text) = 0;
 
+-- Refresh the PulseAssist homepage card so it is positioned only as customer-support AI.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN item->>'url' = '/portfolio/pulseassist'
+                    THEN '{
+                      "icon":"BrainCircuit",
+                      "kicker":"CUSTOMER SUPPORT AI",
+                      "title":"PulseAssist",
+                      "description":"An AI support platform built for growing businesses, startups, and digital teams, with automated queue handling, live agent handoff, and smart customer workflow tools.",
+                      "bullets":"Channels and more.: WhatsApp, web, Telegram, SMS, voice\\nTenancy: Multi-tenant",
+                      "url":"/portfolio/pulseassist"
+                    }'::jsonb
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND fields->'items' @> '[{"url":"/portfolio/pulseassist"}]'::jsonb;
+
 -- Apply the updated FINTECH category copy to the existing production CMS row.
 UPDATE site_sections
 SET fields = jsonb_set(fields, '{items}', (
@@ -7078,10 +7099,10 @@ var DEFAULT_SECTIONS = [
         },
         {
           icon: "BrainCircuit",
-          kicker: "Enterprise AI",
+          kicker: "CUSTOMER SUPPORT AI",
           title: "PulseAssist",
-          description: "An AI operations platform for banking, fintech, and telecoms, with automated queue handling, live agent handoff, and policy-bound workflow automation.",
-          bullets: "Channels: WhatsApp, web, email, SMS, voice\nTenancy: Multi-tenant",
+          description: "An AI support platform built for growing businesses, startups, and digital teams, with automated queue handling, live agent handoff, and smart customer workflow tools.",
+          bullets: "Channels and more.: WhatsApp, web, Telegram, SMS, voice\nTenancy: Multi-tenant",
           url: "/portfolio/pulseassist"
         },
         {

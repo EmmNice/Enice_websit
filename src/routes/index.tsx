@@ -167,11 +167,11 @@ const PORTFOLIO_PREVIEW = [
   },
   {
     icon: BrainCircuit,
-    kicker: "Enterprise AI",
+    kicker: "CUSTOMER SUPPORT AI",
     title: "PulseAssist",
-    desc: "An AI operations platform for banking, fintech, and telecoms, with automated queue handling, live agent handoff, and policy-bound workflow automation.",
+    desc: "An AI support platform built for growing businesses, startups, and digital teams, with automated queue handling, live agent handoff, and smart customer workflow tools.",
     facts: [
-      { label: "Channels", value: "WhatsApp, web, email, SMS, voice" },
+      { label: "Channels and more.", value: "WhatsApp, web, Telegram, SMS, voice" },
       { label: "Tenancy", value: "Multi-tenant" },
     ],
     to: "/portfolio/pulseassist",

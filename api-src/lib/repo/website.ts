@@ -1021,11 +1021,11 @@ const DEFAULT_SECTIONS: {
         },
         {
           icon: "BrainCircuit",
-          kicker: "Enterprise AI",
+          kicker: "CUSTOMER SUPPORT AI",
           title: "PulseAssist",
           description:
-            "An AI operations platform for banking, fintech, and telecoms, with automated queue handling, live agent handoff, and policy-bound workflow automation.",
-          bullets: "Channels: WhatsApp, web, email, SMS, voice\nTenancy: Multi-tenant",
+            "An AI support platform built for growing businesses, startups, and digital teams, with automated queue handling, live agent handoff, and smart customer workflow tools.",
+          bullets: "Channels and more.: WhatsApp, web, Telegram, SMS, voice\nTenancy: Multi-tenant",
           url: "/portfolio/pulseassist",
         },
         {
