@@ -2474,6 +2474,24 @@ SET fields = jsonb_set(fields, '{ctaLabel}', '"Contact the team"'::jsonb), updat
 WHERE key = 'home.careers' AND fields->>'ctaLabel' = 'Meet the team';
 `,
   },
+  {
+    id: 29,
+    name: "remove_public_vercel_and_railway_partners",
+    sql: /* sql */ `
+-- Keep deployment providers private by removing them only from the public partner section.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(COALESCE(fields->'items', '[]'::jsonb))
+           WITH ORDINALITY AS t(item, ord)
+      WHERE item->>'name' NOT IN ('Vercel', 'Railway')
+    )),
+    updated_at = now()
+WHERE key = 'home.partners'
+  AND (fields->'items' @> '[{"name":"Vercel"}]'::jsonb
+       OR fields->'items' @> '[{"name":"Railway"}]'::jsonb);
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */
