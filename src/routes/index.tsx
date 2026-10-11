@@ -183,15 +183,15 @@ const PORTFOLIO_PREVIEW = [
     to: "/portfolio/faga",
   },
   {
-    icon: Banknote,
-    kicker: "Fintech infrastructure",
-    title: "DevaPay",
-    desc: "Payment infrastructure for businesses to accept and manage customer payments through a single, developer friendly API, with real time updates and webhook notifications.",
+    icon: Bitcoin,
+    kicker: "DIGITAL ASSETS",
+    title: "PRIDE",
+    desc: "ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance simple, secure, and accessible within the ENICE ecosystem.",
     facts: [
-      { label: "Launch", value: "2028" },
-      { label: "Integration", value: "One API" },
+      { label: "Launch", value: "Q3 2027" },
+      { label: "Category", value: "Digital Assets" },
     ],
-    to: "/portfolio/devapay",
+    to: "/portfolio/pride",
   },
 ];
 
