@@ -139,11 +139,6 @@ const CORE_MODULES = [
     title: "Automated Compliance and KYC Layer",
     desc: "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
   },
-  {
-    icon: Globe,
-    title: "Global Cloud Grid",
-    desc: "Managed database clustering and serverless edge delivery, so the same infrastructure serves every product without each one reinventing it.",
-  },
 ];
 
 /**
@@ -156,9 +151,9 @@ const CORE_MODULES = [
 const PORTFOLIO_PREVIEW = [
   {
     icon: CreditCard,
-    kicker: "Fintech infrastructure",
+    kicker: "DIGITAL PAYMENTS",
     title: "PulsePay",
-    desc: "A virtual payment platform for modern commerce: instant Naira card issuance, programmable wallets, embedded KYC, and peer-to-peer transfers built for Nigerian institutions.",
+    desc: "A virtual payment platform for modern commerce: instant Naira and USD card issuance, programmable wallets, embedded KYC, and fast peer-to-peer transfers built for businesses and individuals.",
     facts: [
       { label: "Cards", value: "Naira & USD" },
       { label: "Market", value: "Nigeria" },

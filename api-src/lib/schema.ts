@@ -2144,6 +2144,39 @@ SET fields = jsonb_set(fields, '{items}', (
 WHERE key = 'home.portfolio'
   AND fields->'items' @> '[{"url":"/portfolio/pulseassist"}]'::jsonb;
 
+-- Apply the supplied Digital Payments copy to the PulsePay homepage card.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN item->>'url' = '/portfolio/pulsepay'
+                    THEN '{
+                      "icon":"CreditCard",
+                      "kicker":"DIGITAL PAYMENTS",
+                      "title":"PulsePay",
+                      "description":"A virtual payment platform for modern commerce: instant Naira and USD card issuance, programmable wallets, embedded KYC, and fast peer-to-peer transfers built for businesses and individuals.",
+                      "bullets":"Cards: Naira & USD\\nMarket: Nigeria",
+                      "url":"/portfolio/pulsepay"
+                    }'::jsonb
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND fields->'items' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb;
+
+-- Remove the Global Cloud Grid homepage card from existing CMS data.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(COALESCE(fields->'items', '[]'::jsonb))
+           WITH ORDINALITY AS t(item, ord)
+      WHERE item->>'title' IS DISTINCT FROM 'Global Cloud Grid'
+    )),
+    updated_at = now()
+WHERE key = 'home.core'
+  AND fields->'items' @> '[{"title":"Global Cloud Grid"}]'::jsonb;
+
 -- Apply the updated FINTECH category copy to the existing production CMS row.
 UPDATE site_sections
 SET fields = jsonb_set(fields, '{items}', (
@@ -2175,6 +2208,15 @@ SET fields = replace(
 WHERE key = 'home.faq'
   AND (position('PulseAssist handles AI-powered business communication' in fields::text) > 0
        OR position('PulseAssist covers business communication' in fields::text) > 0);
+
+UPDATE site_sections
+SET fields = replace(
+      fields::text,
+      'A shared AI and automation pipeline, a fast ledger and payment core, an automated KYC and compliance layer, and a global cloud grid.',
+      'A shared AI and automation pipeline, a fast ledger and payment core, and an automated KYC and compliance layer.')::jsonb,
+    updated_at = now()
+WHERE key = 'home.faq'
+  AND position('global cloud grid' in lower(fields::text)) > 0;
 `,
   },
 ];

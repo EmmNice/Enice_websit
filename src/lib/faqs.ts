@@ -20,7 +20,7 @@ export const FAQS: readonly { q: string; a: string }[] = [
   },
   {
     q: "What does the ENICE Core provide?",
-    a: "A shared AI and automation pipeline, a fast ledger and payment core, an automated KYC and compliance layer, and a global cloud grid. Every product inherits the same scale, security, and observability from day one.",
+    a: "A shared AI and automation pipeline, a fast ledger and payment core, and an automated KYC and compliance layer. Every product inherits the same scale, security, and observability from day one.",
   },
   {
     q: "How does ENICE Group approach security and compliance?",

@@ -1012,10 +1012,10 @@ const DEFAULT_SECTIONS: {
       items: [
         {
           icon: "CreditCard",
-          kicker: "Fintech infrastructure",
+          kicker: "DIGITAL PAYMENTS",
           title: "PulsePay",
           description:
-            "A virtual payment platform for modern commerce: instant Naira card issuance, programmable wallets, embedded KYC, and peer-to-peer transfers built for Nigerian institutions.",
+            "A virtual payment platform for modern commerce: instant Naira and USD card issuance, programmable wallets, embedded KYC, and fast peer-to-peer transfers built for businesses and individuals.",
           bullets: "Cards: Naira & USD\nMarket: Nigeria",
           url: "/portfolio/pulsepay",
         },
@@ -1078,12 +1078,6 @@ const DEFAULT_SECTIONS: {
           title: "Automated Compliance and KYC Layer",
           description:
             "Identity verification, fraud detection, and regulatory screening, run in real time and shared across every product.",
-        },
-        {
-          icon: "Globe",
-          title: "Global Cloud Grid",
-          description:
-            "Managed database clustering and serverless edge delivery, so the same infrastructure serves every product without each one reinventing it.",
         },
       ],
     },
@@ -1331,7 +1325,7 @@ const DEFAULT_SECTIONS: {
         {
           question: "What does the ENICE Core provide?",
           answer:
-            "A shared AI and automation pipeline, a fast ledger and payment core, an automated KYC and compliance layer, and a global cloud grid. Every product inherits the same scale, security, and observability from day one.",
+            "A shared AI and automation pipeline, a fast ledger and payment core, and an automated KYC and compliance layer. Every product inherits the same scale, security, and observability from day one.",
         },
         {
           question: "How does ENICE Group approach security and compliance?",
