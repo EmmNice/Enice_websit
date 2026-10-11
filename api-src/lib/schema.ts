@@ -2337,6 +2337,143 @@ WHERE key = 'portfolio.pride'
   AND fields->>'heading' = 'Pulse[[X]]';
 `,
   },
+  {
+    id: 28,
+    name: "make_homepage_shorter_and_clearer",
+    sql: /* sql */ `
+-- Tighten the landing page without changing the named product cards. Retired homepage rows stay in
+-- the database to preserve editor work, but their defaults and renderers are removed.
+
+UPDATE site_settings
+SET value = jsonb_set(
+      value,
+      '{tagline}',
+      '"ENICE builds and runs software for payments, customer support, email, and digital assets."'::jsonb
+    ),
+    updated_at = now()
+WHERE key = 'footer'
+  AND value->>'tagline' = 'ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.';
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{eyebrow}', '"AI, payments and digital products"'::jsonb),
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'eyebrow' = 'Technology Group · Building for Africa';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"We build software businesses can use every day."'::jsonb),
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'heading' = 'We build the technology behind Africa''s next generation of businesses.';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{subheading}',
+      '"ENICE builds and runs tools for customer support, payments, email, and digital assets."'::jsonb),
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'subheading' = 'ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.';
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"Infrastructure and platform providers"'::jsonb),
+    updated_at = now()
+WHERE key = 'home.partners'
+  AND fields->>'heading' IN ('Working with', 'Built on trusted infrastructure partners');
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{eyebrow}', '"Our products"'::jsonb), updated_at = now()
+WHERE key = 'home.portfolio' AND fields->>'eyebrow' = 'Built and operated by ENICE';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"Products we build and run."'::jsonb), updated_at = now()
+WHERE key = 'home.portfolio' AND fields->>'heading' = 'The products we build and run.';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{subheading}',
+      '"Tools for payments, customer support, email, and digital assets."'::jsonb),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND fields->>'subheading' = 'Each one began as a problem we hit ourselves, and each one is a platform we operate day to day rather than hand over.';
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{eyebrow}', '"What we build"'::jsonb), updated_at = now()
+WHERE key = 'home.products' AND fields->>'eyebrow' = 'What we''re building';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"Three areas we work in."'::jsonb), updated_at = now()
+WHERE key = 'home.products' AND fields->>'heading' = 'Three areas we build in.';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{subheading}',
+      '"Payments, customer support, and software products built for businesses in Africa."'::jsonb),
+    updated_at = now()
+WHERE key = 'home.products'
+  AND fields->>'subheading' = 'ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on.';
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT jsonb_agg(
+               CASE
+                 WHEN item = '{
+                   "icon":"BrainCircuit",
+                   "kicker":"Artificial Intelligence",
+                   "title":"Autonomous Enterprise AI",
+                   "description":"Conversational AI that handles customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms.",
+                   "bullets":"Autonomous Customer Support\\nPolicy-Bound AI Agents\\nWorkflow Automation"
+                 }'::jsonb THEN '{
+                   "icon":"BrainCircuit",
+                   "kicker":"AI SUPPORT",
+                   "title":"AI for customer support",
+                   "description":"AI tools that answer common questions, route work, and hand conversations to people when needed.",
+                   "bullets":"Customer Support\\nRules and Approval Steps\\nWorkflows and Handoffs"
+                 }'::jsonb
+                 WHEN item = '{
+                   "icon":"Boxes",
+                   "kicker":"Product Engineering",
+                   "title":"Products built to operate",
+                   "description":"We build, own, and operate full-stack products. Each platform starts from a real customer problem and goes through engineering, launch, and day-to-day operation.",
+                   "bullets":"Product Ownership\\nPlatform Engineering\\nContinuous Operation"
+                 }'::jsonb THEN '{
+                   "icon":"Boxes",
+                   "kicker":"SOFTWARE PRODUCTS",
+                   "title":"Software we build and run",
+                   "description":"We design, launch, and maintain our own products instead of handing them off after release.",
+                   "bullets":"Product Design\\nPlatform Engineering\\nDaily Operation"
+                 }'::jsonb
+                 ELSE item
+               END
+               ORDER BY ord)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'home.products'
+  AND (
+    fields->'items' @> '[{
+      "icon":"BrainCircuit",
+      "kicker":"Artificial Intelligence",
+      "title":"Autonomous Enterprise AI",
+      "description":"Conversational AI that handles customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms.",
+      "bullets":"Autonomous Customer Support\\nPolicy-Bound AI Agents\\nWorkflow Automation"
+    }]'::jsonb
+    OR fields->'items' @> '[{
+      "icon":"Boxes",
+      "kicker":"Product Engineering",
+      "title":"Products built to operate",
+      "description":"We build, own, and operate full-stack products. Each platform starts from a real customer problem and goes through engineering, launch, and day-to-day operation.",
+      "bullets":"Product Ownership\\nPlatform Engineering\\nContinuous Operation"
+    }]'::jsonb
+  );
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{eyebrow}', '"Work with us"'::jsonb), updated_at = now()
+WHERE key = 'home.careers' AND fields->>'eyebrow' = 'Join the builders';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{heading}', '"Build useful products."'::jsonb), updated_at = now()
+WHERE key = 'home.careers' AND fields->>'heading' = 'Build products that matter.';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{subheading}',
+      '"We work with engineers and product builders who care about clear thinking, solid work, and reliable software."'::jsonb),
+    updated_at = now()
+WHERE key = 'home.careers'
+  AND fields->>'subheading' = 'We work with people who care about product quality, solid engineering, and technology that holds up at real scale. If that sounds like you, we want to hear from you.';
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{ctaLabel}', '"Contact the team"'::jsonb), updated_at = now()
+WHERE key = 'home.careers' AND fields->>'ctaLabel' = 'Meet the team';
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

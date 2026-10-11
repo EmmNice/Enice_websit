@@ -816,7 +816,7 @@ export function defaultSettings(): SiteSettings {
         },
       ],
       tagline:
-        "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
+        "ENICE builds and runs software for payments, customer support, email, and digital assets.",
       copyright: `© ${new Date().getFullYear()} ENICE Technology Limited. All rights reserved.`,
       showSocials: true,
     },
@@ -848,20 +848,10 @@ const DEFAULT_SECTIONS: {
     type: "hero",
     order: 10,
     fields: {
-      eyebrow: "Technology Group · Building for Africa",
-      /*
-       * No manual line breaks and no [[highlight]] in the default.
-       *
-       * The breaks were tuned for one viewport and ragged badly at every other; the headline is
-       * now balanced by the browser. The highlight is dropped because at display size it put two
-       * lines of the accent at the top of the page — the accent is for small emphasis, and a 60px
-       * phrase in the brand blue stops reading as an accent. Both remain available to an editor
-       * (\n splits a line, [[…]] renders a phrase in the accent colour); they are simply not what
-       * the shipped copy uses.
-       */
-      heading: "We build the technology behind Africa's next generation of businesses.",
+      eyebrow: "AI, payments and digital products",
+      heading: "We build software businesses can use every day.",
       subheading:
-        "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
+        "ENICE builds and runs tools for customer support, payments, email, and digital assets.",
       primaryCtaLabel: "Explore our products",
       primaryCtaUrl: "/portfolio",
       secondaryCtaLabel: "What we build",
@@ -897,10 +887,10 @@ const DEFAULT_SECTIONS: {
     type: "featureGrid",
     order: 30,
     fields: {
-      eyebrow: "What we're building",
-      heading: "Three areas we build in.",
+      eyebrow: "What we build",
+      heading: "Three areas we work in.",
       subheading:
-        "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on.",
+        "Payments, customer support, and software products built for businesses in Africa.",
       // The three cards the homepage product band renders. `index` numbering is derived from
       // position, and bullets are one per line.
       items: [
@@ -914,19 +904,19 @@ const DEFAULT_SECTIONS: {
         },
         {
           icon: "BrainCircuit",
-          kicker: "Artificial Intelligence",
-          title: "Autonomous Enterprise AI",
+          kicker: "AI SUPPORT",
+          title: "AI for customer support",
           description:
-            "Conversational AI that handles customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms.",
-          bullets: "Autonomous Customer Support\nPolicy-Bound AI Agents\nWorkflow Automation",
+            "AI tools that answer common questions, route work, and hand conversations to people when needed.",
+          bullets: "Customer Support\nRules and Approval Steps\nWorkflows and Handoffs",
         },
         {
           icon: "Boxes",
-          kicker: "Product Engineering",
-          title: "Products built to operate",
+          kicker: "SOFTWARE PRODUCTS",
+          title: "Software we build and run",
           description:
-            "We build, own, and operate full-stack products. Each platform starts from a real customer problem and goes through engineering, launch, and day-to-day operation.",
-          bullets: "Product Ownership\nPlatform Engineering\nContinuous Operation",
+            "We design, launch, and maintain our own products instead of handing them off after release.",
+          bullets: "Product Design\nPlatform Engineering\nDaily Operation",
         },
       ],
     },
@@ -938,7 +928,7 @@ const DEFAULT_SECTIONS: {
     type: "logoStrip",
     order: 40,
     fields: {
-      heading: "Working with",
+      heading: "Infrastructure and platform providers",
       // The infrastructure providers, each with a self-hosted brand logo (public/partners/*.svg),
       // so the strip is populated on a fresh install. Existing databases are seeded the same set
       // by migration 3. An administrator can edit, reorder or remove any of these.
@@ -985,12 +975,8 @@ const DEFAULT_SECTIONS: {
   /*
    * The bands below were hardcoded in the page components until now.
    *
-   * Seven sections of the homepage — the product line-up, the infrastructure core, the company
-   * story, the founders' letter, the stack, the hiring band — could only be changed by editing
-   * React and shipping a deploy, while the four beside them were editable. That split is not a
-   * design: it is just where the CMS work stopped. Every one of these describes a product or a
-   * position that changes without the code changing, which is exactly the content that must not
-   * require an engineer.
+   * Several homepage bands were hardcoded until the CMS work was completed. Product, company, and
+   * hiring copy remain editable; retired homepage-only rows are removed by migration 28.
    *
    * Each uses an existing section type, so the admin form and its sanitiser already understand
    * them, and each component keeps its built-in copy as the fallback — so an unseeded or
@@ -1003,10 +989,9 @@ const DEFAULT_SECTIONS: {
     type: "featureGrid",
     order: 32,
     fields: {
-      eyebrow: "Built and operated by ENICE",
-      heading: "The products we build and run.",
-      subheading:
-        "Each one began as a problem we hit ourselves, and each one is a platform we operate day to day rather than hand over.",
+      eyebrow: "Our products",
+      heading: "Products we build and run.",
+      subheading: "Tools for payments, customer support, email, and digital assets.",
       // `bullets` carries the product's checkable facts, one `Label: Value` pair per line, and
       // `url` is the product page. See `parseFacts` in src/routes/index.tsx.
       items: [
@@ -1097,30 +1082,17 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "home.founders",
-    label: "Founders' letter",
-    group: "Home",
-    type: "prose",
-    order: 40,
-    fields: {
-      eyebrow: "From the founders",
-      heading: "A letter from the founders",
-      // Blank lines separate paragraphs; see `fieldParagraphs` in src/lib/cms/use-section.ts.
-      body: "Every good business runs on good infrastructure — that's the idea behind ENICE Group. We don't build technology for its own sake; we build products that solve real problems and give businesses something they can depend on for years.\n\nThe idea came from everyday life in Nigeria: support queues nobody answered, payments that failed exactly when they mattered, cards declined for no reason. We decided that shouldn't be normal. African businesses and consumers deserve technology built to the same standard as anywhere else — for Africa first, and the world as we grow.",
-    },
-  },
-  {
     key: "home.careers",
     label: "Hiring band",
     group: "Home",
     type: "cta",
     order: 60,
     fields: {
-      eyebrow: "Join the builders",
-      heading: "Build products that matter.",
+      eyebrow: "Work with us",
+      heading: "Build useful products.",
       subheading:
-        "We work with people who care about product quality, solid engineering, and technology that holds up at real scale. If that sounds like you, we want to hear from you.",
-      ctaLabel: "Meet the team",
+        "We work with engineers and product builders who care about clear thinking, solid work, and reliable software.",
+      ctaLabel: "Contact the team",
       ctaUrl: "/contact",
       style: "standard",
     },
@@ -1319,20 +1291,6 @@ const DEFAULT_SECTIONS: {
       ],
     },
   },
-  {
-    key: "home.cta",
-    label: "Closing call to action",
-    group: "Home",
-    type: "cta",
-    order: 60,
-    fields: {
-      heading: "Talk to the ENICE Group team",
-      subheading: "Product access, platform integration, enterprise licensing, or partnerships.",
-      ctaLabel: "Contact us",
-      ctaUrl: "/contact",
-      style: "prominent",
-    },
-  },
   /*
    * The roadmap was hardcoded until now. It changes on its own schedule and should not require
    * source code to update, so migration 13 seeds the same row into existing databases.
@@ -1414,40 +1372,9 @@ const DEFAULT_SECTIONS: {
     },
   },
   /*
-   * The last two hardcoded bands on the homepage: the three principles under the product grid, and
-   * the mechanisms strip at the foot of the ENICE Core band.
-   *
-   * Neither band renders a heading of its own, so both seed one for the admin list only — a section
-   * with no label in the section list is unnavigable, and `featureGrid` requires the field anyway.
-   * Nothing on the page reads it. Migration 14 seeds the same two rows into existing databases.
+   * Safeguards shown at the foot of the ENICE Engine section. The heading is admin-facing only;
+   * the public page renders the sentence and tags.
    */
-  {
-    key: "home.principles",
-    label: "Build principles",
-    group: "Home",
-    type: "featureGrid",
-    order: 31,
-    fields: {
-      // Admin-facing only; the band renders the cards and nothing above them.
-      heading: "Build principles",
-      // `title` is the card heading, `description` the line beneath it.
-      items: [
-        {
-          title: "Problems before products",
-          description: "We start with problems people and businesses actually face.",
-        },
-        {
-          title: "Room to grow",
-          description: "Our products are designed to support users as their needs grow.",
-        },
-        {
-          title: "Grounded in African markets",
-          description:
-            "We understand the realities of African markets and build with those realities in mind.",
-        },
-      ],
-    },
-  },
   {
     key: "home.mechanisms",
     label: "Platform mechanisms",

@@ -85,7 +85,7 @@ const FOOTER_COLS = [
 
 /** Shown until the CMS footer settings resolve, and if they never do. */
 const DEFAULT_TAGLINE =
-  "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.";
+  "ENICE builds and runs software for payments, customer support, email, and digital assets.";
 
 const ICONS: Record<string, typeof XIcon> = {
   "X (Twitter)": XIcon,
@@ -137,32 +137,10 @@ export function SiteFooter() {
         }}
       />
 
-      {/*
-        Status ribbon.
-
-        This previously asserted "PulsePay Network: Operational" and "PulseAssist Engine:
-        Operational" as hardcoded text on every page of the site — it would have claimed both
-        platforms were healthy in the middle of an outage. Nothing here checks anything, so it
-        no longer claims anything: it points at /status, where the checks actually run.
-      */}
-      <div className="relative border-b border-border">
-        <div className="page-shell flex flex-col items-start gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[12px] text-bone-soft">
-            Platform availability is checked live on the status page.
-          </p>
-          <Link
-            to="/status"
-            className="tap text-[10px] font-semibold uppercase tracking-[0.22em] text-bone-soft transition-colors hover:text-electric"
-          >
-            View status page →
-          </Link>
-        </div>
-      </div>
-
-      <div className="page-shell relative py-16">
-        <div className="grid gap-12 lg:grid-cols-[1.6fr_repeat(4,1fr)] lg:gap-8">
+      <div className="page-shell relative py-12 sm:py-14">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-10 lg:grid-cols-[1.6fr_repeat(4,1fr)] lg:gap-8">
           {/* Brand column */}
-          <div className="lg:max-w-xs">
+          <div className="col-span-2 lg:col-span-1 lg:max-w-xs">
             <Logo />
             <p className="mt-5 text-[13px] leading-relaxed text-bone-soft">{tagline}</p>
 
@@ -237,13 +215,16 @@ export function SiteFooter() {
       */}
       <div className="relative border-t border-border">
         <div
-          className="page-shell safe-bottom flex flex-col items-start justify-between gap-3 pb-24 pt-6 sm:flex-row sm:items-center sm:pb-6 sm:pr-28"
+          className="page-shell safe-bottom flex flex-col items-start justify-between gap-3 pb-24 pt-5 sm:flex-row sm:items-center sm:pb-5 sm:pr-28"
           style={{ ["--safe-pad" as string]: "6rem" }}
         >
           <p className="type-meta">{copyright}</p>
-          <p className="type-meta">
-            ENICE Technology Limited is registered in the Federal Republic of Nigeria.
-          </p>
+          <Link
+            to="/status"
+            className="tap text-[10px] font-semibold uppercase tracking-[0.18em] text-bone-soft transition-colors hover:text-electric"
+          >
+            Check system status →
+          </Link>
         </div>
       </div>
     </footer>

@@ -37,7 +37,7 @@ import {
   Tag,
   TextLink,
 } from "@/components/site/primitives";
-import { useSectionFields, fieldText, fieldItems, fieldParagraphs } from "@/lib/cms/use-section";
+import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
 import { organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
 import { PRODUCT_ACCENT_BY_PATH } from "@/lib/product-brand";
 
@@ -109,17 +109,17 @@ const VERTICALS = [
   },
   {
     icon: BrainCircuit,
-    kicker: "Artificial Intelligence",
-    title: "Autonomous Enterprise AI",
-    desc: "Conversational AI that handles customer support, compliance monitoring, and daily operations for banks, fintechs, and telecoms.",
-    bullets: ["Autonomous Customer Support", "Policy-Bound AI Agents", "Workflow Automation"],
+    kicker: "AI SUPPORT",
+    title: "AI for customer support",
+    desc: "AI tools that answer common questions, route work, and hand conversations to people when needed.",
+    bullets: ["Customer Support", "Rules and Approval Steps", "Workflows and Handoffs"],
   },
   {
     icon: Boxes,
-    kicker: "Product Engineering",
-    title: "Products built to operate",
-    desc: "We build, own, and operate full-stack products. Each platform starts from a real customer problem and goes through engineering, launch, and day-to-day operation.",
-    bullets: ["Product Ownership", "Platform Engineering", "Continuous Operation"],
+    kicker: "SOFTWARE PRODUCTS",
+    title: "Software we build and run",
+    desc: "We design, launch, and maintain our own products instead of handing them off after release.",
+    bullets: ["Product Design", "Platform Engineering", "Daily Operation"],
   },
 ];
 
@@ -195,56 +195,12 @@ const PORTFOLIO_PREVIEW = [
   },
 ];
 
-/**
- * Mechanisms that exist, not certifications that do not.
- *
- * Was `SOC 2 Aligned · RLS Enforced · Active-Active · Audit Ready`. ENICE holds no SOC 2 audit,
- * does not run active-active infrastructure, and "Audit Ready" asserts nothing checkable. Each of
- * the four below is a thing the code actually does, which is why they can stay.
- *
- * One list, two places. The hero's trust-signal strip was a second hardcoded copy of the first
- * three of these strings — "Row-level security", "Per-tenant isolation", "Audit logging" — so it
- * now renders the first three rows of this same `home.mechanisms` section rather than its own
- * literal. `hero` carries no repeater and every one of its text fields is already spoken for, so
- * folding the strip in here is what makes it editable at all; the alternative was leaving it in
- * code. The hero shows a fixed `Check` for each row because that icon is the strip's design, not
- * content — the per-row icons below are only used by the mechanisms band itself.
- */
-/** How many mechanisms the hero's trust strip shows. Three, as it always has. */
-const HERO_MECHANISMS = 3;
-
+/** Safeguards shown once, alongside the ENICE Engine where they belong. */
 const COMPLIANCE_BADGES = [
   { icon: ShieldCheck, label: "ROW-LEVEL SECURITY" },
   { icon: Lock, label: "PER-TENANT ISOLATION" },
   { icon: Check, label: "AUDIT LOGGING" },
   { icon: Wifi, label: "ENCRYPTED IN TRANSIT AND AT REST" },
-];
-
-const FOUNDERS_LETTER = [
-  "Every good business runs on good infrastructure — that's the idea behind ENICE Group. We don't build technology for its own sake; we build products that solve real problems and give businesses something they can depend on for years.",
-  "The idea came from everyday life in Nigeria: support queues nobody answered, payments that failed exactly when they mattered, cards declined for no reason. We decided that shouldn't be normal. African businesses and consumers deserve technology built to the same standard as anywhere else — for Africa first, and the world as we grow.",
-];
-
-/**
- * The three short principles under the product band.
- *
- * Mapped onto the `featureGrid` row shape: `title` is the heading, `description` the line beneath
- * it. The band renders no heading of its own, so `home.principles` seeds one for the admin list
- * only — nothing on the page reads it.
- */
-const BUILD_PRINCIPLES = [
-  {
-    title: "Problems before products",
-    desc: "We start with problems people and businesses actually face.",
-  },
-  {
-    title: "Room to grow",
-    desc: "Our products are designed to support users as their needs grow.",
-  },
-  {
-    title: "Grounded in African markets",
-    desc: "We understand the realities of African markets and build with those realities in mind.",
-  },
 ];
 
 /** `Label: Value` lines from a CMS `bullets` field, for the product fact lists. */
@@ -268,8 +224,6 @@ function Landing() {
   const products = useSectionFields("home.products");
   const core = useSectionFields("home.core");
   const portfolio = useSectionFields("home.portfolio");
-  const founders = useSectionFields("home.founders");
-  const principles = useSectionFields("home.principles");
   const mechanisms = useSectionFields("home.mechanisms");
 
   // The hero's stats strip. Rows missing a value are skipped rather than rendered blank.
@@ -323,32 +277,22 @@ function Landing() {
     };
   });
 
-  // The three principles under the product band. Rows without a title are skipped.
-  const buildPrinciples = fieldItems(principles, "items", BUILD_PRINCIPLES, (row) => {
-    const title = typeof row.title === "string" ? row.title.trim() : "";
-    if (!title) return null;
-    return { title, desc: typeof row.description === "string" ? row.description.trim() : "" };
-  });
-
-  // The mechanisms the Core implements. `title` is the pill's label; the hero's trust strip reads
-  // the first three rows of this same list — see `COMPLIANCE_BADGES`.
+  // The safeguards shown beneath the ENICE Engine. `title` is the pill label.
   const mechanismList = fieldItems(mechanisms, "items", COMPLIANCE_BADGES, (row) => {
     const label = typeof row.title === "string" ? row.title.trim() : "";
     if (!label) return null;
     return { icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""), label };
   });
 
-  const letter = fieldParagraphs(founders, "body", FOUNDERS_LETTER);
-
   return (
     <SiteShell>
       {/* ═══ HERO ═══════════════════════════════════════════════════════════ */}
-      <section className="relative flex min-h-[calc(100svh-4rem)] flex-col overflow-hidden">
+      <section className="relative overflow-hidden border-b border-border">
         <div aria-hidden className="tech-grid" />
         <div aria-hidden className="mesh-glow" />
 
-        <div className="relative flex flex-1 items-center">
-          <Container className="py-12 sm:py-24">
+        <div className="relative">
+          <Container className="py-16 sm:py-20 lg:py-24">
             {/* Single column. The hero used to pair this copy with a product-ecosystem panel in a
                 two-column grid; the panel is gone, so the statement now stands on its own, capped
                 so lines stay a comfortable measure rather than stretching the full container. */}
@@ -362,7 +306,7 @@ function Landing() {
                   <span aria-hidden className="h-1 w-1 shrink-0 rounded-full bg-electric" />
                   <span className="text-[10px] font-semibold uppercase tracking-[0.08em] text-bone-strong sm:text-[11px] sm:tracking-[0.16em]">
                     <StyledText
-                      text={fieldText(hero, "eyebrow", "Technology Group · Building for Africa")}
+                      text={fieldText(hero, "eyebrow", "AI, payments and digital products")}
                       accentClassName="text-electric"
                     />
                   </span>
@@ -385,7 +329,7 @@ function Landing() {
                     text={fieldText(
                       hero,
                       "heading",
-                      "We build the technology behind Africa's next generation of businesses.",
+                      "We build software businesses can use every day.",
                     )}
                     accentClassName="text-electric"
                   />
@@ -399,13 +343,13 @@ function Landing() {
                     text={fieldText(
                       hero,
                       "subheading",
-                      "ENICE Group builds, owns, and operates technology products for financial services, commerce, and business communication.",
+                      "ENICE builds and runs tools for customer support, payments, email, and digital assets.",
                     )}
                     accentClassName="text-electric"
                   />
                 </p>
                 <p
-                  className="animate-hero-up mt-4 max-w-xl text-[12px] leading-relaxed text-bone-faint"
+                  className="animate-hero-up mt-3 max-w-xl text-[11px] leading-relaxed text-bone-faint"
                   style={{ animationDelay: "150ms" }}
                 >
                   ENICE Group is the technology brand of ENICE Technology Limited.
@@ -440,21 +384,6 @@ function Landing() {
                     {fieldText(hero, "secondaryCtaLabel", "What we build")}
                   </Cta>
                 </div>
-
-                <ul
-                  className="animate-hero-fade mt-10 flex flex-wrap items-center gap-x-6 gap-y-3"
-                  style={{ animationDelay: "280ms" }}
-                >
-                  {mechanismList.slice(0, HERO_MECHANISMS).map((m) => (
-                    <li
-                      key={m.label}
-                      className="flex items-center gap-2 text-[11px] font-medium text-bone-soft"
-                    >
-                      <Check aria-hidden className="h-3 w-3 text-electric" strokeWidth={2.5} />
-                      {m.label}
-                    </li>
-                  ))}
-                </ul>
               </div>
             </div>
           </Container>
@@ -493,30 +422,30 @@ function Landing() {
       <PartnersStrip />
 
       {/* ═══ WHAT WE'RE BUILDING ════════════════════════════════════════════ */}
-      <Section id="verticals" divider aria-labelledby="verticals-heading">
+      <Section id="verticals" spacing="tight" divider aria-labelledby="verticals-heading">
         <Reveal>
           <SectionIntro
             id="verticals-heading"
-            eyebrow={fieldText(products, "eyebrow", "What we're building")}
-            heading={fieldText(products, "heading", "Three areas we build in.")}
+            eyebrow={fieldText(products, "eyebrow", "What we build")}
+            heading={fieldText(products, "heading", "Three areas we work in.")}
             lead={fieldText(
               products,
               "subheading",
-              "ENICE Group takes hard problems in financial services and business communication and turns them into products people can rely on.",
+              "Payments, customer support, and software products built for businesses in Africa.",
             )}
           />
         </Reveal>
 
-        <HairlineGrid columns={3} className="mt-14">
+        <HairlineGrid columns={3} className="mt-10">
           {verticals.map((v, i) => (
             <Reveal key={v.title} delay={i * 60} className="flex">
-              <article className="panel-interactive flex h-full flex-col p-8 xl:p-10">
+              <article className="panel-interactive flex h-full flex-col p-6 sm:p-7">
                 <div className="flex items-start justify-between">
-                  <IconTile icon={v.icon} />
+                  <IconTile icon={v.icon} size="sm" />
                   <CardIndex value={i + 1} />
                 </div>
 
-                <div className="mt-8">
+                <div className="mt-6">
                   {v.kicker && (
                     <Eyebrow className="text-[10px] tracking-[0.2em]">{v.kicker}</Eyebrow>
                   )}
@@ -529,7 +458,7 @@ function Landing() {
                 </div>
 
                 {v.bullets.length > 0 && (
-                  <ul className="mt-7 space-y-3 border-t border-border pt-6">
+                  <ul className="mt-5 space-y-2 border-t border-border pt-4">
                     {v.bullets.map((b) => (
                       <li
                         key={b}
@@ -549,33 +478,26 @@ function Landing() {
             </Reveal>
           ))}
         </HairlineGrid>
-
-        <div className="mt-6 grid gap-6 sm:grid-cols-3">
-          {buildPrinciples.map((item, i) => (
-            <Reveal key={item.title} delay={i * 60}>
-              <div className="h-full border-t border-electric/25 pt-5">
-                <h3 className="text-[14px] font-semibold tracking-tight text-foreground">
-                  {item.title}
-                </h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-bone-soft">{item.desc}</p>
-              </div>
-            </Reveal>
-          ))}
-        </div>
       </Section>
 
       {/* ═══ PRODUCTS ═══════════════════════════════════════════════════════ */}
-      <Section id="products" tone="recessed" divider aria-labelledby="products-heading">
+      <Section
+        id="products"
+        spacing="tight"
+        tone="recessed"
+        divider
+        aria-labelledby="products-heading"
+      >
         <Reveal>
           <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
             <SectionIntro
               id="products-heading"
-              eyebrow={fieldText(portfolio, "eyebrow", "Built and operated by ENICE")}
-              heading={fieldText(portfolio, "heading", "The products we build and run.")}
+              eyebrow={fieldText(portfolio, "eyebrow", "Our products")}
+              heading={fieldText(portfolio, "heading", "Products we build and run.")}
               lead={fieldText(
                 portfolio,
                 "subheading",
-                "Each one began as a problem we hit ourselves, and each one is a platform we operate day to day rather than hand over.",
+                "Tools for payments, customer support, email, and digital assets.",
               )}
             />
             <TextLink to="/portfolio" className="shrink-0 pb-2">
@@ -584,7 +506,7 @@ function Landing() {
           </div>
         </Reveal>
 
-        <div className="mt-14 space-y-5">
+        <div className="mt-10 space-y-4">
           {featured.map((p, i) => (
             <Reveal key={p.title} delay={i * 70}>
               <Panel
@@ -595,7 +517,7 @@ function Landing() {
                     ? { ["--electric" as string]: PRODUCT_ACCENT_BY_PATH[p.to] }
                     : undefined
                 }
-                className="product-accent-card grid gap-8 p-8 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-12 xl:p-10"
+                className="product-accent-card grid gap-6 p-6 sm:p-8 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-10"
               >
                 <div>
                   <div className="flex items-center gap-3">
@@ -636,7 +558,7 @@ function Landing() {
       </Section>
 
       {/* ═══ THE ENICE ENGINE ══════════════════════════════════════════════ */}
-      <Section glow="center" divider aria-labelledby="core-heading">
+      <Section spacing="tight" glow="center" divider aria-labelledby="core-heading">
         <Reveal>
           <SectionIntro
             id="core-heading"
@@ -650,15 +572,15 @@ function Landing() {
           />
         </Reveal>
 
-        <HairlineGrid columns={3} className="mt-14">
+        <HairlineGrid columns={3} className="mt-10">
           {coreModules.map((c, i) => (
             <Reveal key={c.title} delay={i * 70} className="flex">
-              <div className="panel-interactive flex h-full flex-col p-8 xl:p-10">
+              <div className="panel-interactive flex h-full flex-col p-6 sm:p-7">
                 <div className="flex items-start justify-between">
-                  <IconTile icon={c.icon} />
+                  <IconTile icon={c.icon} size="sm" />
                   <CardIndex value={i + 1} />
                 </div>
-                <h3 className="type-h3 mt-8 text-foreground">
+                <h3 className="type-h3 mt-6 text-foreground">
                   <StyledText text={c.title} accentClassName="text-electric" />
                 </h3>
                 <p className="type-body mt-3">
@@ -671,7 +593,7 @@ function Landing() {
 
         {/* Safeguards shared by the ENICE Engine and every product built on it. */}
         <Reveal>
-          <div className="mt-12 flex flex-col gap-5 border-t border-border pt-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="mt-8 flex flex-col gap-4 border-t border-border pt-6 lg:flex-row lg:items-center lg:justify-between">
             <p className="max-w-md text-[13px] leading-relaxed text-bone-soft">
               {fieldText(
                 mechanisms,
@@ -698,34 +620,6 @@ function Landing() {
       </Section>
 
       <AboutMatrix />
-
-      {/* ═══ FROM THE FOUNDERS ══════════════════════════════════════════════ */}
-      <Section container="narrow" divider aria-labelledby="founders-heading">
-        <Reveal>
-          <div className="mx-auto max-w-3xl">
-            <Eyebrow>{fieldText(founders, "eyebrow", "From the founders")}</Eyebrow>
-            <h2 id="founders-heading" className="sr-only">
-              A letter from the founders
-            </h2>
-            <div
-              data-allow-select
-              className="mt-7 space-y-6 text-[1.0625rem] leading-[1.8] text-bone-strong"
-            >
-              {letter.map((paragraph, i) => (
-                <p key={i} className={i === 0 ? "text-foreground" : undefined}>
-                  <StyledText text={paragraph} accentClassName="text-electric" />
-                </p>
-              ))}
-            </div>
-            <div className="mt-10 flex items-center gap-5">
-              <span aria-hidden className="rule-fade h-px flex-1" />
-              <p className="font-mono text-[12px] tracking-[0.14em] text-bone-faint">
-                — The Founders, ENICE Group
-              </p>
-            </div>
-          </div>
-        </Reveal>
-      </Section>
 
       <FAQSection />
       <Careers />

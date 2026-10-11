@@ -38,7 +38,7 @@ export function FAQSection() {
 
   return (
     // `id` is the anchor target for the assistant fallback's "Read the FAQ" link.
-    <Section id="faq" divider container="narrow" aria-labelledby="faq-heading">
+    <Section id="faq" spacing="tight" divider container="narrow" aria-labelledby="faq-heading">
       {/* Generated from `entries`, so it always describes what is rendered below. */}
       <script
         type="application/ld+json"
