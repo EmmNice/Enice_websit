@@ -4611,6 +4611,37 @@ WHERE key = 'home.faq'
   AND position('global cloud grid' in lower(fields::text)) > 0;
 `
     )
+  },
+  {
+    id: 25,
+    name: "feature_pride_instead_of_devapay_on_homepage",
+    sql: (
+      /* sql */
+      `
+-- PRIDE launches in Q3 2027, ahead of DevaPay's 2028 timeline. Replace the DevaPay homepage
+-- preview with PRIDE while leaving DevaPay available everywhere else in the portfolio.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN item->>'url' = '/portfolio/devapay'
+                    THEN '{
+                      "icon":"Bitcoin",
+                      "kicker":"DIGITAL ASSETS",
+                      "title":"PRIDE",
+                      "description":"ENICE Group''s digital asset platform, designed to make cryptocurrency and digital finance simple, secure, and accessible within the ENICE ecosystem.",
+                      "bullets":"Launch: Q3 2027\\nCategory: Digital Assets",
+                      "url":"/portfolio/pride"
+                    }'::jsonb
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE item->>'url' IS DISTINCT FROM '/portfolio/pride'
+    )),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND fields->'items' @> '[{"url":"/portfolio/devapay"}]'::jsonb;
+`
+    )
   }
 ];
 var MIGRATIONS_TABLE_SQL = (
