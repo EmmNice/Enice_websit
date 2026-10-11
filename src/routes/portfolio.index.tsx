@@ -10,6 +10,7 @@ import { useSectionFields, fieldText } from "@/lib/cms/use-section";
 import { cn } from "@/lib/utils";
 import { SHADOW_CARD, SHADOW_FLOAT, SURFACE_1, SURFACE_2, SURFACE_3 } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
+import { PRODUCT_ACCENT_BY_PATH } from "@/lib/product-brand";
 
 export const Route = createFileRoute("/portfolio/")({
   head: () =>
@@ -134,12 +135,25 @@ function CardVisual({ className, children }: { className?: string; children: Rea
   );
 }
 
-function ProductCard({ visual, children }: { visual: ReactNode; children: ReactNode }) {
+function ProductCard({
+  visual,
+  children,
+  to,
+}: {
+  visual: ReactNode;
+  children: ReactNode;
+  to: string;
+}) {
+  const accent = PRODUCT_ACCENT_BY_PATH[to];
+
   return (
     <Panel
       as="article"
-      className="flex flex-col overflow-hidden"
-      style={{ boxShadow: SHADOW_CARD }}
+      className="product-accent-card flex flex-col overflow-hidden"
+      style={{
+        boxShadow: SHADOW_CARD,
+        ...(accent ? { ["--electric" as string]: accent } : {}),
+      }}
     >
       {visual}
       <div className="flex flex-1 flex-col p-8 sm:p-10">{children}</div>
@@ -192,6 +206,7 @@ function PortfolioIndexPage() {
         <div className="mt-14 grid gap-8 lg:grid-cols-2">
           {/* ── PulseAssist ── */}
           <ProductCard
+            to="/portfolio/pulseassist"
             visual={
               <CardVisual className="h-56 sm:h-64">
                 <div className="tech-grid tech-grid-flat" />
@@ -254,6 +269,7 @@ function PortfolioIndexPage() {
 
           {/* ── Faga ── */}
           <ProductCard
+            to="/portfolio/faga"
             visual={
               <CardVisual className="h-56 sm:h-64">
                 <div className="tech-grid tech-grid-flat" />
@@ -340,6 +356,7 @@ function PortfolioIndexPage() {
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
           {/* ── PulsePay ── */}
           <ProductCard
+            to="/portfolio/pulsepay"
             visual={
               <CardVisual className="h-56 sm:h-64">
                 <div className="tech-grid tech-grid-flat" />
@@ -425,6 +442,7 @@ function PortfolioIndexPage() {
 
           {/* ── DevaPay ── */}
           <ProductCard
+            to="/portfolio/devapay"
             visual={
               <CardVisual className="h-56 sm:h-64">
                 <div className="mesh-glow-center" />
@@ -497,6 +515,7 @@ function PortfolioIndexPage() {
 
           {/* ── PRIDE ── */}
           <ProductCard
+            to="/portfolio/pride"
             visual={
               <CardVisual className="h-56 sm:h-64">
                 <div className="mesh-glow-center" />

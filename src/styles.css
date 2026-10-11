@@ -224,6 +224,12 @@
   --electric-deep: #0048ed; /* the mark blue. Fills only: 3.02:1 */
   --electric-shadow: #001f6b; /* gradient tail, decorative only */
 
+  /* Product accents sampled from each live platform and lifted only where needed for readable
+     small text on the shared dark surfaces. */
+  --pulsepay-accent: #d76550;
+  --pulseassist-accent: #a78bfa;
+  --pride-accent: #fcc82c;
+
   /* Surfaces, each a small lift of the canvas toward bone. */
   --surface-1: #0b0e15; /* recessed bands, inputs at rest */
   --surface-2: #12151d; /* cards and panels */
@@ -259,6 +265,27 @@
 
   background-color: var(--background);
   color: var(--foreground);
+}
+
+.product-theme-pulsepay {
+  --electric: var(--pulsepay-accent);
+  --primary: var(--pulsepay-accent);
+  --accent: var(--pulsepay-accent);
+  --ring: var(--pulsepay-accent);
+}
+
+.product-theme-pulseassist {
+  --electric: var(--pulseassist-accent);
+  --primary: var(--pulseassist-accent);
+  --accent: var(--pulseassist-accent);
+  --ring: var(--pulseassist-accent);
+}
+
+.product-theme-pride {
+  --electric: var(--pride-accent);
+  --primary: var(--pride-accent);
+  --accent: var(--pride-accent);
+  --ring: var(--pride-accent);
 }
 
 .dark {

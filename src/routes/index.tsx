@@ -23,6 +23,7 @@ import { Careers } from "@/components/site/Careers";
 import { FAQSection } from "@/components/site/FAQSection";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
+import { ProductUiPreview } from "@/components/site/ProductUiPreview";
 import { StyledText } from "@/components/site/StyledText";
 import {
   CardIndex,
@@ -39,6 +40,7 @@ import {
 } from "@/components/site/primitives";
 import { useSectionFields, fieldText, fieldItems, fieldParagraphs } from "@/lib/cms/use-section";
 import { organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
+import { PRODUCT_ACCENT_BY_PATH } from "@/lib/product-brand";
 
 export const Route = createFileRoute("/")({
   // FAQ markup is deliberately absent here: `FAQSection` emits it from the questions it actually
@@ -193,13 +195,6 @@ const PORTFOLIO_PREVIEW = [
     to: "/portfolio/pride",
   },
 ];
-
-const PRODUCT_ACCENT_BY_PATH: Partial<Record<string, string>> = {
-  // Text-safe colors sampled from each product's live brand palette.
-  "/portfolio/pulsepay": "#d76550",
-  "/portfolio/pulseassist": "#a78bfa",
-  "/portfolio/pride": "#fcc82c",
-};
 
 /**
  * Mechanisms that exist, not certifications that do not.
@@ -601,7 +596,7 @@ function Landing() {
                     ? { ["--electric" as string]: PRODUCT_ACCENT_BY_PATH[p.to] }
                     : undefined
                 }
-                className="product-accent-card grid gap-8 p-8 md:grid-cols-[1.4fr_1fr] md:items-center md:gap-12 xl:p-10"
+                className="product-accent-card grid gap-8 p-8 md:grid-cols-[0.9fr_1.1fr] md:items-center md:gap-10 xl:p-10"
               >
                 <div>
                   <div className="flex items-center gap-3">
@@ -616,25 +611,28 @@ function Landing() {
                   <p className="type-body mt-3.5 max-w-xl">
                     <StyledText text={p.desc} accentClassName="text-electric" />
                   </p>
-                  <Cta to={p.to} variant="secondary" size="sm" icon="external" className="mt-7">
+                  <Cta to={p.to} variant="secondary" size="sm" icon="arrow" className="mt-7">
                     View {p.title}
                   </Cta>
                 </div>
 
-                {p.facts.length > 0 && (
-                  <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border">
-                    {p.facts.map((f) => (
-                      <div key={f.label} className="bg-surface-1 px-5 py-4">
-                        <dd className="tnum text-[15px] font-semibold tracking-tight text-foreground">
-                          {f.value}
-                        </dd>
-                        <dt className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
-                          {f.label}
-                        </dt>
-                      </div>
-                    ))}
-                  </dl>
-                )}
+                <div className="min-w-0">
+                  <ProductUiPreview to={p.to} />
+                  {p.facts.length > 0 && (
+                    <dl className="mt-3 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-border bg-border">
+                      {p.facts.map((f) => (
+                        <div key={f.label} className="bg-surface-1 px-5 py-4">
+                          <dd className="tnum text-[15px] font-semibold tracking-tight text-foreground">
+                            {f.value}
+                          </dd>
+                          <dt className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
+                            {f.label}
+                          </dt>
+                        </div>
+                      ))}
+                    </dl>
+                  )}
+                </div>
               </Panel>
             </Reveal>
           ))}
