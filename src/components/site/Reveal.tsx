@@ -29,9 +29,9 @@ interface RevealProps {
   as?: ElementType;
   /** Animation direction. Default: "up" */
   direction?: Direction;
-  /** How many px the element travels. Default: 24 */
+  /** How many px the element travels. Default: 20 */
   distance?: number;
-  /** Duration in ms. Default: 750 */
+  /** Duration in ms. Default: 700 */
   duration?: number;
 }
 
@@ -58,8 +58,8 @@ export function Reveal({
   className = "",
   as: Tag = "div",
   direction = "up",
-  distance = 44,
-  duration = 850,
+  distance = 20,
+  duration = 700,
 }: RevealProps) {
   const ref = useRef<HTMLElement | null>(null);
   const [visible, setVisible] = useState(false);
@@ -82,11 +82,21 @@ export function Reveal({
       return;
     }
 
+    // Reveal once, then stop observing.
+    //
+    // This used to mirror `isIntersecting` in both directions, so content hid again whenever it
+    // left the viewport. Hidden content is translated downward, which on an element sitting at the
+    // edge of the screen moves it *out* of the observed area, which hides it, which moves it back
+    // in — a feedback loop that made blocks visibly shake and blur at the bottom of a phone
+    // screen. A one-shot reveal cannot oscillate.
     const io = new IntersectionObserver(
       ([entry]) => {
-        setVisible(entry.isIntersecting);
+        if (entry.isIntersecting) {
+          setVisible(true);
+          io.disconnect();
+        }
       },
-      { threshold: 0.08, rootMargin: "0px 0px -32px 0px" },
+      { threshold: 0.01, rootMargin: "0px 0px -24px 0px" },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -107,16 +117,16 @@ export function Reveal({
     <Component
       ref={ref}
       style={{
-        transition: `opacity ${duration}ms ${ease}, transform ${duration}ms ${ease}, filter ${duration}ms ${ease}`,
+        transition: `opacity ${duration}ms ${ease}, transform ${duration}ms ${ease}`,
         transitionDelay: `${delay}ms`,
         opacity: visible ? 1 : 0,
         transform: visible
           ? "translateY(0) translateX(0) scale(1)"
           : direction === "scale"
             ? "scale(0.92)"
-            : `${getInitialTransform(direction, distance)} scale(0.98)`,
-        filter: visible ? "blur(0px)" : "blur(8px)",
-        willChange: "opacity, transform, filter",
+            : getInitialTransform(direction, distance),
+        // Only hint the compositor while the transition can still run.
+        willChange: visible ? undefined : "opacity, transform",
       }}
       className={className}
     >
