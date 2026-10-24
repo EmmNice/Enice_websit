@@ -50,8 +50,6 @@ const FOOTER_COLS = [
       { label: "PulsePay", url: "/portfolio/pulsepay" },
       { label: "PulseAssist", url: "/portfolio/pulseassist" },
       { label: "Faga", url: "/portfolio/faga" },
-      { label: "DevaPay", url: "/portfolio/devapay" },
-      { label: "PRIDE", url: "/portfolio/pride" },
       { label: "All products", url: "/portfolio" },
     ],
   },
@@ -84,8 +82,7 @@ const FOOTER_COLS = [
 ];
 
 /** Shown until the CMS footer settings resolve, and if they never do. */
-const DEFAULT_TAGLINE =
-  "ENICE builds and runs software for payments, customer support, email, and digital assets.";
+const DEFAULT_TAGLINE = "ENICE builds and runs software for payments, customer support, and email.";
 
 const ICONS: Record<string, typeof XIcon> = {
   "X (Twitter)": XIcon,

@@ -11,6 +11,7 @@
  */
 
 import type { NavItem as CmsNavItem } from "@/lib/cms/types";
+import { isRetiredProductPath } from "@/lib/retired-products";
 
 export interface NavItem {
   label: string;
@@ -69,18 +70,6 @@ export const PRODUCTS: NavItem[] = [
     to: "/portfolio/faga",
     description: "Email delivery infrastructure for transactional and marketing messages.",
     stage: "available",
-  },
-  {
-    label: "DevaPay",
-    to: "/portfolio/devapay",
-    description: "One developer-friendly API for accepting and reconciling payments.",
-    stage: "building",
-  },
-  {
-    label: "PRIDE",
-    to: "/portfolio/pride",
-    description: "Digital asset trading and custody, integrated with the ecosystem.",
-    stage: "building",
   },
 ];
 
@@ -157,13 +146,23 @@ const DESCRIPTIONS = new Map(
  */
 export function navFromCms(items: CmsNavItem[] | undefined): NavEntry[] | null {
   const usable = (items ?? []).filter(
-    (item) => item && item.visible !== false && item.label?.trim() && item.url?.trim(),
+    (item) =>
+      item &&
+      item.visible !== false &&
+      item.label?.trim() &&
+      item.url?.trim() &&
+      !isRetiredProductPath(item.url),
   );
   if (usable.length === 0) return null;
 
   return usable.map((item): NavEntry => {
     const children = (item.children ?? []).filter(
-      (child) => child && child.visible !== false && child.label?.trim() && child.url?.trim(),
+      (child) =>
+        child &&
+        child.visible !== false &&
+        child.label?.trim() &&
+        child.url?.trim() &&
+        !isRetiredProductPath(child.url),
     );
 
     if (children.length === 0) {

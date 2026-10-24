@@ -2492,6 +2492,126 @@ WHERE key = 'home.partners'
        OR fields->'items' @> '[{"name":"Railway"}]'::jsonb);
 `,
   },
+  {
+    id: 30,
+    name: "retire_devapay_and_pride",
+    sql: /* sql */ `
+-- The portfolio is now PulsePay, PulseAssist and Faga. DevaPay and PRIDE are retired: their pages,
+-- sections, homepage tiles, roadmap milestones and nav/footer links are removed, and both routes
+-- redirect to /portfolio in vercel.json. Same structure as migration 22 (the ePulse removal), and
+-- every statement is guarded on the old state still being present, so a re-run is a no-op.
+
+DELETE FROM site_sections
+WHERE key IN ('portfolio.devapay', 'portfolio.pride')
+   OR key LIKE 'portfolio.devapay.%'
+   OR key LIKE 'portfolio.pride.%';
+DELETE FROM cms_pages WHERE path IN ('/portfolio/devapay', '/portfolio/pride');
+
+-- Homepage product tiles.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE COALESCE(item->>'url', '') NOT IN ('/portfolio/devapay', '/portfolio/pride')
+    )),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND (position('/portfolio/devapay' in fields::text) > 0
+       OR position('/portfolio/pride' in fields::text) > 0);
+
+-- Roadmap milestones about either product.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE position('product: PRIDE' in COALESCE(item->>'description', '')) = 0
+        AND COALESCE(item->>'title', '') <> 'DevaPay Launch'
+    )),
+    updated_at = now()
+WHERE key = 'home.roadmap'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND (position('product: PRIDE' in fields::text) > 0
+       OR fields->'items' @> '[{"title":"DevaPay Launch"}]'::jsonb);
+
+-- The FAQ sentence that lists the portfolio.
+UPDATE site_sections
+SET fields = replace(fields::text,
+      ', Faga provides transactional and marketing email infrastructure, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.',
+      ', and Faga provides transactional and marketing email infrastructure.')::jsonb,
+    updated_at = now()
+WHERE key = 'home.faq'
+  AND position('DevaPay covers payment collection' in fields::text) > 0;
+
+-- Copy that described the old five-product portfolio. Each replacement only fires while the stored
+-- value is still the untouched old default, so an administrator's own wording is left alone.
+UPDATE site_sections
+SET fields = fields || jsonb_build_object(
+      'eyebrow', 'AI, payments and email infrastructure',
+      'heading', 'Run payments, support and email on one platform',
+      'subheading', 'PulsePay, PulseAssist and Faga give your business cards and wallets, AI customer support, and reliable email delivery, all built and operated by ENICE Group.',
+      'secondaryCtaLabel', 'Talk to our team',
+      'secondaryCtaUrl', '/contact'),
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'heading' = 'We build software businesses can use every day.'
+  AND fields->>'subheading' = 'ENICE builds and runs tools for customer support, payments, email, and digital assets.';
+
+UPDATE site_sections
+SET fields = fields || jsonb_build_object(
+      'heading', 'Start with the product you need, or run all three together',
+      'subheading', 'Every product is built on the same ENICE Engine, so payments, conversations and email share one secure foundation.'),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND fields->>'heading' = 'Products we build and run.';
+
+UPDATE site_settings
+SET value = jsonb_set(value, '{tagline}',
+      to_jsonb('ENICE builds and runs software for payments, customer support, and email.'::text)),
+    updated_at = now()
+WHERE key = 'footer'
+  AND value->>'tagline' = 'ENICE builds and runs software for payments, customer support, email, and digital assets.';
+
+-- Header: drop both products from every menu (top level and children).
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                    THEN jsonb_set(item, '{children}', (
+                           SELECT COALESCE(jsonb_agg(child ORDER BY cord), '[]'::jsonb)
+                           FROM jsonb_array_elements(item->'children') WITH ORDINALITY AS c(child, cord)
+                           WHERE COALESCE(child->>'url', '') NOT IN ('/portfolio/devapay', '/portfolio/pride')))
+                    ELSE item END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE COALESCE(item->>'url', '') NOT IN ('/portfolio/devapay', '/portfolio/pride')
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND (position('/portfolio/devapay' in value::text) > 0
+       OR position('/portfolio/pride' in value::text) > 0);
+
+-- Footer: the same, one level down in each column's links.
+UPDATE site_settings
+SET value = jsonb_set(value, '{columns}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(col->'links') = 'array'
+                    THEN jsonb_set(col, '{links}', (
+                           SELECT COALESCE(jsonb_agg(link ORDER BY lord), '[]'::jsonb)
+                           FROM jsonb_array_elements(col->'links') WITH ORDINALITY AS l(link, lord)
+                           WHERE COALESCE(link->>'url', '') NOT IN ('/portfolio/devapay', '/portfolio/pride')))
+                    ELSE col END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'columns') WITH ORDINALITY AS t(col, ord)
+    )),
+    updated_at = now()
+WHERE key = 'footer'
+  AND jsonb_typeof(value->'columns') = 'array'
+  AND (position('/portfolio/devapay' in value::text) > 0
+       OR position('/portfolio/pride' in value::text) > 0);
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

@@ -228,7 +228,6 @@
      small text on the shared dark surfaces. */
   --pulsepay-accent: #d76550;
   --pulseassist-accent: #a78bfa;
-  --pride-accent: #fcc82c;
 
   /* Surfaces, each a small lift of the canvas toward bone. */
   --surface-1: #0b0e15; /* recessed bands, inputs at rest */
@@ -285,13 +284,58 @@
   --ring: var(--pulseassist-accent);
 }
 
-.product-theme-pride {
-  --electric: var(--pride-accent);
-  --electric-deep: #e6a100;
-  --electric-shadow: #6b4700;
-  --primary: var(--pride-accent);
-  --accent: var(--pride-accent);
-  --ring: var(--pride-accent);
+/*
+ * Light bands on the public site.
+ *
+ * The homepage alternates white corporate bands with the dark ENICE canvas. Rather than restyle
+ * every component for a second background, this re-points the same semantic tokens `.site` sets
+ * — exactly the trick `.site` itself plays on `:root` — so `text-foreground`, `bg-surface-1`,
+ * `border-border`, `.panel`, `.btn-secondary`, the FAQ accordion and the partner strip all
+ * render correctly on white without a single `dark:`/`light:` variant.
+ *
+ * The accent stays the brand: on white the mark blue `#0048ed` measures 6.67:1, so here it can
+ * carry type literally and `--electric` *is* the mark blue.
+ */
+.theme-light {
+  color-scheme: light;
+
+  --bone: #0b1220; /* 18.6:1 on white */
+  --bone-strong: #273249; /* 12.9:1 */
+  --bone-soft: #4a5568; /*  7.5:1 */
+  --bone-faint: #5f6b7e; /*  5.6:1 */
+
+  --electric: #0048ed;
+  --electric-deep: #0048ed;
+  --electric-shadow: #001f6b;
+
+  --surface-1: #f5f7fb;
+  --surface-2: #ffffff;
+  --surface-3: #eef2f9;
+
+  --hairline: rgb(11 18 32 / 0.09);
+  --hairline-strong: rgb(11 18 32 / 0.16);
+  --positive: #127a4f;
+
+  --background: #ffffff;
+  --foreground: var(--bone);
+  --card: #ffffff;
+  --card-foreground: var(--bone);
+  --popover: #ffffff;
+  --popover-foreground: var(--bone);
+  --primary: var(--electric);
+  --primary-foreground: #ffffff;
+  --secondary: var(--surface-1);
+  --secondary-foreground: var(--bone);
+  --muted: var(--surface-1);
+  --muted-foreground: var(--bone-soft);
+  --accent: var(--electric);
+  --accent-foreground: #ffffff;
+  --border: var(--hairline);
+  --input: var(--hairline-strong);
+  --ring: var(--electric);
+
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .dark {
@@ -884,6 +928,143 @@
     min-height: 2.75rem;
     width: 100%;
     min-width: 2.75rem;
+  }
+}
+
+/* ── Light-band component overrides ─────────────────────────────────────────
+ * The few component treatments that hardcode a bone-on-dark value rather than reading a token.
+ */
+@layer components {
+  .theme-light .btn-secondary {
+    background-color: #ffffff;
+    border-color: var(--hairline-strong);
+    color: var(--bone);
+  }
+
+  .theme-light .btn-secondary:hover {
+    background-color: var(--surface-1);
+    border-color: rgb(0 72 237 / 0.45);
+  }
+
+  .theme-light .btn-ghost:hover {
+    background-color: rgb(11 18 32 / 0.05);
+  }
+
+  .theme-light .panel-raised {
+    box-shadow:
+      0 1px 2px rgb(11 18 32 / 0.04),
+      0 24px 48px -28px rgb(11 18 32 / 0.25);
+  }
+
+  /* Partner marks: flatten to charcoal instead of bone. */
+  .theme-light .logo-mono {
+    filter: grayscale(1) brightness(0);
+    opacity: 0.62;
+  }
+
+  .theme-light ::selection {
+    background-color: rgb(0 72 237 / 0.18);
+    color: var(--bone);
+  }
+
+  /* ── Homepage ──────────────────────────────────────────────────────────── */
+
+  /* The hero field: the canvas lit from the right by the mark blue, the way a product shot is lit. */
+  .hero-brand {
+    background-color: var(--enice-canvas);
+    background-image:
+      radial-gradient(52rem 34rem at 82% 40%, rgb(0 72 237 / 0.42), transparent 70%),
+      radial-gradient(40rem 26rem at 8% 0%, rgb(107 152 255 / 0.12), transparent 70%),
+      linear-gradient(180deg, #05070d 0%, #061031 100%);
+  }
+
+  /* A deep brand band (the ENICE Engine, the closing CTA). */
+  .band-brand {
+    background-color: #061031;
+    background-image:
+      radial-gradient(48rem 30rem at 90% 10%, rgb(0 72 237 / 0.35), transparent 70%),
+      linear-gradient(180deg, #061031 0%, #05070d 100%);
+  }
+
+  .band-cta {
+    background-color: var(--enice-blue);
+    background-image:
+      radial-gradient(40rem 22rem at 85% 0%, rgb(107 152 255 / 0.55), transparent 70%),
+      linear-gradient(120deg, #0039c0 0%, #0048ed 55%, #1f5cff 100%);
+  }
+
+  /* The tinted frame a product interface sits in, as on a large SaaS homepage. */
+  .mock-frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background-color: #eaf0fd;
+    background-image:
+      radial-gradient(30rem 18rem at 100% 0%, rgb(0 72 237 / 0.14), transparent 70%),
+      radial-gradient(24rem 16rem at 0% 100%, rgb(107 152 255 / 0.18), transparent 70%);
+  }
+
+  /* White UI card used inside every mock. */
+  .mock-card {
+    border-radius: 0.875rem;
+    border: 1px solid rgb(11 18 32 / 0.08);
+    background-color: #ffffff;
+    color: #0b1220;
+    box-shadow:
+      0 1px 2px rgb(11 18 32 / 0.05),
+      0 18px 40px -18px rgb(11 18 32 / 0.28);
+  }
+
+  /* Product icon tile: a solid gradient chip in the mark blue, like an app icon. */
+  .app-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    color: #ffffff;
+    background-image: linear-gradient(145deg, #6b98ff 0%, #0048ed 55%, #001f6b 100%);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.25),
+      0 10px 24px -12px rgb(0 72 237 / 0.7);
+  }
+
+  /* Underlined text action, the corporate "Learn more". */
+  .link-underline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 2px solid var(--electric);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--foreground);
+    transition: color 200ms ease;
+  }
+
+  .link-underline:hover {
+    color: var(--electric);
+  }
+
+  /* Solid white button for use on the blue CTA band. */
+  .btn-inverse {
+    background-color: #ffffff;
+    border-color: #ffffff;
+    color: #0039c0;
+  }
+
+  .btn-inverse:hover {
+    background-color: #eaf0fd;
+    border-color: #eaf0fd;
+  }
+
+  .btn-outline-inverse {
+    background-color: transparent;
+    border-color: rgb(255 255 255 / 0.55);
+    color: #ffffff;
+  }
+
+  .btn-outline-inverse:hover {
+    background-color: rgb(255 255 255 / 0.1);
+    border-color: #ffffff;
   }
 }
 

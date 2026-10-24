@@ -715,13 +715,6 @@ export function defaultSettings(): SiteSettings {
               url: "/portfolio/faga",
               visible: true,
             },
-            {
-              id: "nav-devapay",
-              label: "DevaPay",
-              url: "/portfolio/devapay",
-              visible: true,
-            },
-            { id: "nav-pride", label: "PRIDE", url: "/portfolio/pride", visible: true },
           ],
         },
         { id: "nav-company", label: "Company", url: "/about", visible: true },
@@ -763,13 +756,6 @@ export function defaultSettings(): SiteSettings {
               url: "/portfolio/faga",
               visible: true,
             },
-            {
-              id: "f-devapay",
-              label: "DevaPay",
-              url: "/portfolio/devapay",
-              visible: true,
-            },
-            { id: "f-pride", label: "PRIDE", url: "/portfolio/pride", visible: true },
             { id: "f-all-products", label: "All products", url: "/portfolio", visible: true },
           ],
         },
@@ -815,8 +801,7 @@ export function defaultSettings(): SiteSettings {
           ],
         },
       ],
-      tagline:
-        "ENICE builds and runs software for payments, customer support, email, and digital assets.",
+      tagline: "ENICE builds and runs software for payments, customer support, and email.",
       copyright: `© ${new Date().getFullYear()} ENICE Technology Limited. All rights reserved.`,
       showSocials: true,
     },
@@ -848,14 +833,14 @@ const DEFAULT_SECTIONS: {
     type: "hero",
     order: 10,
     fields: {
-      eyebrow: "AI, payments and digital products",
-      heading: "We build software businesses can use every day.",
+      eyebrow: "AI, payments and email infrastructure",
+      heading: "Run payments, support and email on one platform",
       subheading:
-        "ENICE builds and runs tools for customer support, payments, email, and digital assets.",
+        "PulsePay, PulseAssist and Faga give your business cards and wallets, AI customer support, and reliable email delivery, all built and operated by ENICE Group.",
       primaryCtaLabel: "Explore our products",
       primaryCtaUrl: "/portfolio",
-      secondaryCtaLabel: "What we build",
-      secondaryCtaUrl: "/about",
+      secondaryCtaLabel: "Talk to our team",
+      secondaryCtaUrl: "/contact",
     },
   },
   {
@@ -978,8 +963,9 @@ const DEFAULT_SECTIONS: {
     order: 32,
     fields: {
       eyebrow: "Our products",
-      heading: "Products we build and run.",
-      subheading: "Tools for payments, customer support, email, and digital assets.",
+      heading: "Start with the product you need, or run all three together",
+      subheading:
+        "Every product is built on the same ENICE Engine, so payments, conversations and email share one secure foundation.",
       // `bullets` carries the product's checkable facts, one `Label: Value` pair per line, and
       // `url` is the product page. See `parseFacts` in src/routes/index.tsx.
       items: [
@@ -1009,15 +995,6 @@ const DEFAULT_SECTIONS: {
             "Faga handles the same email delivery work businesses use SendGrid or Resend for: transactional and marketing messages, verified domains, templates, webhooks, analytics, and API-driven sending.",
           bullets: "Delivery: Transactional & marketing\nIntegration: REST API & webhooks",
           url: "/portfolio/faga",
-        },
-        {
-          icon: "Bitcoin",
-          kicker: "DIGITAL ASSETS",
-          title: "PRIDE",
-          description:
-            "ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance simple, secure, and accessible within the ENICE ecosystem.",
-          bullets: "Launch: Q3 2027\nCategory: Digital Assets",
-          url: "/portfolio/pride",
         },
       ],
     },
@@ -1259,7 +1236,7 @@ const DEFAULT_SECTIONS: {
         {
           question: "Which problems are ENICE products built to solve?",
           answer:
-            "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, Faga provides transactional and marketing email infrastructure, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.",
+            "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, and Faga provides transactional and marketing email infrastructure.",
         },
         {
           question: "What does the ENICE Engine provide?",
@@ -1342,19 +1319,9 @@ const DEFAULT_SECTIONS: {
             "when: Q3 2026\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Multi-Currency, Treasury\n\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform.",
         },
         {
-          title: "Global Digital Asset Exchange Private Beta",
-          description:
-            "when: Q3 2027\nstatus: planned\nproduct: PRIDE\ntags: Crypto, Exchange, Global\n\nPRIDE opens to institutional and qualified retail participants, with support for major digital asset pairs, custody, and compliance reporting.",
-        },
-        {
           title: "Universal Financial Hub",
           description:
             "when: 2027\nstatus: planned\nproduct: ENICE Core\ntags: Infrastructure, Global, Liquidity\n\nA global virtual-dollar and asset infrastructure layer connecting institutional liquidity across markets through a single API.",
-        },
-        {
-          title: "DevaPay Launch",
-          description:
-            "when: 2028\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Payments, API\n\nDevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
         },
       ],
     },
@@ -1660,30 +1627,6 @@ const DEFAULT_SECTIONS: {
         "A multi-tenant AI operations platform for telecoms and financial networks. It handles customer support routing, provides API-driven account management, and hands calls to live agents in real time when needed.",
     },
   },
-  {
-    key: "portfolio.pride",
-    label: "PRIDE page",
-    group: "Portfolio",
-    type: "hero",
-    order: 240,
-    fields: {
-      heading: "PRIDE",
-      subheading:
-        "PRIDE is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
-    },
-  },
-  {
-    key: "portfolio.devapay",
-    label: "DevaPay page",
-    group: "Portfolio",
-    type: "hero",
-    order: 250,
-    fields: {
-      heading: "DevaPay",
-      subheading:
-        "Simple, reliable payment infrastructure for modern businesses. Accept and manage customer payments through a single, developer friendly integration.",
-    },
-  },
   /*
    * The bands *inside* each product page, previously hardcoded in the route components.
    *
@@ -1695,7 +1638,7 @@ const DEFAULT_SECTIONS: {
    * existing databases.
    *
    * `sort_order` follows the order the bands appear on their page, inside the block already
-   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse — since removed — 240 PRIDE, 250 DevaPay).
+   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse, 240 PRIDE and 250 DevaPay — all since removed).
    */
   {
     key: "portfolio.pulsepay.stats",
@@ -1886,168 +1829,6 @@ const DEFAULT_SECTIONS: {
     },
   },
   {
-    key: "portfolio.pride.facts",
-    label: "PRIDE launch facts",
-    group: "Portfolio",
-    type: "statistics",
-    order: 241,
-    fields: {
-      heading: "PRIDE launch framing",
-      items: [
-        { value: "Planned Project", label: "Status" },
-        { value: "Q3 2027", label: "Launch" },
-        { value: "Digital Assets", label: "Category" },
-      ],
-    },
-  },
-  {
-    key: "portfolio.pride.highlights",
-    label: "PRIDE capabilities",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 242,
-    fields: {
-      eyebrow: "Platform Capabilities",
-      heading: "Digital assets, without the friction.",
-      subheading:
-        "PRIDE will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
-      items: [
-        {
-          icon: "BarChart3",
-          title: "Multi-asset trading",
-          description:
-            "Trade major digital assets with deep liquidity and institutional-grade execution: Bitcoin, Ethereum, and beyond.",
-        },
-        {
-          icon: "Lock",
-          title: "Secure custody",
-          description:
-            "Cold storage, multi-signature protection, and continuous on-chain monitoring for every asset in your portfolio.",
-        },
-        {
-          icon: "Layers",
-          title: "Ecosystem-native",
-          description:
-            "Move between PRIDE and PulsePay without leaving the ENICE stack: one account, every service.",
-        },
-        {
-          icon: "Globe",
-          title: "Built for scale",
-          description:
-            "Global access with compliance and reporting designed for regulated markets from day one, in Africa, Europe, and beyond.",
-        },
-        {
-          icon: "Zap",
-          title: "Instant settlement",
-          description:
-            "Near-instant on-chain and off-chain settlement rails so your capital moves as fast as the market does.",
-        },
-        {
-          icon: "ShieldCheck",
-          title: "Regulatory-ready",
-          description:
-            "Compliance built in from the ground up: KYC, AML, and transaction monitoring at the core.",
-        },
-      ],
-    },
-  },
-  {
-    key: "portfolio.devapay.facts",
-    label: "DevaPay launch facts",
-    group: "Portfolio",
-    type: "statistics",
-    order: 251,
-    fields: {
-      heading: "DevaPay launch framing",
-      items: [
-        { value: "Planned", label: "Status" },
-        { value: "2028", label: "Launch" },
-        { value: "Payments", label: "Category" },
-      ],
-    },
-  },
-  {
-    key: "portfolio.devapay.audience",
-    label: "DevaPay audience",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 252,
-    fields: {
-      eyebrow: "Built For",
-      heading: "From online businesses to growing enterprises.",
-      items: [
-        {
-          icon: "Globe2",
-          title: "Online Businesses",
-          description: "Accept customer payments without stitching together separate providers.",
-        },
-        {
-          icon: "Code2",
-          title: "SaaS Platforms",
-          description: "Add payment collection to your product through one integration.",
-        },
-        {
-          icon: "ShoppingCart",
-          title: "Marketplaces",
-          description: "Manage payments across many sellers and transactions from one place.",
-        },
-        {
-          icon: "TrendingUp",
-          title: "Growing Enterprises",
-          description: "Infrastructure built to scale with transaction volume, not against it.",
-        },
-      ],
-    },
-  },
-  {
-    key: "portfolio.devapay.capabilities",
-    label: "DevaPay capabilities",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 253,
-    fields: {
-      eyebrow: "Key Capabilities",
-      heading: "Payments, made easier to collect and scale.",
-      subheading:
-        "DevaPay is being built as part of ENICE Group's broader financial infrastructure, giving businesses the tools to run modern payment experiences.",
-      items: [
-        {
-          icon: "Code2",
-          title: "Unified payment API",
-          description: "Accept payments through a single, developer friendly integration.",
-        },
-        {
-          icon: "Zap",
-          title: "Real time status updates",
-          description: "Track transactions and payment status as they happen, not after the fact.",
-        },
-        {
-          icon: "Webhook",
-          title: "Webhook notifications",
-          description:
-            "Get notified the moment a payment is received, so your product can react instantly.",
-        },
-        {
-          icon: "Store",
-          title: "Merchant management",
-          description: "View and manage merchants and transactions from a single, clear dashboard.",
-        },
-        {
-          icon: "Users",
-          title: "Built for platforms",
-          description:
-            "Designed for businesses that collect payments on behalf of others, at any scale.",
-        },
-        {
-          icon: "CheckCircle2",
-          title: "Reliable by design",
-          description:
-            "Payment infrastructure built to stay dependable as transaction volume grows.",
-        },
-      ],
-    },
-  },
-  {
     key: "contact.details",
     label: "Contact details",
     group: "Contact",
@@ -2085,12 +1866,6 @@ const SYSTEM_PAGES: { path: string; title: string; summary: string }[] = [
     path: "/portfolio/faga",
     title: "Faga",
     summary: "Transactional and marketing email on a verified domain.",
-  },
-  { path: "/portfolio/pride", title: "PRIDE", summary: "Digital asset platform." },
-  {
-    path: "/portfolio/devapay",
-    title: "DevaPay",
-    summary: "Payment infrastructure for businesses.",
   },
   { path: "/contact", title: "Contact", summary: "Enquiry form and contact details." },
   { path: "/roadmap", title: "Product Roadmap", summary: "Milestones and what is next." },

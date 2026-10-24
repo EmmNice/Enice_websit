@@ -80,15 +80,6 @@ const MILESTONES: Milestone[] = [
     tags: ["Fintech", "Multi-Currency", "Treasury"],
   },
   {
-    when: "Q3 2027",
-    quarter: "Q3 2027",
-    status: "planned",
-    product: "PRIDE",
-    title: "Global Digital Asset Exchange Private Beta",
-    body: "PRIDE opens to institutional and qualified retail participants, with support for major digital asset pairs, custody, and compliance reporting.",
-    tags: ["Crypto", "Exchange", "Global"],
-  },
-  {
     when: "2027",
     quarter: "2027",
     status: "planned",
@@ -96,15 +87,6 @@ const MILESTONES: Milestone[] = [
     title: "Universal Financial Hub",
     body: "A global virtual-dollar and asset infrastructure layer connecting institutional liquidity across markets through a single API.",
     tags: ["Infrastructure", "Global", "Liquidity"],
-  },
-  {
-    when: "2028",
-    quarter: "2028",
-    status: "planned",
-    product: "PulsePay",
-    title: "DevaPay Launch",
-    body: "DevaPay launches: a unified API for businesses to accept and manage customer payments, with real time status updates and webhook notifications.",
-    tags: ["Fintech", "Payments", "API"],
   },
 ];
 
@@ -283,7 +265,16 @@ export function Roadmap() {
   const milestones = fieldItems(section, "items", MILESTONES, (row) => {
     const title = typeof row.title === "string" ? row.title.trim() : "";
     if (!title) return null;
-    return parseMilestone(title, typeof row.description === "string" ? row.description : "");
+    const milestone = parseMilestone(
+      title,
+      typeof row.description === "string" ? row.description : "",
+    );
+    // DevaPay and PRIDE are no longer part of the portfolio; stored milestones about them are
+    // dropped rather than left to advertise products the site no longer offers.
+    const retired = /\b(devapay|pride)\b/i;
+    return retired.test(milestone.title) || retired.test(milestone.product ?? "")
+      ? null
+      : milestone;
   });
 
   const filtered = tab === "all" ? milestones : milestones.filter((m) => m.status === tab);

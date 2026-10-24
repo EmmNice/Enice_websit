@@ -19,6 +19,7 @@
 import { useEffect, useState } from "react";
 import { loadSharedBootstrap } from "./use-section";
 import type { DesignSettings, FooterSettings, HeaderSettings, NavItem } from "./types";
+import { isRetiredProductPath } from "@/lib/retired-products";
 
 export interface SiteChrome {
   header: HeaderSettings | null;
@@ -58,10 +59,18 @@ export function useSiteChrome(): SiteChrome {
   return chrome;
 }
 
-/** Visible items only, in order, with blank labels and URLs discarded. */
+/**
+ * Visible items only, in order, with blank labels and URLs discarded — and links to retired
+ * products dropped, so stale CMS data cannot put them back on the site.
+ */
 export function visibleNavItems(items: NavItem[] | undefined): NavItem[] {
   if (!Array.isArray(items)) return [];
   return items.filter(
-    (item) => item && item.visible !== false && item.label?.trim() && item.url?.trim(),
+    (item) =>
+      item &&
+      item.visible !== false &&
+      item.label?.trim() &&
+      item.url?.trim() &&
+      !isRetiredProductPath(item.url),
   );
 }

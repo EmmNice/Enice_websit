@@ -31,9 +31,7 @@ import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
-import { Route as PortfolioDevapayRouteImport } from './routes/portfolio.devapay'
 import { Route as PortfolioFagaRouteImport } from './routes/portfolio.faga'
-import { Route as PortfolioPrideRouteImport } from './routes/portfolio.pride'
 import { Route as PortfolioPulseassistRouteImport } from './routes/portfolio.pulseassist'
 import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
 import { Route as AdminAdministrationSettingsRouteImport } from './routes/admin/administration.settings'
@@ -150,19 +148,9 @@ const PortfolioIndexRoute = PortfolioIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PortfolioRoute,
 } as any)
-const PortfolioDevapayRoute = PortfolioDevapayRouteImport.update({
-  id: '/devapay',
-  path: '/devapay',
-  getParentRoute: () => PortfolioRoute,
-} as any)
 const PortfolioFagaRoute = PortfolioFagaRouteImport.update({
   id: '/faga',
   path: '/faga',
-  getParentRoute: () => PortfolioRoute,
-} as any)
-const PortfolioPrideRoute = PortfolioPrideRouteImport.update({
-  id: '/pride',
-  path: '/pride',
   getParentRoute: () => PortfolioRoute,
 } as any)
 const PortfolioPulseassistRoute = PortfolioPulseassistRouteImport.update({
@@ -210,9 +198,7 @@ export interface FileRoutesByFullPath {
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
-  '/portfolio/devapay': typeof PortfolioDevapayRoute
   '/portfolio/faga': typeof PortfolioFagaRoute
-  '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/admin/': typeof AdminIndexRoute
@@ -240,9 +226,7 @@ export interface FileRoutesByTo {
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
-  '/portfolio/devapay': typeof PortfolioDevapayRoute
   '/portfolio/faga': typeof PortfolioFagaRoute
-  '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/admin': typeof AdminIndexRoute
@@ -273,9 +257,7 @@ export interface FileRoutesById {
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
-  '/portfolio/devapay': typeof PortfolioDevapayRoute
   '/portfolio/faga': typeof PortfolioFagaRoute
-  '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulseassist': typeof PortfolioPulseassistRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
   '/admin/': typeof AdminIndexRoute
@@ -307,9 +289,7 @@ export interface FileRouteTypes {
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
-    | '/portfolio/devapay'
     | '/portfolio/faga'
-    | '/portfolio/pride'
     | '/portfolio/pulseassist'
     | '/portfolio/pulsepay'
     | '/admin/'
@@ -337,9 +317,7 @@ export interface FileRouteTypes {
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
-    | '/portfolio/devapay'
     | '/portfolio/faga'
-    | '/portfolio/pride'
     | '/portfolio/pulseassist'
     | '/portfolio/pulsepay'
     | '/admin'
@@ -369,9 +347,7 @@ export interface FileRouteTypes {
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
-    | '/portfolio/devapay'
     | '/portfolio/faga'
-    | '/portfolio/pride'
     | '/portfolio/pulseassist'
     | '/portfolio/pulsepay'
     | '/admin/'
@@ -562,25 +538,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioIndexRouteImport
       parentRoute: typeof PortfolioRoute
     }
-    '/portfolio/devapay': {
-      id: '/portfolio/devapay'
-      path: '/devapay'
-      fullPath: '/portfolio/devapay'
-      preLoaderRoute: typeof PortfolioDevapayRouteImport
-      parentRoute: typeof PortfolioRoute
-    }
     '/portfolio/faga': {
       id: '/portfolio/faga'
       path: '/faga'
       fullPath: '/portfolio/faga'
       preLoaderRoute: typeof PortfolioFagaRouteImport
-      parentRoute: typeof PortfolioRoute
-    }
-    '/portfolio/pride': {
-      id: '/portfolio/pride'
-      path: '/pride'
-      fullPath: '/portfolio/pride'
-      preLoaderRoute: typeof PortfolioPrideRouteImport
       parentRoute: typeof PortfolioRoute
     }
     '/portfolio/pulseassist': {
@@ -640,18 +602,14 @@ const AdminRouteChildren: AdminRouteChildren = {
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface PortfolioRouteChildren {
-  PortfolioDevapayRoute: typeof PortfolioDevapayRoute
   PortfolioFagaRoute: typeof PortfolioFagaRoute
-  PortfolioPrideRoute: typeof PortfolioPrideRoute
   PortfolioPulseassistRoute: typeof PortfolioPulseassistRoute
   PortfolioPulsepayRoute: typeof PortfolioPulsepayRoute
   PortfolioIndexRoute: typeof PortfolioIndexRoute
 }
 
 const PortfolioRouteChildren: PortfolioRouteChildren = {
-  PortfolioDevapayRoute: PortfolioDevapayRoute,
   PortfolioFagaRoute: PortfolioFagaRoute,
-  PortfolioPrideRoute: PortfolioPrideRoute,
   PortfolioPulseassistRoute: PortfolioPulseassistRoute,
   PortfolioPulsepayRoute: PortfolioPulsepayRoute,
   PortfolioIndexRoute: PortfolioIndexRoute,

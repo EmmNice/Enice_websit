@@ -106,12 +106,22 @@
     },
     {
       "source": "/portfolio/payment-collection",
-      "destination": "/portfolio/devapay",
+      "destination": "/portfolio",
       "permanent": true
     },
     {
       "source": "/portfolio/pulsex",
-      "destination": "/portfolio/pride",
+      "destination": "/portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/devapay",
+      "destination": "/portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/pride",
+      "destination": "/portfolio",
       "permanent": true
     },
     {
