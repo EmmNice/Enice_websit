@@ -833,10 +833,10 @@ const DEFAULT_SECTIONS: {
     type: "hero",
     order: 10,
     fields: {
-      eyebrow: "AI, payments and email infrastructure",
-      heading: "Run payments, support and email on one platform",
+      eyebrow: "",
+      heading: "Unified technology solutions for growing enterprises",
       subheading:
-        "PulsePay, PulseAssist and Faga give your business cards and wallets, AI customer support, and reliable email delivery, all built and operated by ENICE Group.",
+        "We build and manage scalable platforms designed to handle business transactions, customer relations, and digital messaging seamlessly.",
       primaryCtaLabel: "Explore our products",
       primaryCtaUrl: "/portfolio",
       secondaryCtaLabel: "Talk to our team",
