@@ -132,8 +132,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   },
   "/portfolio": {
     title: "Products | ENICE Group",
-    description:
-      "PulsePay, PulseAssist, Faga, DevaPay, and PRIDE: the products built and operated by ENICE Group.",
+    description: "PulsePay, PulseAssist, and Faga: the products built and operated by ENICE Group.",
   },
   "/portfolio/pulsepay": {
     title: "PulsePay | Virtual Payment Platform by ENICE Group",
@@ -150,16 +149,6 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     description:
       "Faga provides transactional and marketing email delivery with verified domains, inbound routing, templates, automations, suppression handling, analytics, webhooks, and a REST API.",
   },
-  "/portfolio/pride": {
-    title: "PRIDE | Digital Asset Platform by ENICE Group",
-    description:
-      "PRIDE is ENICE Group's digital asset platform launching Q3 2027. Trade cryptocurrency, manage digital assets, and access DeFi, kept simple, secure, and integrated with the ENICE ecosystem.",
-  },
-  "/portfolio/devapay": {
-    title: "DevaPay | ENICE Group",
-    description:
-      "DevaPay is ENICE Group's upcoming payment infrastructure for businesses, launching in 2028. Accept and manage customer payments through a single, developer friendly API.",
-  },
   "/about-pulseassist-beta": {
     title: "About the PulseAssist Beta | ENICE Group",
     description:
@@ -168,7 +157,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/roadmap": {
     title: "Product Roadmap | ENICE Group",
     description:
-      "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist live, and what we are building next, including PRIDE, DevaPay, and the ENICE Core.",
+      "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist live, and what we are building next, including Faga and the ENICE Core.",
   },
   "/blog/": {
     title: "Blog and Updates | ENICE Group",

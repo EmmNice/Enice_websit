@@ -16,7 +16,7 @@ export const FAQS: readonly { q: string; a: string }[] = [
   },
   {
     q: "Which problems are ENICE products built to solve?",
-    a: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, Faga provides transactional and marketing email infrastructure, DevaPay covers payment collection, and PRIDE extends the ecosystem into digital assets.",
+    a: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, and Faga provides transactional and marketing email infrastructure.",
   },
   {
     q: "What does the ENICE Engine provide?",
