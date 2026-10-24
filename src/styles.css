@@ -375,7 +375,7 @@
 
 @layer base {
   * {
-    border-color: var(--color-border);
+    border-color: var(--border);
     box-sizing: border-box;
   }
 
@@ -385,8 +385,8 @@
   }
 
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-body);
     overflow-x: hidden;
     max-width: 100%;
@@ -431,7 +431,7 @@
    * `:focus-visible` keeps it off mouse clicks, so this costs the pointer experience nothing.
    */
   :focus-visible {
-    outline: 2px solid var(--color-ring);
+    outline: 2px solid var(--ring);
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -516,14 +516,14 @@
   .type-lead {
     font-size: clamp(1rem, 1.25vw, 1.1875rem);
     line-height: 1.65;
-    color: var(--color-muted-foreground);
+    color: var(--muted-foreground);
     text-wrap: pretty;
   }
 
   .type-body {
     font-size: 0.9375rem;
     line-height: 1.7;
-    color: var(--color-muted-foreground);
+    color: var(--muted-foreground);
     text-wrap: pretty;
   }
 
@@ -542,7 +542,7 @@
   }
 
   .eyebrow-muted {
-    color: var(--color-muted-foreground);
+    color: var(--muted-foreground);
   }
 
   /* Restrained metadata: timestamps, counters, captions. */
@@ -566,21 +566,21 @@
   .panel {
     position: relative;
     border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--border);
     background-color: var(--surface-2);
   }
 
   .panel-quiet {
     position: relative;
     border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--border);
     background-color: var(--surface-1);
   }
 
   .panel-raised {
     position: relative;
     border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--border);
     background-color: var(--surface-2);
     box-shadow:
       inset 0 1px 0 0 rgb(247 248 250 / 0.05),
@@ -604,7 +604,7 @@
      stays on the existing accent details rather than replacing the shared surface/text system. */
   .product-accent-card {
     overflow: hidden;
-    border-color: color-mix(in srgb, var(--electric) 24%, var(--color-border));
+    border-color: color-mix(in srgb, var(--electric) 24%, var(--border));
     background-image: linear-gradient(
       135deg,
       color-mix(in srgb, var(--electric) 7%, transparent),
@@ -622,25 +622,25 @@
   }
 
   .product-accent-card.panel-interactive:hover {
-    border-color: color-mix(in srgb, var(--electric) 45%, var(--color-border));
+    border-color: color-mix(in srgb, var(--electric) 45%, var(--border));
   }
 
   .product-accent-card .btn-secondary {
-    border-color: color-mix(in srgb, var(--electric) 32%, var(--color-border));
+    border-color: color-mix(in srgb, var(--electric) 32%, var(--border));
   }
 
   .product-accent-card .btn-secondary:hover {
-    border-color: color-mix(in srgb, var(--electric) 62%, var(--color-border));
+    border-color: color-mix(in srgb, var(--electric) 62%, var(--border));
   }
 
   /* Portfolio cards use the same enterprise shell while making each product palette unmistakable
      inside its interface preview and primary action. */
   .portfolio-product-card {
-    border-color: color-mix(in srgb, var(--electric) 36%, var(--color-border));
+    border-color: color-mix(in srgb, var(--electric) 36%, var(--border));
   }
 
   .portfolio-product-card.panel-interactive:hover {
-    border-color: color-mix(in srgb, var(--electric) 58%, var(--color-border));
+    border-color: color-mix(in srgb, var(--electric) 58%, var(--border));
   }
 
   .portfolio-product-card .btn-primary {
@@ -666,7 +666,7 @@
   }
 
   .portfolio-product-visual .panel {
-    border-color: color-mix(in srgb, var(--electric) 26%, var(--color-border));
+    border-color: color-mix(in srgb, var(--electric) 26%, var(--border));
     box-shadow: inset 0 1px 0 color-mix(in srgb, var(--electric) 18%, transparent);
   }
 
@@ -677,12 +677,12 @@
     gap: 1px;
     overflow: hidden;
     border-radius: var(--radius-xl);
-    border: 1px solid var(--color-border);
-    background-color: var(--color-border);
+    border: 1px solid var(--border);
+    background-color: var(--border);
   }
 
   .grid-hairline > * {
-    background-color: var(--color-background);
+    background-color: var(--background);
   }
 
   /* ── Buttons ──────────────────────────────────────────────────────────────

@@ -2547,9 +2547,9 @@ WHERE key = 'home.faq'
 -- value is still the untouched old default, so an administrator's own wording is left alone.
 UPDATE site_sections
 SET fields = fields || jsonb_build_object(
-      'eyebrow', 'AI, payments and email infrastructure',
-      'heading', 'Run payments, support and email on one platform',
-      'subheading', 'PulsePay, PulseAssist and Faga give your business cards and wallets, AI customer support, and reliable email delivery, all built and operated by ENICE Group.',
+      'eyebrow', '',
+      'heading', 'Unified technology solutions for growing enterprises',
+      'subheading', 'We build and manage scalable platforms designed to handle business transactions, customer relations, and digital messaging seamlessly.',
       'secondaryCtaLabel', 'Talk to our team',
       'secondaryCtaUrl', '/contact'),
     updated_at = now()

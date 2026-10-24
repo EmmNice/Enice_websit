@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
 import {
   ArrowRight,
   Boxes,
@@ -23,11 +22,10 @@ import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { StyledText } from "@/components/site/StyledText";
 import { Container, Cta, Eyebrow } from "@/components/site/primitives";
 import {
+  BrowserShot,
   EngineConsole,
-  FagaMock,
-  HeroConsole,
-  PulseAssistMock,
-  PulsePayMock,
+  HeroVisual,
+  type ShotKey,
 } from "@/components/site/home/ProductMockups";
 import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
 import { organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
@@ -82,7 +80,7 @@ interface Product {
   desc: string;
   bullets: string[];
   facts: { label: string; value: string }[];
-  mock: () => ReactNode;
+  shot: ShotKey;
 }
 
 /**
@@ -108,7 +106,7 @@ const PRODUCTS: Product[] = [
       { label: "Cards", value: "Naira & USD" },
       { label: "Market", value: "Nigeria" },
     ],
-    mock: () => <PulsePayMock />,
+    shot: "pulsepay",
   },
   {
     to: "/portfolio/pulseassist",
@@ -128,7 +126,7 @@ const PRODUCTS: Product[] = [
       { label: "Channels", value: "WhatsApp, web & more" },
       { label: "Tenancy", value: "Multi-tenant" },
     ],
-    mock: () => <PulseAssistMock />,
+    shot: "pulseassist",
   },
   {
     to: "/portfolio/faga",
@@ -148,7 +146,7 @@ const PRODUCTS: Product[] = [
       { label: "Delivery", value: "Transactional & marketing" },
       { label: "Integration", value: "REST API & webhooks" },
     ],
-    mock: () => <FagaMock />,
+    shot: "faga",
   },
 ];
 
@@ -248,26 +246,17 @@ function Landing() {
       <section className="hero-brand relative overflow-hidden" aria-labelledby="hero-heading">
         <Container className="relative grid items-center gap-14 py-16 sm:py-20 lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:py-28">
           <div>
-            <div
-              className="animate-hero-up inline-flex max-w-full items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3.5 py-1.5 backdrop-blur-sm"
-              style={{ animationDelay: "0ms" }}
-            >
-              <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-electric" />
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-bone-strong">
-                <StyledText
-                  text={fieldText(hero, "eyebrow", "AI, payments and email infrastructure")}
-                  accentClassName="text-electric"
-                />
-              </span>
-            </div>
-
             <h1
               id="hero-heading"
-              className="animate-hero-up mt-7 text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-[3.5rem]"
+              className="animate-hero-up text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-[3.5rem]"
               style={{ animationDelay: "60ms", textWrap: "balance" }}
             >
               <StyledText
-                text={fieldText(hero, "heading", "Run payments, support and email on one platform")}
+                text={fieldText(
+                  hero,
+                  "heading",
+                  "Unified technology solutions for growing enterprises",
+                )}
                 accentClassName="text-electric"
               />
             </h1>
@@ -280,7 +269,7 @@ function Landing() {
                 text={fieldText(
                   hero,
                   "subheading",
-                  "PulsePay, PulseAssist and Faga give your business cards and wallets, AI customer support, and reliable email delivery, all built and operated by ENICE Group.",
+                  "We build and manage scalable platforms designed to handle business transactions, customer relations, and digital messaging seamlessly.",
                 )}
                 accentClassName="text-electric"
               />
@@ -336,7 +325,7 @@ function Landing() {
           </div>
 
           <div className="animate-hero-right relative lg:pl-6" style={{ animationDelay: "160ms" }}>
-            <HeroConsole />
+            <HeroVisual />
           </div>
         </Container>
       </section>
@@ -383,7 +372,7 @@ function Landing() {
               {products.map((p, i) => (
                 <Reveal key={p.to} delay={i * 70}>
                   <article className="group flex h-full gap-5 border-t border-border pt-7">
-                    <span className="app-icon h-14 w-14 rounded-2xl">
+                    <span className="app-icon h-12 w-12 rounded-xl sm:h-14 sm:w-14 sm:rounded-2xl">
                       <p.icon aria-hidden className="h-6 w-6" strokeWidth={1.75} />
                     </span>
                     <div className="flex min-w-0 flex-1 flex-col">
@@ -633,7 +622,14 @@ function FeatureRow({ product: p, reverse }: { product: Product; reverse: boolea
       </Reveal>
 
       <Reveal delay={100} className={cn(reverse && "lg:order-1")}>
-        {p.mock()}
+        {/* The product screen sits in a tinted frame and bleeds off its far edge, the way a
+            real product shot is cropped rather than shrunk to fit. */}
+        <div className="mock-frame aspect-[5/4] sm:aspect-[4/3]">
+          <BrowserShot
+            shot={p.shot}
+            className="absolute left-[8%] top-[11%] w-[150%] max-w-none sm:w-[135%]"
+          />
+        </div>
       </Reveal>
     </div>
   );
