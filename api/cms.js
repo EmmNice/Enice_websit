@@ -4160,6 +4160,22 @@ WHERE key = 'header'
   AND position('nav-pulseassist-email' in value::text) = 0;
 
 UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                     AND item->'children' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(item, '{children}', (item->'children') ||
+                           '[{"id":"nav-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND NOT (value->'items' @> '[{"children":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
+UPDATE site_settings
 SET value = jsonb_set(value, '{columns}', (
       SELECT jsonb_agg(
                CASE WHEN col->>'id' = 'col-products'
@@ -4588,6 +4604,22 @@ WHERE key = 'header'
   AND position('/portfolio/epulse' in value::text) > 0;
 
 -- Footer: the same, one level down in each column's links.
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                     AND item->'children' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(item, '{children}', (item->'children') ||
+                           '[{"id":"nav-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND NOT (value->'items' @> '[{"children":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
 UPDATE site_settings
 SET value = jsonb_set(value, '{columns}', (
       SELECT COALESCE(jsonb_agg(
@@ -5191,9 +5223,9 @@ WHERE key = 'home.faq'
 -- value is still the untouched old default, so an administrator's own wording is left alone.
 UPDATE site_sections
 SET fields = fields || jsonb_build_object(
-      'eyebrow', 'AI, payments and email infrastructure',
-      'heading', 'Run payments, support and email on one platform',
-      'subheading', 'PulsePay, PulseAssist and Faga give your business cards and wallets, AI customer support, and reliable email delivery, all built and operated by ENICE Group.',
+      'eyebrow', '',
+      'heading', 'Unified technology solutions for growing enterprises',
+      'subheading', 'We build and manage scalable platforms designed to handle business transactions, customer relations, and digital messaging seamlessly.',
       'secondaryCtaLabel', 'Talk to our team',
       'secondaryCtaUrl', '/contact'),
     updated_at = now()
@@ -5238,6 +5270,22 @@ WHERE key = 'header'
 
 -- Footer: the same, one level down in each column's links.
 UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                     AND item->'children' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(item, '{children}', (item->'children') ||
+                           '[{"id":"nav-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND NOT (value->'items' @> '[{"children":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
+UPDATE site_settings
 SET value = jsonb_set(value, '{columns}', (
       SELECT COALESCE(jsonb_agg(
                CASE WHEN jsonb_typeof(col->'links') = 'array'
@@ -5254,6 +5302,211 @@ WHERE key = 'footer'
   AND jsonb_typeof(value->'columns') = 'array'
   AND (position('/portfolio/devapay' in value::text) > 0
        OR position('/portfolio/pride' in value::text) > 0);
+`
+    )
+  },
+  {
+    id: 31,
+    name: "retire_pulseassist_and_faga_restore_pride",
+    sql: (
+      /* sql */
+      `
+-- The portfolio is now PulsePay and PRIDE. PulseAssist, Faga and the beta page are retired: their
+-- sections, page records, nav and footer links and homepage tiles are removed, and their routes
+-- redirect to /portfolio in vercel.json. PRIDE returns to the site, so its page and sections are
+-- re-seeded where a previous migration deleted them.
+--
+-- Every statement is guarded on the old state still being present, so a re-run is a no-op and an
+-- administrator's own later edit is left alone.
+
+-- Retired product pages, their sections and their managed page records.
+DELETE FROM site_sections
+WHERE key IN ('portfolio.pulseassist', 'portfolio.faga')
+   OR key LIKE 'portfolio.pulseassist.%'
+   OR key LIKE 'portfolio.faga.%';
+DELETE FROM cms_pages
+WHERE path IN ('/portfolio/pulseassist', '/portfolio/faga', '/about-pulseassist-beta');
+
+-- PRIDE: the page record and the three sections its page reads.
+INSERT INTO cms_pages (id, path, title, summary, status, sections, seo, system_route, published_at)
+SELECT md5(random()::text || clock_timestamp()::text)::uuid, '/portfolio/pride',
+       'PRIDE', 'Digital asset trading and custody.',
+       'published', '[]'::jsonb, '{}'::jsonb, true, now()
+ON CONFLICT (path) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, sort_order, fields, updated_at)
+VALUES
+  ('portfolio.pride', 'PRIDE page', 'Portfolio', 'hero', 230,
+   '{"eyebrow":"Digital Assets","heading":"PRIDE","subheading":"PRIDE is ENICE Group''s digital asset platform, designed to make cryptocurrency and digital finance simple, secure, and accessible, inside the same account as PulsePay."}'::jsonb,
+   now()),
+  ('portfolio.pride.facts', 'PRIDE launch facts', 'Portfolio', 'statistics', 231,
+   '{"heading":"At launch","items":[{"value":"2027","label":"Public launch"},{"value":"Same ledger","label":"As PulsePay"},{"value":"Self-custody option","label":"Keys stay with the holder"}]}'::jsonb,
+   now()),
+  ('portfolio.pride.highlights', 'PRIDE highlights', 'Portfolio', 'featureGrid', 232,
+   '{"eyebrow":"Platform Capabilities","heading":"What PRIDE does.","subheading":"The scope the platform is being built to, not a claim that any of it is live today.","items":[{"icon":"BarChart3","title":"Trading","description":"Buy and sell digital assets from the balance already held on PulsePay, with pricing shown before an order is placed."},{"icon":"Lock","title":"Custody","description":"Assets held with the same isolation and audit trail as money on the payment platform, with a self-custody option for holders who want it."},{"icon":"Globe","title":"Cross-ecosystem transfers","description":"Move value between the payment and asset sides of the ecosystem without leaving ENICE or repeating identity checks."},{"icon":"ShieldCheck","title":"Regulatory-ready","description":"KYC, AML and transaction monitoring run on the same controls as PulsePay, from the first transaction."}]}'::jsonb,
+   now())
+ON CONFLICT (key) DO NOTHING;
+
+-- Homepage product tiles: drop the retired products, keep PulsePay, add PRIDE.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE COALESCE(item->>'url', '') NOT IN (
+        '/portfolio/pulseassist', '/portfolio/faga', '/portfolio/payment-collection',
+        '/portfolio/epulse', '/portfolio/pulsex', '/portfolio/devapay')
+    )),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND (position('/portfolio/pulseassist' in fields::text) > 0
+       OR position('/portfolio/faga' in fields::text) > 0
+       OR position('/portfolio/payment-collection' in fields::text) > 0
+       OR position('/portfolio/epulse' in fields::text) > 0
+       OR position('/portfolio/pulsex' in fields::text) > 0);
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (fields->'items') || '[
+      {"icon":"Bitcoin","kicker":"DIGITAL ASSETS","title":"PRIDE","description":"ENICE Group''s digital asset platform for cryptocurrency trading, secure custody and cross-ecosystem digital finance, built on the same ledger as PulsePay.","bullets":"Launch: 2027
+Category: Digital assets","url":"/portfolio/pride"}
+    ]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND position('/portfolio/pride' in fields::text) = 0;
+
+-- Roadmap milestones about the retired products, plus the PRIDE milestones that replace them.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE position('product: PulseAssist' in COALESCE(item->>'description', '')) = 0
+        AND position('product: Faga' in COALESCE(item->>'description', '')) = 0
+        AND position('product: PulseX' in COALESCE(item->>'description', '')) = 0
+        AND position('product: ePulse' in COALESCE(item->>'description', '')) = 0
+        AND position('product: DevaPay' in COALESCE(item->>'description', '')) = 0
+    )),
+    updated_at = now()
+WHERE key = 'home.roadmap'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND (position('product: PulseAssist' in fields::text) > 0
+       OR position('product: Faga' in fields::text) > 0
+       OR position('product: PulseX' in fields::text) > 0
+       OR position('product: ePulse' in fields::text) > 0
+       OR position('product: DevaPay' in fields::text) > 0);
+
+-- PRIDE milestones, so the roadmap still describes the second product after the rows above.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (fields->'items') || '[
+      {"title":"PRIDE Waitlist and Platform Preview","description":"when: Q4 2026
+status: in-progress
+product: PRIDE
+tags: Digital Assets, Custody
+
+Early access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch."},
+      {"title":"PRIDE Public Launch","description":"when: 2027
+status: planned
+product: PRIDE
+tags: Digital Assets, Trading
+
+Trading, custody and cross-ecosystem transfers open to PulsePay account holders."}
+    ]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.roadmap'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND position('product: PRIDE' in fields::text) = 0;
+
+-- Header and footer: drop the retired products from every menu.
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                    THEN jsonb_set(item, '{children}', (
+                           SELECT COALESCE(jsonb_agg(child ORDER BY cord), '[]'::jsonb)
+                           FROM jsonb_array_elements(item->'children') WITH ORDINALITY AS c(child, cord)
+                           WHERE COALESCE(child->>'url', '') NOT IN ('/portfolio/pulseassist', '/portfolio/faga')))
+                    ELSE item END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND (position('/portfolio/pulseassist' in value::text) > 0
+       OR position('/portfolio/faga' in value::text) > 0);
+
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                     AND item->'children' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(item, '{children}', (item->'children') ||
+                           '[{"id":"nav-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND NOT (value->'items' @> '[{"children":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
+UPDATE site_settings
+SET value = jsonb_set(value, '{columns}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(col->'links') = 'array'
+                    THEN jsonb_set(col, '{links}', (
+                           SELECT COALESCE(jsonb_agg(link ORDER BY lord), '[]'::jsonb)
+                           FROM jsonb_array_elements(col->'links') WITH ORDINALITY AS l(link, lord)
+                           WHERE COALESCE(link->>'url', '') NOT IN ('/portfolio/pulseassist', '/portfolio/faga')))
+                    ELSE col END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'columns') WITH ORDINALITY AS t(col, ord)
+    )),
+    updated_at = now()
+WHERE key = 'footer'
+  AND jsonb_typeof(value->'columns') = 'array'
+  AND (position('/portfolio/pulseassist' in value::text) > 0
+       OR position('/portfolio/faga' in value::text) > 0);
+
+UPDATE site_settings
+SET value = jsonb_set(value, '{columns}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(col->'links') = 'array'
+                     AND col->'links' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(col, '{links}', (col->'links') ||
+                           '[{"id":"f-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE col END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'columns') WITH ORDINALITY AS t(col, ord)
+    )),
+    updated_at = now()
+WHERE key = 'footer'
+  AND jsonb_typeof(value->'columns') = 'array'
+  AND NOT (value->'columns' @> '[{"links":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
+-- Partners strip: the company's own products are not partners.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE COALESCE(item->>'name', '') <> 'PulseAssist'
+    )),
+    updated_at = now()
+WHERE key = 'home.partners'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND position('PulseAssist' in fields::text) > 0;
+
+-- The FAQ answers that listed the old portfolio.
+UPDATE site_sections
+SET fields = replace(replace(fields::text,
+      'ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform, PulseAssist is our AI customer-operations platform, and Faga provides email delivery infrastructure.',
+      'ENICE Group builds and operates technology products for financial services and digital assets. PulsePay is our digital payments platform and PRIDE is our digital asset platform, both running on the same shared infrastructure.'),
+      'Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, and Faga provides transactional and marketing email infrastructure.',
+      'Our products focus on payments and digital finance. PulsePay covers cards, wallets and transfers for businesses and individuals, and PRIDE covers trading and custody of digital assets in the same account.')::jsonb,
+    updated_at = now()
+WHERE key = 'home.faq'
+  AND (position('PulseAssist' in fields::text) > 0 OR position('Faga' in fields::text) > 0);
 `
     )
   }
@@ -7257,18 +7510,7 @@ function defaultSettings() {
           visible: true,
           children: [
             { id: "nav-pulsepay", label: "PulsePay", url: "/portfolio/pulsepay", visible: true },
-            {
-              id: "nav-pulseassist",
-              label: "PulseAssist",
-              url: "/portfolio/pulseassist",
-              visible: true
-            },
-            {
-              id: "nav-faga",
-              label: "Faga",
-              url: "/portfolio/faga",
-              visible: true
-            }
+            { id: "nav-pride", label: "PRIDE", url: "/portfolio/pride", visible: true }
           ]
         },
         { id: "nav-company", label: "Company", url: "/about", visible: true },
@@ -7298,18 +7540,7 @@ function defaultSettings() {
           heading: "Products",
           links: [
             { id: "f-pulsepay", label: "PulsePay", url: "/portfolio/pulsepay", visible: true },
-            {
-              id: "f-pulseassist",
-              label: "PulseAssist",
-              url: "/portfolio/pulseassist",
-              visible: true
-            },
-            {
-              id: "f-faga",
-              label: "Faga",
-              url: "/portfolio/faga",
-              visible: true
-            },
+            { id: "f-pride", label: "PRIDE", url: "/portfolio/pride", visible: true },
             { id: "f-all-products", label: "All products", url: "/portfolio", visible: true }
           ]
         },
@@ -7372,9 +7603,9 @@ var DEFAULT_SECTIONS = [
     type: "hero",
     order: 10,
     fields: {
-      eyebrow: "AI, payments and email infrastructure",
-      heading: "Run payments, support and email on one platform",
-      subheading: "PulsePay, PulseAssist and Faga give your business cards and wallets, AI customer support, and reliable email delivery, all built and operated by ENICE Group.",
+      eyebrow: "",
+      heading: "Unified technology solutions for growing enterprises",
+      subheading: "We build and operate payment and digital asset platforms: cards, wallets and transfers through PulsePay, trading and custody through PRIDE.",
       primaryCtaLabel: "Explore our products",
       primaryCtaUrl: "/portfolio",
       secondaryCtaLabel: "Talk to our team",
@@ -7411,8 +7642,8 @@ var DEFAULT_SECTIONS = [
     order: 30,
     fields: {
       eyebrow: "What we build",
-      heading: "Three areas we work in.",
-      subheading: "Payments, customer support, and software products built for businesses in Africa.",
+      heading: "Two platforms, one foundation.",
+      subheading: "Payments and digital assets, built on the same ledger, compliance and infrastructure.",
       // The three cards the homepage product band renders. `index` numbering is derived from
       // position, and bullets are one per line.
       items: [
@@ -7424,11 +7655,11 @@ var DEFAULT_SECTIONS = [
           bullets: "Virtual Card Issuance\nTreasury and Ledger\nKYC and Compliance Tooling"
         },
         {
-          icon: "BrainCircuit",
-          kicker: "AI SUPPORT",
-          title: "AI for customer support",
-          description: "AI tools that answer common questions, route work, and hand conversations to people when needed.",
-          bullets: "Customer Support\nRules and Approval Steps\nWorkflows and Handoffs"
+          icon: "Bitcoin",
+          kicker: "DIGITAL ASSETS",
+          title: "Digital assets and custody",
+          description: "Trading and custody for digital assets inside the same account, so a balance can move between payment rails and asset rails without leaving the platform.",
+          bullets: "Trading and Custody\nCross-Ecosystem Transfers\nShared Compliance Controls"
         },
         {
           icon: "Boxes",
@@ -7469,12 +7700,6 @@ var DEFAULT_SECTIONS = [
           tagline: "Database & Auth",
           logo: "/partners/supabase.svg",
           url: "https://supabase.com"
-        },
-        {
-          name: "PulseAssist",
-          tagline: "AI Customer Operations",
-          logo: "/partners/pulseassist.svg",
-          url: "https://getpulseassist.com"
         }
       ]
     }
@@ -7497,8 +7722,8 @@ var DEFAULT_SECTIONS = [
     order: 32,
     fields: {
       eyebrow: "Our products",
-      heading: "Start with the product you need, or run all three together",
-      subheading: "Every product is built on the same ENICE Engine, so payments, conversations and email share one secure foundation.",
+      heading: "Start with the product you need, or run both together",
+      subheading: "Both products are built on the same ENICE Engine, so payments and digital assets share one secure foundation.",
       // `bullets` carries the product's checkable facts, one `Label: Value` pair per line, and
       // `url` is the product page. See `parseFacts` in src/routes/index.tsx.
       items: [
@@ -7511,20 +7736,12 @@ var DEFAULT_SECTIONS = [
           url: "/portfolio/pulsepay"
         },
         {
-          icon: "BrainCircuit",
-          kicker: "CUSTOMER SUPPORT AI",
-          title: "PulseAssist",
-          description: "An AI support platform built for growing businesses, startups, and digital teams, with automated queue handling, live agent handoff, and smart customer workflow tools.",
-          bullets: "Channels and more.: WhatsApp, web, Telegram, SMS, voice\nTenancy: Multi-tenant",
-          url: "/portfolio/pulseassist"
-        },
-        {
-          icon: "Mail",
-          kicker: "Email infrastructure",
-          title: "Faga",
-          description: "Faga handles the same email delivery work businesses use SendGrid or Resend for: transactional and marketing messages, verified domains, templates, webhooks, analytics, and API-driven sending.",
-          bullets: "Delivery: Transactional & marketing\nIntegration: REST API & webhooks",
-          url: "/portfolio/faga"
+          icon: "Bitcoin",
+          kicker: "DIGITAL ASSETS",
+          title: "PRIDE",
+          description: "ENICE Group's digital asset platform for cryptocurrency trading, secure custody and cross-ecosystem digital finance, built on the same ledger as PulsePay.",
+          bullets: "Launch: 2027\nCategory: Digital assets",
+          url: "/portfolio/pride"
         }
       ]
     }
@@ -7543,7 +7760,7 @@ var DEFAULT_SECTIONS = [
         {
           icon: "Cpu",
           title: "AI & Automation",
-          description: "Centralized AI tools and smart workflows that power products like PulseAssist to handle customer support and communication seamlessly."
+          description: "Centralized AI tools and smart workflows behind both platforms, from payment reconciliation to asset monitoring."
         },
         {
           icon: "Database",
@@ -7592,137 +7809,6 @@ var DEFAULT_SECTIONS = [
    * operations.
    */
   {
-    key: "portfolio.faga",
-    label: "Faga page",
-    group: "Portfolio",
-    type: "hero",
-    order: 225,
-    fields: {
-      eyebrow: "Faga",
-      heading: "Professional email, on your own domain.",
-      subheading: "Faga is an email delivery platform for transactional and marketing messages\u2014the same category of platform as SendGrid and Resend. Send and receive from your own domain, manage templates and campaigns, or integrate through the REST API and signed webhooks."
-    }
-  },
-  {
-    key: "portfolio.faga.facts",
-    label: "Faga facts strip",
-    group: "Portfolio",
-    type: "statistics",
-    order: 226,
-    fields: {
-      heading: "Faga at a glance",
-      items: [
-        { value: "Your domain", label: "Verified in live DNS" },
-        { value: "Send + receive", label: "Inbound routing included" },
-        { value: "REST API", label: "Scoped, rotatable keys" },
-        { value: "Webhooks", label: "Signed delivery events" }
-      ]
-    }
-  },
-  {
-    key: "portfolio.faga.capabilities",
-    label: "Faga capabilities",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 227,
-    fields: {
-      eyebrow: "What you get",
-      heading: "Everything the product actually does.",
-      subheading: "This is the implementation rather than a roadmap. If something is missing from the list, it is because it has not been built yet.",
-      items: [
-        {
-          icon: "Globe2",
-          title: "Your own sending domain",
-          description: "Mail goes out from your domain, not ours. The DKIM, SPF and MAIL FROM records are generated for you, then checked against public DNS. A domain is only marked connected once those records genuinely resolve."
-        },
-        {
-          icon: "Send",
-          title: "Transactional and bulk sending",
-          description: "A single message and a campaign run through the same pipeline, each with its own delivery status. Sends are recorded with the idempotency key you supplied, so a retried request cannot become a duplicate email."
-        },
-        {
-          icon: "Inbox",
-          title: "Inbound email and routing",
-          description: "Receive mail on your own domain and route it by recipient, sender or subject: to a mailbox, a team, or your own webhook. Inbound is part of the product rather than a forwarding workaround."
-        },
-        {
-          icon: "AtSign",
-          title: "Mailboxes and sending addresses",
-          description: "Mailboxes that receive and addresses that send, each tied to a verified domain. An address is claimed once across the platform, so two workspaces cannot share an identity."
-        },
-        {
-          icon: "Layers",
-          title: "Templates with version history",
-          description: "Write a template once and use it from the console or the API. Versions are append-only, so a campaign keeps sending the wording it was reviewed with even after the template moves on."
-        },
-        {
-          icon: "Sparkles",
-          title: "Automations and sequences",
-          description: "Multi-step sequences with delays between steps. Consent is re-checked when each step sends rather than when someone was enrolled, so an unsubscribe takes effect mid-sequence."
-        },
-        {
-          icon: "BarChart3",
-          title: "Delivery analytics",
-          description: "Delivered, bounced and complained totals with the rates behind them, measured against what the provider accepted rather than what was attempted. Rates are withheld until the sample is large enough to mean anything."
-        },
-        {
-          icon: "ShieldCheck",
-          title: "Suppression and deliverability protection",
-          description: "Hard bounces and complaints are suppressed automatically and permanently, and a suppressed address is refused before it costs another bounce. The list is yours to inspect, search and export."
-        },
-        {
-          icon: "KeyRound",
-          title: "REST API with scoped keys",
-          description: "A documented API for sending, addresses, suppressions, analytics and events. Keys carry scopes, so a key that reads analytics cannot send mail, and any key can be rotated or revoked without downtime."
-        },
-        {
-          icon: "Webhook",
-          title: "Signed delivery webhooks",
-          description: "Register endpoints and receive delivery, bounce and complaint events as they happen, signed and deduplicated. Failed deliveries are retried and visible, so a broken endpoint does not fail quietly."
-        },
-        {
-          icon: "BrainCircuit",
-          title: "AI drafting and classification",
-          description: "Draft, rewrite, summarise and classify mail with AI-assisted tools while keeping ordinary sending independent from AI usage."
-        },
-        {
-          icon: "Code2",
-          title: "Usage you can see coming",
-          description: "Live usage against your plan's allowances (sent this month, addresses, domains, endpoints), read from your entitlements rather than estimated, so a limit is visible while there is still time to act."
-        }
-      ]
-    }
-  },
-  {
-    key: "portfolio.faga.setup",
-    label: "Faga setup steps",
-    group: "Portfolio",
-    type: "steps",
-    order: 228,
-    fields: {
-      heading: "Four steps, and the hard one is checked for you.",
-      subheading: "DNS is where email setup usually goes wrong, so the console names the records that are still outstanding and the ones that are published but wrong, which never fix themselves while you wait.",
-      items: [
-        {
-          title: "Add your domain",
-          description: "Enter the domain you want to send from. It is registered with the sending provider and the exact records it needs are generated for you."
-        },
-        {
-          title: "Publish the records",
-          description: "Add the DKIM, SPF and MAIL FROM records at your DNS provider. Each is shown with its host and value, and the console tells you which are still outstanding."
-        },
-        {
-          title: "Verification against real DNS",
-          description: "The records are looked up in public DNS, not just requested from the provider. A record that is published but wrong, whether a stale value, a proxied CNAME or a second SPF line, is reported as exactly that."
-        },
-        {
-          title: "Send, receive and watch it",
-          description: "Once the records agree, sending is live. Add mailboxes and routing rules for inbound, then follow delivery, bounces and complaints from the first message onward."
-        }
-      ]
-    }
-  },
-  {
     key: "home.faq",
     label: "Frequently asked questions",
     group: "Home",
@@ -7735,11 +7821,11 @@ var DEFAULT_SECTIONS = [
       items: [
         {
           question: "What does ENICE Group build?",
-          answer: "ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform, PulseAssist is our AI customer-operations platform, and Faga provides email delivery infrastructure."
+          answer: "ENICE Group builds and operates technology products for financial services and digital assets. PulsePay is our digital payments platform and PRIDE is our digital asset platform, both running on the same shared infrastructure."
         },
         {
           question: "Which problems are ENICE products built to solve?",
-          answer: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, and Faga provides transactional and marketing email infrastructure."
+          answer: "Our products focus on payments and digital finance. PulsePay covers cards, wallets and transfers for businesses and individuals, and PRIDE covers trading and custody of digital assets in the same account."
         },
         {
           question: "What does the ENICE Engine provide?",
@@ -7801,16 +7887,20 @@ var DEFAULT_SECTIONS = [
           description: "when: Q3 2026\nstatus: completed\nproduct: PulsePay\ntags: Fintech, Wallets, KYC\n\nProgrammable wallets, instant virtual card issuance, and embedded compliance controls, rolled out to a wider pilot group across West Africa."
         },
         {
-          title: "Enterprise B2B Launch",
-          description: "when: Q4 2026\nstatus: in-progress\nproduct: PulseAssist\ntags: AI, B2B, Telecom\n\nFirst rollout of support automation to banking, fintech, and telecom partners, with policy-bound agents and live-agent failover."
+          title: "PRIDE Waitlist and Platform Preview",
+          description: "when: Q4 2026\nstatus: in-progress\nproduct: PRIDE\ntags: Digital Assets, Custody\n\nEarly access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch."
         },
         {
           title: "Developer API Public Beta",
-          description: "when: Q2 2026\nstatus: in-progress\nproduct: PulsePay\ntags: API, Developer, Fintech\n\nThe ENICE Core API opens to verified integration partners, with wallet issuance, ledger, KYC, and Assist endpoints available in a sandbox."
+          description: "when: Q2 2026\nstatus: in-progress\nproduct: PulsePay\ntags: API, Developer, Fintech\n\nThe ENICE Core API opens to verified integration partners, with wallet issuance, ledger and KYC endpoints available in a sandbox."
         },
         {
           title: "Multi-Currency Expansion",
-          description: "when: Q3 2026\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Multi-Currency, Treasury\n\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform."
+          description: "when: H1 2027\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Multi-Currency, Treasury\n\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations opening to all businesses."
+        },
+        {
+          title: "PRIDE Public Launch",
+          description: "when: 2027\nstatus: planned\nproduct: PRIDE\ntags: Digital Assets, Trading\n\nTrading, custody and cross-ecosystem transfers open to PulsePay account holders."
         },
         {
           title: "Universal Financial Hub",
@@ -8068,6 +8158,67 @@ var DEFAULT_SECTIONS = [
     }
   },
   {
+    key: "portfolio.pride",
+    label: "PRIDE page",
+    group: "Portfolio",
+    type: "hero",
+    order: 230,
+    fields: {
+      eyebrow: "Digital Assets",
+      heading: "PRIDE",
+      subheading: "PRIDE is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance simple, secure, and accessible, inside the same account as PulsePay."
+    }
+  },
+  {
+    key: "portfolio.pride.facts",
+    label: "PRIDE launch facts",
+    group: "Portfolio",
+    type: "statistics",
+    order: 231,
+    fields: {
+      heading: "At launch",
+      items: [
+        { value: "2027", label: "Public launch" },
+        { value: "Same ledger", label: "As PulsePay" },
+        { value: "Self-custody option", label: "Keys stay with the holder" }
+      ]
+    }
+  },
+  {
+    key: "portfolio.pride.highlights",
+    label: "PRIDE highlights",
+    group: "Portfolio",
+    type: "featureGrid",
+    order: 232,
+    fields: {
+      eyebrow: "Platform Capabilities",
+      heading: "What PRIDE does.",
+      subheading: "The scope the platform is being built to, not a claim that any of it is live today.",
+      items: [
+        {
+          icon: "BarChart3",
+          title: "Trading",
+          description: "Buy and sell digital assets from the balance already held on PulsePay, with pricing shown before an order is placed."
+        },
+        {
+          icon: "Lock",
+          title: "Custody",
+          description: "Assets held with the same isolation and audit trail as money on the payment platform, with a self-custody option for holders who want it."
+        },
+        {
+          icon: "Globe",
+          title: "Cross-ecosystem transfers",
+          description: "Move value between the payment and asset sides of the ecosystem without leaving ENICE or repeating identity checks."
+        },
+        {
+          icon: "ShieldCheck",
+          title: "Regulatory-ready",
+          description: "KYC, AML and transaction monitoring run on the same controls as PulsePay, from the first transaction."
+        }
+      ]
+    }
+  },
+  {
     key: "portfolio.index",
     label: "Products page",
     group: "Portfolio",
@@ -8089,18 +8240,6 @@ var DEFAULT_SECTIONS = [
       eyebrow: "Fintech Infrastructure Platform",
       heading: "PulsePay",
       subheading: "A virtual payment platform that issues Naira and USD cards, handles KYC verification, moves funds between users, and delivers value-added services with speed and reliability."
-    }
-  },
-  {
-    key: "portfolio.pulseassist",
-    label: "PulseAssist page",
-    group: "Portfolio",
-    type: "hero",
-    order: 220,
-    fields: {
-      eyebrow: "Enterprise Conversational SaaS",
-      heading: "PulseAssist",
-      subheading: "A multi-tenant AI operations platform for telecoms and financial networks. It handles customer support routing, provides API-driven account management, and hands calls to live agents in real time when needed."
     }
   },
   /*
@@ -8197,103 +8336,6 @@ var DEFAULT_SECTIONS = [
     }
   },
   {
-    key: "portfolio.pulseassist.stats",
-    label: "PulseAssist facts strip",
-    group: "Portfolio",
-    type: "statistics",
-    order: 221,
-    fields: {
-      heading: "PulseAssist at a glance",
-      // `∞ — Concurrent sessions` and `100% — Audit coverage` were removed from this strip: one is
-      // an invented capacity claim, the other a measured figure nothing measures.
-      items: [
-        { value: "WhatsApp \xB7 Web \xB7 Email \xB7 SMS \xB7 Voice", label: "Channels" },
-        { value: "Multi-tenant", label: "Architecture" }
-      ]
-    }
-  },
-  {
-    key: "portfolio.pulseassist.features",
-    label: "PulseAssist capabilities",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 222,
-    fields: {
-      eyebrow: "Platform Capabilities",
-      heading: "Operations that run themselves.",
-      subheading: "PulseAssist covers the full customer operations lifecycle, from first contact to resolution, without needing a human for every interaction.",
-      items: [
-        {
-          icon: "Inbox",
-          title: "Five channels, one inbox",
-          description: "WhatsApp, web chat, email, SMS and voice answered from a single shared inbox, so support is consistent wherever people reach you."
-        },
-        {
-          icon: "MessageSquare",
-          title: "Autonomous support routing",
-          description: "AI-driven triage and routing that resolves common queries without human intervention."
-        },
-        {
-          icon: "ShieldCheck",
-          title: "Policy-bound agents",
-          description: "Conversational agents that operate strictly within configurable organisational policies."
-        },
-        {
-          icon: "Zap",
-          title: "Real-time live-agent handoff",
-          description: "Escalation to a human agent mid-conversation, with full context preserved."
-        },
-        {
-          icon: "Globe",
-          title: "API-driven account management",
-          description: "Agents can query and update account state through secure, scoped API integrations."
-        },
-        {
-          icon: "Network",
-          title: "Multi-tenant architecture",
-          description: "Enterprise-grade isolation between clients with dedicated model and routing configs."
-        }
-      ]
-    }
-  },
-  {
-    key: "portfolio.pulseassist.sectors",
-    label: "PulseAssist sectors served",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 223,
-    fields: {
-      eyebrow: "Sectors Served",
-      heading: "Built for businesses that put customer communication first.",
-      // Icon tiles with a name only, so each row's title is the tile's label. The icon names must
-      // exist in `CARD_ICONS` in src/routes/portfolio.pulseassist.tsx — that map is curated rather
-      // than the whole of lucide, so an unlisted name silently degrades to a neutral tile.
-      items: [
-        { icon: "CreditCard", title: "Fintech" },
-        { icon: "ShoppingBag", title: "E-commerce & Retail" },
-        { icon: "HeartPulse", title: "Healthcare & Wellness" },
-        { icon: "Cloud", title: "Technology & SaaS" }
-      ]
-    }
-  },
-  {
-    key: "portfolio.pulseassist.compliance",
-    label: "PulseAssist compliance",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 224,
-    fields: {
-      eyebrow: "Enterprise Compliance",
-      heading: "Every interaction is compliant by design.",
-      subheading: "Policy configurations are version-controlled and every conversation runs with per-tenant data isolation and row-level security, built to meet the regulatory requirements of banking and telecom in Africa and beyond.",
-      items: [
-        { title: "Tenant Isolation" },
-        { title: "Policy Versioning" },
-        { title: "Row-Level Security" }
-      ]
-    }
-  },
-  {
     key: "contact.details",
     label: "Contact details",
     group: "Contact",
@@ -8314,14 +8356,9 @@ var SYSTEM_PAGES = [
   { path: "/portfolio", title: "Products", summary: "The ENICE Group product portfolio." },
   { path: "/portfolio/pulsepay", title: "PulsePay", summary: "Virtual payment platform." },
   {
-    path: "/portfolio/pulseassist",
-    title: "PulseAssist",
-    summary: "Enterprise AI operations platform."
-  },
-  {
-    path: "/portfolio/faga",
-    title: "Faga",
-    summary: "Transactional and marketing email on a verified domain."
+    path: "/portfolio/pride",
+    title: "PRIDE",
+    summary: "Digital asset trading and custody."
   },
   { path: "/contact", title: "Contact", summary: "Enquiry form and contact details." },
   { path: "/roadmap", title: "Product Roadmap", summary: "Milestones and what is next." },

@@ -58,18 +58,11 @@ export const PRODUCTS: NavItem[] = [
     stage: "building",
   },
   {
-    // Channels per the product's own site (getpulseassist.com/channels): WhatsApp, web chat,
-    // email, SMS and voice, answered from one shared inbox.
-    label: "PulseAssist",
-    to: "/portfolio/pulseassist",
-    description: "AI customer support across WhatsApp, web, email, SMS and voice.",
-    stage: "available",
-  },
-  {
-    label: "Faga",
-    to: "/portfolio/faga",
-    description: "Email delivery infrastructure for transactional and marketing messages.",
-    stage: "available",
+    // Unlaunched: waitlist only. The roadmap carries the launch milestones.
+    label: "PRIDE",
+    to: "/portfolio/pride",
+    description: "Digital asset trading and custody across the ENICE ecosystem.",
+    stage: "building",
   },
 ];
 

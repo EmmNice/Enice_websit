@@ -40,15 +40,6 @@ const CHECKS = [
     healthy: [200],
   },
   {
-    id: "early-access",
-    name: "Early Access Intake",
-    detail: "PulseAssist early-access registration endpoint.",
-    path: "/api/early-access",
-    method: "POST" as const,
-    // 400 is the expected answer to an empty body: the endpoint is up and validating.
-    healthy: [400, 429],
-  },
-  {
     id: "contact",
     name: "Contact Delivery",
     detail: `Contact form intake and routing to ${CORPORATE_EMAIL}.`,

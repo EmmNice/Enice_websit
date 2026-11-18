@@ -48,8 +48,7 @@ const FOOTER_COLS = [
     heading: "Products",
     links: [
       { label: "PulsePay", url: "/portfolio/pulsepay" },
-      { label: "PulseAssist", url: "/portfolio/pulseassist" },
-      { label: "Faga", url: "/portfolio/faga" },
+      { label: "PRIDE", url: "/portfolio/pride" },
       { label: "All products", url: "/portfolio" },
     ],
   },
@@ -205,16 +204,9 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/*
-        Bottom bar. The extra bottom and right padding keeps this clear of the floating
-        assistant launcher, which is fixed to the bottom-right corner and was sitting on top of
-        the tagline.
-      */}
+      {/* Bottom bar. */}
       <div className="relative border-t border-border">
-        <div
-          className="page-shell safe-bottom flex flex-col items-start justify-between gap-3 pb-24 pt-5 sm:flex-row sm:items-center sm:pb-5 sm:pr-28"
-          style={{ ["--safe-pad" as string]: "6rem" }}
-        >
+        <div className="page-shell safe-bottom flex flex-col items-start justify-between gap-3 pb-10 pt-5 sm:flex-row sm:items-center sm:pb-5">
           <p className="type-meta">{copyright}</p>
           <Link
             to="/status"

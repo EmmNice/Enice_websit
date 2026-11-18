@@ -12,11 +12,11 @@
 export const FAQS: readonly { q: string; a: string }[] = [
   {
     q: "What does ENICE Group build?",
-    a: "ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform, PulseAssist is our AI customer-operations platform, and Faga provides email delivery infrastructure.",
+    a: "ENICE Group builds and operates technology products for financial services and digital assets. PulsePay is our digital payments platform and PRIDE is our digital asset platform, both running on the same shared infrastructure.",
   },
   {
     q: "Which problems are ENICE products built to solve?",
-    a: "Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, and Faga provides transactional and marketing email infrastructure.",
+    a: "Our products focus on payments and digital finance. PulsePay covers cards, wallets and transfers for businesses and individuals, and PRIDE covers trading and custody of digital assets in the same account.",
   },
   {
     q: "What does the ENICE Engine provide?",

@@ -16,8 +16,12 @@ export const Route = createFileRoute("/docs")({
  * It was written out by hand in three places — the header chip and two examples — which is how a
  * reference ends up documenting a host it no longer answers on. One constant, interpolated
  * everywhere, so the prose and the examples cannot disagree.
+ *
+ * The previous value, `api.enice.group`, was a domain that was never registered: it did not
+ * resolve, so every example on this page pointed at nothing. The base now sits under the domain
+ * the site actually runs on, and access is issued per account rather than assumed public.
  */
-const API_BASE_URL = "https://api.enice.group/v1";
+const API_BASE_URL = "https://api.enicehq.com/v1";
 
 // ─── Sidebar nav ──────────────────────────────────────────────────────────────
 
@@ -27,7 +31,6 @@ const NAV = [
   { id: "errors", label: "Errors & Rate Limits" },
   { id: "wallets", label: "Wallets" },
   { id: "ledger", label: "Ledger" },
-  { id: "assist", label: "Assist" },
   { id: "kyc", label: "KYC & Identity" },
   { id: "webhooks", label: "Webhooks" },
 ];
@@ -366,7 +369,6 @@ ${API_BASE_URL}
                         ["wallets:write", "Issue cards and initiate transfers"],
                         ["ledger:write", "Post and reconcile ledger entries"],
                         ["kyc:verify", "Submit and retrieve identity verifications"],
-                        ["assist:*", "Full access to AI agent routing"],
                       ].map(([scope, desc]) => (
                         <div
                           key={scope}
@@ -699,87 +701,6 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
             </div>
           </DocSection>
 
-          {/* ── ASSIST ── */}
-          <DocSection id="assist" title="Assist">
-            <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
-              The Assist API exposes PulseAssist's multi-tenant AI routing engine. Invoke agents,
-              manage conversation state, and configure policy-bound automations via REST.
-            </p>
-
-            <div className="mt-10">
-              <div className="flex items-center gap-3">
-                <MethodBadge method="POST" />
-                <code className="font-mono text-[14px] font-semibold text-foreground">
-                  /v1/assist/query
-                </code>
-                <span className="text-[12px] text-bone-soft">Invoke an AI agent</span>
-              </div>
-              <SplitRow
-                left={
-                  <div>
-                    <p className="text-[14px] leading-relaxed text-bone-soft">
-                      Routes a user message through the configured tenant agent. The agent applies
-                      your policy rules, executes permitted actions, and returns a structured
-                      response.
-                    </p>
-                    <div className="mt-6">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
-                        Body parameters
-                      </p>
-                      <dl className="mt-3 rounded-lg border border-border">
-                        <ParamRow
-                          name="session_id"
-                          type="string"
-                          required
-                          desc="Unique conversation session identifier. Use the same ID to maintain context across turns."
-                        />
-                        <ParamRow
-                          name="message"
-                          type="string"
-                          required
-                          desc="End-user's input message."
-                        />
-                        <ParamRow
-                          name="tenant_id"
-                          type="string"
-                          required
-                          desc="Your PulseAssist tenant identifier."
-                        />
-                        <ParamRow
-                          name="language"
-                          type="string"
-                          desc="BCP-47 language tag. Default: en."
-                        />
-                      </dl>
-                    </div>
-                  </div>
-                }
-                right={
-                  <CodeBlock
-                    title="REQUEST / RESPONSE"
-                    code={`<span class="text-bone-faint"># POST /v1/assist/query</span>
-{
-  <span class="text-electric">"session_id"</span>: <span class="text-bone-strong">"sess_01kz..."</span>,
-  <span class="text-electric">"message"</span>:    <span class="text-bone-strong">"What is my account balance?"</span>,
-  <span class="text-electric">"tenant_id"</span>:  <span class="text-bone-strong">"ten_bank_ng"</span>,
-  <span class="text-electric">"language"</span>:   <span class="text-bone-strong">"en"</span>
-}
-
-<span class="text-bone-faint"># 200 OK</span>
-{
-  <span class="text-electric">"data"</span>: {
-    <span class="text-electric">"reply"</span>:      <span class="text-bone-strong">"Your NGN balance is ₦500,000."</span>,
-    <span class="text-electric">"intent"</span>:     <span class="text-bone-strong">"account.balance_inquiry"</span>,
-    <span class="text-electric">"confidence"</span>: <span class="text-bone-soft">0.98</span>,
-    <span class="text-electric">"actions"</span>:    []
-  }
-}`}
-                  />
-                }
-              />
-            </div>
-          </DocSection>
-
           {/* ── KYC ── */}
           <DocSection id="kyc" title="KYC & Identity">
             <p className="mt-4 text-[15px] leading-relaxed text-bone-soft">
@@ -898,7 +819,6 @@ X-RateLimit-Reset:     <span class="text-bone-soft">1751500860</span>`}
                         ["ledger.tx.settled", "A ledger transaction settled"],
                         ["kyc.verified", "Identity verification completed"],
                         ["kyc.failed", "Identity verification failed"],
-                        ["assist.escalated", "Agent escalated to live agent"],
                       ].map(([event, desc]) => (
                         <div
                           key={event}

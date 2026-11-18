@@ -6,7 +6,7 @@ import {
   useRouterState,
 } from "@tanstack/react-router";
 import type { ErrorComponentProps } from "@tanstack/react-router";
-import { lazy, Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { RefreshCw, ArrowLeft } from "lucide-react";
 import { NotFound } from "@/components/site/NotFound";
 import { CORPORATE_EMAIL } from "@/lib/seo";
@@ -143,29 +143,6 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
 }
 
 /**
- * The assistant is PulseAssist — ENICE's own product — loaded from the platform rather than
- * reimplemented here. See `PulseAssistWidget` for what it replaced and why.
- *
- * Still code-split and still off the admin screens: it is never part of first paint, and on
- * /admin it would only be in the way.
- */
-const PulseAssistWidget = lazy(() =>
-  import("@/components/site/PulseAssistWidget").then((m) => ({ default: m.PulseAssistWidget })),
-);
-
-/**
- * The PulseAssist Beta announcement is a one-time interruption, not part of first paint, so it
- * is code-split the same way as the assistant. It renders `null` on its own once the beta launch
- * window has passed (see `src/lib/beta-announcement.ts`), so no route-level check is needed here
- * beyond keeping it off the admin screens.
- */
-const BetaLaunchAnnouncement = lazy(() =>
-  import("@/components/site/BetaLaunchAnnouncement").then((m) => ({
-    default: m.BetaLaunchAnnouncement,
-  })),
-);
-
-/**
  * Injects each route's `head()` output — title, meta, canonical link and JSON-LD — into the
  * document head, and keeps the theme scope in step with the route.
  *
@@ -192,12 +169,6 @@ function RootComponent() {
     <>
       <HeadContent />
       <Outlet />
-      {!isAdmin && (
-        <Suspense fallback={null}>
-          <BetaLaunchAnnouncement />
-          <PulseAssistWidget />
-        </Suspense>
-      )}
     </>
   );
 }

@@ -29,9 +29,8 @@ interface Partner {
  * Shown before the CMS section has loaded, and if it can't be reached, so the homepage is never
  * blank. Mirrors the seeded section content, so the common case has no visible change on load.
  *
- * PulseAssist remains in the list because the site assistant runs on its AI platform. Email
- * delivery is now a separate ENICE product, Faga, and is presented in the product portfolio rather
- * than folded into PulseAssist's infrastructure label.
+ * Only external infrastructure providers appear here. The portfolio's own products are presented
+ * in the product sections, not as partners of the company that builds them.
  */
 const DEFAULT_PARTNERS: Partner[] = [
   {
@@ -51,12 +50,6 @@ const DEFAULT_PARTNERS: Partner[] = [
     tagline: "Database & Auth",
     logo: "/partners/supabase.svg",
     url: "https://supabase.com",
-  },
-  {
-    name: "PulseAssist",
-    tagline: "AI Customer Operations",
-    logo: "/partners/pulseassist.svg",
-    url: "https://getpulseassist.com",
   },
 ];
 

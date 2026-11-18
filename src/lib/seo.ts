@@ -132,37 +132,27 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   },
   "/portfolio": {
     title: "Products | ENICE Group",
-    description: "PulsePay, PulseAssist, and Faga: the products built and operated by ENICE Group.",
+    description: "PulsePay and PRIDE: the products built and operated by ENICE Group.",
   },
   "/portfolio/pulsepay": {
     title: "PulsePay | Virtual Payment Platform by ENICE Group",
     description:
       "PulsePay by ENICE Group: virtual Naira and USD card issuance, built-in KYC, programmable wallets, peer-to-peer transfers, and fraud monitoring for modern commerce.",
   },
-  "/portfolio/pulseassist": {
-    title: "PulseAssist | Enterprise AI Operations Platform by ENICE Group",
+  "/portfolio/pride": {
+    title: "PRIDE | Digital Asset Platform by ENICE Group",
     description:
-      "PulseAssist by ENICE Group answers customers across WhatsApp, web chat, email, SMS and voice from one shared inbox, hands off to a human when it matters, and keeps compliance-ready audit trails.",
-  },
-  "/portfolio/faga": {
-    title: "Faga | Email Delivery Platform by ENICE Group",
-    description:
-      "Faga provides transactional and marketing email delivery with verified domains, inbound routing, templates, automations, suppression handling, analytics, webhooks, and a REST API.",
-  },
-  "/about-pulseassist-beta": {
-    title: "About the PulseAssist Beta | ENICE Group",
-    description:
-      "PulseAssist has been built and internally tested to deliver faster, more intelligent, and more consistent customer support. The September 2026 Beta opens the platform to selected early users.",
+      "PRIDE is ENICE Group's digital asset platform for trading, secure custody and cross-ecosystem transfers, built on the same ledger and compliance controls as PulsePay.",
   },
   "/roadmap": {
     title: "Product Roadmap | ENICE Group",
     description:
-      "The ENICE Group product roadmap: milestones completed, PulsePay and PulseAssist live, and what we are building next, including Faga and the ENICE Core.",
+      "The ENICE Group product roadmap: milestones completed for PulsePay, the PRIDE launch, and the shared ENICE Core underneath both.",
   },
   "/blog/": {
     title: "Blog and Updates | ENICE Group",
     description:
-      "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PulseAssist, and the rest of our platform.",
+      "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PRIDE, and the platform underneath them.",
   },
   "/news/": {
     title: "News and Changelog | ENICE Group",

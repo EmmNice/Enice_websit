@@ -2,8 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import {
   ArrowRight,
+  Bitcoin,
   Boxes,
-  BrainCircuit,
   Check,
   Cpu,
   CreditCard,
@@ -11,7 +11,6 @@ import {
   FileCheck2,
   Globe,
   Lock,
-  Mail,
   ShieldCheck,
   Wifi,
 } from "lucide-react";
@@ -25,6 +24,7 @@ import {
   BrowserShot,
   EngineConsole,
   HeroVisual,
+  PrideShot,
   type ShotKey,
 } from "@/components/site/home/ProductMockups";
 import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
@@ -50,7 +50,7 @@ export const Route = createFileRoute("/")({
 
 /** Icons an editor may name on a CMS-managed card. Unknown names fall back to a neutral icon. */
 const CARD_ICONS: Record<string, LucideIcon> = {
-  BrainCircuit,
+  Bitcoin,
   Boxes,
   Check,
   Cpu,
@@ -59,7 +59,6 @@ const CARD_ICONS: Record<string, LucideIcon> = {
   FileCheck2,
   Globe,
   Lock,
-  Mail,
   ShieldCheck,
   Wifi,
 };
@@ -80,7 +79,7 @@ interface Product {
   desc: string;
   bullets: string[];
   facts: { label: string; value: string }[];
-  shot: ShotKey;
+  shot: ShotKey | "pride";
 }
 
 /**
@@ -109,44 +108,23 @@ const PRODUCTS: Product[] = [
     shot: "pulsepay",
   },
   {
-    to: "/portfolio/pulseassist",
-    title: "PulseAssist",
-    kicker: "Customer support AI",
-    icon: BrainCircuit,
-    summary:
-      "AI customer support across WhatsApp, web, email, SMS and voice, with live agent handoff.",
-    heading: "Answer every customer, on every channel",
-    desc: "An AI support platform built for growing businesses, startups, and digital teams, with automated queue handling, live agent handoff, and smart customer workflow tools.",
+    to: "/portfolio/pride",
+    title: "PRIDE",
+    kicker: "Digital assets",
+    icon: Bitcoin,
+    summary: "Trading and custody for digital assets, built into the same ledger as PulsePay.",
+    heading: "Hold and move digital assets with the same controls",
+    desc: "PRIDE is ENICE Group's digital asset platform: trading, custody and cross-ecosystem transfers for users who already hold funds on PulsePay, with the same compliance and ledger controls behind both.",
     bullets: [
-      "One shared inbox for WhatsApp, web chat, email, SMS and voice",
-      "AI replies grounded in your own knowledge base",
-      "Hands off to a person the moment it matters",
+      "Digital asset trading in one account",
+      "Custody and transfers built on the ENICE ledger",
+      "Same KYC and monitoring as PulsePay",
     ],
     facts: [
-      { label: "Channels", value: "WhatsApp, web & more" },
-      { label: "Tenancy", value: "Multi-tenant" },
+      { label: "Launch", value: "2027" },
+      { label: "Category", value: "Digital assets" },
     ],
-    shot: "pulseassist",
-  },
-  {
-    to: "/portfolio/faga",
-    title: "Faga",
-    kicker: "Email infrastructure",
-    icon: Mail,
-    summary:
-      "Transactional and marketing email with verified domains, templates, webhooks and analytics.",
-    heading: "Email that reaches the inbox",
-    desc: "Faga handles the same email delivery work businesses use SendGrid or Resend for: transactional and marketing messages, verified domains, templates, webhooks, analytics, and API-driven sending.",
-    bullets: [
-      "Verified sending domains with DKIM, SPF and DMARC",
-      "Templates, automations and suppression handling",
-      "Delivery analytics, webhooks and a REST API",
-    ],
-    facts: [
-      { label: "Delivery", value: "Transactional & marketing" },
-      { label: "Integration", value: "REST API & webhooks" },
-    ],
-    shot: "faga",
+    shot: "pride",
   },
 ];
 
@@ -154,7 +132,7 @@ const CORE_MODULES = [
   {
     icon: Cpu,
     title: "AI & Automation",
-    desc: "Centralized AI tools and smart workflows that power products like PulseAssist to handle customer support and communication seamlessly.",
+    desc: "Centralized AI tools and smart workflows behind both platforms, from payment reconciliation to asset monitoring.",
   },
   {
     icon: Database,
@@ -625,10 +603,14 @@ function FeatureRow({ product: p, reverse }: { product: Product; reverse: boolea
         {/* The product screen sits in a tinted frame and bleeds off its far edge, the way a
             real product shot is cropped rather than shrunk to fit. */}
         <div className="mock-frame aspect-[5/4] sm:aspect-[4/3]">
-          <BrowserShot
-            shot={p.shot}
-            className="absolute left-[8%] top-[11%] w-[150%] max-w-none sm:w-[135%]"
-          />
+          {p.shot === "pride" ? (
+            <PrideShot className="absolute left-[10%] top-[16%] w-[125%] max-w-none sm:w-[112%]" />
+          ) : (
+            <BrowserShot
+              shot={p.shot}
+              className="absolute left-[8%] top-[11%] w-[150%] max-w-none sm:w-[135%]"
+            />
+          )}
         </div>
       </Reveal>
     </div>

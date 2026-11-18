@@ -227,7 +227,7 @@
   /* Product accents sampled from each live platform and lifted only where needed for readable
      small text on the shared dark surfaces. */
   --pulsepay-accent: #d76550;
-  --pulseassist-accent: #a78bfa;
+  --pride-accent: #a78bfa;
 
   /* Surfaces, each a small lift of the canvas toward bone. */
   --surface-1: #0b0e15; /* recessed bands, inputs at rest */
@@ -275,13 +275,13 @@
   --ring: var(--pulsepay-accent);
 }
 
-.product-theme-pulseassist {
-  --electric: var(--pulseassist-accent);
+.product-theme-pride {
+  --electric: var(--pride-accent);
   --electric-deep: #7c3aed;
   --electric-shadow: #3b167a;
-  --primary: var(--pulseassist-accent);
-  --accent: var(--pulseassist-accent);
-  --ring: var(--pulseassist-accent);
+  --primary: var(--pride-accent);
+  --accent: var(--pride-accent);
+  --ring: var(--pride-accent);
 }
 
 /*

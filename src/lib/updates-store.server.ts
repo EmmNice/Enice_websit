@@ -15,7 +15,6 @@
  */
 import { emailProvider } from "./email/index.server";
 import type { AudienceRef } from "./email/types";
-import { SEGMENT_NAME as EARLY_ACCESS_SEGMENT } from "./early-access-store.server";
 
 export const UPDATES_SEGMENT_NAME = "Product Updates";
 
@@ -88,5 +87,4 @@ export async function subscribeToUpdates(input: {
  */
 export const RELATED_SEGMENTS = {
   updates: UPDATES_SEGMENT_NAME,
-  earlyAccess: EARLY_ACCESS_SEGMENT,
 } as const;

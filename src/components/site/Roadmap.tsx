@@ -56,10 +56,10 @@ const MILESTONES: Milestone[] = [
     when: "Q4 2026",
     quarter: "Q4 2026",
     status: "in-progress",
-    product: "PulseAssist",
-    title: "Enterprise B2B Launch",
-    body: "First rollout of support automation to banking, fintech, and telecom partners, with policy-bound agents and live-agent failover.",
-    tags: ["AI", "B2B", "Telecom"],
+    product: "PRIDE",
+    title: "PRIDE Waitlist and Platform Preview",
+    body: "Early access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch.",
+    tags: ["Digital Assets", "Custody"],
   },
   {
     when: "Q2 2026",
@@ -67,17 +67,26 @@ const MILESTONES: Milestone[] = [
     status: "in-progress",
     product: "PulsePay",
     title: "Developer API Public Beta",
-    body: "The ENICE Core API opens to verified integration partners, with wallet issuance, ledger, KYC, and Assist endpoints available in a sandbox.",
+    body: "The ENICE Core API opens to verified integration partners, with wallet issuance, ledger and KYC endpoints available in a sandbox.",
     tags: ["API", "Developer", "Fintech"],
   },
   {
-    when: "Q3 2026",
-    quarter: "Q3 2026",
+    when: "H1 2027",
+    quarter: "H1 2027",
     status: "planned",
     product: "PulsePay",
-    title: "Multi-Currency Expansion",
-    body: "Multi-currency wallet rails, programmable spend controls, and embedded treasury operations for the payment platform.",
+    title: "PulsePay General Availability",
+    body: "Multi-currency wallet rails, programmable spend controls, and embedded treasury operations opening to all businesses.",
     tags: ["Fintech", "Multi-Currency", "Treasury"],
+  },
+  {
+    when: "2027",
+    quarter: "2027",
+    status: "planned",
+    product: "PRIDE",
+    title: "PRIDE Public Launch",
+    body: "Trading, custody and cross-ecosystem transfers open to PulsePay account holders.",
+    tags: ["Digital Assets", "Trading"],
   },
   {
     when: "2027",
@@ -144,10 +153,10 @@ const STATUS_CONFIG: Record<
  *
  *     when: Q4 2026
  *     status: in-progress
- *     product: PulseAssist
- *     tags: AI, B2B, Telecom
+ *     product: PRIDE
+ *     tags: Digital Assets, Custody
  *
- *     First rollout of support automation to banking, fintech, and telecom partners.
+ *     Early access to the digital asset platform ahead of launch.
  *
  * Only leading lines matching one of those four labels are read as metadata; the first line that
  * does not starts the body, so a description written with no header at all is simply all body.
@@ -269,9 +278,9 @@ export function Roadmap() {
       title,
       typeof row.description === "string" ? row.description : "",
     );
-    // DevaPay and PRIDE are no longer part of the portfolio; stored milestones about them are
-    // dropped rather than left to advertise products the site no longer offers.
-    const retired = /\b(devapay|pride)\b/i;
+    // PulseAssist, Faga and DevaPay are no longer part of the portfolio; stored milestones about
+    // them are dropped rather than left to advertise products the site no longer offers.
+    const retired = /\b(pulseassist|faga|devapay|epulse|pulsex)\b/i;
     return retired.test(milestone.title) || retired.test(milestone.product ?? "")
       ? null
       : milestone;

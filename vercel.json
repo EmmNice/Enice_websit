@@ -8,7 +8,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' https://getpulseassist.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' https:; connect-src 'self' https:; frame-src https://www.youtube-nocookie.com https://player.vimeo.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; media-src 'self' https:; connect-src 'self' https:; frame-src https://www.youtube-nocookie.com https://player.vimeo.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
         },
         {
           "key": "Strict-Transport-Security",
@@ -100,8 +100,23 @@
   ],
   "redirects": [
     {
+      "source": "/portfolio/pulseassist",
+      "destination": "/portfolio",
+      "permanent": true
+    },
+    {
       "source": "/portfolio/pulseassist-email",
-      "destination": "/portfolio/faga",
+      "destination": "/portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/portfolio/faga",
+      "destination": "/portfolio",
+      "permanent": true
+    },
+    {
+      "source": "/about-pulseassist-beta",
+      "destination": "/portfolio",
       "permanent": true
     },
     {
@@ -111,16 +126,11 @@
     },
     {
       "source": "/portfolio/pulsex",
-      "destination": "/portfolio",
+      "destination": "/portfolio/pride",
       "permanent": true
     },
     {
       "source": "/portfolio/devapay",
-      "destination": "/portfolio",
-      "permanent": true
-    },
-    {
-      "source": "/portfolio/pride",
       "destination": "/portfolio",
       "permanent": true
     },

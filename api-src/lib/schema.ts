@@ -1558,6 +1558,22 @@ WHERE key = 'header'
   AND position('nav-pulseassist-email' in value::text) = 0;
 
 UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                     AND item->'children' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(item, '{children}', (item->'children') ||
+                           '[{"id":"nav-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND NOT (value->'items' @> '[{"children":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
+UPDATE site_settings
 SET value = jsonb_set(value, '{columns}', (
       SELECT jsonb_agg(
                CASE WHEN col->>'id' = 'col-products'
@@ -1968,6 +1984,22 @@ WHERE key = 'header'
   AND position('/portfolio/epulse' in value::text) > 0;
 
 -- Footer: the same, one level down in each column's links.
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                     AND item->'children' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(item, '{children}', (item->'children') ||
+                           '[{"id":"nav-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND NOT (value->'items' @> '[{"children":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
 UPDATE site_settings
 SET value = jsonb_set(value, '{columns}', (
       SELECT COALESCE(jsonb_agg(
@@ -2594,6 +2626,22 @@ WHERE key = 'header'
 
 -- Footer: the same, one level down in each column's links.
 UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                     AND item->'children' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(item, '{children}', (item->'children') ||
+                           '[{"id":"nav-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND NOT (value->'items' @> '[{"children":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
+UPDATE site_settings
 SET value = jsonb_set(value, '{columns}', (
       SELECT COALESCE(jsonb_agg(
                CASE WHEN jsonb_typeof(col->'links') = 'array'
@@ -2610,6 +2658,197 @@ WHERE key = 'footer'
   AND jsonb_typeof(value->'columns') = 'array'
   AND (position('/portfolio/devapay' in value::text) > 0
        OR position('/portfolio/pride' in value::text) > 0);
+`,
+  },
+  {
+    id: 31,
+    name: "retire_pulseassist_and_faga_restore_pride",
+    sql: /* sql */ `
+-- The portfolio is now PulsePay and PRIDE. PulseAssist, Faga and the beta page are retired: their
+-- sections, page records, nav and footer links and homepage tiles are removed, and their routes
+-- redirect to /portfolio in vercel.json. PRIDE returns to the site, so its page and sections are
+-- re-seeded where a previous migration deleted them.
+--
+-- Every statement is guarded on the old state still being present, so a re-run is a no-op and an
+-- administrator's own later edit is left alone.
+
+-- Retired product pages, their sections and their managed page records.
+DELETE FROM site_sections
+WHERE key IN ('portfolio.pulseassist', 'portfolio.faga')
+   OR key LIKE 'portfolio.pulseassist.%'
+   OR key LIKE 'portfolio.faga.%';
+DELETE FROM cms_pages
+WHERE path IN ('/portfolio/pulseassist', '/portfolio/faga', '/about-pulseassist-beta');
+
+-- PRIDE: the page record and the three sections its page reads.
+INSERT INTO cms_pages (id, path, title, summary, status, sections, seo, system_route, published_at)
+SELECT md5(random()::text || clock_timestamp()::text)::uuid, '/portfolio/pride',
+       'PRIDE', 'Digital asset trading and custody.',
+       'published', '[]'::jsonb, '{}'::jsonb, true, now()
+ON CONFLICT (path) DO NOTHING;
+
+INSERT INTO site_sections (key, label, group_name, type, sort_order, fields, updated_at)
+VALUES
+  ('portfolio.pride', 'PRIDE page', 'Portfolio', 'hero', 230,
+   '{"eyebrow":"Digital Assets","heading":"PRIDE","subheading":"PRIDE is ENICE Group''s digital asset platform, designed to make cryptocurrency and digital finance simple, secure, and accessible, inside the same account as PulsePay."}'::jsonb,
+   now()),
+  ('portfolio.pride.facts', 'PRIDE launch facts', 'Portfolio', 'statistics', 231,
+   '{"heading":"At launch","items":[{"value":"2027","label":"Public launch"},{"value":"Same ledger","label":"As PulsePay"},{"value":"Self-custody option","label":"Keys stay with the holder"}]}'::jsonb,
+   now()),
+  ('portfolio.pride.highlights', 'PRIDE highlights', 'Portfolio', 'featureGrid', 232,
+   '{"eyebrow":"Platform Capabilities","heading":"What PRIDE does.","subheading":"The scope the platform is being built to, not a claim that any of it is live today.","items":[{"icon":"BarChart3","title":"Trading","description":"Buy and sell digital assets from the balance already held on PulsePay, with pricing shown before an order is placed."},{"icon":"Lock","title":"Custody","description":"Assets held with the same isolation and audit trail as money on the payment platform, with a self-custody option for holders who want it."},{"icon":"Globe","title":"Cross-ecosystem transfers","description":"Move value between the payment and asset sides of the ecosystem without leaving ENICE or repeating identity checks."},{"icon":"ShieldCheck","title":"Regulatory-ready","description":"KYC, AML and transaction monitoring run on the same controls as PulsePay, from the first transaction."}]}'::jsonb,
+   now())
+ON CONFLICT (key) DO NOTHING;
+
+-- Homepage product tiles: drop the retired products, keep PulsePay, add PRIDE.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE COALESCE(item->>'url', '') NOT IN (
+        '/portfolio/pulseassist', '/portfolio/faga', '/portfolio/payment-collection',
+        '/portfolio/epulse', '/portfolio/pulsex', '/portfolio/devapay')
+    )),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND (position('/portfolio/pulseassist' in fields::text) > 0
+       OR position('/portfolio/faga' in fields::text) > 0
+       OR position('/portfolio/payment-collection' in fields::text) > 0
+       OR position('/portfolio/epulse' in fields::text) > 0
+       OR position('/portfolio/pulsex' in fields::text) > 0);
+
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (fields->'items') || '[
+      {"icon":"Bitcoin","kicker":"DIGITAL ASSETS","title":"PRIDE","description":"ENICE Group''s digital asset platform for cryptocurrency trading, secure custody and cross-ecosystem digital finance, built on the same ledger as PulsePay.","bullets":"Launch: 2027\nCategory: Digital assets","url":"/portfolio/pride"}
+    ]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.portfolio'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND position('/portfolio/pride' in fields::text) = 0;
+
+-- Roadmap milestones about the retired products, plus the PRIDE milestones that replace them.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE position('product: PulseAssist' in COALESCE(item->>'description', '')) = 0
+        AND position('product: Faga' in COALESCE(item->>'description', '')) = 0
+        AND position('product: PulseX' in COALESCE(item->>'description', '')) = 0
+        AND position('product: ePulse' in COALESCE(item->>'description', '')) = 0
+        AND position('product: DevaPay' in COALESCE(item->>'description', '')) = 0
+    )),
+    updated_at = now()
+WHERE key = 'home.roadmap'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND (position('product: PulseAssist' in fields::text) > 0
+       OR position('product: Faga' in fields::text) > 0
+       OR position('product: PulseX' in fields::text) > 0
+       OR position('product: ePulse' in fields::text) > 0
+       OR position('product: DevaPay' in fields::text) > 0);
+
+-- PRIDE milestones, so the roadmap still describes the second product after the rows above.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (fields->'items') || '[
+      {"title":"PRIDE Waitlist and Platform Preview","description":"when: Q4 2026\nstatus: in-progress\nproduct: PRIDE\ntags: Digital Assets, Custody\n\nEarly access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch."},
+      {"title":"PRIDE Public Launch","description":"when: 2027\nstatus: planned\nproduct: PRIDE\ntags: Digital Assets, Trading\n\nTrading, custody and cross-ecosystem transfers open to PulsePay account holders."}
+    ]'::jsonb),
+    updated_at = now()
+WHERE key = 'home.roadmap'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND position('product: PRIDE' in fields::text) = 0;
+
+-- Header and footer: drop the retired products from every menu.
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                    THEN jsonb_set(item, '{children}', (
+                           SELECT COALESCE(jsonb_agg(child ORDER BY cord), '[]'::jsonb)
+                           FROM jsonb_array_elements(item->'children') WITH ORDINALITY AS c(child, cord)
+                           WHERE COALESCE(child->>'url', '') NOT IN ('/portfolio/pulseassist', '/portfolio/faga')))
+                    ELSE item END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND (position('/portfolio/pulseassist' in value::text) > 0
+       OR position('/portfolio/faga' in value::text) > 0);
+
+UPDATE site_settings
+SET value = jsonb_set(value, '{items}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(item->'children') = 'array'
+                     AND item->'children' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(item, '{children}', (item->'children') ||
+                           '[{"id":"nav-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE item END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'items') WITH ORDINALITY AS t(item, ord)
+    )),
+    updated_at = now()
+WHERE key = 'header'
+  AND jsonb_typeof(value->'items') = 'array'
+  AND NOT (value->'items' @> '[{"children":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
+UPDATE site_settings
+SET value = jsonb_set(value, '{columns}', (
+      SELECT COALESCE(jsonb_agg(
+               CASE WHEN jsonb_typeof(col->'links') = 'array'
+                    THEN jsonb_set(col, '{links}', (
+                           SELECT COALESCE(jsonb_agg(link ORDER BY lord), '[]'::jsonb)
+                           FROM jsonb_array_elements(col->'links') WITH ORDINALITY AS l(link, lord)
+                           WHERE COALESCE(link->>'url', '') NOT IN ('/portfolio/pulseassist', '/portfolio/faga')))
+                    ELSE col END
+               ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(value->'columns') WITH ORDINALITY AS t(col, ord)
+    )),
+    updated_at = now()
+WHERE key = 'footer'
+  AND jsonb_typeof(value->'columns') = 'array'
+  AND (position('/portfolio/pulseassist' in value::text) > 0
+       OR position('/portfolio/faga' in value::text) > 0);
+
+UPDATE site_settings
+SET value = jsonb_set(value, '{columns}', (
+      SELECT jsonb_agg(
+               CASE WHEN jsonb_typeof(col->'links') = 'array'
+                     AND col->'links' @> '[{"url":"/portfolio/pulsepay"}]'::jsonb
+                    THEN jsonb_set(col, '{links}', (col->'links') ||
+                           '[{"id":"f-pride","label":"PRIDE","url":"/portfolio/pride","visible":true}]'::jsonb)
+                    ELSE col END
+               ORDER BY ord)
+      FROM jsonb_array_elements(value->'columns') WITH ORDINALITY AS t(col, ord)
+    )),
+    updated_at = now()
+WHERE key = 'footer'
+  AND jsonb_typeof(value->'columns') = 'array'
+  AND NOT (value->'columns' @> '[{"links":[{"url":"/portfolio/pride"}]}]'::jsonb);
+
+-- Partners strip: the company's own products are not partners.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{items}', (
+      SELECT COALESCE(jsonb_agg(item ORDER BY ord), '[]'::jsonb)
+      FROM jsonb_array_elements(fields->'items') WITH ORDINALITY AS t(item, ord)
+      WHERE COALESCE(item->>'name', '') <> 'PulseAssist'
+    )),
+    updated_at = now()
+WHERE key = 'home.partners'
+  AND jsonb_typeof(fields->'items') = 'array'
+  AND position('PulseAssist' in fields::text) > 0;
+
+-- The FAQ answers that listed the old portfolio.
+UPDATE site_sections
+SET fields = replace(replace(fields::text,
+      'ENICE Group builds and operates technology products for financial services, commerce, and business communication. PulsePay is our digital financial platform, PulseAssist is our AI customer-operations platform, and Faga provides email delivery infrastructure.',
+      'ENICE Group builds and operates technology products for financial services and digital assets. PulsePay is our digital payments platform and PRIDE is our digital asset platform, both running on the same shared infrastructure.'),
+      'Our products focus on financial services, telecommunications, and business operations. PulsePay covers digital finance, PulseAssist provides AI customer operations, and Faga provides transactional and marketing email infrastructure.',
+      'Our products focus on payments and digital finance. PulsePay covers cards, wallets and transfers for businesses and individuals, and PRIDE covers trading and custody of digital assets in the same account.')::jsonb,
+    updated_at = now()
+WHERE key = 'home.faq'
+  AND (position('PulseAssist' in fields::text) > 0 OR position('Faga' in fields::text) > 0);
 `,
   },
 ];

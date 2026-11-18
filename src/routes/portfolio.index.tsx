@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { SITE_URL } from "@/lib/site";
-import { Wifi, CreditCard, BrainCircuit, Mail } from "lucide-react";
+import { Wifi, CreditCard, Bitcoin, TrendingUp } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
-import { PulseAssistEarlyAccessButton } from "@/components/site/PulseAssistEarlyAccess";
 import { Cta, Eyebrow, Panel, Section, SectionIntro, Tag } from "@/components/site/primitives";
 import { PRODUCTS } from "@/components/site/navigation";
 import { useSectionFields, fieldText } from "@/lib/cms/use-section";
@@ -33,15 +32,9 @@ export const Route = createFileRoute("/portfolio/")({
           },
           {
             "@type": "SoftwareApplication",
-            name: "PulseAssist",
-            url: `${SITE_URL}/portfolio/pulseassist`,
-            applicationCategory: "BusinessApplication",
-          },
-          {
-            "@type": "SoftwareApplication",
-            name: "Faga",
-            url: `${SITE_URL}/portfolio/faga`,
-            applicationCategory: "BusinessApplication",
+            name: "PRIDE",
+            url: `${SITE_URL}/portfolio/pride`,
+            applicationCategory: "FinanceApplication",
           },
         ],
       },
@@ -55,11 +48,14 @@ export const Route = createFileRoute("/portfolio/")({
 // `aria-hidden` and contain nothing focusable, so they are decoration to a screen reader and to
 // the keyboard — which is the only honest way to show a simulated interface on a marketing page.
 
-const QUEUE_ROWS = [
-  { id: "REQ_001", state: "Resolved", width: "w-full", isLive: false },
-  { id: "REQ_002", state: "Routing", width: "w-[82%]", isLive: false },
-  { id: "REQ_003", state: "Processing", width: "w-[64%]", isLive: true },
-  { id: "REQ_004", state: "Queued", width: "w-[46%]", isLive: false },
+/**
+ * Decorative market rows for the PRIDE illustration. Symbols only — no prices, no percentages.
+ * PRIDE is unlaunched, so a number beside a ticker would be an invented quotation.
+ */
+const MARKET_ROWS = [
+  { symbol: "BTC", name: "Bitcoin", width: "w-[72%]" },
+  { symbol: "ETH", name: "Ethereum", width: "w-[58%]" },
+  { symbol: "USDT", name: "Tether", width: "w-[44%]" },
 ];
 
 /**
@@ -199,11 +195,11 @@ function PortfolioIndexPage() {
         <SectionIntro
           id="active-heading"
           eyebrow="Our Products"
-          heading="Three products, one platform"
-          lead="PulsePay, PulseAssist and Faga, built and operated by ENICE Group. PulsePay is in pilot ahead of general availability."
+          heading="Two products, one platform"
+          lead="PulsePay and PRIDE, built and operated by ENICE Group. PulsePay is in pilot ahead of general availability; PRIDE opens its waitlist ahead of launch."
         />
 
-        <div className="mt-14 grid gap-8 lg:grid-cols-3">
+        <div className="mt-14 grid gap-8 lg:grid-cols-2">
           {/* ── PulsePay ── */}
           <ProductCard
             to="/portfolio/pulsepay"
@@ -290,103 +286,40 @@ function PortfolioIndexPage() {
             </div>
           </ProductCard>
 
-          {/* ── PulseAssist ── */}
+          {/* ── PRIDE ── */}
           <ProductCard
-            to="/portfolio/pulseassist"
+            to="/portfolio/pride"
             visual={
-              <CardVisual label="PulseAssist support console" className="h-56 sm:h-64">
+              <CardVisual label="PRIDE markets" className="h-56 sm:h-64">
                 <div className="tech-grid tech-grid-flat" />
                 <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="w-full max-w-sm space-y-2.5">
-                    {QUEUE_ROWS.map((row) => (
+                    {MARKET_ROWS.map((row) => (
                       <div
-                        key={row.id}
+                        key={row.symbol}
                         className="flex items-center gap-3 rounded-md border border-border bg-surface-2 px-3 py-2"
                       >
-                        <span
-                          className={cn(
-                            "h-1.5 w-1.5 shrink-0 rounded-full",
-                            row.isLive ? "bg-electric" : "bg-surface-3",
-                          )}
+                        <Bitcoin
+                          className="h-3.5 w-3.5 shrink-0 text-electric"
+                          strokeWidth={1.75}
                         />
-                        <span className="font-mono text-[10px] tracking-wider text-bone-soft">
-                          {row.id}
+                        <span className="font-mono text-[10px] font-semibold tracking-wider text-bone-strong">
+                          {row.symbol}
                         </span>
-                        <div className="relative ml-1 h-1 flex-1 overflow-hidden rounded-full bg-border">
+                        <span className="min-w-0 flex-1 truncate text-[10px] text-bone-faint">
+                          {row.name}
+                        </span>
+                        <div className="relative h-1 w-16 overflow-hidden rounded-full bg-border">
                           <div className={cn("h-full rounded-full bg-electric/60", row.width)} />
                         </div>
-                        <span className="text-[9px] font-semibold uppercase tracking-[0.18em] text-bone-faint">
-                          {row.state}
-                        </span>
                       </div>
                     ))}
-                  </div>
-                </div>
-              </CardVisual>
-            }
-          >
-            <div className="flex flex-wrap items-center gap-3">
-              <Eyebrow>
-                <BrainCircuit aria-hidden className="h-3.5 w-3.5" />
-                Enterprise Conversational SaaS
-              </Eyebrow>
-              <LifecycleTag to="/portfolio/pulseassist" />
-            </div>
-            <h3 className="type-h3 mt-4 text-foreground">PulseAssist</h3>
-            <p className="type-body mt-4">
-              A multi-tenant AI operations platform for telecoms and financial networks. It handles
-              customer support routing, provides API-driven account management, and hands calls to
-              live agents in real time when needed.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              {/* Opens the early-access modal in place, so it stays a button rather than a Cta. */}
-              <PulseAssistEarlyAccessButton className="btn btn-primary btn-sm group" />
-              <Cta
-                to="/portfolio/pulseassist"
-                variant="secondary"
-                size="sm"
-                icon="arrow"
-                aria-label="View PulseAssist platform details"
-              >
-                Learn More
-              </Cta>
-            </div>
-          </ProductCard>
-
-          {/* ── Faga ── */}
-          <ProductCard
-            to="/portfolio/faga"
-            visual={
-              <CardVisual label="Faga delivery console" className="h-56 sm:h-64">
-                <div className="tech-grid tech-grid-flat" />
-                <div className="absolute inset-0 flex items-center justify-center p-8">
-                  <div className="panel w-full max-w-sm" style={{ boxShadow: SHADOW_CARD }}>
-                    <div className="flex items-center justify-between border-b border-border px-4 py-2.5">
-                      <span className="flex items-center gap-2">
-                        <Mail className="h-3.5 w-3.5 text-electric" strokeWidth={1.75} />
-                        <span className="text-[11px] font-semibold text-bone-strong">
-                          Sending domain
-                        </span>
-                      </span>
-                      <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-positive">
-                        Verified
+                    <div className="flex items-center justify-center gap-2 pt-1">
+                      <TrendingUp className="h-3 w-3 text-bone-faint" strokeWidth={1.75} />
+                      <span className="text-[9px] uppercase tracking-[0.16em] text-bone-faint">
+                        Simulated preview
                       </span>
                     </div>
-                    <ul className="divide-y divide-border">
-                      {["DKIM", "SPF", "MAIL FROM"].map((record) => (
-                        <li
-                          key={record}
-                          className="flex items-center justify-between px-4 py-2 text-[10px]"
-                        >
-                          <span className="font-mono font-semibold tracking-[0.12em] text-bone-strong">
-                            {record}
-                          </span>
-                          <span className="font-semibold uppercase tracking-[0.14em] text-positive">
-                            Resolving
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
                   </div>
                 </div>
               </CardVisual>
@@ -394,33 +327,32 @@ function PortfolioIndexPage() {
           >
             <div className="flex flex-wrap items-center gap-3">
               <Eyebrow>
-                <Mail aria-hidden className="h-3.5 w-3.5" />
-                Email Infrastructure
+                <Bitcoin aria-hidden className="h-3.5 w-3.5" />
+                Digital Assets
               </Eyebrow>
-              <LifecycleTag to="/portfolio/faga" />
+              <LifecycleTag to="/portfolio/pride" />
             </div>
-            <h3 className="type-h3 mt-4 text-foreground">Faga</h3>
+            <h3 className="type-h3 mt-4 text-foreground">PRIDE</h3>
             <p className="type-body mt-4">
-              Faga is an email delivery platform for the same work businesses use SendGrid or Resend
-              for: transactional and marketing messages, verified domains, templates, webhooks,
-              analytics, and API-driven sending.
+              ENICE Group's digital asset platform for cryptocurrency trading, secure custody and
+              cross-ecosystem digital finance, built into the same infrastructure as PulsePay.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta
-                to="/portfolio/faga"
+                to="/portfolio/pride"
                 size="sm"
                 icon="arrow"
-                aria-label="View Faga email platform details"
+                aria-label="View PRIDE platform details"
               >
                 View Platform
               </Cta>
               <Cta
-                to="mailto:corporate@enicehq.com?subject=Faga%20Access%20Request"
+                to="mailto:corporate@enicehq.com?subject=Join%20the%20PRIDE%20waitlist"
                 variant="secondary"
                 size="sm"
                 icon="external"
               >
-                Request Access
+                Join Waitlist
               </Cta>
             </div>
           </ProductCard>
