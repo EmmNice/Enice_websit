@@ -812,9 +812,9 @@ const DEFAULT_SECTIONS: {
     order: 10,
     fields: {
       eyebrow: "",
-      heading: "Unified technology solutions for growing enterprises",
+      heading: "One ledger. Two products. One API.",
       subheading:
-        "We build and operate payment and digital asset platforms: cards, wallets and transfers through PulsePay, trading and custody through PRIDE.",
+        "ENICE builds payment and digital asset infrastructure: PulsePay for cards, wallets and transfers, PRIDE for trading and custody, both on the same core.",
       primaryCtaLabel: "Explore our products",
       primaryCtaUrl: "/portfolio",
       secondaryCtaLabel: "Talk to our team",

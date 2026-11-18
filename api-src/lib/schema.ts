@@ -2851,6 +2851,21 @@ WHERE key = 'home.faq'
   AND (position('PulseAssist' in fields::text) > 0 OR position('Faga' in fields::text) > 0);
 `,
   },
+  {
+    id: 32,
+    name: "homepage_hero_platform_positioning",
+    sql: /* sql */ `
+-- The hero now says what the platform is rather than what it hopes to be. Guarded on the old
+-- default still being in place, so an administrator's own wording is left alone.
+UPDATE site_sections
+SET fields = fields || jsonb_build_object(
+      'heading', 'One ledger. Two products. One API.',
+      'subheading', 'ENICE builds payment and digital asset infrastructure: PulsePay for cards, wallets and transfers, PRIDE for trading and custody, both on the same core.'),
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'heading' = 'Unified technology solutions for growing enterprises';
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

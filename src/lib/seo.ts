@@ -116,9 +116,9 @@ export type PageSeo = {
  */
 export const PAGE_SEO: Record<string, PageSeo> = {
   "/": {
-    title: "ENICE Group | AI, Email Infrastructure & Digital Technology",
+    title: "ENICE Group | Payments and Digital Asset Infrastructure",
     description:
-      "ENICE Group, the technology brand of ENICE Technology Limited, builds AI, email infrastructure, financial technology, and digital products.",
+      "ENICE Group builds and operates payment and digital asset infrastructure: PulsePay for cards, wallets and transfers, PRIDE for trading and custody, on one shared ledger.",
   },
   "/about": {
     title: "About ENICE Group | A Technology Company Building African Infrastructure",

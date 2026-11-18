@@ -156,7 +156,7 @@ const COMPLIANCE_BADGES = [
 /** Plain, checkable statements for the hero's trust row — no ratings we have not earned. */
 const HERO_PROOF = [
   { icon: Globe, label: "Built in Nigeria", sub: "for businesses across Africa" },
-  { icon: Boxes, label: "Three products", sub: "on one shared platform" },
+  { icon: Boxes, label: "Two products", sub: "on one shared ledger" },
   { icon: ShieldCheck, label: "Secure by default", sub: "isolation, audit, encryption" },
 ];
 
@@ -224,17 +224,26 @@ function Landing() {
       <section className="hero-brand relative overflow-hidden" aria-labelledby="hero-heading">
         <Container className="relative grid items-center gap-14 py-16 sm:py-20 lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:py-28">
           <div>
+            <div
+              className="animate-hero-up mb-6 flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-[#8a93a6]"
+              style={{ animationDelay: "20ms" }}
+            >
+              <span className="inline-flex items-center gap-2 rounded border border-white/10 bg-white/[0.03] px-2.5 py-1.5">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#4ec08d]" />
+                Platform
+              </span>
+              <span>Lagos · NG</span>
+              <span className="text-white/20">/</span>
+              <span>API v1</span>
+            </div>
+
             <h1
               id="hero-heading"
               className="animate-hero-up text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-[3.5rem]"
               style={{ animationDelay: "60ms", textWrap: "balance" }}
             >
               <StyledText
-                text={fieldText(
-                  hero,
-                  "heading",
-                  "Unified technology solutions for growing enterprises",
-                )}
+                text={fieldText(hero, "heading", "One ledger. Two products. One API.")}
                 accentClassName="text-electric"
               />
             </h1>
@@ -247,7 +256,7 @@ function Landing() {
                 text={fieldText(
                   hero,
                   "subheading",
-                  "We build and manage scalable platforms designed to handle business transactions, customer relations, and digital messaging seamlessly.",
+                  "ENICE builds payment and digital asset infrastructure: PulsePay for cards, wallets and transfers, PRIDE for trading and custody, both on the same core.",
                 )}
                 accentClassName="text-electric"
               />
@@ -283,19 +292,21 @@ function Landing() {
             </p>
 
             <ul
-              className="animate-hero-up mt-12 grid max-w-xl grid-cols-1 gap-6 border-t border-white/10 pt-8 sm:grid-cols-3"
+              className="animate-hero-up mt-12 grid max-w-xl grid-cols-1 gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-3"
               style={{ animationDelay: "240ms" }}
             >
               {HERO_PROOF.map((p) => (
-                <li key={p.label} className="flex items-start gap-3 sm:block">
+                <li key={p.label} className="flex items-start gap-3 bg-[#05070d]/80 p-4 sm:block">
                   <p.icon
                     aria-hidden
-                    className="h-5 w-5 shrink-0 text-electric"
-                    strokeWidth={1.75}
+                    className="h-4 w-4 shrink-0 text-electric"
+                    strokeWidth={1.6}
                   />
                   <div className="sm:mt-3">
-                    <div className="text-[14px] font-semibold text-white">{p.label}</div>
-                    <div className="mt-0.5 text-[12.5px] text-bone-soft">{p.sub}</div>
+                    <div className="text-[13px] font-semibold text-white">{p.label}</div>
+                    <div className="mt-1 font-mono text-[10px] leading-relaxed tracking-[0.06em] text-bone-soft">
+                      {p.sub}
+                    </div>
                   </div>
                 </li>
               ))}
@@ -308,134 +319,130 @@ function Landing() {
         </Container>
       </section>
 
-      <div className="theme-light">
-        <PartnersStrip />
+      <PartnersStrip />
 
-        {/* ═══ PRODUCT GRID ═══════════════════════════════════════════════ */}
-        <section
-          id="products"
-          className="bg-surface-1 py-20 sm:py-24"
-          aria-labelledby="products-heading"
-        >
-          <Container>
-            <Reveal>
-              <div className="mx-auto max-w-3xl text-center">
-                <Eyebrow className="justify-center">
-                  {fieldText(portfolio, "eyebrow", "Our products")}
-                </Eyebrow>
-                <h2 id="products-heading" className="type-h2 mt-5 text-foreground">
-                  <StyledText
-                    text={fieldText(
-                      portfolio,
-                      "heading",
-                      "Start with the product you need, or run all three together",
-                    )}
-                    accentClassName="text-electric"
-                  />
-                </h2>
-                <p className="type-lead mx-auto mt-5 max-w-2xl">
-                  <StyledText
-                    text={fieldText(
-                      portfolio,
-                      "subheading",
-                      "Every product is built on the same ENICE Engine, so payments, conversations and email share one secure foundation.",
-                    )}
-                    accentClassName="text-electric"
-                  />
-                </p>
-              </div>
-            </Reveal>
+      {/* ═══ PRODUCT GRID ═══════════════════════════════════════════════ */}
+      <section
+        id="products"
+        className="bg-surface-1 py-20 sm:py-24"
+        aria-labelledby="products-heading"
+      >
+        <Container>
+          <Reveal>
+            <div className="mx-auto max-w-3xl text-center">
+              <Eyebrow className="justify-center">
+                {fieldText(portfolio, "eyebrow", "Our products")}
+              </Eyebrow>
+              <h2 id="products-heading" className="type-h2 mt-5 text-foreground">
+                <StyledText
+                  text={fieldText(
+                    portfolio,
+                    "heading",
+                    "Start with one product, or run both together",
+                  )}
+                  accentClassName="text-electric"
+                />
+              </h2>
+              <p className="type-lead mx-auto mt-5 max-w-2xl">
+                <StyledText
+                  text={fieldText(
+                    portfolio,
+                    "subheading",
+                    "Both products are built on the same ENICE Engine, so payments and digital assets share one secure foundation.",
+                  )}
+                  accentClassName="text-electric"
+                />
+              </p>
+            </div>
+          </Reveal>
 
-            <div className="mt-14 grid gap-x-10 gap-y-10 md:grid-cols-3">
-              {products.map((p, i) => (
-                <Reveal key={p.to} delay={i * 70}>
-                  <article className="group flex h-full gap-5 border-t border-border pt-7">
-                    <span className="app-icon h-12 w-12 rounded-xl sm:h-14 sm:w-14 sm:rounded-2xl">
-                      <p.icon aria-hidden className="h-6 w-6" strokeWidth={1.75} />
-                    </span>
-                    <div className="flex min-w-0 flex-1 flex-col">
-                      <div className="flex items-start justify-between gap-3">
-                        <h3 className="text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground">
-                          {p.title}
-                        </h3>
-                        <ArrowRight
-                          aria-hidden
-                          className="mt-1.5 h-5 w-5 shrink-0 text-bone-soft transition-transform group-hover:translate-x-1 group-hover:text-electric"
-                        />
-                      </div>
-                      <p className="mt-2.5 text-[15px] leading-relaxed text-bone-soft">
-                        {p.summary}
-                      </p>
-                      <div className="mt-auto pt-6">
-                        <Link to={p.to as "/"} className="link-underline">
-                          Learn more<span className="sr-only"> about {p.title}</span>
-                        </Link>
-                      </div>
+          <div className="mt-14 grid gap-x-10 gap-y-10 md:grid-cols-3">
+            {products.map((p, i) => (
+              <Reveal key={p.to} delay={i * 70}>
+                <article className="group flex h-full gap-5 border-t border-border pt-7">
+                  <span className="app-icon h-12 w-12 rounded-xl sm:h-14 sm:w-14 sm:rounded-2xl">
+                    <p.icon aria-hidden className="h-6 w-6" strokeWidth={1.75} />
+                  </span>
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground">
+                        {p.title}
+                      </h3>
+                      <ArrowRight
+                        aria-hidden
+                        className="mt-1.5 h-5 w-5 shrink-0 text-bone-soft transition-transform group-hover:translate-x-1 group-hover:text-electric"
+                      />
                     </div>
-                  </article>
-                </Reveal>
-              ))}
-            </div>
+                    <p className="mt-2.5 text-[15px] leading-relaxed text-bone-soft">{p.summary}</p>
+                    <div className="mt-auto pt-6">
+                      <Link to={p.to as "/"} className="link-underline">
+                        Learn more<span className="sr-only"> about {p.title}</span>
+                      </Link>
+                    </div>
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
 
-            {/* Wide banner, the platform pitch under the grid. */}
-            <Reveal>
-              <div className="mt-16 grid overflow-hidden rounded-2xl border border-border bg-white md:grid-cols-[18rem_1fr]">
-                <div aria-hidden className="band-brand relative grid min-h-40 place-items-center">
-                  <img
-                    src="/brand/enice-mark.svg"
-                    alt=""
-                    width={112}
-                    height={80}
-                    className="h-20 w-auto"
-                  />
+          {/* Wide banner, the platform pitch under the grid. */}
+          <Reveal>
+            <div className="mt-16 grid overflow-hidden rounded-2xl border border-border bg-white md:grid-cols-[18rem_1fr]">
+              <div aria-hidden className="band-brand relative grid min-h-40 place-items-center">
+                <img
+                  src="/brand/enice-mark.svg"
+                  alt=""
+                  width={112}
+                  height={80}
+                  className="h-20 w-auto"
+                />
+              </div>
+              <div className="flex flex-col gap-6 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
+                <div className="max-w-xl">
+                  <h3 className="text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground">
+                    One account across the ENICE ecosystem
+                  </h3>
+                  <p className="mt-2.5 text-[15px] leading-relaxed text-bone-soft">
+                    Shared identity, permissions, compliance and billing, so adding a second product
+                    is a switch, not a new integration project.
+                  </p>
                 </div>
-                <div className="flex flex-col gap-6 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
-                  <div className="max-w-xl">
-                    <h3 className="text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground">
-                      One account across the ENICE ecosystem
-                    </h3>
-                    <p className="mt-2.5 text-[15px] leading-relaxed text-bone-soft">
-                      Shared identity, permissions, compliance and billing, so adding a second
-                      product is a switch, not a new integration project.
-                    </p>
-                  </div>
-                  <div className="btn-stack flex shrink-0 flex-wrap gap-3">
-                    <Cta to="/contact" icon="arrow">
-                      Get in touch
-                    </Cta>
-                    <Cta to="/portfolio" variant="secondary">
-                      All products
-                    </Cta>
-                  </div>
+                <div className="btn-stack flex shrink-0 flex-wrap gap-3">
+                  <Cta to="/contact" icon="arrow">
+                    Get in touch
+                  </Cta>
+                  <Cta to="/portfolio" variant="secondary">
+                    All products
+                  </Cta>
                 </div>
               </div>
-            </Reveal>
-          </Container>
-        </section>
-
-        {/* ═══ PRODUCT FEATURE ROWS ═══════════════════════════════════════ */}
-        <section className="bg-background py-20 sm:py-28" aria-labelledby="platform-heading">
-          <Container>
-            <Reveal>
-              <div className="mx-auto max-w-3xl text-center">
-                <h2 id="platform-heading" className="type-h2 text-foreground">
-                  Software your business runs on, every day
-                </h2>
-                <p className="type-lead mx-auto mt-5 max-w-2xl">
-                  We design, launch and operate our own products instead of handing them off after
-                  release, so the tools you rely on keep getting better.
-                </p>
-              </div>
-            </Reveal>
-
-            <div className="mt-20 space-y-24 sm:space-y-32">
-              {products.map((p, i) => (
-                <FeatureRow key={p.to} product={p} reverse={i % 2 === 1} />
-              ))}
             </div>
-          </Container>
-        </section>
-      </div>
+          </Reveal>
+        </Container>
+      </section>
+
+      {/* ═══ PRODUCT FEATURE ROWS ═══════════════════════════════════════ */}
+      <section className="bg-background py-20 sm:py-28" aria-labelledby="platform-heading">
+        <Container>
+          <Reveal>
+            <div className="mx-auto max-w-3xl text-center">
+              <h2 id="platform-heading" className="type-h2 text-foreground">
+                Software your business runs on, every day
+              </h2>
+              <p className="type-lead mx-auto mt-5 max-w-2xl">
+                We design, launch and operate our own products instead of handing them off after
+                release, so the tools you rely on keep getting better.
+              </p>
+            </div>
+          </Reveal>
+
+          <div className="mt-20 space-y-24 sm:space-y-32">
+            {products.map((p, i) => (
+              <FeatureRow key={p.to} product={p} reverse={i % 2 === 1} />
+            ))}
+          </div>
+        </Container>
+      </section>
 
       {/* ═══ THE ENICE ENGINE ═══════════════════════════════════════════════ */}
       <section
@@ -515,9 +522,7 @@ function Landing() {
         </Container>
       </section>
 
-      <div className="theme-light">
-        <FAQSection />
-      </div>
+      <FAQSection />
 
       {/* ═══ CLOSING CTA ════════════════════════════════════════════════════ */}
       <section className="band-cta relative overflow-hidden" aria-labelledby="cta-heading">

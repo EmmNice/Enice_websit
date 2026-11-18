@@ -10,7 +10,7 @@
  * real description.
  */
 
-import { Bitcoin, CheckCircle2, TrendingUp } from "lucide-react";
+import { Bitcoin, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const SHOTS = {
@@ -107,89 +107,127 @@ export function BrowserShot({
   );
 }
 
-/** A phone with the PulsePay mobile app on screen. */
-export function PhoneShot({ className }: { className?: string }) {
-  return (
-    <div
-      aria-hidden
-      className={cn(
-        "rounded-[2.25rem] bg-[#0b1220] p-[7px] shadow-[0_40px_80px_-24px_rgb(0_0_0_/_0.6)] ring-1 ring-white/10",
-        className,
-      )}
-    >
-      <div className="relative overflow-hidden rounded-[1.85rem] bg-white">
-        <img
-          src="/home/pulsepay-mobile.jpg"
-          alt=""
-          width={780}
-          height={1688}
-          decoding="async"
-          className="block aspect-[390/780] h-auto w-full object-cover object-top"
-        />
-        <span className="absolute left-1/2 top-2 h-5 w-20 -translate-x-1/2 rounded-full bg-[#0b1220]" />
-      </div>
-    </div>
-  );
-}
-
 /**
- * The hero composition: a photograph of a professional at work, with the products she is using
- * layered over it — the PulsePay app on a phone, a PRIDE custody notice and a settled-payment
- * receipt.
+ * The hero visual: the platform itself, drawn rather than photographed.
+ *
+ * The previous version was a stock photograph of a professional with a phone, a custody notice
+ * and a delivery chip floating over it. It read as a consumer fintech advert, which is the wrong
+ * claim: ENICE sells infrastructure. This shows what a visitor is actually buying — one API, two
+ * products and the shared ledger underneath them — as a console, with no invented figures.
  */
 export function HeroVisual() {
   return (
-    <div className="relative mx-auto w-full max-w-[600px] pb-10 lg:pb-0">
-      <div className="relative overflow-hidden rounded-[1.75rem] ring-1 ring-white/10">
-        <img
-          src="/home/hero-professional.jpg"
-          alt="A business owner checking payments on her phone at her desk"
-          width={1400}
-          height={934}
-          fetchPriority="high"
-          decoding="async"
-          className="block aspect-[4/4.2] h-auto w-full object-cover object-[30%_50%] sm:aspect-[4/3.6]"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-t from-[#05070d]/55 via-transparent to-transparent"
-        />
-      </div>
-
-      {/* PulsePay on a phone, breaking the frame bottom-left. */}
-      <PhoneShot className="absolute -bottom-2 left-3 w-[38%] max-w-[210px] sm:-left-8 lg:-bottom-10" />
-
-      {/* PRIDE notice, top-right. */}
+    <div className="relative mx-auto w-full max-w-[620px]">
       <div
         aria-hidden
-        className="absolute right-3 top-5 w-[62%] max-w-[270px] rounded-2xl border border-[#0b1220]/5 bg-white/95 p-3.5 text-[#0b1220] shadow-[0_24px_48px_-16px_rgb(0_0_0_/_0.45)] backdrop-blur sm:-right-6"
+        className="overflow-hidden rounded-xl border border-white/10 bg-[#070a12]/90 shadow-[0_40px_90px_-30px_rgb(0_0_0_/_0.85)] backdrop-blur"
       >
-        <div className="flex items-center gap-2.5">
-          <span className="app-icon h-8 w-8 rounded-lg">
-            <Bitcoin className="h-4 w-4" />
+        {/* Console chrome */}
+        <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-2.5">
+          <span className="flex items-center gap-2 font-mono text-[10.5px] tracking-[0.14em] text-[#8a93a6]">
+            <span className="flex gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-white/15" />
+              <span className="h-2 w-2 rounded-full bg-white/15" />
+              <span className="h-2 w-2 rounded-full bg-white/15" />
+            </span>
+            enice-core
           </span>
-          <div className="min-w-0">
-            <div className="text-[12.5px] font-semibold">PRIDE</div>
-            <div className="text-[11px] text-[#5f6b7e]">Custody · just now</div>
-          </div>
-          <CheckCircle2 className="ml-auto h-4 w-4 shrink-0 text-[#127a4f]" />
+          <span className="flex items-center gap-2 font-mono text-[10px] tracking-[0.12em] text-[#8a93a6]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#4ec08d]" />
+            v1
+          </span>
         </div>
-        <p className="mt-2.5 text-[12px] leading-snug text-[#273249]">
-          Digital assets settled to custody on the same ledger as her cards.
-        </p>
-      </div>
 
-      {/* Settlement receipt, bottom-right. */}
-      <div
-        aria-hidden
-        className="absolute bottom-6 right-3 hidden items-center gap-2.5 rounded-xl bg-white/95 px-3.5 py-2.5 text-[#0b1220] shadow-[0_24px_48px_-16px_rgb(0_0_0_/_0.45)] sm:flex sm:-right-4 lg:bottom-12"
-      >
-        <span className="grid h-7 w-7 place-items-center rounded-full bg-[#e7f6ee] text-[#127a4f]">
-          <CheckCircle2 className="h-4 w-4" />
-        </span>
-        <div className="leading-tight">
-          <div className="text-[12px] font-semibold">Payment settled</div>
-          <div className="text-[10.5px] text-[#5f6b7e]">via PulsePay · 0.8s</div>
+        {/* System map */}
+        <div className="grid gap-px bg-white/[0.06] sm:grid-cols-[1fr_1.15fr]">
+          <div className="space-y-2 bg-[#070a12] p-4">
+            {[
+              { name: "PulsePay", meta: "cards · wallets · transfers", state: "PILOT" },
+              { name: "PRIDE", meta: "trading · custody", state: "PREVIEW" },
+            ].map((p) => (
+              <div
+                key={p.name}
+                className="rounded-md border border-white/10 bg-white/[0.02] px-3 py-2.5"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-[12.5px] font-semibold text-white">{p.name}</span>
+                  <span className="font-mono text-[9px] tracking-[0.16em] text-[#4ec08d]">
+                    {p.state}
+                  </span>
+                </div>
+                <div className="mt-1 font-mono text-[10px] text-[#7b8497]">{p.meta}</div>
+              </div>
+            ))}
+
+            <div className="flex items-center gap-2 pl-1 font-mono text-[9px] tracking-[0.16em] text-[#5b6376]">
+              <span className="h-3 w-px bg-white/15" />
+              shared ledger
+            </div>
+
+            <div className="rounded-md border border-[#6b98ff]/25 bg-[#6b98ff]/[0.07] px-3 py-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[12.5px] font-semibold text-white">ENICE Core</span>
+                <span className="font-mono text-[9px] tracking-[0.16em] text-[#6b98ff]">API</span>
+              </div>
+              <div className="mt-1 font-mono text-[10px] text-[#7b8497]">
+                ledger · kyc · webhooks
+              </div>
+            </div>
+          </div>
+
+          {/* Request trace */}
+          <div className="bg-[#05070d] p-4">
+            <div className="font-mono text-[10.5px] leading-[1.9] text-[#7b8497]">
+              <div>
+                <span className="text-[#4ec08d]">POST</span> /v1/ledger/tx
+              </div>
+              <div className="mt-1 text-[#c6cad2]">
+                {"{"}
+                <div className="pl-3">
+                  <span className="text-[#6b98ff]">"amount"</span>: 25000,
+                </div>
+                <div className="pl-3">
+                  <span className="text-[#6b98ff]">"currency"</span>:{" "}
+                  <span className="text-[#4ec08d]">"NGN"</span>
+                </div>
+                {"}"}
+              </div>
+              <div className="mt-4 text-[#5b6376]"># 200 OK</div>
+              <div className="text-[#c6cad2]">
+                {"{"}
+                <div className="pl-3">
+                  <span className="text-[#6b98ff]">"status"</span>:{" "}
+                  <span className="text-[#4ec08d]">"settled"</span>,
+                </div>
+                <div className="pl-3">
+                  <span className="text-[#6b98ff]">"rail"</span>:{" "}
+                  <span className="text-[#4ec08d]">"pulsepay"</span>
+                </div>
+                {"}"}
+              </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-3 gap-px overflow-hidden rounded border border-white/10 bg-white/10 text-center">
+              {[
+                ["Products", "2"],
+                ["Ledger", "1"],
+                ["API", "v1"],
+              ].map(([label, value]) => (
+                <div key={label} className="bg-[#070a12] px-2 py-2">
+                  <div className="font-mono text-[13px] font-semibold text-white">{value}</div>
+                  <div className="mt-0.5 font-mono text-[8.5px] uppercase tracking-[0.14em] text-[#5b6376]">
+                    {label}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between border-t border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-[9.5px] tracking-[0.12em] text-[#5b6376]">
+          <span>per-tenant isolation</span>
+          <span>audit log</span>
+          <span>encrypted at rest</span>
         </div>
       </div>
     </div>
