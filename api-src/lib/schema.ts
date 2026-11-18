@@ -2866,6 +2866,24 @@ WHERE key = 'home.hero'
   AND fields->>'heading' = 'Unified technology solutions for growing enterprises';
 `,
   },
+  {
+    id: 33,
+    name: "homepage_hero_infrastructure_positioning",
+    sql: /* sql */ `
+-- Replace the console-style hero wording with the approved positioning. Guarded on the previous
+-- default, so anything an administrator has written themselves survives.
+UPDATE site_sections
+SET fields = fields || jsonb_build_object(
+      'eyebrow', 'Financial technology & digital infrastructure',
+      'heading', 'Building the infrastructure behind modern finance.',
+      'subheading', 'ENICE develops financial technology and digital asset infrastructure through PulsePay and PRIDE, creating solutions that simplify payments and expand access to digital financial services.',
+      'primaryCtaLabel', 'Discover our solutions',
+      'secondaryCtaLabel', 'Contact ENICE'),
+    updated_at = now()
+WHERE key = 'home.hero'
+  AND fields->>'heading' = 'One ledger. Two products. One API.';
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

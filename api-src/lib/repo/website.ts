@@ -811,13 +811,13 @@ const DEFAULT_SECTIONS: {
     type: "hero",
     order: 10,
     fields: {
-      eyebrow: "",
-      heading: "One ledger. Two products. One API.",
+      eyebrow: "Financial technology & digital infrastructure",
+      heading: "Building the infrastructure behind modern finance.",
       subheading:
-        "ENICE builds payment and digital asset infrastructure: PulsePay for cards, wallets and transfers, PRIDE for trading and custody, both on the same core.",
-      primaryCtaLabel: "Explore our products",
+        "ENICE develops financial technology and digital asset infrastructure through PulsePay and PRIDE, creating solutions that simplify payments and expand access to digital financial services.",
+      primaryCtaLabel: "Discover our solutions",
       primaryCtaUrl: "/portfolio",
-      secondaryCtaLabel: "Talk to our team",
+      secondaryCtaLabel: "Contact ENICE",
       secondaryCtaUrl: "/contact",
     },
   },

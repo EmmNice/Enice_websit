@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
 import {
+  ArrowDown,
   ArrowRight,
   Bitcoin,
   Boxes,
@@ -23,7 +24,6 @@ import { Container, Cta, Eyebrow } from "@/components/site/primitives";
 import {
   BrowserShot,
   EngineConsole,
-  HeroVisual,
   PrideShot,
   type ShotKey,
 } from "@/components/site/home/ProductMockups";
@@ -154,11 +154,6 @@ const COMPLIANCE_BADGES = [
 ];
 
 /** Plain, checkable statements for the hero's trust row — no ratings we have not earned. */
-const HERO_PROOF = [
-  { icon: Globe, label: "Built in Nigeria", sub: "for businesses across Africa" },
-  { icon: Boxes, label: "Two products", sub: "on one shared ledger" },
-  { icon: ShieldCheck, label: "Secure by default", sub: "isolation, audit, encryption" },
-];
 
 /** `Label: Value` lines from a CMS `bullets` field. */
 function parseFacts(raw: unknown): { label: string; value: string }[] {
@@ -222,48 +217,46 @@ function Landing() {
     <SiteShell progress={false}>
       {/* ═══ HERO ═══════════════════════════════════════════════════════════ */}
       <section className="hero-brand relative overflow-hidden" aria-labelledby="hero-heading">
-        <Container className="relative grid items-center gap-14 py-16 sm:py-20 lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:py-28">
-          <div>
-            <div
-              className="animate-hero-up mb-6 flex flex-wrap items-center gap-3 font-mono text-[10.5px] uppercase tracking-[0.2em] text-[#8a93a6]"
+        <Container className="relative flex min-h-[68vh] flex-col justify-center py-20 sm:py-24 lg:py-28">
+          <div className="mx-auto max-w-3xl text-center">
+            <p
+              className="animate-hero-up text-[11px] font-semibold uppercase tracking-[0.16em] text-electric sm:text-[11.5px]"
               style={{ animationDelay: "20ms" }}
             >
-              <span className="inline-flex items-center gap-2 rounded border border-white/10 bg-white/[0.03] px-2.5 py-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#4ec08d]" />
-                Platform
-              </span>
-              <span>Lagos · NG</span>
-              <span className="text-white/20">/</span>
-              <span>API v1</span>
-            </div>
+              {fieldText(hero, "eyebrow", "Financial technology & digital infrastructure")}
+            </p>
 
             <h1
               id="hero-heading"
-              className="animate-hero-up text-[2.25rem] font-semibold leading-[1.05] tracking-[-0.035em] text-white sm:text-5xl lg:text-[3.5rem]"
+              className="animate-hero-up mt-5 text-[2.25rem] font-semibold leading-[1.06] tracking-[-0.035em] text-white sm:text-[2.875rem] lg:text-[3.5rem]"
               style={{ animationDelay: "60ms", textWrap: "balance" }}
             >
               <StyledText
-                text={fieldText(hero, "heading", "One ledger. Two products. One API.")}
+                text={fieldText(
+                  hero,
+                  "heading",
+                  "Building the infrastructure behind modern finance.",
+                )}
                 accentClassName="text-electric"
               />
             </h1>
 
             <p
-              className="animate-hero-up mt-6 max-w-xl text-[1.0625rem] leading-relaxed text-bone-strong sm:text-lg"
+              className="animate-hero-up mx-auto mt-6 max-w-2xl text-[1.0625rem] leading-relaxed text-bone-strong sm:text-lg"
               style={{ animationDelay: "120ms" }}
             >
               <StyledText
                 text={fieldText(
                   hero,
                   "subheading",
-                  "ENICE builds payment and digital asset infrastructure: PulsePay for cards, wallets and transfers, PRIDE for trading and custody, both on the same core.",
+                  "ENICE develops financial technology and digital asset infrastructure through PulsePay and PRIDE, creating solutions that simplify payments and expand access to digital financial services.",
                 )}
                 accentClassName="text-electric"
               />
             </p>
 
             <div
-              className="animate-hero-up btn-stack mt-9 flex flex-wrap gap-3"
+              className="animate-hero-up btn-stack mt-9 flex flex-wrap justify-center gap-3"
               style={{ animationDelay: "180ms" }}
             >
               <Cta
@@ -272,7 +265,7 @@ function Landing() {
                 icon="arrow"
                 data-cta="hero-primary"
               >
-                {fieldText(hero, "primaryCtaLabel", "Explore our products")}
+                {fieldText(hero, "primaryCtaLabel", "Discover our solutions")}
               </Cta>
               <Cta
                 to={fieldText(hero, "secondaryCtaUrl", "/contact")}
@@ -280,42 +273,26 @@ function Landing() {
                 size="lg"
                 data-cta="hero-secondary"
               >
-                {fieldText(hero, "secondaryCtaLabel", "Talk to our team")}
+                {fieldText(hero, "secondaryCtaLabel", "Contact ENICE")}
               </Cta>
             </div>
 
             <p
-              className="animate-hero-up mt-4 text-[11px] text-bone-faint"
-              style={{ animationDelay: "200ms" }}
+              className="animate-hero-up mt-6 text-[11.5px] text-bone-faint"
+              style={{ animationDelay: "220ms" }}
             >
               ENICE Group is the technology brand of ENICE Technology Limited.
             </p>
-
-            <ul
-              className="animate-hero-up mt-12 grid max-w-xl grid-cols-1 gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 sm:grid-cols-3"
-              style={{ animationDelay: "240ms" }}
-            >
-              {HERO_PROOF.map((p) => (
-                <li key={p.label} className="flex items-start gap-3 bg-[#05070d]/80 p-4 sm:block">
-                  <p.icon
-                    aria-hidden
-                    className="h-4 w-4 shrink-0 text-electric"
-                    strokeWidth={1.6}
-                  />
-                  <div className="sm:mt-3">
-                    <div className="text-[13px] font-semibold text-white">{p.label}</div>
-                    <div className="mt-1 font-mono text-[10px] leading-relaxed tracking-[0.06em] text-bone-soft">
-                      {p.sub}
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
           </div>
 
-          <div className="animate-hero-right relative lg:pl-6" style={{ animationDelay: "160ms" }}>
-            <HeroVisual />
-          </div>
+          <a
+            href="#products"
+            aria-label="See our products"
+            className="animate-hero-up mx-auto mt-14 grid h-11 w-11 place-items-center rounded-full border border-white/12 text-bone-soft transition-colors hover:border-electric/40 hover:text-electric"
+            style={{ animationDelay: "280ms" }}
+          >
+            <ArrowDown aria-hidden className="h-4 w-4" strokeWidth={1.8} />
+          </a>
         </Container>
       </section>
 
