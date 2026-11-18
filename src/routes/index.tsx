@@ -1,36 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
-import {
-  ArrowDown,
-  ArrowRight,
-  Bitcoin,
-  Boxes,
-  Check,
-  Cpu,
-  CreditCard,
-  Database,
-  FileCheck2,
-  Globe,
-  Lock,
-  ShieldCheck,
-  Wifi,
-} from "lucide-react";
+import { ArrowDown, ArrowRight, Bitcoin, CreditCard } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { FAQSection } from "@/components/site/FAQSection";
 import { Reveal } from "@/components/site/Reveal";
 import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { StyledText } from "@/components/site/StyledText";
 import { Container, Cta, Eyebrow } from "@/components/site/primitives";
-import {
-  BrowserShot,
-  EngineConsole,
-  PrideShot,
-  type ShotKey,
-} from "@/components/site/home/ProductMockups";
 import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
 import { organizationJsonLd, pageHead, webSiteJsonLd } from "@/lib/seo";
 import { isRetiredProductPath } from "@/lib/retired-products";
-import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/")({
   // FAQ markup is deliberately absent here: `FAQSection` emits it from the questions it actually
@@ -48,42 +27,21 @@ export const Route = createFileRoute("/")({
 // Copy blocks are CMS fallbacks: each band reads its `home.*` section and overlays whatever an
 // administrator has published. See `src/lib/cms/use-section.ts`.
 
-/** Icons an editor may name on a CMS-managed card. Unknown names fall back to a neutral icon. */
-const CARD_ICONS: Record<string, LucideIcon> = {
-  Bitcoin,
-  Boxes,
-  Check,
-  Cpu,
-  CreditCard,
-  Database,
-  FileCheck2,
-  Globe,
-  Lock,
-  ShieldCheck,
-  Wifi,
-};
-
-function cardIcon(name: string): LucideIcon {
-  return CARD_ICONS[name] ?? Boxes;
-}
-
 interface Product {
   to: string;
   title: string;
   kicker: string;
   icon: LucideIcon;
-  /** One line for the product grid. */
+  /** The one-line position under the product name. */
   summary: string;
-  /** The feature row. */
-  heading: string;
+  /** What the product does, in plain terms. */
   desc: string;
   bullets: string[];
   facts: { label: string; value: string }[];
-  shot: ShotKey | "pride";
 }
 
 /**
- * The three products ENICE Group runs. This list is the portfolio — the homepage shows nothing
+ * The two products ENICE Group runs. This list is the portfolio — the homepage shows nothing
  * else, whatever the CMS holds (see `src/lib/retired-products.ts`).
  */
 const PRODUCTS: Product[] = [
@@ -94,7 +52,6 @@ const PRODUCTS: Product[] = [
     icon: CreditCard,
     summary:
       "Naira and USD virtual cards, programmable wallets, embedded KYC and instant transfers.",
-    heading: "Issue cards and move money in minutes",
     desc: "A virtual payment platform for modern commerce: instant Naira and USD card issuance, programmable wallets, embedded KYC, and fast peer-to-peer transfers built for businesses and individuals.",
     bullets: [
       "Virtual Naira and USD cards on demand",
@@ -105,7 +62,6 @@ const PRODUCTS: Product[] = [
       { label: "Cards", value: "Naira & USD" },
       { label: "Market", value: "Nigeria" },
     ],
-    shot: "pulsepay",
   },
   {
     to: "/portfolio/pride",
@@ -113,7 +69,6 @@ const PRODUCTS: Product[] = [
     kicker: "Digital assets",
     icon: Bitcoin,
     summary: "Trading and custody for digital assets, built into the same ledger as PulsePay.",
-    heading: "Hold and move digital assets with the same controls",
     desc: "PRIDE is ENICE Group's digital asset platform: trading, custody and cross-ecosystem transfers for users who already hold funds on PulsePay, with the same compliance and ledger controls behind both.",
     bullets: [
       "Digital asset trading in one account",
@@ -124,33 +79,7 @@ const PRODUCTS: Product[] = [
       { label: "Launch", value: "2027" },
       { label: "Category", value: "Digital assets" },
     ],
-    shot: "pride",
   },
-];
-
-const CORE_MODULES = [
-  {
-    icon: Cpu,
-    title: "AI & Automation",
-    desc: "Centralized AI tools and smart workflows behind both platforms, from payment reconciliation to asset monitoring.",
-  },
-  {
-    icon: Database,
-    title: "Fast Payments & Ledgers",
-    desc: "A reliable transaction engine and virtual account system that powers PulsePay and future financial tools we build.",
-  },
-  {
-    icon: FileCheck2,
-    title: "Built-In Compliance & KYC",
-    desc: "Identity verification, fraud checks, and security screening running automatically in real time across all our products.",
-  },
-];
-
-const COMPLIANCE_BADGES = [
-  { icon: ShieldCheck, label: "Row-level security" },
-  { icon: Lock, label: "Per-tenant isolation" },
-  { icon: Check, label: "Audit logging" },
-  { icon: Wifi, label: "Encrypted in transit and at rest" },
 ];
 
 /** Plain, checkable statements for the hero's trust row — no ratings we have not earned. */
@@ -173,8 +102,6 @@ function parseFacts(raw: unknown): { label: string; value: string }[] {
 function Landing() {
   const hero = useSectionFields("home.hero");
   const portfolio = useSectionFields("home.portfolio");
-  const core = useSectionFields("home.core");
-  const mechanisms = useSectionFields("home.mechanisms");
 
   // Published product copy overlays the built-in copy for the same path. The set of products and
   // their interfaces is fixed: a CMS tile for any other path (including retired products) is
@@ -195,22 +122,6 @@ function Landing() {
       kicker: kicker || p.kicker,
       facts: facts.length > 0 ? facts : p.facts,
     };
-  });
-
-  const coreModules = fieldItems(core, "items", CORE_MODULES, (row) => {
-    const title = typeof row.title === "string" ? row.title.trim() : "";
-    if (!title) return null;
-    return {
-      icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""),
-      title,
-      desc: typeof row.description === "string" ? row.description.trim() : "",
-    };
-  });
-
-  const badges = fieldItems(mechanisms, "items", COMPLIANCE_BADGES, (row) => {
-    const label = typeof row.title === "string" ? row.title.trim() : "";
-    if (!label) return null;
-    return { icon: cardIcon(typeof row.icon === "string" ? row.icon.trim() : ""), label };
   });
 
   return (
@@ -298,34 +209,32 @@ function Landing() {
 
       <PartnersStrip />
 
-      {/* ═══ PRODUCT GRID ═══════════════════════════════════════════════ */}
+      {/* ═══ PRODUCTS & TECHNOLOGY ══════════════════════════════════════ */}
       <section
         id="products"
-        className="bg-surface-1 py-20 sm:py-24"
+        className="bg-background py-24 sm:py-32"
         aria-labelledby="products-heading"
       >
         <Container>
           <Reveal>
-            <div className="mx-auto max-w-3xl text-center">
-              <Eyebrow className="justify-center">
-                {fieldText(portfolio, "eyebrow", "Our products")}
-              </Eyebrow>
+            <div className="max-w-2xl">
+              <Eyebrow>{fieldText(portfolio, "eyebrow", "Products & technology")}</Eyebrow>
               <h2 id="products-heading" className="type-h2 mt-5 text-foreground">
                 <StyledText
                   text={fieldText(
                     portfolio,
                     "heading",
-                    "Start with one product, or run both together",
+                    "Two products, held to the same standard of engineering",
                   )}
                   accentClassName="text-electric"
                 />
               </h2>
-              <p className="type-lead mx-auto mt-5 max-w-2xl">
+              <p className="type-lead mt-5">
                 <StyledText
                   text={fieldText(
                     portfolio,
                     "subheading",
-                    "Both products are built on the same ENICE Engine, so payments and digital assets share one secure foundation.",
+                    "PulsePay and PRIDE are designed, built and operated by ENICE on infrastructure we run ourselves.",
                   )}
                   accentClassName="text-electric"
                 />
@@ -333,169 +242,66 @@ function Landing() {
             </div>
           </Reveal>
 
-          <div className="mt-14 grid gap-x-10 gap-y-10 md:grid-cols-3">
-            {products.map((p, i) => (
-              <Reveal key={p.to} delay={i * 70}>
-                <article className="group flex h-full gap-5 border-t border-border pt-7">
-                  <span className="app-icon h-12 w-12 rounded-xl sm:h-14 sm:w-14 sm:rounded-2xl">
-                    <p.icon aria-hidden className="h-6 w-6" strokeWidth={1.75} />
-                  </span>
-                  <div className="flex min-w-0 flex-1 flex-col">
-                    <div className="flex items-start justify-between gap-3">
-                      <h3 className="text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground">
-                        {p.title}
-                      </h3>
-                      <ArrowRight
-                        aria-hidden
-                        className="mt-1.5 h-5 w-5 shrink-0 text-bone-soft transition-transform group-hover:translate-x-1 group-hover:text-electric"
-                      />
-                    </div>
-                    <p className="mt-2.5 text-[15px] leading-relaxed text-bone-soft">{p.summary}</p>
-                    <div className="mt-auto pt-6">
-                      <Link to={p.to as "/"} className="link-underline">
-                        Learn more<span className="sr-only"> about {p.title}</span>
-                      </Link>
-                    </div>
-                  </div>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-
-          {/* Wide banner, the platform pitch under the grid. */}
-          <Reveal>
-            <div className="mt-16 grid overflow-hidden rounded-2xl border border-border bg-white md:grid-cols-[18rem_1fr]">
-              <div aria-hidden className="band-brand relative grid min-h-40 place-items-center">
-                <img
-                  src="/brand/enice-mark.svg"
-                  alt=""
-                  width={112}
-                  height={80}
-                  className="h-20 w-auto"
-                />
-              </div>
-              <div className="flex flex-col gap-6 p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
-                <div className="max-w-xl">
-                  <h3 className="text-[1.375rem] font-semibold tracking-[-0.02em] text-foreground">
-                    One account across the ENICE ecosystem
-                  </h3>
-                  <p className="mt-2.5 text-[15px] leading-relaxed text-bone-soft">
-                    Shared identity, permissions, compliance and billing, so adding a second product
-                    is a switch, not a new integration project.
+          <Reveal delay={80}>
+            <div className="mt-14 grid gap-px overflow-hidden border border-border bg-border lg:grid-cols-2">
+              {products.map((p) => (
+                <article
+                  key={p.to}
+                  className="flex h-full flex-col bg-surface-1 p-8 sm:p-10 lg:p-12"
+                >
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-bone-faint">
+                    {p.kicker}
                   </p>
-                </div>
-                <div className="btn-stack flex shrink-0 flex-wrap gap-3">
-                  <Cta to="/contact" icon="arrow">
-                    Get in touch
-                  </Cta>
-                  <Cta to="/portfolio" variant="secondary">
-                    All products
-                  </Cta>
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </Container>
-      </section>
+                  <h3 className="mt-5 text-[1.75rem] font-semibold tracking-[-0.025em] text-foreground">
+                    {p.title}
+                  </h3>
+                  <p className="mt-4 max-w-md text-[15.5px] leading-relaxed text-bone-soft">
+                    {p.summary}
+                  </p>
 
-      {/* ═══ PRODUCT FEATURE ROWS ═══════════════════════════════════════ */}
-      <section className="bg-background py-20 sm:py-28" aria-labelledby="platform-heading">
-        <Container>
-          <Reveal>
-            <div className="mx-auto max-w-3xl text-center">
-              <h2 id="platform-heading" className="type-h2 text-foreground">
-                Software your business runs on, every day
-              </h2>
-              <p className="type-lead mx-auto mt-5 max-w-2xl">
-                We design, launch and operate our own products instead of handing them off after
-                release, so the tools you rely on keep getting better.
-              </p>
-            </div>
-          </Reveal>
+                  <ul className="mt-8 space-y-3.5 border-t border-border pt-7">
+                    {p.bullets.map((b) => (
+                      <li
+                        key={b}
+                        className="flex gap-3 text-[14.5px] leading-relaxed text-bone-strong"
+                      >
+                        <span
+                          aria-hidden
+                          className="mt-[0.6rem] h-1 w-1 shrink-0 rounded-full bg-electric"
+                        />
+                        {b}
+                      </li>
+                    ))}
+                  </ul>
 
-          <div className="mt-20 space-y-24 sm:space-y-32">
-            {products.map((p, i) => (
-              <FeatureRow key={p.to} product={p} reverse={i % 2 === 1} />
-            ))}
-          </div>
-        </Container>
-      </section>
-
-      {/* ═══ THE ENICE ENGINE ═══════════════════════════════════════════════ */}
-      <section
-        className="band-brand relative overflow-hidden py-20 sm:py-28"
-        aria-labelledby="core-heading"
-      >
-        <Container>
-          <Reveal>
-            <div className="mx-auto max-w-3xl text-center">
-              <Eyebrow className="justify-center">
-                {fieldText(core, "eyebrow", "What powers our products")}
-              </Eyebrow>
-              <h2 id="core-heading" className="type-h2 mt-5 text-white">
-                <StyledText
-                  text={fieldText(core, "heading", "The ENICE Engine")}
-                  accentClassName="text-electric"
-                />
-              </h2>
-              <p className="type-lead mx-auto mt-5 max-w-2xl text-bone-strong">
-                <StyledText
-                  text={fieldText(
-                    core,
-                    "subheading",
-                    "All of our apps share the same underlying technology, making every product faster, more reliable, and secure right out of the box.",
-                  )}
-                  accentClassName="text-electric"
-                />
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="mt-16 grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
-            <ul className="divide-y divide-white/10 border-y border-white/10">
-              {coreModules.map((c, i) => (
-                <Reveal key={c.title} delay={i * 70}>
-                  <li className="flex gap-5 py-7">
-                    <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-white text-[#0048ed]">
-                      <c.icon aria-hidden className="h-5 w-5" strokeWidth={1.9} />
-                    </span>
-                    <div>
-                      <h3 className="text-[1.0625rem] font-semibold text-white">
-                        <StyledText text={c.title} accentClassName="text-electric" />
-                      </h3>
-                      <p className="mt-2 text-[15px] leading-relaxed text-bone-soft">
-                        <StyledText text={c.desc} accentClassName="text-electric" />
-                      </p>
-                    </div>
-                  </li>
-                </Reveal>
+                  <Link
+                    to={p.to as "/"}
+                    className="group mt-auto inline-flex items-center gap-2 pt-9 text-[14.5px] font-semibold text-foreground transition-colors hover:text-electric"
+                  >
+                    Explore {p.title}
+                    <ArrowRight
+                      aria-hidden
+                      className="h-4 w-4 transition-transform group-hover:translate-x-1"
+                      strokeWidth={1.9}
+                    />
+                  </Link>
+                </article>
               ))}
-            </ul>
+            </div>
+          </Reveal>
 
-            <Reveal delay={120}>
-              <div>
-                <EngineConsole />
-                <ul className="mt-6 flex flex-wrap gap-2">
-                  {badges.map((b) => (
-                    <li
-                      key={b.label}
-                      className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.05] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-bone-strong"
-                    >
-                      <b.icon aria-hidden className="h-3.5 w-3.5 text-electric" strokeWidth={2} />
-                      {b.label}
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-5 max-w-lg text-[13px] leading-relaxed text-bone-faint">
-                  {fieldText(
-                    mechanisms,
-                    "subheading",
-                    "Built in compliance with applicable standards in the Federal Republic of Nigeria, with strict privacy controls and security architecture across all systems.",
-                  )}
-                </p>
-              </div>
-            </Reveal>
-          </div>
+          <Reveal delay={120}>
+            <div className="mt-10 flex flex-col gap-5 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
+              <p className="max-w-2xl text-[14px] leading-relaxed text-bone-soft">
+                Shared identity, compliance and settlement run across both products, built to
+                applicable standards in the Federal Republic of Nigeria with strict privacy and
+                security controls.
+              </p>
+              <Link to="/portfolio" className="link-underline shrink-0 text-[14px] font-medium">
+                All products
+              </Link>
+            </div>
+          </Reveal>
         </Container>
       </section>
 
@@ -524,77 +330,5 @@ function Landing() {
         </Container>
       </section>
     </SiteShell>
-  );
-}
-
-// ─── Feature row ──────────────────────────────────────────────────────────────
-
-function FeatureRow({ product: p, reverse }: { product: Product; reverse: boolean }) {
-  return (
-    <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
-      <Reveal className={cn(reverse && "lg:order-2")}>
-        <div>
-          <div className="flex items-center gap-3">
-            <span className="app-icon h-9 w-9 rounded-xl">
-              <p.icon aria-hidden className="h-4 w-4" strokeWidth={1.9} />
-            </span>
-            <span className="text-[15px] font-semibold text-foreground">{p.title}</span>
-            <span className="text-[13px] text-bone-faint">· {p.kicker}</span>
-          </div>
-          <h3 className="mt-6 text-[1.75rem] font-semibold leading-tight tracking-[-0.025em] text-foreground sm:text-[2rem]">
-            {p.heading}
-          </h3>
-          <p className="mt-4 text-[1.0625rem] leading-relaxed text-bone-soft">
-            <StyledText text={p.desc} accentClassName="text-electric" />
-          </p>
-
-          <ul className="mt-7 space-y-3">
-            {p.bullets.map((b) => (
-              <li key={b} className="flex items-start gap-3 text-[15px] text-bone-strong">
-                <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-[#eaf0fd] text-electric">
-                  <Check aria-hidden className="h-3 w-3" strokeWidth={3} />
-                </span>
-                {b}
-              </li>
-            ))}
-          </ul>
-
-          {p.facts.length > 0 && (
-            <dl className="mt-9 grid grid-cols-2 gap-6 rounded-2xl bg-surface-1 p-6 sm:p-7">
-              {p.facts.map((f) => (
-                <div key={f.label} className="flex flex-col-reverse">
-                  <dt className="mt-1 text-[13px] text-bone-soft">{f.label}</dt>
-                  <dd className="text-[1.125rem] font-semibold tracking-tight text-foreground">
-                    {f.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          )}
-
-          <div className="mt-8">
-            <Link to={p.to as "/"} className="link-underline">
-              Explore {p.title}
-              <ArrowRight aria-hidden className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </Reveal>
-
-      <Reveal delay={100} className={cn(reverse && "lg:order-1")}>
-        {/* The product screen sits in a tinted frame and bleeds off its far edge, the way a
-            real product shot is cropped rather than shrunk to fit. */}
-        <div className="mock-frame aspect-[5/4] sm:aspect-[4/3]">
-          {p.shot === "pride" ? (
-            <PrideShot className="absolute left-[10%] top-[16%] w-[125%] max-w-none sm:w-[112%]" />
-          ) : (
-            <BrowserShot
-              shot={p.shot}
-              className="absolute left-[8%] top-[11%] w-[150%] max-w-none sm:w-[135%]"
-            />
-          )}
-        </div>
-      </Reveal>
-    </div>
   );
 }
