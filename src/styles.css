@@ -227,7 +227,12 @@
   /* Product accents sampled from each live platform and lifted only where needed for readable
      small text on the shared dark surfaces. */
   --pulsepay-accent: #d76550;
-  --pride-accent: #a78bfa;
+  --pride-accent: #d4af37;
+
+  /* Product accents as utility classes, for the places that are not inside a product theme —
+     the homepage presents both products side by side and needs both colours at once. */
+  --product-accent-pulsepay: var(--pulsepay-accent);
+  --product-accent-pride: var(--pride-accent);
 
   /* Surfaces, each a small lift of the canvas toward bone. */
   --surface-1: #0b0e15; /* recessed bands, inputs at rest */
@@ -275,10 +280,18 @@
   --ring: var(--pulsepay-accent);
 }
 
+.accent-pulsepay {
+  color: var(--product-accent-pulsepay);
+}
+
+.accent-pride {
+  color: var(--product-accent-pride);
+}
+
 .product-theme-pride {
   --electric: var(--pride-accent);
-  --electric-deep: #7c3aed;
-  --electric-shadow: #3b167a;
+  --electric-deep: #a8842a;
+  --electric-shadow: #4a3708;
   --primary: var(--pride-accent);
   --accent: var(--pride-accent);
   --ring: var(--pride-accent);

@@ -30,6 +30,8 @@ interface Product {
   to: string;
   title: string;
   kicker: string;
+  /** The product's own accent, used on its label, rule and link. */
+  accent: string;
   icon: LucideIcon;
   /** The one-line position under the product name. */
   summary: string;
@@ -48,6 +50,7 @@ const PRODUCTS: Product[] = [
     to: "/portfolio/pulsepay",
     title: "PulsePay",
     kicker: "Digital payments",
+    accent: "accent-pulsepay",
     icon: CreditCard,
     summary:
       "Naira and USD virtual cards, programmable wallets, embedded KYC and instant transfers.",
@@ -66,6 +69,7 @@ const PRODUCTS: Product[] = [
     to: "/portfolio/pride",
     title: "PRIDE",
     kicker: "Digital assets",
+    accent: "accent-pride",
     icon: Bitcoin,
     summary: "Trading and custody for digital assets, built into the same ledger as PulsePay.",
     desc: "PRIDE is ENICE Group's digital asset platform: trading, custody and cross-ecosystem transfers for users who already hold funds on PulsePay, with the same compliance and ledger controls behind both.",
@@ -246,7 +250,9 @@ function Landing() {
                   key={p.to}
                   className="flex h-full flex-col bg-surface-1 p-8 sm:p-10 lg:p-12"
                 >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-bone-faint">
+                  <p
+                    className={`text-[11px] font-semibold uppercase tracking-[0.16em] ${p.accent}`}
+                  >
                     {p.kicker}
                   </p>
                   <h3 className="mt-5 text-[1.75rem] font-semibold tracking-[-0.025em] text-foreground">
@@ -273,7 +279,7 @@ function Landing() {
 
                   <Link
                     to={p.to as "/"}
-                    className="group mt-auto inline-flex items-center gap-2 pt-9 text-[14.5px] font-semibold text-foreground transition-colors hover:text-electric"
+                    className={`group mt-auto inline-flex items-center gap-2 pt-9 text-[14.5px] font-semibold text-foreground transition-colors hover:opacity-80 ${p.accent}`}
                   >
                     Explore {p.title}
                     <ArrowRight
