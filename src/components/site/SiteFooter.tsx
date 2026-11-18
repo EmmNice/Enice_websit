@@ -81,7 +81,8 @@ const FOOTER_COLS = [
 ];
 
 /** Shown until the CMS footer settings resolve, and if they never do. */
-const DEFAULT_TAGLINE = "ENICE builds and runs software for payments, customer support, and email.";
+const DEFAULT_TAGLINE =
+  "ENICE builds and runs payment and digital asset infrastructure for businesses across Africa.";
 
 const ICONS: Record<string, typeof XIcon> = {
   "X (Twitter)": XIcon,

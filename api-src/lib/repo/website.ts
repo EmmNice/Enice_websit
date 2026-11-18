@@ -779,7 +779,8 @@ export function defaultSettings(): SiteSettings {
           ],
         },
       ],
-      tagline: "ENICE builds and runs software for payments, customer support, and email.",
+      tagline:
+        "ENICE builds and runs payment and digital asset infrastructure for businesses across Africa.",
       copyright: `© ${new Date().getFullYear()} ENICE Technology Limited. All rights reserved.`,
       showSocials: true,
     },
@@ -880,39 +881,6 @@ const DEFAULT_SECTIONS: {
           description:
             "We design, launch, and maintain our own products instead of handing them off after release.",
           bullets: "Product Design\nPlatform Engineering\nDaily Operation",
-        },
-      ],
-    },
-  },
-  {
-    key: "home.partners",
-    label: "Partners strip",
-    group: "Home",
-    type: "logoStrip",
-    order: 40,
-    fields: {
-      heading: "Infrastructure and platform providers",
-      // The infrastructure providers, each with a self-hosted brand logo (public/partners/*.svg),
-      // so the strip is populated on a fresh install. Existing databases are seeded the same set
-      // by migration 3. An administrator can edit, reorder or remove any of these.
-      items: [
-        {
-          name: "Amazon Web Services",
-          tagline: "Cloud Infrastructure",
-          logo: "/partners/aws.svg",
-          url: "https://aws.amazon.com",
-        },
-        {
-          name: "Google Cloud",
-          tagline: "AI & Compute",
-          logo: "/partners/googlecloud.svg",
-          url: "https://cloud.google.com",
-        },
-        {
-          name: "Supabase",
-          tagline: "Database & Auth",
-          logo: "/partners/supabase.svg",
-          url: "https://supabase.com",
         },
       ],
     },

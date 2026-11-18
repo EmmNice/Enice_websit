@@ -2884,6 +2884,28 @@ WHERE key = 'home.hero'
   AND fields->>'heading' = 'One ledger. Two products. One API.';
 `,
   },
+  {
+    id: 34,
+    name: "drop_partners_strip",
+    sql: /* sql */ `
+-- The infrastructure logo strip is no longer part of the homepage. Its section is removed so the
+-- admin panel does not offer a band the site does not render.
+DELETE FROM site_sections WHERE key = 'home.partners';
+`,
+  },
+  {
+    id: 35,
+    name: "footer_tagline_two_products",
+    sql: /* sql */ `
+-- The footer described products that are no longer part of the company. Replace it only where the
+-- old default is still in place, so an edited tagline is left alone.
+UPDATE site_sections
+SET fields = jsonb_set(fields, '{tagline}', to_jsonb('ENICE builds and runs payment and digital asset infrastructure for businesses across Africa.'::text)),
+    updated_at = now()
+WHERE key = 'site.footer'
+  AND fields->>'tagline' = 'ENICE builds and runs software for payments, customer support, and email.';
+`,
+  },
 ];
 
 /** Bookkeeping table, created before any migration runs. */

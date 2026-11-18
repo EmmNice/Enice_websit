@@ -4,7 +4,6 @@ import { ArrowDown, ArrowRight, Bitcoin, CreditCard } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { FAQSection } from "@/components/site/FAQSection";
 import { Reveal } from "@/components/site/Reveal";
-import { PartnersStrip } from "@/components/site/PartnersStrip";
 import { StyledText } from "@/components/site/StyledText";
 import { Container, Cta, Eyebrow } from "@/components/site/primitives";
 import { useSectionFields, fieldText, fieldItems } from "@/lib/cms/use-section";
@@ -206,8 +205,6 @@ function Landing() {
           </a>
         </Container>
       </section>
-
-      <PartnersStrip />
 
       {/* ═══ PRODUCTS & TECHNOLOGY ══════════════════════════════════════ */}
       <section
