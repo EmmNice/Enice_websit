@@ -860,6 +860,10 @@ export function mediaCategoryFor(mimeType: string): MediaCategory | null {
  * and colour reliably and a typo cannot create a phantom action type.
  */
 export const ACTIVITY_ACTIONS = [
+  "waitlist.updated",
+  "waitlist.deleted",
+  "waitlist.exported",
+  "waitlist.notified",
   "login.success",
   "login.failed",
   "login.locked",

@@ -71,6 +71,10 @@ var PAGE_SEO = {
     title: "About ENICE Group | A Technology Company Building African Infrastructure",
     description: "ENICE Group builds and operates software platforms for digital commerce, financial services, and enterprise AI. Here is our story, our mission, and how we work."
   },
+  "/waitlist": {
+    title: "Join the waitlist | ENICE Group",
+    description: "Join the PulsePay waitlist for launch updates, early access and priority onboarding when general availability opens."
+  },
   "/contact": {
     title: "Contact ENICE Group",
     description: "Reach ENICE Group about product access, platform integration, enterprise licensing, partnerships, or general inquiries at corporate@enicehq.com."
@@ -5102,8 +5106,7 @@ WHERE key = 'home.portfolio'
 
 UPDATE site_sections
 SET fields = jsonb_set(fields, '{items}', (fields->'items') || '[
-      {"icon":"Bitcoin","kicker":"DIGITAL ASSETS","title":"PRIDE","description":"ENICE Group''s digital asset platform for cryptocurrency trading, secure custody and cross-ecosystem digital finance, built on the same ledger as PulsePay.","bullets":"Launch: 2027
-Category: Digital assets","url":"/portfolio/pride"}
+      {"icon":"Bitcoin","kicker":"DIGITAL ASSETS","title":"PRIDE","description":"ENICE Group''s digital asset platform for cryptocurrency trading, secure custody and cross-ecosystem digital finance, built on the same ledger as PulsePay.","bullets":"Launch: 2027\\nCategory: Digital assets","url":"/portfolio/pride"}
     ]'::jsonb),
     updated_at = now()
 WHERE key = 'home.portfolio'
@@ -5133,18 +5136,8 @@ WHERE key = 'home.roadmap'
 -- PRIDE milestones, so the roadmap still describes the second product after the rows above.
 UPDATE site_sections
 SET fields = jsonb_set(fields, '{items}', (fields->'items') || '[
-      {"title":"PRIDE Waitlist and Platform Preview","description":"when: Q4 2026
-status: in-progress
-product: PRIDE
-tags: Digital Assets, Custody
-
-Early access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch."},
-      {"title":"PRIDE Public Launch","description":"when: 2027
-status: planned
-product: PRIDE
-tags: Digital Assets, Trading
-
-Trading, custody and cross-ecosystem transfers open to PulsePay account holders."}
+      {"title":"PRIDE Waitlist and Platform Preview","description":"when: Q4 2026\\nstatus: in-progress\\nproduct: PRIDE\\ntags: Digital Assets, Custody\\n\\nEarly access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch."},
+      {"title":"PRIDE Public Launch","description":"when: 2027\\nstatus: planned\\nproduct: PRIDE\\ntags: Digital Assets, Trading\\n\\nTrading, custody and cross-ecosystem transfers open to PulsePay account holders."}
     ]'::jsonb),
     updated_at = now()
 WHERE key = 'home.roadmap'
@@ -5309,6 +5302,65 @@ SET fields = jsonb_set(fields, '{tagline}', to_jsonb('ENICE builds and runs paym
     updated_at = now()
 WHERE key = 'site.footer'
   AND fields->>'tagline' = 'ENICE builds and runs software for payments, customer support, and email.';
+`
+    )
+  },
+  {
+    id: 36,
+    name: "pulsepay_waitlist",
+    sql: (
+      /* sql */
+      `
+-- PulsePay waitlist registrations. Stored in the CMS database rather than the email provider's
+-- audience on purpose: the list has to survive a provider change, and the team needs to see who
+-- registered even when no provider is configured.
+CREATE TABLE IF NOT EXISTS pulsepay_waitlist (
+  id uuid PRIMARY KEY,
+  name text NOT NULL,
+  email text NOT NULL,
+  -- Normalised to +<digits> by the application; '' when none was given.
+  phone text NOT NULL DEFAULT '',
+  interests text[] NOT NULL DEFAULT '{}',
+  segment text,
+  status text NOT NULL DEFAULT 'new',
+
+  -- Consent is its own fact, not a side effect of registering. consent_at records when it was
+  -- given; unsubscribed_at records when it was withdrawn. A person with unsubscribed_at set stays
+  -- on file (so they are not re-added) but is never notified.
+  consent boolean NOT NULL DEFAULT false,
+  consent_at timestamptz,
+  unsubscribed_at timestamptz,
+
+  source text NOT NULL DEFAULT '',
+  notes text NOT NULL DEFAULT '',
+  last_contacted_at timestamptz,
+  notified_at timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+
+  CONSTRAINT pulsepay_waitlist_status_check
+    CHECK (status IN ('new','contacted','qualified','invited','onboarded','not_interested')),
+  CONSTRAINT pulsepay_waitlist_segment_check
+    CHECK (segment IS NULL OR segment IN ('individual','business','developer')),
+  CONSTRAINT pulsepay_waitlist_consent_check
+    CHECK (NOT consent OR consent_at IS NOT NULL)
+);
+
+-- One registration per person, whatever capitalisation they typed.
+CREATE UNIQUE INDEX IF NOT EXISTS pulsepay_waitlist_email_key
+  ON pulsepay_waitlist (lower(email));
+
+-- The same phone number cannot register twice either. Partial, because phone is optional and
+-- many rows legitimately have none.
+CREATE UNIQUE INDEX IF NOT EXISTS pulsepay_waitlist_phone_key
+  ON pulsepay_waitlist (phone) WHERE phone <> '';
+
+CREATE INDEX IF NOT EXISTS pulsepay_waitlist_created_idx
+  ON pulsepay_waitlist (created_at DESC);
+CREATE INDEX IF NOT EXISTS pulsepay_waitlist_status_idx
+  ON pulsepay_waitlist (status);
+CREATE INDEX IF NOT EXISTS pulsepay_waitlist_interests_idx
+  ON pulsepay_waitlist USING gin (interests);
 `
     )
   }

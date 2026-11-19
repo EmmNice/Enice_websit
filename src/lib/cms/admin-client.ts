@@ -29,6 +29,7 @@ import type {
   SearchHit,
 } from "./types";
 import type { AdminRole, Permission } from "./permissions";
+import type { WaitlistEntry, WaitlistStats } from "../waitlist";
 
 const BASE = "/api/cms";
 const CSRF_COOKIE = "enice_admin_csrf";
@@ -391,4 +392,49 @@ export const knowledge = {
   ) => patch<{ entry: KnowledgeEntry }>(`/knowledge/${id}`, input),
 
   remove: (id: string) => remove<{ deleted: boolean; id: string }>(`/knowledge/${id}`),
+};
+
+// ─── PulsePay waitlist ───────────────────────────────────────────────────────
+
+export interface WaitlistQuery {
+  search?: string;
+  status?: string;
+  segment?: string;
+  interest?: string;
+  consent?: string;
+  sort?: string;
+  limit?: number;
+  offset?: number;
+}
+
+export const waitlist = {
+  list: (params: WaitlistQuery = {}) =>
+    get<{ entries: WaitlistEntry[]; total: number }>(`/waitlist${query({ ...params })}`),
+
+  stats: () => get<{ stats: WaitlistStats }>("/waitlist/stats"),
+
+  update: (
+    id: string,
+    input: {
+      status?: string;
+      segment?: string | null;
+      notes?: string;
+      consent?: boolean;
+      markContacted?: boolean;
+    },
+  ) => patch<{ entry: WaitlistEntry }>(`/waitlist/${id}`, input),
+
+  remove: (id: string) => remove<{ deleted: boolean; id: string }>(`/waitlist/${id}`),
+
+  /**
+   * The export is a plain GET authenticated by the session cookie, so the browser can download it
+   * directly. Building the URL here keeps the filters identical to the table's.
+   */
+  exportUrl: (params: WaitlistQuery = {}) =>
+    `${BASE}/waitlist/export${query({ ...params, limit: undefined, offset: undefined })}`,
+
+  notifyPreview: () => get<{ count: number }>("/waitlist/notify"),
+
+  notify: (input: { subject: string; message: string; expectedCount: number }) =>
+    post<{ sent: number; failed: number }>("/waitlist/notify", input),
 };

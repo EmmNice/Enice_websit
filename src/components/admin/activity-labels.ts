@@ -60,6 +60,10 @@ export const ACTIVITY_LABELS: Record<ActivityAction, string> = {
   "ai.applied": "applied the AI change",
   "ai.deployed": "opened a pull request for",
 
+  "waitlist.updated": "updated a waitlist registration",
+  "waitlist.deleted": "deleted a waitlist registration",
+  "waitlist.exported": "exported the waitlist to CSV",
+  "waitlist.notified": "sent the PulsePay launch notification",
   "knowledge.created": "added to the assistant knowledge base",
   "knowledge.updated": "edited in the assistant knowledge base",
   "knowledge.deleted": "removed from the assistant knowledge base",

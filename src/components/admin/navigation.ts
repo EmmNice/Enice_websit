@@ -91,6 +91,20 @@ export const NAV_GROUPS: NavGroup[] = [
     ],
   },
   {
+    label: "Audience",
+    entries: [
+      {
+        label: "PulsePay waitlist",
+        to: "/admin/waitlist",
+        icon: "Users",
+        permission: "waitlist.read",
+        matchPrefix: true,
+        description: "People registered for early access",
+        keywords: ["waitlist", "early access", "signups", "registrations", "launch", "pulsepay"],
+      },
+    ],
+  },
+  {
     label: "AI training",
     entries: [
       {

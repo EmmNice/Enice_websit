@@ -61,6 +61,11 @@ export const PERMISSIONS = [
   // AI assistant knowledge base (what the public chatbot is trained on).
   "ai.knowledge.read",
   "ai.knowledge.write",
+
+  // PulsePay waitlist: personal data of people who have not yet become customers.
+  "waitlist.read",
+  "waitlist.write",
+  "waitlist.export",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
@@ -81,6 +86,17 @@ export const PERMISSION_META: Record<Permission, PermissionMeta> = {
   "ai.knowledge.write": {
     label: "Edit what the assistant knows",
     group: "AI training",
+    sensitive: true,
+  },
+
+  "waitlist.read": { label: "View waitlist registrations", group: "Waitlist" },
+  "waitlist.write": {
+    label: "Update waitlist status, notes and consent",
+    group: "Waitlist",
+  },
+  "waitlist.export": {
+    label: "Export waitlist data to CSV",
+    group: "Waitlist",
     sensitive: true,
   },
 };
@@ -105,6 +121,9 @@ export const ROLE_PERMISSIONS: Record<AdminRole, readonly Permission[]> = {
     "content.delete",
     "ai.knowledge.read",
     "ai.knowledge.write",
+    "waitlist.read",
+    "waitlist.write",
+    "waitlist.export",
   ],
 
   editor: ["content.read", "content.write", "content.publish", "ai.knowledge.read"],

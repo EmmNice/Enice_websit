@@ -125,6 +125,11 @@ export const PAGE_SEO: Record<string, PageSeo> = {
     description:
       "ENICE Group builds and operates software platforms for digital commerce, financial services, and enterprise AI. Here is our story, our mission, and how we work.",
   },
+  "/waitlist": {
+    title: "Join the waitlist | ENICE Group",
+    description:
+      "Join the PulsePay waitlist for launch updates, early access and priority onboarding when general availability opens.",
+  },
   "/contact": {
     title: "Contact ENICE Group",
     description:

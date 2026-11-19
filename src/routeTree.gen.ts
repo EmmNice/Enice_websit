@@ -21,8 +21,10 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminKnowledgeRouteImport } from './routes/admin/knowledge'
+import { Route as AdminWaitlistRouteImport } from './routes/admin/waitlist'
 import { Route as AnnouncementsIndexRouteImport } from './routes/announcements.index'
 import { Route as AnnouncementsSlugRouteImport } from './routes/announcements.$slug'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
@@ -96,6 +98,11 @@ const TermsRoute = TermsRouteImport.update({
   path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WaitlistRoute = WaitlistRouteImport.update({
+  id: '/waitlist',
+  path: '/waitlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -104,6 +111,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminWaitlistRoute = AdminWaitlistRouteImport.update({
+  id: '/waitlist',
+  path: '/waitlist',
   getParentRoute: () => AdminRoute,
 } as any)
 const AnnouncementsIndexRoute = AnnouncementsIndexRouteImport.update({
@@ -181,7 +193,9 @@ export interface FileRoutesByFullPath {
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
+  '/waitlist': typeof WaitlistRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
+  '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -207,7 +221,9 @@ export interface FileRoutesByTo {
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
+  '/waitlist': typeof WaitlistRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
+  '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -236,7 +252,9 @@ export interface FileRoutesById {
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
+  '/waitlist': typeof WaitlistRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
+  '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
@@ -266,7 +284,9 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/status'
     | '/terms'
+    | '/waitlist'
     | '/admin/knowledge'
+    | '/admin/waitlist'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
@@ -292,7 +312,9 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/status'
     | '/terms'
+    | '/waitlist'
     | '/admin/knowledge'
+    | '/admin/waitlist'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
@@ -320,7 +342,9 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/status'
     | '/terms'
+    | '/waitlist'
     | '/admin/knowledge'
+    | '/admin/waitlist'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
@@ -349,6 +373,7 @@ export interface RootRouteChildren {
   RoadmapRoute: typeof RoadmapRoute
   StatusRoute: typeof StatusRoute
   TermsRoute: typeof TermsRoute
+  WaitlistRoute: typeof WaitlistRoute
   AnnouncementsSlugRoute: typeof AnnouncementsSlugRoute
   BlogSlugRoute: typeof BlogSlugRoute
   NewsSlugRoute: typeof NewsSlugRoute
@@ -443,6 +468,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/waitlist': {
+      id: '/waitlist'
+      path: '/waitlist'
+      fullPath: '/waitlist'
+      preLoaderRoute: typeof WaitlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -455,6 +487,13 @@ declare module '@tanstack/react-router' {
       path: '/knowledge'
       fullPath: '/admin/knowledge'
       preLoaderRoute: typeof AdminKnowledgeRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/waitlist': {
+      id: '/admin/waitlist'
+      path: '/waitlist'
+      fullPath: '/admin/waitlist'
+      preLoaderRoute: typeof AdminWaitlistRouteImport
       parentRoute: typeof AdminRoute
     }
     '/announcements/': {
@@ -546,6 +585,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminKnowledgeRoute: typeof AdminKnowledgeRoute
+  AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminAdministrationSettingsRoute: typeof AdminAdministrationSettingsRoute
   AdminContentKindItemIdRoute: typeof AdminContentKindItemIdRoute
@@ -554,6 +594,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminKnowledgeRoute: AdminKnowledgeRoute,
+  AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminAdministrationSettingsRoute: AdminAdministrationSettingsRoute,
   AdminContentKindItemIdRoute: AdminContentKindItemIdRoute,
@@ -591,6 +632,7 @@ const rootRouteChildren: RootRouteChildren = {
   RoadmapRoute: RoadmapRoute,
   StatusRoute: StatusRoute,
   TermsRoute: TermsRoute,
+  WaitlistRoute: WaitlistRoute,
   AnnouncementsSlugRoute: AnnouncementsSlugRoute,
   BlogSlugRoute: BlogSlugRoute,
   NewsSlugRoute: NewsSlugRoute,

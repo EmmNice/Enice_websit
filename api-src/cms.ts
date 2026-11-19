@@ -111,6 +111,16 @@ import {
   updateKnowledge,
 } from "./lib/repo/knowledge";
 import { db } from "./lib/db";
+import {
+  deleteWaitlistEntry,
+  exportWaitlist,
+  listWaitlist,
+  markNotified,
+  notifiableRecipients,
+  updateWaitlistEntry,
+  waitlistStats,
+} from "./lib/repo/waitlist";
+import { waitlistCsv } from "./lib/waitlist-csv";
 
 // ─── Route declaration ───────────────────────────────────────────────────────
 
@@ -147,6 +157,14 @@ const ROUTE_PERMISSIONS: Record<string, Permission> = {
   "GET /knowledge/:id": "ai.knowledge.read",
   "PATCH /knowledge/:id": "ai.knowledge.write",
   "DELETE /knowledge/:id": "ai.knowledge.write",
+
+  "GET /waitlist": "waitlist.read",
+  "GET /waitlist/stats": "waitlist.read",
+  "GET /waitlist/export": "waitlist.export",
+  "GET /waitlist/notify": "waitlist.write",
+  "POST /waitlist/notify": "waitlist.write",
+  "PATCH /waitlist/:id": "waitlist.write",
+  "DELETE /waitlist/:id": "waitlist.write",
 };
 
 const router = new Router<AdminIdentity>();
@@ -560,6 +578,96 @@ router.add("POST /content/:id/revert", async ({ req, params, body, identity }) =
     metadata: { revertedTo: revision },
   });
   return { item };
+});
+
+// ─── PulsePay waitlist ───────────────────────────────────────────────────────
+
+/** Reads the list filters shared by the table and the CSV export. */
+function waitlistFilters(query: URLSearchParams) {
+  return {
+    search: query.get("search") ?? undefined,
+    status: query.get("status") ?? undefined,
+    segment: query.get("segment") ?? undefined,
+    interest: query.get("interest") ?? undefined,
+    consent: query.get("consent") ?? undefined,
+  };
+}
+
+router.add("GET /waitlist", async ({ query }) => {
+  const result = await listWaitlist({
+    ...waitlistFilters(query),
+    sort: query.get("sort") ?? undefined,
+    limit: Number(query.get("limit") ?? 25),
+    offset: Number(query.get("offset") ?? 0),
+  });
+  return result;
+});
+
+// Literal routes are registered before `/waitlist/:id`, which would otherwise swallow them.
+router.add("GET /waitlist/stats", async () => ({ stats: await waitlistStats() }));
+
+router.add("GET /waitlist/export", async ({ req, res, query, identity }) => {
+  const entries = await exportWaitlist(waitlistFilters(query));
+  // Exporting personal data is recorded with how many rows left, not just that it happened.
+  await recordActivity(req, identity, "waitlist.exported", {
+    entityType: "waitlist",
+    entityLabel: `${entries.length} registrations`,
+    metadata: { count: entries.length, filters: waitlistFilters(query) },
+  });
+  const stamp = new Date().toISOString().slice(0, 10);
+  res.setHeader("Content-Type", "text/csv; charset=utf-8");
+  res.setHeader("Content-Disposition", `attachment; filename="pulsepay-waitlist-${stamp}.csv"`);
+  res.status(200).end(waitlistCsv(entries));
+});
+
+// Preview: how many people would be told, so a send is never a surprise.
+router.add("GET /waitlist/notify", async () => {
+  const recipients = await notifiableRecipients();
+  return { count: recipients.length };
+});
+
+router.add("POST /waitlist/notify", async ({ req, body, identity }) => {
+  const recipients = await notifiableRecipients();
+  const expected = typeof body.expectedCount === "number" ? body.expectedCount : -1;
+  if (expected !== recipients.length) {
+    throw badRequest(
+      `The list changed: ${recipients.length} people can be notified now, not ${expected}. Review and try again.`,
+    );
+  }
+  const subject = typeof body.subject === "string" ? body.subject.trim().slice(0, 200) : "";
+  const message = typeof body.message === "string" ? body.message.trim().slice(0, 5000) : "";
+  if (!subject || !message) throw badRequest("A subject and a message are required.");
+
+  const { sendLaunchNotification } = await import("./lib/waitlist-notify");
+  const result = await sendLaunchNotification(recipients, subject, message);
+  await markNotified(result.sentIds);
+  await recordActivity(req, identity, "waitlist.notified", {
+    entityType: "waitlist",
+    entityLabel: `${result.sentIds.length} of ${recipients.length} notified`,
+    metadata: { sent: result.sentIds.length, failed: result.failed, subject },
+  });
+  return { sent: result.sentIds.length, failed: result.failed };
+});
+
+router.add("PATCH /waitlist/:id", async ({ req, params, body, identity }) => {
+  const entry = await updateWaitlistEntry(params.id, body);
+  await recordActivity(req, identity, "waitlist.updated", {
+    entityType: "waitlist",
+    entityId: entry.id,
+    entityLabel: entry.name,
+    metadata: { fields: Object.keys(body) },
+  });
+  return { entry };
+});
+
+router.add("DELETE /waitlist/:id", async ({ req, params, identity }) => {
+  const entry = await deleteWaitlistEntry(params.id);
+  await recordActivity(req, identity, "waitlist.deleted", {
+    entityType: "waitlist",
+    entityId: entry.id,
+    entityLabel: entry.name,
+  });
+  return { deleted: true, id: entry.id };
 });
 
 // ─── AI assistant knowledge base ─────────────────────────────────────────────

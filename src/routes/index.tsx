@@ -30,6 +30,8 @@ interface Product {
   to: string;
   title: string;
   kicker: string;
+  /** Optional product mark, shown beside the name. */
+  mark?: string;
   /** The product's own accent, used on its label, rule and link. */
   accent: string;
   icon: LucideIcon;
@@ -50,6 +52,7 @@ const PRODUCTS: Product[] = [
     to: "/portfolio/pulsepay",
     title: "PulsePay",
     kicker: "Digital payments",
+    mark: "/brand/pulsepay-mark.png",
     accent: "accent-pulsepay",
     icon: CreditCard,
     summary:
@@ -255,9 +258,21 @@ function Landing() {
                   >
                     {p.kicker}
                   </p>
-                  <h3 className="mt-5 text-[1.75rem] font-semibold tracking-[-0.025em] text-foreground">
-                    {p.title}
-                  </h3>
+                  <div className="mt-5 flex items-center gap-3">
+                    {p.mark && (
+                      <img
+                        src={p.mark}
+                        alt=""
+                        aria-hidden
+                        width={34}
+                        height={40}
+                        className="h-9 w-auto"
+                      />
+                    )}
+                    <h3 className="text-[1.75rem] font-semibold tracking-[-0.025em] text-foreground">
+                      {p.title}
+                    </h3>
+                  </div>
                   <p className="mt-4 max-w-md text-[15.5px] leading-relaxed text-bone-soft">
                     {p.summary}
                   </p>

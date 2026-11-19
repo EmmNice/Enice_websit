@@ -231,11 +231,8 @@ function PulsePayPage() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <Cta
-                to="mailto:corporate@enicehq.com?subject=PulsePay%20Access%20Request"
-                icon="external"
-              >
-                Request Access
+              <Cta to="/waitlist" icon="arrow">
+                Join the waitlist
               </Cta>
               <Cta to="/portfolio" variant="secondary">
                 All Products
@@ -396,12 +393,8 @@ function PulsePayPage() {
           lead="Contact our enterprise team to discuss integration options, pricing, and access to the PulsePay platform."
         />
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-          <Cta
-            to="mailto:corporate@enicehq.com?subject=PulsePay%20Access%20Request"
-            size="lg"
-            icon="external"
-          >
-            Request Access
+          <Cta to="/waitlist" size="lg" icon="arrow">
+            Join the waitlist
           </Cta>
           <Cta to="/portfolio" variant="secondary" size="lg">
             View All Products
