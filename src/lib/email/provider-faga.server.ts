@@ -326,7 +326,7 @@ export const fagaProvider: EmailProvider = {
     }
 
     const recipients = toRecipientArray(message.to);
-    const res = await callWithRetry<{ id?: string; sendId?: string }>("email.send", "/email/send", {
+    const res = await callWithRetry<{ id?: string; sendId?: string }>("email.send", "/emails", {
       method: "POST",
       body: {
         // A local part only — see the note above.

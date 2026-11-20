@@ -6458,7 +6458,7 @@ var fagaProvider = {
       );
     }
     const recipients = toRecipientArray(message.to);
-    const res = await callWithRetry("email.send", "/email/send", {
+    const res = await callWithRetry("email.send", "/emails", {
       method: "POST",
       body: {
         // A local part only — see the note above.
