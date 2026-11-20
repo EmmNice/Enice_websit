@@ -699,28 +699,35 @@ router.add("POST /invite/accept", async ({ body }) => {
  * which leaves no way to tell "sent" from "refused" when a confirmation does not arrive. This is
  * the missing half: the same provider call, with the error returned instead of logged.
  */
-router.add("POST /email/test", async ({ identity }) => {
+router.add("POST /email/test", async ({ body, identity }) => {
   if (identity.role !== "owner") {
     throw new HttpError(403, "Only the Owner can run the email test.", "forbidden");
   }
   const { emailProvider, configuredProviderName } = await import("../src/lib/email/index.server");
-  const { contactFormSender } = await import("../src/lib/email/senders");
-  const { AUTO_GENERATED_HEADERS } = await import("../src/lib/email/types");
+  const { groupSender } = await import("../src/lib/email/senders");
+  const { AUTO_REPLY_HEADERS } = await import("../src/lib/email/types");
+
+  const to = typeof body.to === "string" && body.to.trim() ? body.to.trim() : identity.email;
 
   try {
     const result = await emailProvider().send({
-      from: contactFormSender(),
-      to: identity.email,
-      subject: "ENICE email test",
-      html: `<p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;">This is a test from the ENICE website. If you are reading it, mail is working.</p>`,
-      headers: AUTO_GENERATED_HEADERS,
+      from: groupSender(),
+      to,
+      subject: "You are on the PulsePay waitlist",
+      html: `<div style="font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#111827;">
+               <p>You are on the PulsePay waitlist, Emmy.</p>
+               <p>This is a test of the confirmation message from the ENICE website.</p>
+             </div>`,
+      text: "You are on the PulsePay waitlist, Emmy.\n\nThis is a test of the confirmation message from the ENICE website.\n\nENICE Group",
+      headers: AUTO_REPLY_HEADERS,
     });
-    return { ok: true, provider: configuredProviderName(), id: result?.id ?? null };
+    return { ok: true, provider: configuredProviderName(), to, id: result?.id ?? null };
   } catch (error) {
     const err = error as { name?: string; message?: string; status?: number | null };
     return {
       ok: false,
       provider: configuredProviderName(),
+      to,
       errorName: err?.name ?? "Error",
       error: err?.message ?? String(error),
       status: err?.status ?? null,

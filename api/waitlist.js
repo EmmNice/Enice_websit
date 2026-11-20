@@ -6166,9 +6166,6 @@ var WAITLIST_INTERESTS = [
   { id: "savings", label: "Money management and savings" }
 ];
 var INTEREST_IDS = WAITLIST_INTERESTS.map((i) => i.id);
-function interestLabel(id) {
-  return WAITLIST_INTERESTS.find((i) => i.id === id)?.label ?? id;
-}
 var WAITLIST_LIMITS = {
   name: 200,
   email: 200,
@@ -6241,10 +6238,6 @@ function formatAddress(sender) {
 }
 var AUTO_REPLY_HEADERS = {
   "Auto-Submitted": "auto-replied",
-  "X-Auto-Response-Suppress": "All"
-};
-var AUTO_GENERATED_HEADERS = {
-  "Auto-Submitted": "auto-generated",
   "X-Auto-Response-Suppress": "All"
 };
 var EmailProviderConfigError = class extends Error {
@@ -12412,13 +12405,9 @@ var DEFAULT_SENDING_DOMAIN = "enicehq.com";
 function sendingDomain() {
   return process.env.EMAIL_FROM_DOMAIN?.trim() || DEFAULT_SENDING_DOMAIN;
 }
-function contactFormSender() {
-  return { name: "ENICE Contact", localPart: "corporate", domain: sendingDomain() };
-}
 function groupSender() {
   return { name: "ENICE Group", localPart: "corporate", domain: sendingDomain() };
 }
-var INTERNAL_RECIPIENT = "corporate@enicehq.com";
 
 // api-src/waitlist.ts
 var MIN_FILL_MS = 2500;
@@ -12430,22 +12419,19 @@ function readInterests(value) {
   if (!Array.isArray(value)) return [];
   return [...new Set(value.filter((v) => typeof v === "string"))].slice(0, 20);
 }
-function notificationHtml(f) {
-  const row = (label, value) => `<tr>
-       <td style="padding:8px 14px;background:#f8fafc;border:1px solid #e2e8f0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#64748b;font-weight:600;width:170px;vertical-align:top;">${escapeHtml(label)}</td>
-       <td style="padding:10px 14px;border:1px solid #e2e8f0;font-size:14px;color:#0f172a;">${escapeHtml(value || "-")}</td>
-     </tr>`;
-  return `<!DOCTYPE html>
-<html lang="en"><body style="margin:0;padding:24px;font-family:Helvetica,Arial,sans-serif;">
-  <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#0048ed;font-weight:700;">ENICE Group &middot; PulsePay waitlist</p>
-  <h1 style="margin:0 0 20px;font-size:20px;color:#111827;">${escapeHtml(f.name)} joined the waitlist</h1>
-  <table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;border-collapse:collapse;">
-    ${row("Name", f.name)}${row("Email", f.email)}${row("Phone", f.phone)}
-    ${row("Interested in", f.interests.map(interestLabel).join(", "))}
-    ${row("Joined from", f.source)}
-  </table>
-  <p style="margin:20px 0 0;font-size:12px;color:#6b7280;">Manage this registration in the admin dashboard under Waitlist.</p>
-</body></html>`;
+function receiptText(name) {
+  const firstName = name.trim().split(/\s+/)[0] || "there";
+  return [
+    `You are on the PulsePay waitlist, ${firstName}.`,
+    "",
+    "Thank you for your interest. We will write to this address when PulsePay opens, with early",
+    "access details and the next steps. There is nothing to pay and nothing more you need to do.",
+    "",
+    "You agreed to hear from us about the PulsePay launch. If you change your mind, reply to this",
+    "email and we will remove you.",
+    "",
+    "ENICE Group"
+  ].join("\n");
 }
 function receiptHtml(name) {
   const firstName = escapeHtml(name.split(/\s+/)[0] || "there");
@@ -12528,19 +12514,11 @@ async function handler(req, res) {
     const provider = emailProvider();
     if (outcome === "joined") {
       await provider.send({
-        from: contactFormSender(),
-        to: INTERNAL_RECIPIENT,
-        replyTo: fields.email,
-        subject: `Waitlist: PulsePay, ${fields.name}`,
-        html: notificationHtml(fields),
-        headers: AUTO_GENERATED_HEADERS,
-        idempotencyKey: `waitlist-notification-${ref}`
-      });
-      await provider.send({
         from: groupSender(),
         to: fields.email,
         subject: "You are on the PulsePay waitlist",
         html: receiptHtml(fields.name),
+        text: receiptText(fields.name),
         headers: AUTO_REPLY_HEADERS,
         idempotencyKey: `waitlist-receipt-${ref}`
       });

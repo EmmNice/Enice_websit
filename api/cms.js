@@ -16942,27 +16942,33 @@ router.add("POST /invite/accept", async ({ body }) => {
   const admin = await acceptInvite(body.token, body.password);
   return { accepted: true, email: admin.email };
 });
-router.add("POST /email/test", async ({ identity }) => {
+router.add("POST /email/test", async ({ body, identity }) => {
   if (identity.role !== "owner") {
     throw new HttpError(403, "Only the Owner can run the email test.", "forbidden");
   }
   const { emailProvider: emailProvider2, configuredProviderName: configuredProviderName2 } = await Promise.resolve().then(() => (init_index_server(), index_server_exports));
-  const { contactFormSender: contactFormSender2 } = await Promise.resolve().then(() => (init_senders(), senders_exports));
-  const { AUTO_GENERATED_HEADERS: AUTO_GENERATED_HEADERS2 } = await Promise.resolve().then(() => (init_types(), types_exports));
+  const { groupSender: groupSender2 } = await Promise.resolve().then(() => (init_senders(), senders_exports));
+  const { AUTO_REPLY_HEADERS: AUTO_REPLY_HEADERS2 } = await Promise.resolve().then(() => (init_types(), types_exports));
+  const to = typeof body.to === "string" && body.to.trim() ? body.to.trim() : identity.email;
   try {
     const result = await emailProvider2().send({
-      from: contactFormSender2(),
-      to: identity.email,
-      subject: "ENICE email test",
-      html: `<p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;">This is a test from the ENICE website. If you are reading it, mail is working.</p>`,
-      headers: AUTO_GENERATED_HEADERS2
+      from: groupSender2(),
+      to,
+      subject: "You are on the PulsePay waitlist",
+      html: `<div style="font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#111827;">
+               <p>You are on the PulsePay waitlist, Emmy.</p>
+               <p>This is a test of the confirmation message from the ENICE website.</p>
+             </div>`,
+      text: "You are on the PulsePay waitlist, Emmy.\n\nThis is a test of the confirmation message from the ENICE website.\n\nENICE Group",
+      headers: AUTO_REPLY_HEADERS2
     });
-    return { ok: true, provider: configuredProviderName2(), id: result?.id ?? null };
+    return { ok: true, provider: configuredProviderName2(), to, id: result?.id ?? null };
   } catch (error) {
     const err = error;
     return {
       ok: false,
       provider: configuredProviderName2(),
+      to,
       errorName: err?.name ?? "Error",
       error: err?.message ?? String(error),
       status: err?.status ?? null
