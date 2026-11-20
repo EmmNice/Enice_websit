@@ -23,6 +23,7 @@ import { Route as StatusRouteImport } from './routes/status'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WaitlistRouteImport } from './routes/waitlist'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminInviteRouteImport } from './routes/admin/invite'
 import { Route as AdminKnowledgeRouteImport } from './routes/admin/knowledge'
 import { Route as AdminWaitlistRouteImport } from './routes/admin/waitlist'
 import { Route as AnnouncementsIndexRouteImport } from './routes/announcements.index'
@@ -35,6 +36,7 @@ import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
 import { Route as PortfolioPrideRouteImport } from './routes/portfolio.pride'
 import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
 import { Route as AdminAdministrationSettingsRouteImport } from './routes/admin/administration.settings'
+import { Route as AdminAdministrationTeamRouteImport } from './routes/admin/administration/team'
 import { Route as AdminContentKindIndexRouteImport } from './routes/admin/content.$kind.index'
 import { Route as AdminContentKindItemIdRouteImport } from './routes/admin/content.$kind.$itemId'
 
@@ -108,6 +110,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminInviteRoute = AdminInviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
   id: '/knowledge',
   path: '/knowledge',
@@ -169,6 +176,11 @@ const AdminAdministrationSettingsRoute =
     path: '/administration/settings',
     getParentRoute: () => AdminRoute,
   } as any)
+const AdminAdministrationTeamRoute = AdminAdministrationTeamRouteImport.update({
+  id: '/administration/team',
+  path: '/administration/team',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminContentKindIndexRoute = AdminContentKindIndexRouteImport.update({
   id: '/content/$kind/',
   path: '/content/$kind/',
@@ -194,6 +206,7 @@ export interface FileRoutesByFullPath {
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
+  '/admin/invite': typeof AdminInviteRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
@@ -207,6 +220,7 @@ export interface FileRoutesByFullPath {
   '/news/': typeof NewsIndexRoute
   '/portfolio/': typeof PortfolioIndexRoute
   '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
+  '/admin/administration/team': typeof AdminAdministrationTeamRoute
   '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
   '/admin/content/$kind/': typeof AdminContentKindIndexRoute
 }
@@ -222,6 +236,7 @@ export interface FileRoutesByTo {
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
+  '/admin/invite': typeof AdminInviteRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
@@ -235,6 +250,7 @@ export interface FileRoutesByTo {
   '/news': typeof NewsIndexRoute
   '/portfolio': typeof PortfolioIndexRoute
   '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
+  '/admin/administration/team': typeof AdminAdministrationTeamRoute
   '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
   '/admin/content/$kind': typeof AdminContentKindIndexRoute
 }
@@ -253,6 +269,7 @@ export interface FileRoutesById {
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
+  '/admin/invite': typeof AdminInviteRoute
   '/admin/knowledge': typeof AdminKnowledgeRoute
   '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
@@ -266,6 +283,7 @@ export interface FileRoutesById {
   '/news/': typeof NewsIndexRoute
   '/portfolio/': typeof PortfolioIndexRoute
   '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
+  '/admin/administration/team': typeof AdminAdministrationTeamRoute
   '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
   '/admin/content/$kind/': typeof AdminContentKindIndexRoute
 }
@@ -285,6 +303,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/terms'
     | '/waitlist'
+    | '/admin/invite'
     | '/admin/knowledge'
     | '/admin/waitlist'
     | '/announcements/$slug'
@@ -298,6 +317,7 @@ export interface FileRouteTypes {
     | '/news/'
     | '/portfolio/'
     | '/admin/administration/settings'
+    | '/admin/administration/team'
     | '/admin/content/$kind/$itemId'
     | '/admin/content/$kind/'
   fileRoutesByTo: FileRoutesByTo
@@ -313,6 +333,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/terms'
     | '/waitlist'
+    | '/admin/invite'
     | '/admin/knowledge'
     | '/admin/waitlist'
     | '/announcements/$slug'
@@ -326,6 +347,7 @@ export interface FileRouteTypes {
     | '/news'
     | '/portfolio'
     | '/admin/administration/settings'
+    | '/admin/administration/team'
     | '/admin/content/$kind/$itemId'
     | '/admin/content/$kind'
   id:
@@ -343,6 +365,7 @@ export interface FileRouteTypes {
     | '/status'
     | '/terms'
     | '/waitlist'
+    | '/admin/invite'
     | '/admin/knowledge'
     | '/admin/waitlist'
     | '/announcements/$slug'
@@ -356,6 +379,7 @@ export interface FileRouteTypes {
     | '/news/'
     | '/portfolio/'
     | '/admin/administration/settings'
+    | '/admin/administration/team'
     | '/admin/content/$kind/$itemId'
     | '/admin/content/$kind/'
   fileRoutesById: FileRoutesById
@@ -482,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/invite': {
+      id: '/admin/invite'
+      path: '/invite'
+      fullPath: '/admin/invite'
+      preLoaderRoute: typeof AdminInviteRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/knowledge': {
       id: '/admin/knowledge'
       path: '/knowledge'
@@ -566,6 +597,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdministrationSettingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/administration/team': {
+      id: '/admin/administration/team'
+      path: '/administration/team'
+      fullPath: '/admin/administration/team'
+      preLoaderRoute: typeof AdminAdministrationTeamRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/content/$kind/': {
       id: '/admin/content/$kind/'
       path: '/content/$kind'
@@ -584,19 +622,23 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminInviteRoute: typeof AdminInviteRoute
   AdminKnowledgeRoute: typeof AdminKnowledgeRoute
   AdminWaitlistRoute: typeof AdminWaitlistRoute
   AdminIndexRoute: typeof AdminIndexRoute
   AdminAdministrationSettingsRoute: typeof AdminAdministrationSettingsRoute
+  AdminAdministrationTeamRoute: typeof AdminAdministrationTeamRoute
   AdminContentKindItemIdRoute: typeof AdminContentKindItemIdRoute
   AdminContentKindIndexRoute: typeof AdminContentKindIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminInviteRoute: AdminInviteRoute,
   AdminKnowledgeRoute: AdminKnowledgeRoute,
   AdminWaitlistRoute: AdminWaitlistRoute,
   AdminIndexRoute: AdminIndexRoute,
   AdminAdministrationSettingsRoute: AdminAdministrationSettingsRoute,
+  AdminAdministrationTeamRoute: AdminAdministrationTeamRoute,
   AdminContentKindItemIdRoute: AdminContentKindItemIdRoute,
   AdminContentKindIndexRoute: AdminContentKindIndexRoute,
 }

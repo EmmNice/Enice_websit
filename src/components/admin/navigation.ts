@@ -122,6 +122,14 @@ export const NAV_GROUPS: NavGroup[] = [
     label: "Account",
     entries: [
       {
+        label: "Team",
+        to: "/admin/administration/team",
+        icon: "Users",
+        permission: "team.manage",
+        description: "Who can sign in, and what they can do",
+        keywords: ["admin", "invite", "people", "colleagues", "roles", "access"],
+      },
+      {
         label: "Settings",
         to: "/admin/administration/settings",
         icon: "Settings",

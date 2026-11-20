@@ -112,6 +112,14 @@ import {
 } from "./lib/repo/knowledge";
 import { db } from "./lib/db";
 import {
+  acceptInvite,
+  deleteAdmin,
+  inviteAdmin,
+  listAdmins,
+  reissueInvite,
+  updateAdmin,
+} from "./lib/repo/admins";
+import {
   deleteWaitlistEntry,
   exportWaitlist,
   listWaitlist,
@@ -130,6 +138,8 @@ const PUBLIC_ROUTES = new Set([
   "POST /auth/mfa",
   "POST /auth/logout",
   "GET /auth/session",
+  // The invitee has no session yet; the single-use token is the credential.
+  "POST /invite/accept",
 ]);
 
 /**
@@ -578,6 +588,106 @@ router.add("POST /content/:id/revert", async ({ req, params, body, identity }) =
     metadata: { revertedTo: revision },
   });
   return { item };
+});
+
+// ─── Administrators ──────────────────────────────────────────────────────────
+
+/**
+ * Who may manage the team: Owners and Administrators.
+ *
+ * Enforced here rather than through a permission so the rank rules in the repository stay the
+ * single authority on who can act on whom. An Editor reaching these routes is refused.
+ */
+function requireTeamManager(identity: AdminIdentity): void {
+  if (identity.role !== "owner" && identity.role !== "administrator") {
+    throw new HttpError(403, "Only an Owner or Administrator can manage the team.", "forbidden");
+  }
+}
+
+router.add("GET /administrators", async ({ identity }) => {
+  requireTeamManager(identity);
+  return { admins: await listAdmins() };
+});
+
+router.add("POST /administrators", async ({ req, body, identity }) => {
+  requireTeamManager(identity);
+  const result = await inviteAdmin(body, identity);
+  await recordActivity(req, identity, "admin.invited", {
+    entityType: "admin",
+    entityId: result.admin.id,
+    entityLabel: result.admin.email,
+    metadata: { role: result.admin.role },
+  });
+
+  // The token is returned regardless; the email is a convenience. A mail failure must not lose
+  // an invitation the Owner can still copy and deliver by hand.
+  let emailed = false;
+  try {
+    const { emailProvider } = await import("../src/lib/email/index.server");
+    const { groupSender } = await import("../src/lib/email/senders");
+    const { AUTO_GENERATED_HEADERS } = await import("../src/lib/email/types");
+    const link = `https://enicehq.com/admin/invite?token=${encodeURIComponent(result.inviteToken)}`;
+    await emailProvider().send({
+      from: groupSender(),
+      to: result.admin.email,
+      subject: "You have been invited to the ENICE Website Manager",
+      html: `<p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#111827;">You have been invited to the ENICE Website Manager as ${result.admin.role}.</p>
+             <p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;"><a href="${link}">Set your password and sign in</a></p>
+             <p style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#6b7280;">This link expires on ${new Date(result.expiresAt).toUTCString()} and can be used once.</p>`,
+      headers: AUTO_GENERATED_HEADERS,
+    });
+    emailed = true;
+  } catch (error) {
+    console.error("[cms] invite email failed:", error);
+  }
+
+  return {
+    admin: result.admin,
+    inviteToken: result.inviteToken,
+    expiresAt: result.expiresAt,
+    emailed,
+  };
+});
+
+router.add("POST /administrators/:id/reissue", async ({ req, params, identity }) => {
+  requireTeamManager(identity);
+  const result = await reissueInvite(params.id, identity);
+  await recordActivity(req, identity, "admin.invited", {
+    entityType: "admin",
+    entityId: result.admin.id,
+    entityLabel: result.admin.email,
+    metadata: { reissued: true },
+  });
+  return { admin: result.admin, inviteToken: result.inviteToken, expiresAt: result.expiresAt };
+});
+
+router.add("PATCH /administrators/:id", async ({ req, params, body, identity }) => {
+  requireTeamManager(identity);
+  const admin = await updateAdmin(params.id, body, identity);
+  await recordActivity(req, identity, "admin.updated", {
+    entityType: "admin",
+    entityId: admin.id,
+    entityLabel: admin.email,
+    metadata: { fields: Object.keys(body) },
+  });
+  return { admin };
+});
+
+router.add("DELETE /administrators/:id", async ({ req, params, identity }) => {
+  requireTeamManager(identity);
+  const admin = await deleteAdmin(params.id, identity);
+  await recordActivity(req, identity, "admin.removed", {
+    entityType: "admin",
+    entityId: admin.id,
+    entityLabel: admin.email,
+  });
+  return { deleted: true, id: admin.id };
+});
+
+// Unauthenticated: the invitee sets a password using the single-use token.
+router.add("POST /invite/accept", async ({ body }) => {
+  const admin = await acceptInvite(body.token, body.password);
+  return { accepted: true, email: admin.email };
 });
 
 // ─── Diagnostics ─────────────────────────────────────────────────────────────

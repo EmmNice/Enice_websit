@@ -7649,7 +7649,9 @@ var PERMISSIONS = [
   // PulsePay waitlist: personal data of people who have not yet become customers.
   "waitlist.read",
   "waitlist.write",
-  "waitlist.export"
+  "waitlist.export",
+  // The team: who can sign in and what they may do.
+  "team.manage"
 ];
 var ROLE_PERMISSIONS = {
   owner: PERMISSIONS,
@@ -7662,7 +7664,8 @@ var ROLE_PERMISSIONS = {
     "ai.knowledge.write",
     "waitlist.read",
     "waitlist.write",
-    "waitlist.export"
+    "waitlist.export",
+    "team.manage"
   ],
   editor: ["content.read", "content.write", "content.publish", "ai.knowledge.read"]
 };
@@ -7670,6 +7673,9 @@ function can(role, permission) {
   if (!role) return false;
   const granted = ROLE_PERMISSIONS[role];
   return granted ? granted.includes(permission) : false;
+}
+function canManageRole(actor, target) {
+  return ROLE_META[actor].rank < ROLE_META[target].rank;
 }
 
 // api-src/cms.ts
@@ -15748,6 +15754,16 @@ var ADMIN_COLUMNS = `
   id, email, name, title, avatar_url, role, status, totp_enabled,
   last_login_at, created_at, invite_expires_at, password_hash
 `;
+async function listAdmins() {
+  const sql = db();
+  const rows = await sql`
+    SELECT ${sql.unsafe(ADMIN_COLUMNS)} FROM admin_users
+    ORDER BY
+      CASE role WHEN 'owner' THEN 0 WHEN 'administrator' THEN 1 ELSE 2 END,
+      name ASC, email ASC
+  `;
+  return rows.map(mapAdmin);
+}
 async function getAdmin(id) {
   const sql = db();
   const rows = await sql`
@@ -15756,6 +15772,164 @@ async function getAdmin(id) {
   return rows[0] ? mapAdmin(rows[0]) : null;
 }
 var INVITE_TTL_MS = 7 * 24 * 60 * 60 * 1e3;
+async function inviteAdmin(input, actor) {
+  const email = typeof input.email === "string" ? input.email.trim().toLowerCase() : "";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    throw badRequest("Enter a valid email address.");
+  }
+  const role = typeof input.role === "string" ? input.role : "editor";
+  if (!ADMIN_ROLES.includes(role)) {
+    throw badRequest(`Role must be one of: ${ADMIN_ROLES.join(", ")}.`);
+  }
+  if (!canManageRole(actor.role, role)) {
+    throw badRequest(
+      `As ${ROLE_META[actor.role].label} you can only invite administrators below your own level.`
+    );
+  }
+  const existing = await db()`SELECT id FROM admin_users WHERE email = ${email}`;
+  if (existing.length > 0) throw conflict("An administrator with that email already exists.");
+  const id = newId();
+  const token = randomToken(32);
+  const expiresAt = new Date(Date.now() + INVITE_TTL_MS);
+  await db()`
+    INSERT INTO admin_users (
+      id, email, name, title, role, status, invite_token_hash, invite_expires_at,
+      must_change_password
+    ) VALUES (
+      ${id}, ${email}, ${sanitizeText(input.name, 120)}, ${sanitizeText(input.title, 120)},
+      ${role}, ${"invited"}, ${sha2562(token)}, ${expiresAt}, true
+    )
+  `;
+  const admin = await getAdmin(id);
+  if (!admin) throw new Error("Administrator disappeared immediately after insert.");
+  return { admin, inviteToken: token, expiresAt: expiresAt.toISOString() };
+}
+async function acceptInvite(token, password) {
+  if (typeof token !== "string" || !token) throw badRequest("This invitation link is not valid.");
+  const policy = checkPassword(password);
+  if (!policy.ok) throw badRequest(policy.error);
+  const sql = db();
+  const rows = await sql`
+    SELECT id FROM admin_users
+    WHERE invite_token_hash = ${sha2562(token)}
+      AND invite_expires_at > now()
+      AND password_hash IS NULL
+  `;
+  const row = rows[0];
+  if (!row) {
+    throw badRequest("This invitation link has expired or has already been used.");
+  }
+  await sql`
+    UPDATE admin_users SET
+      password_hash = ${await hashPassword(password)},
+      password_updated_at = now(),
+      must_change_password = false,
+      status = 'active',
+      invite_token_hash = NULL,
+      invite_expires_at = NULL,
+      failed_attempts = 0,
+      locked_until = NULL,
+      updated_at = now()
+    WHERE id = ${row.id}
+  `;
+  const admin = await getAdmin(row.id);
+  if (!admin) throw notFound("That administrator");
+  return admin;
+}
+async function reissueInvite(id, actor) {
+  const target = await getAdmin(id);
+  if (!target) throw notFound("That administrator");
+  if (target.id !== actor.id && !canManageRole(actor.role, target.role)) {
+    throw badRequest("You cannot manage an administrator at or above your own level.");
+  }
+  const token = randomToken(32);
+  const expiresAt = new Date(Date.now() + INVITE_TTL_MS);
+  await db()`
+    UPDATE admin_users SET
+      invite_token_hash = ${sha2562(token)},
+      invite_expires_at = ${expiresAt},
+      password_hash = NULL,
+      must_change_password = true,
+      status = CASE WHEN status = 'suspended' THEN 'suspended' ELSE 'invited' END,
+      failed_attempts = 0,
+      locked_until = NULL,
+      updated_at = now()
+    WHERE id = ${id}
+  `;
+  await revokeAllSessions(id);
+  const admin = await getAdmin(id);
+  if (!admin) throw notFound("That administrator");
+  return { admin, inviteToken: token, expiresAt: expiresAt.toISOString() };
+}
+async function activeOwnerCount() {
+  const rows = await db()`
+    SELECT count(*)::text AS count FROM admin_users WHERE role = 'owner' AND status = 'active'
+  `;
+  return Number(rows[0]?.count ?? "0");
+}
+async function guardLastOwner(target, change) {
+  if (target.role !== "owner" || target.status !== "active") return;
+  if (await activeOwnerCount() > 1) return;
+  throw badRequest(
+    `${target.name || target.email} is the only active Owner, so they cannot be ${change}. Promote another administrator to Owner first.`
+  );
+}
+async function updateAdmin(id, input, actor) {
+  const target = await getAdmin(id);
+  if (!target) throw notFound("That administrator");
+  const isSelf = target.id === actor.id;
+  if (!isSelf && !canManageRole(actor.role, target.role)) {
+    throw badRequest("You cannot manage an administrator at or above your own level.");
+  }
+  let role = target.role;
+  if (input.role !== void 0 && input.role !== target.role) {
+    if (isSelf) throw badRequest("You cannot change your own role.");
+    const requested = typeof input.role === "string" ? input.role : "";
+    if (!ADMIN_ROLES.includes(requested)) {
+      throw badRequest(`Role must be one of: ${ADMIN_ROLES.join(", ")}.`);
+    }
+    if (!canManageRole(actor.role, requested)) {
+      throw badRequest("You cannot assign a role at or above your own level.");
+    }
+    await guardLastOwner(target, "demoted");
+    role = requested;
+  }
+  let status = target.status;
+  if (input.status !== void 0 && input.status !== target.status) {
+    if (isSelf) throw badRequest("You cannot change your own account status.");
+    const requested = typeof input.status === "string" ? input.status : "";
+    if (!["active", "suspended"].includes(requested)) {
+      throw badRequest("Status must be either active or suspended.");
+    }
+    if (requested === "suspended") await guardLastOwner(target, "suspended");
+    status = requested === "active" && target.invitePending ? "invited" : requested;
+  }
+  await db()`
+    UPDATE admin_users SET
+      name = ${input.name === void 0 ? target.name : sanitizeText(input.name, 120)},
+      title = ${input.title === void 0 ? target.title : sanitizeText(input.title, 120)},
+      avatar_url = ${input.avatarUrl === void 0 ? target.avatarUrl : sanitizeUrl(input.avatarUrl) ?? null},
+      role = ${role},
+      status = ${status},
+      updated_at = now()
+    WHERE id = ${id}
+  `;
+  if (status === "suspended") await revokeAllSessions(id);
+  const updated = await getAdmin(id);
+  if (!updated) throw notFound("That administrator");
+  return updated;
+}
+async function deleteAdmin(id, actor) {
+  const target = await getAdmin(id);
+  if (!target) throw notFound("That administrator");
+  if (target.id === actor.id) throw badRequest("You cannot remove your own account.");
+  if (!canManageRole(actor.role, target.role)) {
+    throw badRequest("You cannot remove an administrator at or above your own level.");
+  }
+  await guardLastOwner(target, "removed");
+  await db()`DELETE FROM admin_users WHERE id = ${id}`;
+  return target;
+}
 async function changeOwnPassword(actor, currentPassword, newPassword) {
   const sql = db();
   const rows = await sql`
@@ -16342,7 +16516,9 @@ var PUBLIC_ROUTES = /* @__PURE__ */ new Set([
   "POST /auth/login",
   "POST /auth/mfa",
   "POST /auth/logout",
-  "GET /auth/session"
+  "GET /auth/session",
+  // The invitee has no session yet; the single-use token is the credential.
+  "POST /invite/accept"
 ]);
 var ROUTE_PERMISSIONS = {
   "GET /content": "content.read",
@@ -16685,6 +16861,86 @@ router.add("POST /content/:id/revert", async ({ req, params, body, identity }) =
     metadata: { revertedTo: revision }
   });
   return { item };
+});
+function requireTeamManager(identity) {
+  if (identity.role !== "owner" && identity.role !== "administrator") {
+    throw new HttpError(403, "Only an Owner or Administrator can manage the team.", "forbidden");
+  }
+}
+router.add("GET /administrators", async ({ identity }) => {
+  requireTeamManager(identity);
+  return { admins: await listAdmins() };
+});
+router.add("POST /administrators", async ({ req, body, identity }) => {
+  requireTeamManager(identity);
+  const result = await inviteAdmin(body, identity);
+  await recordActivity(req, identity, "admin.invited", {
+    entityType: "admin",
+    entityId: result.admin.id,
+    entityLabel: result.admin.email,
+    metadata: { role: result.admin.role }
+  });
+  let emailed = false;
+  try {
+    const { emailProvider: emailProvider2 } = await Promise.resolve().then(() => (init_index_server(), index_server_exports));
+    const { groupSender: groupSender2 } = await Promise.resolve().then(() => (init_senders(), senders_exports));
+    const { AUTO_GENERATED_HEADERS: AUTO_GENERATED_HEADERS2 } = await Promise.resolve().then(() => (init_types(), types_exports));
+    const link = `https://enicehq.com/admin/invite?token=${encodeURIComponent(result.inviteToken)}`;
+    await emailProvider2().send({
+      from: groupSender2(),
+      to: result.admin.email,
+      subject: "You have been invited to the ENICE Website Manager",
+      html: `<p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;color:#111827;">You have been invited to the ENICE Website Manager as ${result.admin.role}.</p>
+             <p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;line-height:1.7;"><a href="${link}">Set your password and sign in</a></p>
+             <p style="font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#6b7280;">This link expires on ${new Date(result.expiresAt).toUTCString()} and can be used once.</p>`,
+      headers: AUTO_GENERATED_HEADERS2
+    });
+    emailed = true;
+  } catch (error) {
+    console.error("[cms] invite email failed:", error);
+  }
+  return {
+    admin: result.admin,
+    inviteToken: result.inviteToken,
+    expiresAt: result.expiresAt,
+    emailed
+  };
+});
+router.add("POST /administrators/:id/reissue", async ({ req, params, identity }) => {
+  requireTeamManager(identity);
+  const result = await reissueInvite(params.id, identity);
+  await recordActivity(req, identity, "admin.invited", {
+    entityType: "admin",
+    entityId: result.admin.id,
+    entityLabel: result.admin.email,
+    metadata: { reissued: true }
+  });
+  return { admin: result.admin, inviteToken: result.inviteToken, expiresAt: result.expiresAt };
+});
+router.add("PATCH /administrators/:id", async ({ req, params, body, identity }) => {
+  requireTeamManager(identity);
+  const admin = await updateAdmin(params.id, body, identity);
+  await recordActivity(req, identity, "admin.updated", {
+    entityType: "admin",
+    entityId: admin.id,
+    entityLabel: admin.email,
+    metadata: { fields: Object.keys(body) }
+  });
+  return { admin };
+});
+router.add("DELETE /administrators/:id", async ({ req, params, identity }) => {
+  requireTeamManager(identity);
+  const admin = await deleteAdmin(params.id, identity);
+  await recordActivity(req, identity, "admin.removed", {
+    entityType: "admin",
+    entityId: admin.id,
+    entityLabel: admin.email
+  });
+  return { deleted: true, id: admin.id };
+});
+router.add("POST /invite/accept", async ({ body }) => {
+  const admin = await acceptInvite(body.token, body.password);
+  return { accepted: true, email: admin.email };
 });
 router.add("POST /email/test", async ({ identity }) => {
   if (identity.role !== "owner") {

@@ -66,6 +66,9 @@ export const PERMISSIONS = [
   "waitlist.read",
   "waitlist.write",
   "waitlist.export",
+
+  // The team: who can sign in and what they may do.
+  "team.manage",
 ] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 
@@ -99,6 +102,8 @@ export const PERMISSION_META: Record<Permission, PermissionMeta> = {
     group: "Waitlist",
     sensitive: true,
   },
+
+  "team.manage": { label: "Invite and manage administrators", group: "Team", sensitive: true },
 };
 
 // ─── Role → permission matrix ────────────────────────────────────────────────
@@ -124,6 +129,7 @@ export const ROLE_PERMISSIONS: Record<AdminRole, readonly Permission[]> = {
     "waitlist.read",
     "waitlist.write",
     "waitlist.export",
+    "team.manage",
   ],
 
   editor: ["content.read", "content.write", "content.publish", "ai.knowledge.read"],

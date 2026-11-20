@@ -438,3 +438,46 @@ export const waitlist = {
   notify: (input: { subject: string; message: string; expectedCount: number }) =>
     post<{ sent: number; failed: number }>("/waitlist/notify", input),
 };
+
+// ─── Administrators ──────────────────────────────────────────────────────────
+
+export interface AdminSummary {
+  id: string;
+  email: string;
+  name: string;
+  title: string;
+  avatarUrl: string | null;
+  role: AdminRole;
+  status: "active" | "invited" | "suspended";
+  twoFactorEnabled: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+  invitePending: boolean;
+}
+
+export interface InviteResponse {
+  admin: AdminSummary;
+  inviteToken?: string;
+  expiresAt?: string;
+  emailed?: boolean;
+}
+
+export const administrators = {
+  list: () => get<{ admins: AdminSummary[] }>("/administrators"),
+
+  invite: (input: { email: string; name?: string; title?: string; role: AdminRole }) =>
+    post<InviteResponse>("/administrators", input),
+
+  reissue: (id: string) => post<InviteResponse>(`/administrators/${id}/reissue`, {}),
+
+  update: (
+    id: string,
+    input: { name?: string; title?: string; role?: AdminRole; status?: string },
+  ) => patch<{ admin: AdminSummary }>(`/administrators/${id}`, input),
+
+  remove: (id: string) => remove<{ deleted: boolean; id: string }>(`/administrators/${id}`),
+
+  /** Unauthenticated: used by the invitation screen. */
+  accept: (token: string, password: string) =>
+    post<{ accepted: boolean; email: string }>("/invite/accept", { token, password }),
+};
