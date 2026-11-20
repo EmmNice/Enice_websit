@@ -77,6 +77,20 @@ var init_http = __esm({
 });
 
 // src/lib/email/types.ts
+var types_exports = {};
+__export(types_exports, {
+  AUTO_GENERATED_HEADERS: () => AUTO_GENERATED_HEADERS,
+  AUTO_REPLY_HEADERS: () => AUTO_REPLY_HEADERS,
+  EmailProviderConfigError: () => EmailProviderConfigError,
+  EmailSendError: () => EmailSendError,
+  formatAddress: () => formatAddress,
+  isTransientStatus: () => isTransientStatus,
+  joinName: () => joinName,
+  sleep: () => sleep,
+  splitName: () => splitName,
+  toRecipientArray: () => toRecipientArray,
+  withRetry: () => withRetry
+});
 function displayName(raw) {
   const clean = raw.replace(/[\u0000-\u001F\u007F-\u009F]/g, " ").replace(/\s+/g, " ").trim().slice(0, MAX_DISPLAY_NAME).trim();
   if (!clean) return "";
@@ -117,11 +131,15 @@ function joinName(firstName, lastName) {
 function toRecipientArray(to) {
   return Array.isArray(to) ? to : [to];
 }
-var MAX_DISPLAY_NAME, AUTO_GENERATED_HEADERS, EmailProviderConfigError, EmailSendError, sleep;
+var MAX_DISPLAY_NAME, AUTO_REPLY_HEADERS, AUTO_GENERATED_HEADERS, EmailProviderConfigError, EmailSendError, sleep;
 var init_types = __esm({
   "src/lib/email/types.ts"() {
     "use strict";
     MAX_DISPLAY_NAME = 120;
+    AUTO_REPLY_HEADERS = {
+      "Auto-Submitted": "auto-replied",
+      "X-Auto-Response-Suppress": "All"
+    };
     AUTO_GENERATED_HEADERS = {
       "Auto-Submitted": "auto-generated",
       "X-Auto-Response-Suppress": "All"
@@ -7110,6 +7128,15 @@ var init_provider_resend_server = __esm({
 });
 
 // src/lib/email/index.server.ts
+var index_server_exports = {};
+__export(index_server_exports, {
+  DEFAULT_PROVIDER: () => DEFAULT_PROVIDER,
+  EmailProviderConfigError: () => EmailProviderConfigError,
+  EmailSendError: () => EmailSendError,
+  configuredProviderName: () => configuredProviderName,
+  emailProvider: () => emailProvider,
+  formatAddress: () => formatAddress
+});
 function configuredProviderName() {
   const raw = process.env.EMAIL_PROVIDER?.trim().toLowerCase();
   if (!raw) return DEFAULT_PROVIDER;
@@ -7128,6 +7155,7 @@ var init_index_server = __esm({
     init_types();
     init_provider_faga_server();
     init_provider_resend_server();
+    init_types();
     PROVIDERS = {
       faga: fagaProvider,
       // Keep the old selector working while deployed environments migrate to EMAIL_PROVIDER=faga.
@@ -7139,17 +7167,28 @@ var init_index_server = __esm({
 });
 
 // src/lib/email/senders.ts
+var senders_exports = {};
+__export(senders_exports, {
+  DEFAULT_SENDING_DOMAIN: () => DEFAULT_SENDING_DOMAIN,
+  INTERNAL_RECIPIENT: () => INTERNAL_RECIPIENT,
+  contactFormSender: () => contactFormSender,
+  groupSender: () => groupSender
+});
 function sendingDomain() {
   return process.env.EMAIL_FROM_DOMAIN?.trim() || DEFAULT_SENDING_DOMAIN;
+}
+function contactFormSender() {
+  return { name: "ENICE Contact", localPart: "corporate", domain: sendingDomain() };
 }
 function groupSender() {
   return { name: "ENICE Group", localPart: "corporate", domain: sendingDomain() };
 }
-var DEFAULT_SENDING_DOMAIN;
+var DEFAULT_SENDING_DOMAIN, INTERNAL_RECIPIENT;
 var init_senders = __esm({
   "src/lib/email/senders.ts"() {
     "use strict";
     DEFAULT_SENDING_DOMAIN = "enicehq.com";
+    INTERNAL_RECIPIENT = "corporate@enicehq.com";
   }
 });
 
@@ -16646,6 +16685,33 @@ router.add("POST /content/:id/revert", async ({ req, params, body, identity }) =
     metadata: { revertedTo: revision }
   });
   return { item };
+});
+router.add("POST /email/test", async ({ identity }) => {
+  if (identity.role !== "owner") {
+    throw new HttpError(403, "Only the Owner can run the email test.", "forbidden");
+  }
+  const { emailProvider: emailProvider2, configuredProviderName: configuredProviderName2 } = await Promise.resolve().then(() => (init_index_server(), index_server_exports));
+  const { contactFormSender: contactFormSender2 } = await Promise.resolve().then(() => (init_senders(), senders_exports));
+  const { AUTO_GENERATED_HEADERS: AUTO_GENERATED_HEADERS2 } = await Promise.resolve().then(() => (init_types(), types_exports));
+  try {
+    const result = await emailProvider2().send({
+      from: contactFormSender2(),
+      to: identity.email,
+      subject: "ENICE email test",
+      html: `<p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;">This is a test from the ENICE website. If you are reading it, mail is working.</p>`,
+      headers: AUTO_GENERATED_HEADERS2
+    });
+    return { ok: true, provider: configuredProviderName2(), id: result?.id ?? null };
+  } catch (error) {
+    const err = error;
+    return {
+      ok: false,
+      provider: configuredProviderName2(),
+      errorName: err?.name ?? "Error",
+      error: err?.message ?? String(error),
+      status: err?.status ?? null
+    };
+  }
 });
 function waitlistFilters(query) {
   return {

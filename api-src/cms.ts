@@ -580,6 +580,44 @@ router.add("POST /content/:id/revert", async ({ req, params, body, identity }) =
   return { item };
 });
 
+// ─── Diagnostics ─────────────────────────────────────────────────────────────
+
+/**
+ * Sends a test email to the signed-in Owner and reports exactly what the mail provider said.
+ *
+ * Public endpoints deliberately swallow mail failures so a signup is never lost to a bad mailbox,
+ * which leaves no way to tell "sent" from "refused" when a confirmation does not arrive. This is
+ * the missing half: the same provider call, with the error returned instead of logged.
+ */
+router.add("POST /email/test", async ({ identity }) => {
+  if (identity.role !== "owner") {
+    throw new HttpError(403, "Only the Owner can run the email test.", "forbidden");
+  }
+  const { emailProvider, configuredProviderName } = await import("../src/lib/email/index.server");
+  const { contactFormSender } = await import("../src/lib/email/senders");
+  const { AUTO_GENERATED_HEADERS } = await import("../src/lib/email/types");
+
+  try {
+    const result = await emailProvider().send({
+      from: contactFormSender(),
+      to: identity.email,
+      subject: "ENICE email test",
+      html: `<p style="font-family:Helvetica,Arial,sans-serif;font-size:14px;">This is a test from the ENICE website. If you are reading it, mail is working.</p>`,
+      headers: AUTO_GENERATED_HEADERS,
+    });
+    return { ok: true, provider: configuredProviderName(), id: result?.id ?? null };
+  } catch (error) {
+    const err = error as { name?: string; message?: string; status?: number | null };
+    return {
+      ok: false,
+      provider: configuredProviderName(),
+      errorName: err?.name ?? "Error",
+      error: err?.message ?? String(error),
+      status: err?.status ?? null,
+    };
+  }
+});
+
 // ─── PulsePay waitlist ───────────────────────────────────────────────────────
 
 /** Reads the list filters shared by the table and the CSV export. */
