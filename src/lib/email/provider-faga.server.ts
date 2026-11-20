@@ -303,6 +303,32 @@ async function fetchContact(email: string): Promise<ApiContact | null> {
 
 // ── The provider ─────────────────────────────────────────────────────────────
 
+/**
+ * The workspace's sending domains, as the provider reports them.
+ *
+ * Exists for one question the site cannot answer on its own: when mail is accepted by the API but
+ * never arrives, the cause is nearly always the receiving server rejecting an unauthenticated
+ * sender. This returns the provider's own view — verified or not, and the DNS records it expects —
+ * so the fix can be stated exactly instead of guessed at.
+ */
+export async function listProviderDomains(): Promise<{
+  domains: Array<{ domain: string; verified: boolean; records: Record<string, unknown> | null }>;
+  error?: string;
+}> {
+  const res = await call<{ domains?: Array<Record<string, unknown>> }>("/domains");
+  if (!res.ok) return { domains: [], error: res.error ?? `HTTP ${res.status}` };
+  const raw =
+    res.data?.domains ??
+    (Array.isArray(res.data) ? (res.data as unknown as Array<Record<string, unknown>>) : []);
+  return {
+    domains: raw.map((d) => ({
+      domain: String(d.domain ?? d.name ?? ""),
+      verified: Boolean(d.verified ?? d.isVerified ?? d.status === "verified"),
+      records: (d.records as Record<string, unknown>) ?? null,
+    })),
+  };
+}
+
 export const fagaProvider: EmailProvider = {
   name: "faga",
 

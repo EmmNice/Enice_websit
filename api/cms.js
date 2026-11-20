@@ -165,6 +165,12 @@ var init_types = __esm({
 });
 
 // src/lib/email/provider-faga.server.ts
+var provider_faga_server_exports = {};
+__export(provider_faga_server_exports, {
+  __resetFagaCaches: () => __resetFagaCaches,
+  fagaProvider: () => fagaProvider,
+  listProviderDomains: () => listProviderDomains
+});
 function config() {
   const apiKey = process.env.FAGA_API_KEY || process.env.PULSEASSIST_API_KEY;
   if (!apiKey) {
@@ -315,6 +321,18 @@ async function fetchContact(email) {
   }
   return (res.data?.contacts ?? []).find((c) => c.email.trim().toLowerCase() === target) ?? null;
 }
+async function listProviderDomains() {
+  const res = await call("/domains");
+  if (!res.ok) return { domains: [], error: res.error ?? `HTTP ${res.status}` };
+  const raw = res.data?.domains ?? (Array.isArray(res.data) ? res.data : []);
+  return {
+    domains: raw.map((d) => ({
+      domain: String(d.domain ?? d.name ?? ""),
+      verified: Boolean(d.verified ?? d.isVerified ?? d.status === "verified"),
+      records: d.records ?? null
+    }))
+  };
+}
 async function addToList(listId, contactId) {
   const res = await callWithRetry("lists.addMembers", `/email/lists/${listId}/members`, {
     method: "POST",
@@ -327,6 +345,9 @@ async function addToList(listId, contactId) {
       "faga"
     );
   }
+}
+function __resetFagaCaches() {
+  listIdCache.clear();
 }
 var DEFAULT_BASE_URL, listIdCache, fagaProvider;
 var init_provider_faga_server = __esm({
@@ -16974,6 +16995,18 @@ router.add("POST /email/test", async ({ body, identity }) => {
       status: err?.status ?? null
     };
   }
+});
+router.add("GET /email/domains", async ({ identity }) => {
+  if (identity.role !== "owner") {
+    throw new HttpError(403, "Only the Owner can inspect mail settings.", "forbidden");
+  }
+  const { listProviderDomains: listProviderDomains2 } = await Promise.resolve().then(() => (init_provider_faga_server(), provider_faga_server_exports));
+  const result = await listProviderDomains2();
+  return {
+    ...result,
+    sendingDomain: process.env.EMAIL_FROM_DOMAIN ?? null,
+    provider: process.env.FAGA_API_KEY ? "faga" : process.env.PULSEASSIST_API_KEY ? "faga-legacy" : "none"
+  };
 });
 function waitlistFilters(query) {
   return {

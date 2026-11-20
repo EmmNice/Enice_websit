@@ -735,6 +735,30 @@ router.add("POST /email/test", async ({ body, identity }) => {
   }
 });
 
+/**
+ * What the mail service says about the sending domain.
+ *
+ * Accepted-but-not-delivered is the one mail failure the API cannot report, because the refusal
+ * happens at the receiver. This shows the provider's own verification state and the DNS records it
+ * expects, which is what the domain's DNS needs in order to pass DMARC.
+ */
+router.add("GET /email/domains", async ({ identity }) => {
+  if (identity.role !== "owner") {
+    throw new HttpError(403, "Only the Owner can inspect mail settings.", "forbidden");
+  }
+  const { listProviderDomains } = await import("../src/lib/email/provider-faga.server");
+  const result = await listProviderDomains();
+  return {
+    ...result,
+    sendingDomain: process.env.EMAIL_FROM_DOMAIN ?? null,
+    provider: process.env.FAGA_API_KEY
+      ? "faga"
+      : process.env.PULSEASSIST_API_KEY
+        ? "faga-legacy"
+        : "none",
+  };
+});
+
 // ─── PulsePay waitlist ───────────────────────────────────────────────────────
 
 /** Reads the list filters shared by the table and the CSV export. */
