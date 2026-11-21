@@ -38,7 +38,7 @@ import {
   resolveRequestPath,
   HttpError,
 } from "./lib/router";
-import { getContentBySlug, listContent } from "./lib/repo/content";
+import { getContentBySlug, listContent, publishDueContent } from "./lib/repo/content";
 import { publicContentPath as publicPath } from "./lib/search-discovery";
 import {
   getPageByPath,
@@ -47,6 +47,27 @@ import {
   listSections,
   publishDuePages,
 } from "./lib/repo/website";
+
+/**
+ * Promotes scheduled posts whose time has come, on the way into a public read.
+ *
+ * A scheduled post has to go live when its time arrives, not when somebody happens to open the
+ * dashboard — so the public read path does the promotion itself. The work is one indexed `UPDATE`,
+ * and it is skipped for a minute after the last run, which keeps a busy site from paying for it on
+ * every request.
+ */
+let lastContentPublishAt = 0;
+async function publishDueContentThrottled(): Promise<void> {
+  const now = Date.now();
+  if (now - lastContentPublishAt < 60_000) return;
+  lastContentPublishAt = now;
+  try {
+    await publishDueContent();
+  } catch (error) {
+    // A public read must still serve the site if the promotion fails; the next read retries.
+    console.error("[site] could not publish due content:", error);
+  }
+}
 
 /**
  * Edge cache policy.
@@ -147,6 +168,7 @@ router.add("GET /bootstrap", async ({ res }) => {
 router.add("GET /content/:kind", async ({ res, params, query }) => {
   res.setHeader("Cache-Control", CACHE_CONTENT);
   const kind = kindParam(params.kind);
+  await publishDueContentThrottled();
 
   const { items, total } = await listContent({
     kind,
@@ -174,6 +196,7 @@ router.add("GET /content/:kind", async ({ res, params, query }) => {
  * they appear here alongside the longer entries.
  */
 router.add("GET /feed", async ({ res, query }) => {
+  await publishDueContentThrottled();
   res.setHeader("Cache-Control", CACHE_CONTENT);
   const limit = intParam(query, "limit", 40, 100) || 40;
 
@@ -212,6 +235,7 @@ router.add("GET /feed", async ({ res, query }) => {
 // ─── Single item ─────────────────────────────────────────────────────────────
 
 router.add("GET /content/:kind/:slug", async ({ res, params }) => {
+  await publishDueContentThrottled();
   res.setHeader("Cache-Control", CACHE_CONTENT);
   const kind = kindParam(params.kind);
 

@@ -5992,6 +5992,17 @@ function defaultSettings() {
 }
 
 // api-src/site.ts
+var lastContentPublishAt = 0;
+async function publishDueContentThrottled() {
+  const now = Date.now();
+  if (now - lastContentPublishAt < 6e4) return;
+  lastContentPublishAt = now;
+  try {
+    await publishDueContent();
+  } catch (error) {
+    console.error("[site] could not publish due content:", error);
+  }
+}
 var CACHE_CONTENT = "public, max-age=0, s-maxage=15, stale-while-revalidate=30";
 var CACHE_SETTINGS = "public, max-age=0, s-maxage=15, stale-while-revalidate=30";
 var router = new Router();
@@ -6049,6 +6060,7 @@ router.add("GET /bootstrap", async ({ res }) => {
 router.add("GET /content/:kind", async ({ res, params, query }) => {
   res.setHeader("Cache-Control", CACHE_CONTENT);
   const kind = kindParam(params.kind);
+  await publishDueContentThrottled();
   const { items, total } = await listContent({
     kind,
     status: "published",
@@ -6066,6 +6078,7 @@ router.add("GET /content/:kind", async ({ res, params, query }) => {
   };
 });
 router.add("GET /feed", async ({ res, query }) => {
+  await publishDueContentThrottled();
   res.setHeader("Cache-Control", CACHE_CONTENT);
   const limit = intParam(query, "limit", 40, 100) || 40;
   const [news, updates, announcements] = await Promise.all([
@@ -6094,6 +6107,7 @@ router.add("GET /feed", async ({ res, query }) => {
   return { entries, total: entries.length };
 });
 router.add("GET /content/:kind/:slug", async ({ res, params }) => {
+  await publishDueContentThrottled();
   res.setHeader("Cache-Control", CACHE_CONTENT);
   const kind = kindParam(params.kind);
   const item = await getContentBySlug(kind, params.slug, true);
