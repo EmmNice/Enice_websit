@@ -817,15 +817,24 @@ router.add("POST /waitlist/notify", async ({ req, body, identity }) => {
   const message = typeof body.message === "string" ? body.message.trim().slice(0, 5000) : "";
   if (!subject || !message) throw badRequest("A subject and a message are required.");
 
+  /*
+   * A launch list can be long enough that one request would outlive the function, so each call
+   * sends a slice and reports what is left. The dashboard keeps calling until `remaining` is zero,
+   * which means a slow provider shortens the batches instead of losing the send halfway.
+   */
+  const CHUNK = 300;
+  const slice = recipients.slice(0, CHUNK);
+
   const { sendLaunchNotification } = await import("./lib/waitlist-notify");
-  const result = await sendLaunchNotification(recipients, subject, message);
+  const result = await sendLaunchNotification(slice, subject, message);
   await markNotified(result.sentIds);
+  const remaining = recipients.length - result.sentIds.length - result.failed;
   await recordActivity(req, identity, "waitlist.notified", {
     entityType: "waitlist",
-    entityLabel: `${result.sentIds.length} of ${recipients.length} notified`,
-    metadata: { sent: result.sentIds.length, failed: result.failed, subject },
+    entityLabel: `${result.sentIds.length} of ${slice.length} notified`,
+    metadata: { sent: result.sentIds.length, failed: result.failed, remaining, subject },
   });
-  return { sent: result.sentIds.length, failed: result.failed };
+  return { sent: result.sentIds.length, failed: result.failed, remaining };
 });
 
 router.add("PATCH /waitlist/:id", async ({ req, params, body, identity }) => {

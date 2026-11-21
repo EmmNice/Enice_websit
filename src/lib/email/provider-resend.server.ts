@@ -199,6 +199,37 @@ function toAudienceContact(c: ResendContact): AudienceContact {
 export const resendProvider: EmailProvider = {
   name: "resend",
 
+  async sendBatch(messages: OutboundEmail[]): Promise<SendResult[]> {
+    if (messages.length === 0) return [];
+    const resend = client();
+    const payload = messages.map((message) => ({
+      from: formatAddress(message.from),
+      to: toRecipientArray(message.to),
+      subject: message.subject,
+      html: message.html,
+      ...(message.text ? { text: message.text } : {}),
+      ...(message.replyTo ? { replyTo: message.replyTo } : {}),
+      ...(message.headers && Object.keys(message.headers).length > 0
+        ? { headers: message.headers }
+        : {}),
+    }));
+
+    const res = await resend.batch.send(payload);
+    if (res.error) {
+      // A batch-level refusal tells us nothing about individuals, so every message is reported as
+      // unsent and the caller can retry them one at a time.
+      const message = res.error.message ?? "Resend refused the batch.";
+      return messages.map(() => ({ id: null, provider: "resend" as const, error: message }));
+    }
+
+    const ids = (res.data?.data ?? []) as Array<{ id?: string }>;
+    return messages.map((_, index) => ({
+      id: ids[index]?.id ?? null,
+      provider: "resend" as const,
+      ...(ids[index]?.id ? {} : { error: "Resend did not return an id for this message." }),
+    }));
+  },
+
   async send(message: OutboundEmail): Promise<SendResult> {
     const resend = client();
     // Resend takes a fully-formed address, which is what `formatAddress` is for.

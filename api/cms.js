@@ -7040,6 +7040,30 @@ var init_provider_resend_server = __esm({
     segmentCache = /* @__PURE__ */ new Map();
     resendProvider = {
       name: "resend",
+      async sendBatch(messages2) {
+        if (messages2.length === 0) return [];
+        const resend = client2();
+        const payload = messages2.map((message) => ({
+          from: formatAddress(message.from),
+          to: toRecipientArray(message.to),
+          subject: message.subject,
+          html: message.html,
+          ...message.text ? { text: message.text } : {},
+          ...message.replyTo ? { replyTo: message.replyTo } : {},
+          ...message.headers && Object.keys(message.headers).length > 0 ? { headers: message.headers } : {}
+        }));
+        const res = await resend.batch.send(payload);
+        if (res.error) {
+          const message = res.error.message ?? "Resend refused the batch.";
+          return messages2.map(() => ({ id: null, provider: "resend", error: message }));
+        }
+        const ids = res.data?.data ?? [];
+        return messages2.map((_, index) => ({
+          id: ids[index]?.id ?? null,
+          provider: "resend",
+          ...ids[index]?.id ? {} : { error: "Resend did not return an id for this message." }
+        }));
+      },
       async send(message) {
         const resend = client2();
         const res = await retry(
@@ -7225,26 +7249,59 @@ async function sendLaunchNotification(recipients, subject, message) {
   const paragraphs = message.split(/\n{2,}/).map(
     (p) => `<p style="margin:0 0 14px;font-size:14px;line-height:1.7;color:#111827;">${escapeHtml(p).replace(/\n/g, "<br>")}</p>`
   ).join("");
-  for (const person of recipients) {
+  const compose = (person) => {
     const first = escapeHtml(person.name.split(/\s+/)[0] || "there");
-    try {
-      await provider.send({
-        from: groupSender(),
-        to: person.email,
-        subject,
-        html: `<!DOCTYPE html><html lang="en"><body style="margin:0;padding:24px;font-family:Helvetica,Arial,sans-serif;">
+    return {
+      from: groupSender(),
+      to: person.email,
+      subject,
+      html: `<!DOCTYPE html><html lang="en"><body style="margin:0;padding:24px;font-family:Helvetica,Arial,sans-serif;">
           <p style="margin:0 0 6px;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:#0048ed;font-weight:700;">ENICE Group</p>
           <p style="margin:0 0 14px;font-size:14px;color:#111827;">Hi ${first},</p>
           ${paragraphs}
           <p style="margin:24px 0 0;font-size:12px;line-height:1.6;color:#6b7280;">You are receiving this because you joined the PulsePay waitlist and agreed to hear from us about the launch. Reply to this email and we will remove you.</p>
         </body></html>`,
-        headers: AUTO_GENERATED_HEADERS,
-        idempotencyKey: `waitlist-launch-${person.id}`
-      });
-      sentIds.push(person.id);
-    } catch (error) {
-      failed += 1;
-      console.error(`[waitlist-notify] could not send to ${person.id}:`, error);
+      text: [
+        `Hi ${person.name.split(/\s+/)[0] || "there"},`,
+        "",
+        message,
+        "",
+        "You are receiving this because you joined the PulsePay waitlist and agreed to hear from us about the launch. Reply to this email and we will remove you.",
+        "",
+        "ENICE Group"
+      ].join("\n"),
+      headers: AUTO_GENERATED_HEADERS,
+      idempotencyKey: `waitlist-launch-${person.id}`
+    };
+  };
+  const BATCH = 100;
+  for (let start = 0; start < recipients.length; start += BATCH) {
+    const group = recipients.slice(start, start + BATCH);
+    const messages2 = group.map(compose);
+    if (provider.sendBatch) {
+      try {
+        const results = await provider.sendBatch(messages2);
+        for (let i = 0; i < group.length; i += 1) {
+          if (results[i]?.id) {
+            sentIds.push(group[i].id);
+          } else {
+            failed += 1;
+            console.error(`[waitlist-notify] batch refused ${group[i].id}:`, results[i]?.error);
+          }
+        }
+        continue;
+      } catch (error) {
+        console.error("[waitlist-notify] batch failed, retrying individually:", error);
+      }
+    }
+    for (let i = 0; i < group.length; i += 1) {
+      try {
+        await provider.send(messages2[i]);
+        sentIds.push(group[i].id);
+      } catch (error) {
+        failed += 1;
+        console.error(`[waitlist-notify] could not send to ${group[i].id}:`, error);
+      }
     }
   }
   return { sentIds, failed };
@@ -17054,15 +17111,18 @@ router.add("POST /waitlist/notify", async ({ req, body, identity }) => {
   const subject = typeof body.subject === "string" ? body.subject.trim().slice(0, 200) : "";
   const message = typeof body.message === "string" ? body.message.trim().slice(0, 5e3) : "";
   if (!subject || !message) throw badRequest("A subject and a message are required.");
+  const CHUNK = 300;
+  const slice = recipients.slice(0, CHUNK);
   const { sendLaunchNotification: sendLaunchNotification2 } = await Promise.resolve().then(() => (init_waitlist_notify(), waitlist_notify_exports));
-  const result = await sendLaunchNotification2(recipients, subject, message);
+  const result = await sendLaunchNotification2(slice, subject, message);
   await markNotified(result.sentIds);
+  const remaining = recipients.length - result.sentIds.length - result.failed;
   await recordActivity(req, identity, "waitlist.notified", {
     entityType: "waitlist",
-    entityLabel: `${result.sentIds.length} of ${recipients.length} notified`,
-    metadata: { sent: result.sentIds.length, failed: result.failed, subject }
+    entityLabel: `${result.sentIds.length} of ${slice.length} notified`,
+    metadata: { sent: result.sentIds.length, failed: result.failed, remaining, subject }
   });
-  return { sent: result.sentIds.length, failed: result.failed };
+  return { sent: result.sentIds.length, failed: result.failed, remaining };
 });
 router.add("PATCH /waitlist/:id", async ({ req, params, body, identity }) => {
   const entry = await updateWaitlistEntry(params.id, body);

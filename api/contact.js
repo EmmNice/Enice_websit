@@ -6924,6 +6924,30 @@ function toAudienceContact2(c) {
 }
 var resendProvider = {
   name: "resend",
+  async sendBatch(messages) {
+    if (messages.length === 0) return [];
+    const resend = client();
+    const payload = messages.map((message) => ({
+      from: formatAddress(message.from),
+      to: toRecipientArray(message.to),
+      subject: message.subject,
+      html: message.html,
+      ...message.text ? { text: message.text } : {},
+      ...message.replyTo ? { replyTo: message.replyTo } : {},
+      ...message.headers && Object.keys(message.headers).length > 0 ? { headers: message.headers } : {}
+    }));
+    const res = await resend.batch.send(payload);
+    if (res.error) {
+      const message = res.error.message ?? "Resend refused the batch.";
+      return messages.map(() => ({ id: null, provider: "resend", error: message }));
+    }
+    const ids = res.data?.data ?? [];
+    return messages.map((_, index) => ({
+      id: ids[index]?.id ?? null,
+      provider: "resend",
+      ...ids[index]?.id ? {} : { error: "Resend did not return an id for this message." }
+    }));
+  },
   async send(message) {
     const resend = client();
     const res = await retry(

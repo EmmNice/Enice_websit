@@ -143,6 +143,13 @@ export type SendResult = {
   id: string | null;
   /** Which provider actually sent it — recorded in logs so a switch is visible after the fact. */
   provider: ProviderName;
+  /**
+   * Why this message did not go out, for the per-message results a batch returns.
+   *
+   * `send()` throws instead, so this is only ever set by `sendBatch` — where one refusal must not
+   * hide the messages that succeeded beside it.
+   */
+  error?: string;
 };
 
 // ── Audience (contacts + lists) ───────────────────────────────────────────────
@@ -201,6 +208,18 @@ export interface EmailProvider {
 
   /** Transactional send. Throws `EmailSendError` when the provider refuses the message. */
   send(message: OutboundEmail): Promise<SendResult>;
+
+  /**
+   * Sends many messages in one provider call, when the provider supports it.
+   *
+   * A launch announcement to a few hundred people sent one request at a time is both slow and
+   * rate-limited; Resend takes up to 100 per call. Optional, because not every provider offers it —
+   * callers fall back to `send`.
+   *
+   * Returns one result per message, in order, so a partial failure is attributable to a person
+   * rather than to the batch.
+   */
+  sendBatch?(messages: OutboundEmail[]): Promise<SendResult[]>;
 
   /** The contact for this address, or null. Attributes included. */
   findContact(email: string): Promise<AudienceContact | null>;

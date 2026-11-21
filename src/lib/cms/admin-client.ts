@@ -436,7 +436,7 @@ export const waitlist = {
   notifyPreview: () => get<{ count: number }>("/waitlist/notify"),
 
   notify: (input: { subject: string; message: string; expectedCount: number }) =>
-    post<{ sent: number; failed: number }>("/waitlist/notify", input),
+    post<{ sent: number; failed: number; remaining: number }>("/waitlist/notify", input),
 };
 
 // ─── Administrators ──────────────────────────────────────────────────────────

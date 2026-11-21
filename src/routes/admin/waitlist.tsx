@@ -109,6 +109,7 @@ function WaitlistScreen() {
   const [subject, setSubject] = useState("PulsePay is opening");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [progress, setProgress] = useState<string | null>(null);
 
   const params = (): WaitlistQuery => ({
     search: filters.search.trim() || undefined,
@@ -211,12 +212,28 @@ function WaitlistScreen() {
     if (!ok) return;
     setSending(true);
     try {
-      const result = await waitlist.notify({ subject, message, expectedCount: notifyCount });
+      /*
+       * One press, every recipient. The server sends a slice per call and reports what is left, so
+       * this loop is what turns a long list into repeated batches instead of one request that would
+       * time out halfway through.
+       */
+      let sent = 0;
+      let failed = 0;
+      let expected = notifyCount;
+      for (;;) {
+        const result = await waitlist.notify({ subject, message, expectedCount: expected });
+        sent += result.sent;
+        failed += result.failed;
+        if (result.remaining <= 0) break;
+        expected = result.remaining;
+        setProgress(`Sending, ${sent} done, ${result.remaining} to go`);
+      }
       toast.success(
-        `Sent to ${result.sent}`,
-        result.failed ? `${result.failed} could not be reached and can be retried.` : undefined,
+        `Sent to ${sent}`,
+        failed ? `${failed} could not be reached and can be retried.` : undefined,
       );
       setNotifyOpen(false);
+      setProgress(null);
       load();
     } catch (caught) {
       toast.error("Not sent", caught instanceof CmsError ? caught.message : undefined);
@@ -626,9 +643,11 @@ function WaitlistScreen() {
         footer={
           <div className="flex w-full items-center justify-between">
             <span className="text-muted-foreground text-[12.5px]">
-              {notifyCount === null
-                ? "Checking recipients…"
-                : `${notifyCount} ${notifyCount === 1 ? "person" : "people"} will receive this`}
+              {progress
+                ? progress
+                : notifyCount === null
+                  ? "Checking recipients…"
+                  : `${notifyCount} ${notifyCount === 1 ? "person" : "people"} will receive this`}
             </span>
             <Button
               variant="primary"
