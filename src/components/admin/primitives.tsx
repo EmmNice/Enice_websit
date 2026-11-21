@@ -18,7 +18,8 @@
  */
 
 import { forwardRef, useId, type ReactNode } from "react";
-import { Check, ChevronDown, Loader2, type LucideIcon } from "lucide-react";
+import { Check, ChevronDown, Eye, EyeOff, Loader2, type LucideIcon } from "lucide-react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import type { StatusTone } from "@/lib/cms/types";
 
@@ -344,6 +345,41 @@ export const Input = forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTML
     return <input ref={ref} className={cn(CONTROL_CLASSES, "h-9", className)} {...rest} />;
   },
 );
+
+/**
+ * A password field that can be read back.
+ *
+ * Typing a long password twice on a phone keyboard, with every character masked, is how people end
+ * up locked out of their own account — they cannot see the typo that caused it. The reveal toggle
+ * is deliberately per-field and defaults to hidden, so a shoulder-surfer sees nothing unless the
+ * person holding the phone chooses otherwise.
+ */
+export const PasswordInput = forwardRef<
+  HTMLInputElement,
+  Omit<React.InputHTMLAttributes<HTMLInputElement>, "type">
+>(function PasswordInput({ className, ...rest }, ref) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="relative">
+      <input
+        ref={ref}
+        type={visible ? "text" : "password"}
+        className={cn(CONTROL_CLASSES, "h-9 pr-10", className)}
+        {...rest}
+      />
+      <button
+        type="button"
+        onClick={() => setVisible((v) => !v)}
+        aria-label={visible ? "Hide password" : "Show password"}
+        aria-pressed={visible}
+        title={visible ? "Hide password" : "Show password"}
+        className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1.5 -translate-y-1/2 rounded p-1.5"
+      >
+        {visible ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+});
 
 export const Textarea = forwardRef<
   HTMLTextAreaElement,

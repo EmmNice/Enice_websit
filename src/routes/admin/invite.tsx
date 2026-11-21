@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { administrators, CmsError } from "@/lib/cms/admin-client";
+import { PasswordInput } from "@/components/admin/primitives";
 
 /**
  * Accepting an invitation.
@@ -86,25 +87,23 @@ function InvitePage() {
             <label className="mt-6 block text-[12.5px] font-semibold" htmlFor="pw">
               Password
             </label>
-            <input
+            <PasswordInput
               id="pw"
-              type="password"
               autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="border-border bg-secondary mt-1.5 block w-full rounded-md border px-3 py-2.5 text-[14px]"
+              className="mt-1.5 block w-full px-3 py-2.5 text-[14px]"
             />
 
             <label className="mt-4 block text-[12.5px] font-semibold" htmlFor="pw2">
               Confirm password
             </label>
-            <input
+            <PasswordInput
               id="pw2"
-              type="password"
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="border-border bg-secondary mt-1.5 block w-full rounded-md border px-3 py-2.5 text-[14px]"
+              className="mt-1.5 block w-full px-3 py-2.5 text-[14px]"
             />
 
             {error && (

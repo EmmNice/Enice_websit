@@ -21,6 +21,7 @@ import {
   Field,
   Input,
   PageHeader,
+  PasswordInput,
   Skeleton,
   StatusPill,
 } from "@/components/admin/primitives";
@@ -180,9 +181,8 @@ function PasswordCard() {
       <div className="space-y-4 p-4">
         <Field label="Current password">
           {(props) => (
-            <Input
+            <PasswordInput
               {...props}
-              type="password"
               value={current}
               onChange={(event) => setCurrent(event.target.value)}
               autoComplete="current-password"
@@ -195,9 +195,8 @@ function PasswordCard() {
           error={tooShort ? `Use at least ${PASSWORD_MIN_LENGTH} characters.` : null}
         >
           {(props) => (
-            <Input
+            <PasswordInput
               {...props}
-              type="password"
               value={next}
               onChange={(event) => setNext(event.target.value)}
               autoComplete="new-password"
@@ -206,9 +205,8 @@ function PasswordCard() {
         </Field>
         <Field label="Confirm new password" error={mismatch ? "These do not match." : null}>
           {(props) => (
-            <Input
+            <PasswordInput
               {...props}
-              type="password"
               value={confirmation}
               onChange={(event) => setConfirmation(event.target.value)}
               autoComplete="new-password"
@@ -435,9 +433,8 @@ function TwoFactorCard({
       >
         <Field label="Your password">
           {(props) => (
-            <Input
+            <PasswordInput
               {...props}
-              type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoFocus

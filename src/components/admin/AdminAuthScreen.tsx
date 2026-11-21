@@ -22,7 +22,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowRight, KeyRound, Lock, ServerCrash, ShieldCheck } from "lucide-react";
 import { auth, CmsError } from "@/lib/cms/admin-client";
 import { useAdmin } from "./AdminContext";
-import { Button, Field, Input, Spinner } from "./primitives";
+import { Button, Field, Input, PasswordInput, Spinner } from "./primitives";
 
 export function AdminAuthScreen() {
   const { phase, unavailableReason } = useAdmin();
@@ -152,9 +152,8 @@ function PasswordForm() {
 
         <Field label="Password">
           {(props) => (
-            <Input
+            <PasswordInput
               {...props}
-              type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="current-password"
