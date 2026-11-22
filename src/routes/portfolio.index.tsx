@@ -32,7 +32,7 @@ export const Route = createFileRoute("/portfolio/")({
           },
           {
             "@type": "SoftwareApplication",
-            name: "PRIDE",
+            name: "PrideTrade",
             url: `${SITE_URL}/portfolio/pride`,
             applicationCategory: "FinanceApplication",
           },
@@ -49,8 +49,8 @@ export const Route = createFileRoute("/portfolio/")({
 // the keyboard — which is the only honest way to show a simulated interface on a marketing page.
 
 /**
- * Decorative market rows for the PRIDE illustration. Symbols only — no prices, no percentages.
- * PRIDE is unlaunched, so a number beside a ticker would be an invented quotation.
+ * Decorative market rows for the PrideTrade illustration. Symbols only — no prices, no percentages.
+ * PrideTrade is unlaunched, so a number beside a ticker would be an invented quotation.
  */
 const MARKET_ROWS = [
   { symbol: "BTC", name: "Bitcoin", width: "w-[72%]" },
@@ -182,7 +182,7 @@ function PortfolioIndexPage() {
           lead={fieldText(
             header,
             "subheading",
-            "Payments, financial services, business communication, and digital commerce. Each product runs on the same infrastructure and is built to operate at scale.",
+            "Payments and digital assets. Two products, each built and run on its own infrastructure, to operate at scale.",
           )}
         />
       </Section>
@@ -196,7 +196,7 @@ function PortfolioIndexPage() {
           id="active-heading"
           eyebrow="Our Products"
           heading="Two products, one platform"
-          lead="PulsePay and PRIDE, built and operated by ENICE Group. PulsePay is in pilot ahead of general availability; PRIDE opens its waitlist ahead of launch."
+          lead="PulsePay and PrideTrade, built and operated by ENICE Group. PulsePay is in pilot ahead of general availability; PrideTrade opens its waitlist ahead of launch."
         />
 
         <div className="mt-14 grid gap-8 lg:grid-cols-2">
@@ -286,11 +286,11 @@ function PortfolioIndexPage() {
             </div>
           </ProductCard>
 
-          {/* ── PRIDE ── */}
+          {/* ── PrideTrade ── */}
           <ProductCard
             to="/portfolio/pride"
             visual={
-              <CardVisual label="PRIDE markets" className="h-56 sm:h-64">
+              <CardVisual label="PrideTrade markets" className="h-56 sm:h-64">
                 <div className="tech-grid tech-grid-flat" />
                 <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="w-full max-w-sm space-y-2.5">
@@ -332,22 +332,22 @@ function PortfolioIndexPage() {
               </Eyebrow>
               <LifecycleTag to="/portfolio/pride" />
             </div>
-            <h3 className="type-h3 mt-4 text-foreground">PRIDE</h3>
+            <h3 className="type-h3 mt-4 text-foreground">PrideTrade</h3>
             <p className="type-body mt-4">
               ENICE Group's digital asset platform for cryptocurrency trading, secure custody and
-              cross-ecosystem digital finance, built into the same infrastructure as PulsePay.
+              digital asset trading and custody, run on its own ledger and controls.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Cta
                 to="/portfolio/pride"
                 size="sm"
                 icon="arrow"
-                aria-label="View PRIDE platform details"
+                aria-label="View PrideTrade platform details"
               >
                 View Platform
               </Cta>
               <Cta
-                to="mailto:corporate@enicehq.com?subject=Join%20the%20PRIDE%20waitlist"
+                to="mailto:corporate@enicehq.com?subject=Join%20the%20PrideTrade%20waitlist"
                 variant="secondary"
                 size="sm"
                 icon="external"

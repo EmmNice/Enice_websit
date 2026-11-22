@@ -1,7 +1,7 @@
 /**
  * Products ENICE Group no longer presents on the public site.
  *
- * The portfolio is PulsePay and PRIDE. PulseAssist, Faga, DevaPay and ePulse are retired; their
+ * The portfolio is PulsePay and PrideTrade. PulseAssist, Faga, DevaPay and ePulse are retired; their
  * pages redirect to `/portfolio` (see `vercel.json`). Navigation and footer links are also
  * editable in the Website Manager, and a database seeded before the removal still holds links to
  * these paths — so chrome built from CMS data filters them out here rather than trusting the

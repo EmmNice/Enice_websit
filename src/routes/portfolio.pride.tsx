@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
 import type { LucideIcon } from "lucide-react";
 import { Bitcoin, Boxes, Lock, Globe, Layers, ShieldCheck, Zap, BarChart3 } from "lucide-react";
@@ -16,7 +16,6 @@ import {
   SectionIntro,
   Tag,
 } from "@/components/site/primitives";
-import { PRODUCTS } from "@/components/site/navigation";
 import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
@@ -25,14 +24,14 @@ export const Route = createFileRoute("/portfolio/pride")({
     pageHead("/portfolio/pride", [
       breadcrumbJsonLd([
         { name: "Products", path: "/portfolio" },
-        { name: "PRIDE", path: "/portfolio/pride" },
+        { name: "PrideTrade", path: "/portfolio/pride" },
       ]),
       {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
-        name: "PRIDE",
+        name: "PrideTrade",
         description:
-          "ENICE Group's digital asset platform for cryptocurrency trading, secure custody, and cross-ecosystem digital finance. Launching Q3 2027.",
+          "ENICE Group's digital asset platform for cryptocurrency trading, secure custody and transfers. Launching Q3 2027.",
         url: `${SITE_URL}/portfolio/pride`,
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web, iOS, Android",
@@ -48,14 +47,14 @@ export const Route = createFileRoute("/portfolio/pride")({
   component: PridePage,
 });
 
-const WAITLIST_MAILTO = "mailto:corporate@enicehq.com?subject=Join%20the%20PRIDE%20waitlist";
+const WAITLIST_MAILTO = "mailto:corporate@enicehq.com?subject=Join%20the%20PrideTrade%20waitlist";
 
 // ─── The decorative markets panel ─────────────────────────────────────────────
 //
 // This is an illustration of the product's shape, not a data display, and it is `aria-hidden`
 // throughout. Two things were removed rather than retoned:
 //
-//   * A "Live Preview" pill with a green dot. PRIDE does not exist yet, so nothing was live and
+//   * A "Live Preview" pill with a green dot. PrideTrade does not exist yet, so nothing was live and
 //     nothing was previewing; a green dot beside the words is read as telemetry.
 //   * Hardcoded market figures — "$67,420.00", "+2.41%", a per-row price and percentage change.
 //     They were invented numbers for an unlaunched platform presented in the typography of real
@@ -125,11 +124,6 @@ const HIGHLIGHTS = [
     desc: "Cold storage, multi-signature protection, and continuous on-chain monitoring for every asset in your portfolio.",
   },
   {
-    icon: Layers,
-    title: "Ecosystem-native",
-    desc: "Move between PRIDE and PulsePay without leaving the ENICE stack: one account, every service.",
-  },
-  {
     icon: Globe,
     title: "Built for scale",
     desc: "Global access with compliance and reporting designed for regulated markets from day one, in Africa, Europe, and beyond.",
@@ -145,21 +139,6 @@ const HIGHLIGHTS = [
     desc: "Compliance built in from the ground up: KYC, AML, and transaction monitoring at the core.",
   },
 ];
-
-/**
- * The ecosystem strip, read from the shared product registry.
- *
- * The cards used to be a hand-written copy of `PRODUCTS` — label, one-line description and
- * link, maintained in this file — which is exactly the kind of duplicate that drifts away from the
- * header, the footer and the product pages themselves. The strip now names the routes
- * and takes their labels, descriptions and lifecycle stage from `navigation.ts`, so there is one
- * place a product is described.
- */
-const ECOSYSTEM_ROUTES = ["/portfolio/pulsepay", "/portfolio/pride"];
-
-const ECOSYSTEM = ECOSYSTEM_ROUTES.map((route) => PRODUCTS.find((p) => p.to === route)).filter(
-  (p): p is (typeof PRODUCTS)[number] => p !== undefined,
-);
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -197,10 +176,10 @@ function PridePage() {
           <div data-allow-select>
             <Tag tone="accent">Coming Q3 2027</Tag>
 
-            {/* PRIDE keeps the same display treatment as the rest of the product family. */}
+            {/* PrideTrade keeps the same display treatment as the rest of the product family. */}
             <h1 id="pride-heading" className="type-display mt-8 text-foreground">
               <StyledText
-                text={fieldText(header, "heading", "PRIDE")}
+                text={fieldText(header, "heading", "PrideTrade")}
                 accentClassName="text-foreground"
               />
             </h1>
@@ -210,7 +189,7 @@ function PridePage() {
                 text={fieldText(
                   header,
                   "subheading",
-                  "PRIDE is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform will let users manage digital assets easily, while staying connected to the broader ENICE ecosystem.",
+                  "PrideTrade is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform lets users trade, hold and move digital assets from one account.",
                 )}
                 accentClassName="text-electric"
                 boldClassName="font-semibold text-foreground"
@@ -271,7 +250,7 @@ function PridePage() {
             lead={fieldText(
               highlightsSection,
               "subheading",
-              "PRIDE will let users manage digital assets easily, fully integrated across the broader ENICE Group ecosystem.",
+              "PrideTrade lets users manage digital assets easily, from one account.",
             )}
           />
         </Reveal>
@@ -292,42 +271,6 @@ function PridePage() {
         </HairlineGrid>
       </Section>
 
-      {/* ═══ ECOSYSTEM ════════════════════════════════════════════════════════ */}
-      <Section spacing="tight" container="narrow" divider aria-labelledby="pride-ecosystem-heading">
-        <Reveal>
-          <SectionIntro
-            id="pride-ecosystem-heading"
-            align="center"
-            eyebrow="ENICE Ecosystem"
-            heading="One ecosystem. Every financial need."
-            lead="PRIDE is built into the same ecosystem as PulsePay. Move between crypto and traditional finance from a single account."
-          />
-        </Reveal>
-
-        <ul className="mt-10 grid gap-4 sm:grid-cols-2">
-          {ECOSYSTEM.map((p) => (
-            <li key={p.to} className="flex">
-              {/* `PRODUCTS.to` is a plain string; TanStack validates `to` against the route tree,
-                  so the cast is the same one the design-system primitives make. */}
-              <Link
-                to={p.to as "/"}
-                className="panel panel-interactive flex w-full flex-col gap-1.5 p-5"
-              >
-                <span className="flex items-center justify-between gap-3">
-                  <span className="text-[15px] font-semibold text-foreground">{p.label}</span>
-                  {p.stage === "available" ? (
-                    <Tag tone="positive">Available</Tag>
-                  ) : (
-                    <Tag tone="accent">In development</Tag>
-                  )}
-                </span>
-                <span className="type-body text-[12px]">{p.description}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
       {/* ═══ WAITLIST ═════════════════════════════════════════════════════════ */}
       <Section container="narrow" divider glow="center" aria-labelledby="pride-waitlist-heading">
         <Reveal>
@@ -336,7 +279,7 @@ function PridePage() {
             align="center"
             eyebrow="Be First In Line"
             heading="Get early access when we launch."
-            lead="Join the PRIDE waitlist to receive launch updates, early access opportunities, and priority onboarding when the platform goes live in Q3 2027."
+            lead="Join the PrideTrade waitlist to receive launch updates, early access opportunities, and priority onboarding when the platform goes live in Q3 2027."
           />
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Cta to={WAITLIST_MAILTO} size="lg" icon="external">

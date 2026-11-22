@@ -65,7 +65,7 @@ var DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
 var PAGE_SEO = {
   "/": {
     title: "ENICE Group | Payments and Digital Asset Infrastructure",
-    description: "ENICE Group builds and operates payment and digital asset infrastructure: PulsePay for cards, wallets and transfers, PRIDE for trading and custody, on one shared ledger."
+    description: "ENICE Group builds and operates payment and digital asset platforms: PulsePay for cards, wallets and transfers, PrideTrade for trading and custody. Two separate products."
   },
   "/about": {
     title: "About ENICE Group | A Technology Company Building African Infrastructure",
@@ -81,23 +81,23 @@ var PAGE_SEO = {
   },
   "/portfolio": {
     title: "Products | ENICE Group",
-    description: "PulsePay and PRIDE: the products built and operated by ENICE Group."
+    description: "PulsePay and PrideTrade: the products built and operated by ENICE Group."
   },
   "/portfolio/pulsepay": {
     title: "PulsePay | Virtual Payment Platform by ENICE Group",
     description: "PulsePay by ENICE Group: virtual Naira and USD card issuance, built-in KYC, programmable wallets, peer-to-peer transfers, and fraud monitoring for modern commerce."
   },
   "/portfolio/pride": {
-    title: "PRIDE | Digital Asset Platform by ENICE Group",
-    description: "PRIDE is ENICE Group's digital asset platform for trading, secure custody and cross-ecosystem transfers, built on the same ledger and compliance controls as PulsePay."
+    title: "PrideTrade | Digital Asset Platform by ENICE Group",
+    description: "PrideTrade is ENICE Group's digital asset platform for trading, secure custody and transfers, built on its own ledger and compliance controls."
   },
   "/roadmap": {
     title: "Product Roadmap | ENICE Group",
-    description: "The ENICE Group product roadmap: milestones completed for PulsePay, the PRIDE launch, and the shared ENICE Core underneath both."
+    description: "The ENICE Group product roadmap: milestones completed for PulsePay, the PrideTrade launch, and the shared ENICE Core underneath both."
   },
   "/blog/": {
     title: "Blog and Updates | ENICE Group",
-    description: "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PRIDE, and the platform underneath them."
+    description: "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PrideTrade, and the platform underneath them."
   },
   "/news/": {
     title: "News and Changelog | ENICE Group",
@@ -5905,7 +5905,7 @@ function defaultSettings() {
           visible: true,
           children: [
             { id: "nav-pulsepay", label: "PulsePay", url: "/portfolio/pulsepay", visible: true },
-            { id: "nav-pride", label: "PRIDE", url: "/portfolio/pride", visible: true }
+            { id: "nav-pride", label: "PrideTrade", url: "/portfolio/pride", visible: true }
           ]
         },
         { id: "nav-company", label: "Company", url: "/about", visible: true },
@@ -5935,7 +5935,7 @@ function defaultSettings() {
           heading: "Products",
           links: [
             { id: "f-pulsepay", label: "PulsePay", url: "/portfolio/pulsepay", visible: true },
-            { id: "f-pride", label: "PRIDE", url: "/portfolio/pride", visible: true },
+            { id: "f-pride", label: "PrideTrade", url: "/portfolio/pride", visible: true },
             { id: "f-all-products", label: "All products", url: "/portfolio", visible: true }
           ]
         },

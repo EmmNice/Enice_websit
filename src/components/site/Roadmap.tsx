@@ -56,8 +56,8 @@ const MILESTONES: Milestone[] = [
     when: "Q4 2026",
     quarter: "Q4 2026",
     status: "in-progress",
-    product: "PRIDE",
-    title: "PRIDE Waitlist and Platform Preview",
+    product: "PrideTrade",
+    title: "PrideTrade Waitlist and Platform Preview",
     body: "Early access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch.",
     tags: ["Digital Assets", "Custody"],
   },
@@ -83,9 +83,9 @@ const MILESTONES: Milestone[] = [
     when: "2027",
     quarter: "2027",
     status: "planned",
-    product: "PRIDE",
-    title: "PRIDE Public Launch",
-    body: "Trading, custody and cross-ecosystem transfers open to PulsePay account holders.",
+    product: "PrideTrade",
+    title: "PrideTrade Public Launch",
+    body: "Trading, custody and transfers open to early-access accounts.",
     tags: ["Digital Assets", "Trading"],
   },
   {
@@ -153,7 +153,7 @@ const STATUS_CONFIG: Record<
  *
  *     when: Q4 2026
  *     status: in-progress
- *     product: PRIDE
+ *     product: PrideTrade
  *     tags: Digital Assets, Custody
  *
  *     Early access to the digital asset platform ahead of launch.

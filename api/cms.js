@@ -14941,7 +14941,7 @@ function defaultSettings() {
           visible: true,
           children: [
             { id: "nav-pulsepay", label: "PulsePay", url: "/portfolio/pulsepay", visible: true },
-            { id: "nav-pride", label: "PRIDE", url: "/portfolio/pride", visible: true }
+            { id: "nav-pride", label: "PrideTrade", url: "/portfolio/pride", visible: true }
           ]
         },
         { id: "nav-company", label: "Company", url: "/about", visible: true },
@@ -14971,7 +14971,7 @@ function defaultSettings() {
           heading: "Products",
           links: [
             { id: "f-pulsepay", label: "PulsePay", url: "/portfolio/pulsepay", visible: true },
-            { id: "f-pride", label: "PRIDE", url: "/portfolio/pride", visible: true },
+            { id: "f-pride", label: "PrideTrade", url: "/portfolio/pride", visible: true },
             { id: "f-all-products", label: "All products", url: "/portfolio", visible: true }
           ]
         },
@@ -15036,7 +15036,7 @@ var DEFAULT_SECTIONS = [
     fields: {
       eyebrow: "Financial technology & digital infrastructure",
       heading: "Building the infrastructure behind modern finance.",
-      subheading: "ENICE develops financial technology and digital asset infrastructure through PulsePay and PRIDE, creating solutions that simplify payments and expand access to digital financial services.",
+      subheading: "ENICE develops financial technology and digital asset infrastructure through PulsePay and PrideTrade, creating solutions that simplify payments and expand access to digital financial services.",
       primaryCtaLabel: "Discover our solutions",
       primaryCtaUrl: "/portfolio",
       secondaryCtaLabel: "Contact ENICE",
@@ -15089,8 +15089,8 @@ var DEFAULT_SECTIONS = [
           icon: "Bitcoin",
           kicker: "DIGITAL ASSETS",
           title: "Digital assets and custody",
-          description: "Trading and custody for digital assets inside the same account, so a balance can move between payment rails and asset rails without leaving the platform.",
-          bullets: "Trading and Custody\nCross-Ecosystem Transfers\nShared Compliance Controls"
+          description: "Trading and custody for digital assets in one account, with transfers between assets handled in the same place.",
+          bullets: "Trading and Custody\nTransfers\nCompliance Controls"
         },
         {
           icon: "Boxes",
@@ -15136,8 +15136,8 @@ var DEFAULT_SECTIONS = [
         {
           icon: "Bitcoin",
           kicker: "DIGITAL ASSETS",
-          title: "PRIDE",
-          description: "ENICE Group's digital asset platform for cryptocurrency trading, secure custody and cross-ecosystem digital finance, built on the same ledger as PulsePay.",
+          title: "PrideTrade",
+          description: "ENICE Group's digital asset platform for cryptocurrency trading, secure custody and transfers, built on its own ledger and controls.",
           bullets: "Launch: 2027\nCategory: Digital assets",
           url: "/portfolio/pride"
         }
@@ -15219,11 +15219,11 @@ var DEFAULT_SECTIONS = [
       items: [
         {
           question: "What does ENICE Group build?",
-          answer: "ENICE Group builds and operates technology products for financial services and digital assets. PulsePay is our digital payments platform and PRIDE is our digital asset platform, both running on the same shared infrastructure."
+          answer: "ENICE Group builds and operates technology products for financial services and digital assets. PulsePay is our digital payments platform and PrideTrade is our digital asset platform. They are separate products, each on its own infrastructure."
         },
         {
           question: "Which problems are ENICE products built to solve?",
-          answer: "Our products focus on payments and digital finance. PulsePay covers cards, wallets and transfers for businesses and individuals, and PRIDE covers trading and custody of digital assets in the same account."
+          answer: "Our products focus on payments and digital finance. PulsePay covers cards, wallets and transfers for businesses and individuals, and PrideTrade covers trading and custody of digital assets in its own account."
         },
         {
           question: "What does the ENICE Engine provide?",
@@ -15285,8 +15285,8 @@ var DEFAULT_SECTIONS = [
           description: "when: Q3 2026\nstatus: completed\nproduct: PulsePay\ntags: Fintech, Wallets, KYC\n\nProgrammable wallets, instant virtual card issuance, and embedded compliance controls, rolled out to a wider pilot group across West Africa."
         },
         {
-          title: "PRIDE Waitlist and Platform Preview",
-          description: "when: Q4 2026\nstatus: in-progress\nproduct: PRIDE\ntags: Digital Assets, Custody\n\nEarly access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch."
+          title: "PrideTrade Waitlist and Platform Preview",
+          description: "when: Q4 2026\nstatus: in-progress\nproduct: PrideTrade\ntags: Digital Assets, Custody\n\nEarly access to the digital asset platform ahead of the public launch."
         },
         {
           title: "Developer API Public Beta",
@@ -15297,8 +15297,8 @@ var DEFAULT_SECTIONS = [
           description: "when: H1 2027\nstatus: planned\nproduct: PulsePay\ntags: Fintech, Multi-Currency, Treasury\n\nMulti-currency wallet rails, programmable spend controls, and embedded treasury operations opening to all businesses."
         },
         {
-          title: "PRIDE Public Launch",
-          description: "when: 2027\nstatus: planned\nproduct: PRIDE\ntags: Digital Assets, Trading\n\nTrading, custody and cross-ecosystem transfers open to PulsePay account holders."
+          title: "PrideTrade Public Launch",
+          description: "when: 2027\nstatus: planned\nproduct: PrideTrade\ntags: Digital Assets, Trading\n\nTrading, custody and transfers open to early-access accounts."
         },
         {
           title: "Universal Financial Hub",
@@ -15557,14 +15557,14 @@ var DEFAULT_SECTIONS = [
   },
   {
     key: "portfolio.pride",
-    label: "PRIDE page",
+    label: "PrideTrade page",
     group: "Portfolio",
     type: "hero",
     order: 230,
     fields: {
       eyebrow: "Digital Assets",
-      heading: "PRIDE",
-      subheading: "PRIDE is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance simple, secure, and accessible, inside the same account as PulsePay."
+      heading: "PrideTrade",
+      subheading: "PrideTrade is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance simple, secure and accessible, from one account."
     }
   },
   {
@@ -15605,8 +15605,8 @@ var DEFAULT_SECTIONS = [
         },
         {
           icon: "Globe",
-          title: "Cross-ecosystem transfers",
-          description: "Move value between the payment and asset sides of the ecosystem without leaving ENICE or repeating identity checks."
+          title: "Asset transfers",
+          description: "Move digital assets between your own accounts and external wallets, with identity checks already on file."
         },
         {
           icon: "ShieldCheck",
@@ -15755,7 +15755,7 @@ var SYSTEM_PAGES = [
   { path: "/portfolio/pulsepay", title: "PulsePay", summary: "Virtual payment platform." },
   {
     path: "/portfolio/pride",
-    title: "PRIDE",
+    title: "PrideTrade",
     summary: "Digital asset trading and custody."
   },
   { path: "/contact", title: "Contact", summary: "Enquiry form and contact details." },
@@ -15810,6 +15810,97 @@ async function seedWebsiteDefaults() {
       ON CONFLICT (path) DO NOTHING
     `;
   }
+}
+
+// api-src/lib/repo/copy-fixes.ts
+var MARKER = "copy_fixes_pridetrade_v1";
+var REPLACEMENTS = [
+  // ── Coupling claims: PrideTrade is not part of PulsePay's ecosystem ──
+  [
+    "PrideTrade is built into the same ecosystem as PulsePay. Move between crypto and traditional finance from a single account.",
+    "PrideTrade runs on its own infrastructure, separate from PulsePay. One account for trading, custody and transfers."
+  ],
+  [
+    "PRIDE is built into the same ecosystem as PulsePay. Move between crypto and traditional finance from a single account.",
+    "PrideTrade runs on its own infrastructure, separate from PulsePay. One account for trading, custody and transfers."
+  ],
+  [
+    "PulsePay is our digital payments platform and PRIDE is our digital asset platform, both running on the same shared infrastructure.",
+    "PulsePay is our digital payments platform and PrideTrade is our digital asset platform. They are separate products, each on its own infrastructure."
+  ],
+  [
+    "PulsePay is our digital payments platform and PrideTrade is our digital asset platform, both running on the same shared infrastructure.",
+    "PulsePay is our digital payments platform and PrideTrade is our digital asset platform. They are separate products, each on its own infrastructure."
+  ],
+  [
+    "PulsePay covers cards, wallets and transfers for businesses and individuals, and PRIDE covers trading and custody of digital assets in the same account.",
+    "PulsePay covers cards, wallets and transfers for businesses and individuals, and PrideTrade covers trading and custody of digital assets in its own account."
+  ],
+  [
+    "PulsePay covers cards, wallets and transfers for businesses and individuals, and PrideTrade covers trading and custody of digital assets in the same account.",
+    "PulsePay covers cards, wallets and transfers for businesses and individuals, and PrideTrade covers trading and custody of digital assets in its own account."
+  ],
+  ["built on the same ledger as PulsePay.", "built on its own ledger and controls."],
+  ["inside the same account as PulsePay.", "from one account."],
+  ["while staying connected to the broader ENICE ecosystem.", "from one account."],
+  ["fully integrated across the broader ENICE Group ecosystem.", "from one account."],
+  [
+    "Trading and custody for digital assets inside the same account, so a balance can move between payment rails and asset rails without leaving the platform.",
+    "Trading and custody for digital assets in one account, with transfers between assets handled in the same place."
+  ],
+  [
+    "Early access to the digital asset platform for users already holding funds on PulsePay, ahead of the public launch.",
+    "Early access to the digital asset platform ahead of the public launch."
+  ],
+  [
+    "Trading, custody and cross-ecosystem transfers open to PulsePay account holders.",
+    "Trading, custody and transfers open to early-access accounts."
+  ],
+  [
+    "Move value between the payment and asset sides of the ecosystem without leaving ENICE or repeating identity checks.",
+    "Move digital assets between your own accounts and external wallets, with identity checks already on file."
+  ],
+  [
+    "Move between PrideTrade and PulsePay without leaving the ENICE stack: one account, every service.",
+    "Keep trading, custody and transfers in one place, with your own ledger and controls."
+  ],
+  ["Shared Ecosystem Framework", "Shared Engineering Standards"],
+  [
+    "The unified AI pipeline, ledger, and compliance backbone that now underpins every ENICE product.",
+    "The engineering, audit and security standards applied across every ENICE project."
+  ],
+  ["Same KYC and monitoring as PulsePay", "KYC and monitoring built in from day one"],
+  ["Cross-ecosystem transfers", "Asset transfers"],
+  ["Cross-Ecosystem Transfers", "Transfers"],
+  ["cross-ecosystem digital finance", "digital asset trading and custody"],
+  ["cross-ecosystem transfers", "asset transfers"],
+  ["Same KYC and monitoring as PulsePay", "KYC and monitoring built in from day one"],
+  // ── The brand rename, last: it must not run before the sentences above are matched ──
+  ["PRIDE", "PrideTrade"]
+];
+async function applyCopyFixes() {
+  const sql = db();
+  const existing = await sql`
+    SELECT key FROM site_settings WHERE key = ${MARKER}
+  `;
+  if (existing.length > 0) return;
+  for (const [from, to] of REPLACEMENTS) {
+    await sql`
+      UPDATE site_sections
+         SET fields = replace(fields::text, ${from}, ${to})::jsonb,
+             label  = replace(label, ${from}, ${to})
+       WHERE fields::text LIKE ${"%" + from + "%"} OR label LIKE ${"%" + from + "%"}
+    `;
+    await sql`
+      UPDATE site_settings
+         SET value = replace(value::text, ${from}, ${to})::jsonb
+       WHERE value::text LIKE ${"%" + from + "%"}
+    `;
+  }
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    ON CONFLICT (key) DO NOTHING
+  `;
 }
 
 // api-src/lib/repo/admins.ts
@@ -16821,6 +16912,7 @@ router.add("POST /account/2fa/recovery-codes", async ({ body, identity }) => {
 });
 router.add("GET /dashboard", async () => {
   await seedWebsiteDefaults();
+  await applyCopyFixes();
   return dashboardSnapshot();
 });
 router.add("GET /search", async ({ query }) => ({

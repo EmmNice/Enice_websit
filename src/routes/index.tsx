@@ -70,16 +70,16 @@ const PRODUCTS: Product[] = [
   },
   {
     to: "/portfolio/pride",
-    title: "PRIDE",
+    title: "PrideTrade",
     kicker: "Digital assets",
     accent: "accent-pride",
     icon: Bitcoin,
-    summary: "Trading and custody for digital assets, built into the same ledger as PulsePay.",
-    desc: "PRIDE is ENICE Group's digital asset platform: trading, custody and cross-ecosystem transfers for users who already hold funds on PulsePay, with the same compliance and ledger controls behind both.",
+    summary: "Trading and custody for digital assets, with its own ledger and controls.",
+    desc: "PrideTrade is ENICE Group's digital asset platform: trading, custody and transfers in one account, run on its own ledger and compliance controls.",
     bullets: [
       "Digital asset trading in one account",
       "Custody and transfers built on the ENICE ledger",
-      "Same KYC and monitoring as PulsePay",
+      "KYC and monitoring built in from day one",
     ],
     facts: [
       { label: "Launch", value: "2027" },
@@ -166,7 +166,7 @@ function Landing() {
                 text={fieldText(
                   hero,
                   "subheading",
-                  "ENICE develops financial technology and digital asset infrastructure through PulsePay and PRIDE, creating solutions that simplify payments and expand access to digital financial services.",
+                  "ENICE develops financial technology and digital asset infrastructure through PulsePay and PrideTrade, creating solutions that simplify payments and expand access to digital financial services.",
                 )}
                 accentClassName="text-electric"
               />
@@ -238,7 +238,7 @@ function Landing() {
                   text={fieldText(
                     portfolio,
                     "subheading",
-                    "PulsePay and PRIDE are designed, built and operated by ENICE on infrastructure we run ourselves.",
+                    "Two separate products, each designed, built and operated by ENICE on infrastructure we run ourselves.",
                   )}
                   accentClassName="text-electric"
                 />

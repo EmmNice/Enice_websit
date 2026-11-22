@@ -118,7 +118,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/": {
     title: "ENICE Group | Payments and Digital Asset Infrastructure",
     description:
-      "ENICE Group builds and operates payment and digital asset infrastructure: PulsePay for cards, wallets and transfers, PRIDE for trading and custody, on one shared ledger.",
+      "ENICE Group builds and operates payment and digital asset platforms: PulsePay for cards, wallets and transfers, PrideTrade for trading and custody. Two separate products.",
   },
   "/about": {
     title: "About ENICE Group | A Technology Company Building African Infrastructure",
@@ -137,7 +137,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   },
   "/portfolio": {
     title: "Products | ENICE Group",
-    description: "PulsePay and PRIDE: the products built and operated by ENICE Group.",
+    description: "PulsePay and PrideTrade: the products built and operated by ENICE Group.",
   },
   "/portfolio/pulsepay": {
     title: "PulsePay | Virtual Payment Platform by ENICE Group",
@@ -145,19 +145,19 @@ export const PAGE_SEO: Record<string, PageSeo> = {
       "PulsePay by ENICE Group: virtual Naira and USD card issuance, built-in KYC, programmable wallets, peer-to-peer transfers, and fraud monitoring for modern commerce.",
   },
   "/portfolio/pride": {
-    title: "PRIDE | Digital Asset Platform by ENICE Group",
+    title: "PrideTrade | Digital Asset Platform by ENICE Group",
     description:
-      "PRIDE is ENICE Group's digital asset platform for trading, secure custody and cross-ecosystem transfers, built on the same ledger and compliance controls as PulsePay.",
+      "PrideTrade is ENICE Group's digital asset platform for trading, secure custody and transfers, built on its own ledger and compliance controls.",
   },
   "/roadmap": {
     title: "Product Roadmap | ENICE Group",
     description:
-      "The ENICE Group product roadmap: milestones completed for PulsePay, the PRIDE launch, and the shared ENICE Core underneath both.",
+      "The ENICE Group product roadmap: milestones completed for PulsePay, the PrideTrade launch, and the shared ENICE Core underneath both.",
   },
   "/blog/": {
     title: "Blog and Updates | ENICE Group",
     description:
-      "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PRIDE, and the platform underneath them.",
+      "Product updates, changelog entries, and announcements from ENICE Group across PulsePay, PrideTrade, and the platform underneath them.",
   },
   "/news/": {
     title: "News and Changelog | ENICE Group",

@@ -14,7 +14,7 @@ export const CONTACT_ENDPOINT = "/api/contact";
 
 export const INQUIRY_OPTIONS = [
   "Fintech Infrastructure Integration (PulsePay)",
-  "Digital Assets or PRIDE Waitlist",
+  "Digital Assets or PrideTrade Waitlist",
   "Technology or Product Partnership",
   "General Corporate Inquiry",
 ] as const;

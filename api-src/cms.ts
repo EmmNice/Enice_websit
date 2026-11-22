@@ -95,6 +95,7 @@ import {
   uniqueSlug,
 } from "./lib/repo/content";
 import { seedWebsiteDefaults } from "./lib/repo/website";
+import { applyCopyFixes } from "./lib/repo/copy-fixes";
 import {
   changeOwnPassword,
   twoFactorStatus,
@@ -436,6 +437,7 @@ router.add("POST /account/2fa/recovery-codes", async ({ body, identity }) => {
 
 router.add("GET /dashboard", async () => {
   await seedWebsiteDefaults();
+  await applyCopyFixes();
   return dashboardSnapshot();
 });
 

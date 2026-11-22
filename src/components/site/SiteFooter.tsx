@@ -48,7 +48,7 @@ const FOOTER_COLS = [
     heading: "Products",
     links: [
       { label: "PulsePay", url: "/portfolio/pulsepay" },
-      { label: "PRIDE", url: "/portfolio/pride" },
+      { label: "PrideTrade", url: "/portfolio/pride" },
       { label: "All products", url: "/portfolio" },
     ],
   },

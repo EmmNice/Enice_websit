@@ -7,11 +7,11 @@ import { Panel } from "./primitives";
  * ## Why this exists
  *
  * The pages used to carry decorative panels — a card graphic on PulsePay, a candlestick chart and
- * sparklines on PRIDE. Those are the two things a reader discounts immediately: invented charts and
+ * sparklines on PrideTrade. Those are the two things a reader discounts immediately: invented charts and
  * a render of a card. They also say nothing about whether the product works.
  *
  * These are drawn from the real screens instead: the actions PulsePay offers (transfer, airtime,
- * data, cards, gift cards), the fees it shows before you confirm, and the exchange surfaces PRIDE
+ * data, cards, gift cards), the fees it shows before you confirm, and the exchange surfaces PrideTrade
  * uses (naira funding by bank transfer, market pairs, withdrawal address allowlisting, a payment PIN
  * separate from the password). Text and borders only — no images, no canvas, nothing to download,
  * sharp on any screen.
@@ -104,7 +104,7 @@ export function PrideSurface({ className }: { className?: string }) {
   return (
     <Panel raised aria-hidden className={className}>
       <div className="flex items-center justify-between border-b border-border px-5 py-3">
-        <span className="text-[12.5px] font-semibold text-bone-strong">PRIDE Exchange</span>
+        <span className="text-[12.5px] font-semibold text-bone-strong">PrideTrade Exchange</span>
         <span className="font-mono text-[10px] tracking-[0.18em] text-bone-faint">NGN</span>
       </div>
 

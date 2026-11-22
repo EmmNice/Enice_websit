@@ -59,7 +59,7 @@ export const PRODUCTS: NavItem[] = [
   },
   {
     // Unlaunched: waitlist only. The roadmap carries the launch milestones.
-    label: "PRIDE",
+    label: "PrideTrade",
     to: "/portfolio/pride",
     description: "Digital asset trading and custody across the ENICE ecosystem.",
     stage: "building",
