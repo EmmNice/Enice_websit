@@ -123,3 +123,114 @@ export async function applyCopyFixes(): Promise<void> {
     ON CONFLICT (key) DO NOTHING
   `;
 }
+
+/**
+ * The PulsePay page repositioned from a card issuer to a full digital banking platform.
+ *
+ * The hero, the six capability cards and the compliance paragraph are stored per section, and the
+ * cards are an array: patching sentences inside them would leave a half-renamed grid. So this sets
+ * the three sections' fields outright, which is what an editor would have done in the manager.
+ *
+ * Its own marker, so it still runs on a site where the PrideTrade corrections already applied.
+ */
+const PULSEPAY_MARKER = "copy_fixes_pulsepay_banking_v1";
+
+const PULSEPAY_FEATURES = [
+  {
+    icon: "Landmark",
+    title: "Instant Naira Bank Accounts",
+    description:
+      "Get a dedicated Nigerian bank account in minutes to receive salaries, collect payments, and hold funds securely.",
+  },
+  {
+    icon: "Send",
+    title: "Fast Transfers & P2P Payments",
+    description:
+      "Send money instantly to any Nigerian bank account or transfer between PulsePay wallets with zero friction.",
+  },
+  {
+    icon: "CreditCard",
+    title: "Naira & USD Virtual Cards",
+    description:
+      "Issue Naira and USD virtual cards in seconds for seamless local checkouts, international subscriptions, and global online spend.",
+  },
+  {
+    icon: "Receipt",
+    title: "Bills, Airtime & Utilities",
+    description:
+      "Pay electricity, cable TV, internet, airtime, and data bills in seconds with instant receipts and automated recurring schedules.",
+  },
+  {
+    icon: "ShieldCheck",
+    title: "Built-in KYC & Fraud Protection",
+    description:
+      "Tiered identity verification, real-time transaction screening, and dual-control security protecting every account and transfer.",
+  },
+  {
+    icon: "Sparkles",
+    title: "Fin AI Financial Assistant",
+    description:
+      "Track spending, get smart cashflow insights, and execute transfers or bill payments using natural voice and text commands.",
+  },
+];
+
+export async function applyPulsePayCopy(): Promise<void> {
+  const sql = db();
+
+  const existing = await sql<{ key: string }[]>`
+    SELECT key FROM site_settings WHERE key = ${PULSEPAY_MARKER}
+  `;
+  if (existing.length > 0) return;
+
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+         eyebrow: "Digital Banking & Financial Platform",
+         heading: "PulsePay",
+         subheading:
+           "A complete digital banking platform for everyday money—open instant Naira accounts, send fast transfers, pay bills, spend globally with Naira and USD virtual cards, and manage your money with Fin, your built-in AI financial assistant.",
+       })}::jsonb
+     WHERE key = 'portfolio.pulsepay'
+  `;
+
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+         eyebrow: "Platform Capabilities",
+         heading: "Everything a modern payments stack should be.",
+         subheading:
+           "PulsePay covers the whole of everyday money: accounts, transfers, cards, bills, protection and a built-in assistant, in one platform.",
+         items: PULSEPAY_FEATURES,
+       })}::jsonb
+     WHERE key = 'portfolio.pulsepay.features'
+  `;
+
+  // The compliance paragraph keeps its four mechanism pills; only the sentence goes.
+  await sql`
+    UPDATE site_sections
+       SET fields = jsonb_set(
+             fields,
+             '{subheading}',
+             to_jsonb(
+               'PulsePay operates within Nigeria''s regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions.'::text
+             )
+           )
+     WHERE key = 'portfolio.pulsepay.compliance'
+  `;
+
+  // Defensive: the sentence may also sit in any other section an editor has touched.
+  await sql`
+    UPDATE site_sections
+       SET fields = replace(
+             fields::text,
+             ' PulsePay holds no third-party security certification today, and we will tell you so directly rather than imply otherwise.',
+             ''
+           )::jsonb
+     WHERE fields::text LIKE '%third-party security certification%'
+  `;
+
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${PULSEPAY_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    ON CONFLICT (key) DO NOTHING
+  `;
+}

@@ -12,6 +12,10 @@ import {
   Users,
   BarChart3,
   Lock,
+  Landmark,
+  Receipt,
+  Send,
+  Sparkles,
 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { PulsePaySurface, SurfaceNote } from "@/components/site/ProductSurfaces";
@@ -41,7 +45,7 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
         "@type": "SoftwareApplication",
         name: "PulsePay",
         description:
-          "ENICE Group's virtual payment platform: Naira and USD card issuance, built-in KYC verification, peer-to-peer transfers, programmable spend controls, and fraud monitoring.",
+          "ENICE Group's digital banking platform: instant Naira accounts, fast transfers, Naira and USD virtual cards, bill payments, built-in KYC, and Fin, a built-in AI financial assistant.",
         url: `${SITE_URL}/portfolio/pulsepay`,
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web, iOS, Android",
@@ -52,12 +56,12 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
         },
         author: ORGANIZATION_REF,
         featureList: [
-          "Instant virtual Naira and USD card issuance",
-          "Built-in KYC and identity verification",
-          "Peer-to-peer transfers and wallet funding",
-          "Programmable spend controls for teams",
-          "Value-added services and bill payments",
-          "Enterprise-grade fraud monitoring",
+          "Instant Naira bank accounts",
+          "Fast transfers and peer-to-peer payments",
+          "Naira and USD virtual cards",
+          "Bills, airtime and utilities",
+          "Built-in KYC and fraud protection",
+          "Fin, the built-in AI financial assistant",
         ],
       },
     ]),
@@ -94,8 +98,12 @@ const CARD_ICONS: Record<string, LucideIcon> = {
   Check,
   CreditCard,
   Globe,
+  Landmark,
   Lock,
+  Receipt,
+  Send,
   ShieldCheck,
+  Sparkles,
   Users,
   Wifi,
   Zap,
@@ -107,34 +115,34 @@ function cardIcon(name: string): LucideIcon {
 
 const FEATURES = [
   {
+    icon: Landmark,
+    title: "Instant Naira Bank Accounts",
+    desc: "Get a dedicated Nigerian bank account in minutes to receive salaries, collect payments, and hold funds securely.",
+  },
+  {
+    icon: Send,
+    title: "Fast Transfers & P2P Payments",
+    desc: "Send money instantly to any Nigerian bank account or transfer between PulsePay wallets with zero friction.",
+  },
+  {
     icon: CreditCard,
-    title: "Instant virtual card issuance",
-    desc: "Issue Naira and USD virtual cards in seconds for individuals and teams.",
+    title: "Naira & USD Virtual Cards",
+    desc: "Issue Naira and USD virtual cards in seconds for seamless local checkouts, international subscriptions, and global online spend.",
+  },
+  {
+    icon: Receipt,
+    title: "Bills, Airtime & Utilities",
+    desc: "Pay electricity, cable TV, internet, airtime, and data bills in seconds with instant receipts and automated recurring schedules.",
   },
   {
     icon: ShieldCheck,
-    title: "Built-in KYC verification",
-    desc: "Identity verification and compliance checks built directly into the onboarding flow.",
+    title: "Built-in KYC & Fraud Protection",
+    desc: "Tiered identity verification, real-time transaction screening, and dual-control security protecting every account and transfer.",
   },
   {
-    icon: Users,
-    title: "Peer-to-peer transfers",
-    desc: "Move funds between users and fund wallets instantly with no friction.",
-  },
-  {
-    icon: Lock,
-    title: "Programmable spend controls",
-    desc: "Set granular limits and rules for individuals, teams, and departments.",
-  },
-  {
-    icon: Zap,
-    title: "Value-added services",
-    desc: "Bill payments, airtime, utilities, and more built directly into the platform.",
-  },
-  {
-    icon: BarChart3,
-    title: "Enterprise fraud monitoring",
-    desc: "Real-time transaction screening and anomaly detection at every step.",
+    icon: Sparkles,
+    title: "Fin AI Financial Assistant",
+    desc: "Track spending, get smart cashflow insights, and execute transfers or bill payments using natural voice and text commands.",
   },
 ];
 
@@ -205,12 +213,12 @@ function PulsePayPage() {
             <SectionIntro
               id="pulsepay-heading"
               level={1}
-              eyebrow={fieldText(header, "eyebrow", "Fintech Infrastructure Platform")}
+              eyebrow={fieldText(header, "eyebrow", "Digital Banking & Financial Platform")}
               heading={fieldText(header, "heading", "PulsePay")}
               lead={fieldText(
                 header,
                 "subheading",
-                "A virtual payment platform that issues Naira and USD cards, handles KYC verification, moves funds between users, and delivers value-added services with speed and reliability.",
+                "A complete digital banking platform for everyday money—open instant Naira accounts, send fast transfers, pay bills, spend globally with Naira and USD virtual cards, and manage your money with Fin, your built-in AI financial assistant.",
               )}
             />
 
@@ -275,7 +283,7 @@ function PulsePayPage() {
           lead={fieldText(
             featuresSection,
             "subheading",
-            "PulsePay covers the full payments stack: issuance, compliance, transfers, and spending controls, in one integrated platform.",
+            "PulsePay covers the whole of everyday money: accounts, transfers, cards, bills, protection and a built-in assistant, in one platform.",
           )}
         />
 
@@ -311,7 +319,7 @@ function PulsePayPage() {
               {fieldText(
                 complianceSection,
                 "subheading",
-                "PulsePay operates within Nigeria's regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions. PulsePay holds no third-party security certification today, and we will tell you so directly rather than imply otherwise.",
+                "PulsePay operates within Nigeria's regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions.",
               )}
             </p>
           </div>

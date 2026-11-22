@@ -77,8 +77,7 @@ export const Route = createFileRoute("/compliance")({
           body: (
             <p>
               Our systems apply row-level security on every multi-tenant database, encryption in
-              transit and at rest, and audit logging of privileged actions. We hold no third-party
-              security certification at this time and do not claim one.
+              transit and at rest, and audit logging of privileged actions.
             </p>
           ),
         },

@@ -10877,14 +10877,14 @@ INSERT INTO site_sections (key, label, group_name, type, visible, status, fields
 VALUES ('portfolio.pulsepay.features', 'PulsePay capabilities', 'Portfolio', 'featureGrid', true, 'published', '{
   "eyebrow": "Platform Capabilities",
   "heading": "Everything a modern payments stack should be.",
-  "subheading": "PulsePay covers the full payments stack: issuance, compliance, transfers, and spending controls, in one integrated platform.",
+  "subheading": "PulsePay covers the whole of everyday money: accounts, transfers, cards, bills, protection and a built-in assistant, in one platform.",
   "items": [
-    {"icon":"CreditCard","title":"Instant virtual card issuance","description":"Issue Naira and USD virtual cards in seconds for individuals and teams."},
-    {"icon":"ShieldCheck","title":"Built-in KYC verification","description":"Identity verification and compliance checks built directly into the onboarding flow."},
-    {"icon":"Users","title":"Peer-to-peer transfers","description":"Move funds between users and fund wallets instantly with no friction."},
-    {"icon":"Lock","title":"Programmable spend controls","description":"Set granular limits and rules for individuals, teams, and departments."},
-    {"icon":"Zap","title":"Value-added services","description":"Bill payments, airtime, utilities, and more built directly into the platform."},
-    {"icon":"BarChart3","title":"Enterprise fraud monitoring","description":"Real-time transaction screening and anomaly detection at every step."}
+    {"icon":"Landmark","title":"Instant Naira Bank Accounts","description":"Get a dedicated Nigerian bank account in minutes to receive salaries, collect payments, and hold funds securely."},
+    {"icon":"Send","title":"Fast Transfers & P2P Payments","description":"Send money instantly to any Nigerian bank account or transfer between PulsePay wallets with zero friction."},
+    {"icon":"CreditCard","title":"Naira & USD Virtual Cards","description":"Issue Naira and USD virtual cards in seconds for seamless local checkouts, international subscriptions, and global online spend."},
+    {"icon":"Receipt","title":"Bills, Airtime & Utilities","description":"Pay electricity, cable TV, internet, airtime, and data bills in seconds with instant receipts and automated recurring schedules."},
+    {"icon":"ShieldCheck","title":"Built-in KYC & Fraud Protection","description":"Tiered identity verification, real-time transaction screening, and dual-control security protecting every account and transfer."},
+    {"icon":"Sparkles","title":"Fin AI Financial Assistant","description":"Track spending, get smart cashflow insights, and execute transfers or bill payments using natural voice and text commands."}
   ]
 }'::jsonb, 212)
 ON CONFLICT (key) DO NOTHING;
@@ -10893,7 +10893,7 @@ INSERT INTO site_sections (key, label, group_name, type, visible, status, fields
 VALUES ('portfolio.pulsepay.compliance', 'PulsePay compliance', 'Portfolio', 'featureGrid', true, 'published', '{
   "eyebrow": "Compliance & Regulation",
   "heading": "Built for regulated markets from the ground up.",
-  "subheading": "PulsePay operates within Nigeria''s regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions. PulsePay holds no third-party security certification today, and we will tell you so directly rather than imply otherwise.",
+  "subheading": "PulsePay operates within Nigeria''s regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions.",
   "items": [
     {"title":"Row-Level Security"},
     {"title":"Tenant Isolation"},
@@ -15590,126 +15590,38 @@ var DEFAULT_SECTIONS = [
     order: 232,
     fields: {
       eyebrow: "Platform Capabilities",
-      heading: "What PRIDE does.",
-      subheading: "The scope the platform is being built to, not a claim that any of it is live today.",
-      items: [
-        {
-          icon: "BarChart3",
-          title: "Trading",
-          description: "Buy and sell digital assets from the balance already held on PulsePay, with pricing shown before an order is placed."
-        },
-        {
-          icon: "Lock",
-          title: "Custody",
-          description: "Assets held with the same isolation and audit trail as money on the payment platform, with a self-custody option for holders who want it."
-        },
-        {
-          icon: "Globe",
-          title: "Asset transfers",
-          description: "Move digital assets between your own accounts and external wallets, with identity checks already on file."
-        },
-        {
-          icon: "ShieldCheck",
-          title: "Regulatory-ready",
-          description: "KYC, AML and transaction monitoring run on the same controls as PulsePay, from the first transaction."
-        }
-      ]
-    }
-  },
-  {
-    key: "portfolio.index",
-    label: "Products page",
-    group: "Portfolio",
-    type: "hero",
-    order: 200,
-    fields: {
-      eyebrow: "ENICE Products",
-      heading: "Products built by ENICE Group",
-      subheading: "Payments, financial services, business communication, and digital commerce. Each product runs on the same infrastructure and is built to operate at scale."
-    }
-  },
-  {
-    key: "portfolio.pulsepay",
-    label: "PulsePay page",
-    group: "Portfolio",
-    type: "hero",
-    order: 210,
-    fields: {
-      eyebrow: "Fintech Infrastructure Platform",
-      heading: "PulsePay",
-      subheading: "A virtual payment platform that issues Naira and USD cards, handles KYC verification, moves funds between users, and delivers value-added services with speed and reliability."
-    }
-  },
-  /*
-   * The bands *inside* each product page, previously hardcoded in the route components.
-   *
-   * Migration 11 made each product page's header editable and stopped there, so the capability
-   * grids, the facts strips, the sector tiles and the compliance pills below them still needed a
-   * deploy to change — which is the content that moves most on a product page. Each band is an
-   * existing section type, so the admin form and the sanitiser already understand it, and each
-   * component keeps its built-in copy as the fallback. Migration 13 seeds the same rows into
-   * existing databases.
-   *
-   * `sort_order` follows the order the bands appear on their page, inside the block already
-   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse, 240 PRIDE and 250 DevaPay — all since removed).
-   */
-  {
-    key: "portfolio.pulsepay.stats",
-    label: "PulsePay facts strip",
-    group: "Portfolio",
-    type: "statistics",
-    order: 211,
-    fields: {
-      heading: "PulsePay at a glance",
-      // Only figures that can be checked: `< 5s — Card issuance time` was removed from this strip
-      // because there is no published benchmark behind it.
-      items: [
-        { value: "Naira & USD", label: "Card currencies" },
-        { value: "2", label: "Currency rails (NGN + USD)" },
-        { value: "Every account", label: "KYC screening" }
-      ]
-    }
-  },
-  {
-    key: "portfolio.pulsepay.features",
-    label: "PulsePay capabilities",
-    group: "Portfolio",
-    type: "featureGrid",
-    order: 212,
-    fields: {
-      eyebrow: "Platform Capabilities",
       heading: "Everything a modern payments stack should be.",
-      subheading: "PulsePay covers the full payments stack: issuance, compliance, transfers, and spending controls, in one integrated platform.",
+      subheading: "PulsePay covers the whole of everyday money: accounts, transfers, cards, bills, protection and a built-in assistant, in one platform.",
       items: [
+        {
+          icon: "Landmark",
+          title: "Instant Naira Bank Accounts",
+          description: "Get a dedicated Nigerian bank account in minutes to receive salaries, collect payments, and hold funds securely."
+        },
+        {
+          icon: "Send",
+          title: "Fast Transfers & P2P Payments",
+          description: "Send money instantly to any Nigerian bank account or transfer between PulsePay wallets with zero friction."
+        },
         {
           icon: "CreditCard",
-          title: "Instant virtual card issuance",
-          description: "Issue Naira and USD virtual cards in seconds for individuals and teams."
+          title: "Naira & USD Virtual Cards",
+          description: "Issue Naira and USD virtual cards in seconds for seamless local checkouts, international subscriptions, and global online spend."
+        },
+        {
+          icon: "Receipt",
+          title: "Bills, Airtime & Utilities",
+          description: "Pay electricity, cable TV, internet, airtime, and data bills in seconds with instant receipts and automated recurring schedules."
         },
         {
           icon: "ShieldCheck",
-          title: "Built-in KYC verification",
-          description: "Identity verification and compliance checks built directly into the onboarding flow."
+          title: "Built-in KYC & Fraud Protection",
+          description: "Tiered identity verification, real-time transaction screening, and dual-control security protecting every account and transfer."
         },
         {
-          icon: "Users",
-          title: "Peer-to-peer transfers",
-          description: "Move funds between users and fund wallets instantly with no friction."
-        },
-        {
-          icon: "Lock",
-          title: "Programmable spend controls",
-          description: "Set granular limits and rules for individuals, teams, and departments."
-        },
-        {
-          icon: "Zap",
-          title: "Value-added services",
-          description: "Bill payments, airtime, utilities, and more built directly into the platform."
-        },
-        {
-          icon: "BarChart3",
-          title: "Enterprise fraud monitoring",
-          description: "Real-time transaction screening and anomaly detection at every step."
+          icon: "Sparkles",
+          title: "Fin AI Financial Assistant",
+          description: "Track spending, get smart cashflow insights, and execute transfers or bill payments using natural voice and text commands."
         }
       ]
     }
@@ -15723,7 +15635,7 @@ var DEFAULT_SECTIONS = [
     fields: {
       eyebrow: "Compliance & Regulation",
       heading: "Built for regulated markets from the ground up.",
-      subheading: "PulsePay operates within Nigeria's regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions. PulsePay holds no third-party security certification today, and we will tell you so directly rather than imply otherwise.",
+      subheading: "PulsePay operates within Nigeria's regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions.",
       // A plain list of mechanism names rendered as pills, so only each row's title is read.
       items: [
         { title: "Row-Level Security" },
@@ -15899,6 +15811,89 @@ async function applyCopyFixes() {
   }
   await sql`
     INSERT INTO site_settings (key, value) VALUES (${MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    ON CONFLICT (key) DO NOTHING
+  `;
+}
+var PULSEPAY_MARKER = "copy_fixes_pulsepay_banking_v1";
+var PULSEPAY_FEATURES = [
+  {
+    icon: "Landmark",
+    title: "Instant Naira Bank Accounts",
+    description: "Get a dedicated Nigerian bank account in minutes to receive salaries, collect payments, and hold funds securely."
+  },
+  {
+    icon: "Send",
+    title: "Fast Transfers & P2P Payments",
+    description: "Send money instantly to any Nigerian bank account or transfer between PulsePay wallets with zero friction."
+  },
+  {
+    icon: "CreditCard",
+    title: "Naira & USD Virtual Cards",
+    description: "Issue Naira and USD virtual cards in seconds for seamless local checkouts, international subscriptions, and global online spend."
+  },
+  {
+    icon: "Receipt",
+    title: "Bills, Airtime & Utilities",
+    description: "Pay electricity, cable TV, internet, airtime, and data bills in seconds with instant receipts and automated recurring schedules."
+  },
+  {
+    icon: "ShieldCheck",
+    title: "Built-in KYC & Fraud Protection",
+    description: "Tiered identity verification, real-time transaction screening, and dual-control security protecting every account and transfer."
+  },
+  {
+    icon: "Sparkles",
+    title: "Fin AI Financial Assistant",
+    description: "Track spending, get smart cashflow insights, and execute transfers or bill payments using natural voice and text commands."
+  }
+];
+async function applyPulsePayCopy() {
+  const sql = db();
+  const existing = await sql`
+    SELECT key FROM site_settings WHERE key = ${PULSEPAY_MARKER}
+  `;
+  if (existing.length > 0) return;
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+    eyebrow: "Digital Banking & Financial Platform",
+    heading: "PulsePay",
+    subheading: "A complete digital banking platform for everyday money\u2014open instant Naira accounts, send fast transfers, pay bills, spend globally with Naira and USD virtual cards, and manage your money with Fin, your built-in AI financial assistant."
+  })}::jsonb
+     WHERE key = 'portfolio.pulsepay'
+  `;
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+    eyebrow: "Platform Capabilities",
+    heading: "Everything a modern payments stack should be.",
+    subheading: "PulsePay covers the whole of everyday money: accounts, transfers, cards, bills, protection and a built-in assistant, in one platform.",
+    items: PULSEPAY_FEATURES
+  })}::jsonb
+     WHERE key = 'portfolio.pulsepay.features'
+  `;
+  await sql`
+    UPDATE site_sections
+       SET fields = jsonb_set(
+             fields,
+             '{subheading}',
+             to_jsonb(
+               'PulsePay operates within Nigeria''s regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions.'::text
+             )
+           )
+     WHERE key = 'portfolio.pulsepay.compliance'
+  `;
+  await sql`
+    UPDATE site_sections
+       SET fields = replace(
+             fields::text,
+             ' PulsePay holds no third-party security certification today, and we will tell you so directly rather than imply otherwise.',
+             ''
+           )::jsonb
+     WHERE fields::text LIKE '%third-party security certification%'
+  `;
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${PULSEPAY_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
     ON CONFLICT (key) DO NOTHING
   `;
 }
@@ -16913,6 +16908,7 @@ router.add("POST /account/2fa/recovery-codes", async ({ body, identity }) => {
 router.add("GET /dashboard", async () => {
   await seedWebsiteDefaults();
   await applyCopyFixes();
+  await applyPulsePayCopy();
   return dashboardSnapshot();
 });
 router.add("GET /search", async ({ query }) => ({
