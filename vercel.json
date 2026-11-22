@@ -175,6 +175,10 @@
       "destination": "/api/site?__route=__blocked"
     },
     {
+      "source": "/admin/",
+      "destination": "/api/site?__route=__blocked"
+    },
+    {
       "source": "/admin/:path*",
       "destination": "/api/site?__route=__blocked"
     },
