@@ -7322,28 +7322,28 @@ var CONTENT_KIND_META = {
   blog: {
     singular: "Blog post",
     plural: "Blog",
-    route: "/admin/content/blog",
+    route: "/office-dc5zk6/content/blog",
     publicPrefix: "/blog",
     description: "Long-form articles published to the ENICE Group blog."
   },
   announcement: {
     singular: "Announcement",
     plural: "Announcements",
-    route: "/admin/content/announcements",
+    route: "/office-dc5zk6/content/announcements",
     publicPrefix: "/announcements",
     description: "Company, product and partnership announcements, with an optional call to action."
   },
   update: {
     singular: "Update",
     plural: "Updates",
-    route: "/admin/content/updates",
+    route: "/office-dc5zk6/content/updates",
     publicPrefix: null,
     description: "Short notices about new services, features and expansions."
   },
   news: {
     singular: "News entry",
     plural: "News",
-    route: "/admin/content/news",
+    route: "/office-dc5zk6/content/news",
     publicPrefix: "/news",
     description: "The ENICE news feed and changelog of milestones and platform changes."
   }
@@ -16963,7 +16963,7 @@ router.add("POST /administrators", async ({ req, body, identity }) => {
     const { emailProvider: emailProvider2 } = await Promise.resolve().then(() => (init_index_server(), index_server_exports));
     const { groupSender: groupSender2 } = await Promise.resolve().then(() => (init_senders(), senders_exports));
     const { AUTO_GENERATED_HEADERS: AUTO_GENERATED_HEADERS2 } = await Promise.resolve().then(() => (init_types(), types_exports));
-    const link = `https://enicehq.com/admin/invite?token=${encodeURIComponent(result.inviteToken)}`;
+    const link = `https://enicehq.com/office-dc5zk6/invite?token=${encodeURIComponent(result.inviteToken)}`;
     await emailProvider2().send({
       from: groupSender2(),
       to: result.admin.email,

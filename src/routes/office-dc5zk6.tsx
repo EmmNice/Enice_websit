@@ -3,7 +3,7 @@ import { AdminProvider } from "@/components/admin/AdminContext";
 import { ToastProvider } from "@/components/admin/Toaster";
 
 /**
- * Layout route for everything under `/admin`.
+ * Layout route for everything under `/office-dc5zk6`.
  *
  * ## Deliberately thin
  *
@@ -14,7 +14,7 @@ import { ToastProvider } from "@/components/admin/Toaster";
  * authentication and permission checks — so the guard sits next to the screen it protects, and a
  * screen cannot be added under this prefix and accidentally inherit someone else's access rules.
  *
- * This layout used to be thin for a second reason: `/admin/early-access` was an unrelated screen
+ * This layout used to be thin for a second reason: `/office-dc5zk6/early-access` was an unrelated screen
  * with its own shared-password gate, which CMS authentication here would have broken. That screen
  * is gone, so the layout *could* now hold the gate — it is left as it is because per-screen
  * `requiredPermission` still has to live on `<AdminShell>` regardless, and one place to look for
@@ -23,10 +23,10 @@ import { ToastProvider } from "@/components/admin/Toaster";
  * ## Not indexable, not linked
  *
  * `noindex, nofollow` is set here so it applies to every child without each one repeating it, and
- * `public/robots.txt` disallows `/admin`. Nothing on the public site links here: the entry point is
+ * `public/robots.txt` disallows `/office-dc5zk6`. Nothing on the public site links here: the entry point is
  * the URL itself, or the `admin.` subdomain if one is configured (see the README).
  */
-export const Route = createFileRoute("/admin")({
+export const Route = createFileRoute("/office-dc5zk6")({
   head: () => ({
     meta: [
       { title: "ENICE Website Manager" },

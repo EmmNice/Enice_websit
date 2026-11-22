@@ -12,33 +12,33 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as AdminRouteImport } from './routes/admin'
 import { Route as ComplianceRouteImport } from './routes/compliance'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as DocsRouteImport } from './routes/docs'
+import { Route as OfficeDc5zk6RouteImport } from './routes/office-dc5zk6'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as StatusRouteImport } from './routes/status'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as WaitlistRouteImport } from './routes/waitlist'
-import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as AdminInviteRouteImport } from './routes/admin/invite'
-import { Route as AdminKnowledgeRouteImport } from './routes/admin/knowledge'
-import { Route as AdminWaitlistRouteImport } from './routes/admin/waitlist'
 import { Route as AnnouncementsIndexRouteImport } from './routes/announcements.index'
 import { Route as AnnouncementsSlugRouteImport } from './routes/announcements.$slug'
 import { Route as BlogIndexRouteImport } from './routes/blog/index'
 import { Route as BlogSlugRouteImport } from './routes/blog/$slug'
 import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as NewsSlugRouteImport } from './routes/news.$slug'
+import { Route as OfficeDc5zk6IndexRouteImport } from './routes/office-dc5zk6/index'
+import { Route as OfficeDc5zk6InviteRouteImport } from './routes/office-dc5zk6/invite'
+import { Route as OfficeDc5zk6KnowledgeRouteImport } from './routes/office-dc5zk6/knowledge'
+import { Route as OfficeDc5zk6WaitlistRouteImport } from './routes/office-dc5zk6/waitlist'
 import { Route as PortfolioIndexRouteImport } from './routes/portfolio.index'
 import { Route as PortfolioPrideRouteImport } from './routes/portfolio.pride'
 import { Route as PortfolioPulsepayRouteImport } from './routes/portfolio.pulsepay'
-import { Route as AdminAdministrationSettingsRouteImport } from './routes/admin/administration.settings'
-import { Route as AdminAdministrationTeamRouteImport } from './routes/admin/administration/team'
-import { Route as AdminContentKindIndexRouteImport } from './routes/admin/content.$kind.index'
-import { Route as AdminContentKindItemIdRouteImport } from './routes/admin/content.$kind.$itemId'
+import { Route as OfficeDc5zk6AdministrationSettingsRouteImport } from './routes/office-dc5zk6/administration.settings'
+import { Route as OfficeDc5zk6AdministrationTeamRouteImport } from './routes/office-dc5zk6/administration/team'
+import { Route as OfficeDc5zk6ContentKindIndexRouteImport } from './routes/office-dc5zk6/content.$kind.index'
+import { Route as OfficeDc5zk6ContentKindItemIdRouteImport } from './routes/office-dc5zk6/content.$kind.$itemId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -55,11 +55,6 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ComplianceRoute = ComplianceRouteImport.update({
   id: '/compliance',
   path: '/compliance',
@@ -73,6 +68,11 @@ const ContactRoute = ContactRouteImport.update({
 const DocsRoute = DocsRouteImport.update({
   id: '/docs',
   path: '/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficeDc5zk6Route = OfficeDc5zk6RouteImport.update({
+  id: '/office-dc5zk6',
+  path: '/office-dc5zk6',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioRoute = PortfolioRouteImport.update({
@@ -105,26 +105,6 @@ const WaitlistRoute = WaitlistRouteImport.update({
   path: '/waitlist',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminInviteRoute = AdminInviteRouteImport.update({
-  id: '/invite',
-  path: '/invite',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminKnowledgeRoute = AdminKnowledgeRouteImport.update({
-  id: '/knowledge',
-  path: '/knowledge',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminWaitlistRoute = AdminWaitlistRouteImport.update({
-  id: '/waitlist',
-  path: '/waitlist',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AnnouncementsIndexRoute = AnnouncementsIndexRouteImport.update({
   id: '/announcements/',
   path: '/announcements/',
@@ -155,6 +135,26 @@ const NewsSlugRoute = NewsSlugRouteImport.update({
   path: '/news/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OfficeDc5zk6IndexRoute = OfficeDc5zk6IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => OfficeDc5zk6Route,
+} as any)
+const OfficeDc5zk6InviteRoute = OfficeDc5zk6InviteRouteImport.update({
+  id: '/invite',
+  path: '/invite',
+  getParentRoute: () => OfficeDc5zk6Route,
+} as any)
+const OfficeDc5zk6KnowledgeRoute = OfficeDc5zk6KnowledgeRouteImport.update({
+  id: '/knowledge',
+  path: '/knowledge',
+  getParentRoute: () => OfficeDc5zk6Route,
+} as any)
+const OfficeDc5zk6WaitlistRoute = OfficeDc5zk6WaitlistRouteImport.update({
+  id: '/waitlist',
+  path: '/waitlist',
+  getParentRoute: () => OfficeDc5zk6Route,
+} as any)
 const PortfolioIndexRoute = PortfolioIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -170,59 +170,62 @@ const PortfolioPulsepayRoute = PortfolioPulsepayRouteImport.update({
   path: '/pulsepay',
   getParentRoute: () => PortfolioRoute,
 } as any)
-const AdminAdministrationSettingsRoute =
-  AdminAdministrationSettingsRouteImport.update({
+const OfficeDc5zk6AdministrationSettingsRoute =
+  OfficeDc5zk6AdministrationSettingsRouteImport.update({
     id: '/administration/settings',
     path: '/administration/settings',
-    getParentRoute: () => AdminRoute,
+    getParentRoute: () => OfficeDc5zk6Route,
   } as any)
-const AdminAdministrationTeamRoute = AdminAdministrationTeamRouteImport.update({
-  id: '/administration/team',
-  path: '/administration/team',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminContentKindIndexRoute = AdminContentKindIndexRouteImport.update({
-  id: '/content/$kind/',
-  path: '/content/$kind/',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminContentKindItemIdRoute = AdminContentKindItemIdRouteImport.update({
-  id: '/content/$kind/$itemId',
-  path: '/content/$kind/$itemId',
-  getParentRoute: () => AdminRoute,
-} as any)
+const OfficeDc5zk6AdministrationTeamRoute =
+  OfficeDc5zk6AdministrationTeamRouteImport.update({
+    id: '/administration/team',
+    path: '/administration/team',
+    getParentRoute: () => OfficeDc5zk6Route,
+  } as any)
+const OfficeDc5zk6ContentKindIndexRoute =
+  OfficeDc5zk6ContentKindIndexRouteImport.update({
+    id: '/content/$kind/',
+    path: '/content/$kind/',
+    getParentRoute: () => OfficeDc5zk6Route,
+  } as any)
+const OfficeDc5zk6ContentKindItemIdRoute =
+  OfficeDc5zk6ContentKindItemIdRouteImport.update({
+    id: '/content/$kind/$itemId',
+    path: '/content/$kind/$itemId',
+    getParentRoute: () => OfficeDc5zk6Route,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/compliance': typeof ComplianceRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
+  '/office-dc5zk6': typeof OfficeDc5zk6RouteWithChildren
   '/portfolio': typeof PortfolioRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
-  '/admin/invite': typeof AdminInviteRoute
-  '/admin/knowledge': typeof AdminKnowledgeRoute
-  '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/office-dc5zk6/invite': typeof OfficeDc5zk6InviteRoute
+  '/office-dc5zk6/knowledge': typeof OfficeDc5zk6KnowledgeRoute
+  '/office-dc5zk6/waitlist': typeof OfficeDc5zk6WaitlistRoute
   '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
-  '/admin/': typeof AdminIndexRoute
   '/announcements/': typeof AnnouncementsIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/office-dc5zk6/': typeof OfficeDc5zk6IndexRoute
   '/portfolio/': typeof PortfolioIndexRoute
-  '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
-  '/admin/administration/team': typeof AdminAdministrationTeamRoute
-  '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
-  '/admin/content/$kind/': typeof AdminContentKindIndexRoute
+  '/office-dc5zk6/administration/settings': typeof OfficeDc5zk6AdministrationSettingsRoute
+  '/office-dc5zk6/administration/team': typeof OfficeDc5zk6AdministrationTeamRoute
+  '/office-dc5zk6/content/$kind/$itemId': typeof OfficeDc5zk6ContentKindItemIdRoute
+  '/office-dc5zk6/content/$kind/': typeof OfficeDc5zk6ContentKindIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -236,56 +239,56 @@ export interface FileRoutesByTo {
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
-  '/admin/invite': typeof AdminInviteRoute
-  '/admin/knowledge': typeof AdminKnowledgeRoute
-  '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/office-dc5zk6/invite': typeof OfficeDc5zk6InviteRoute
+  '/office-dc5zk6/knowledge': typeof OfficeDc5zk6KnowledgeRoute
+  '/office-dc5zk6/waitlist': typeof OfficeDc5zk6WaitlistRoute
   '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
-  '/admin': typeof AdminIndexRoute
   '/announcements': typeof AnnouncementsIndexRoute
   '/blog': typeof BlogIndexRoute
   '/news': typeof NewsIndexRoute
+  '/office-dc5zk6': typeof OfficeDc5zk6IndexRoute
   '/portfolio': typeof PortfolioIndexRoute
-  '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
-  '/admin/administration/team': typeof AdminAdministrationTeamRoute
-  '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
-  '/admin/content/$kind': typeof AdminContentKindIndexRoute
+  '/office-dc5zk6/administration/settings': typeof OfficeDc5zk6AdministrationSettingsRoute
+  '/office-dc5zk6/administration/team': typeof OfficeDc5zk6AdministrationTeamRoute
+  '/office-dc5zk6/content/$kind/$itemId': typeof OfficeDc5zk6ContentKindItemIdRoute
+  '/office-dc5zk6/content/$kind': typeof OfficeDc5zk6ContentKindIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/about': typeof AboutRoute
-  '/admin': typeof AdminRouteWithChildren
   '/compliance': typeof ComplianceRoute
   '/contact': typeof ContactRoute
   '/docs': typeof DocsRoute
+  '/office-dc5zk6': typeof OfficeDc5zk6RouteWithChildren
   '/portfolio': typeof PortfolioRouteWithChildren
   '/privacy': typeof PrivacyRoute
   '/roadmap': typeof RoadmapRoute
   '/status': typeof StatusRoute
   '/terms': typeof TermsRoute
   '/waitlist': typeof WaitlistRoute
-  '/admin/invite': typeof AdminInviteRoute
-  '/admin/knowledge': typeof AdminKnowledgeRoute
-  '/admin/waitlist': typeof AdminWaitlistRoute
   '/announcements/$slug': typeof AnnouncementsSlugRoute
   '/blog/$slug': typeof BlogSlugRoute
   '/news/$slug': typeof NewsSlugRoute
+  '/office-dc5zk6/invite': typeof OfficeDc5zk6InviteRoute
+  '/office-dc5zk6/knowledge': typeof OfficeDc5zk6KnowledgeRoute
+  '/office-dc5zk6/waitlist': typeof OfficeDc5zk6WaitlistRoute
   '/portfolio/pride': typeof PortfolioPrideRoute
   '/portfolio/pulsepay': typeof PortfolioPulsepayRoute
-  '/admin/': typeof AdminIndexRoute
   '/announcements/': typeof AnnouncementsIndexRoute
   '/blog/': typeof BlogIndexRoute
   '/news/': typeof NewsIndexRoute
+  '/office-dc5zk6/': typeof OfficeDc5zk6IndexRoute
   '/portfolio/': typeof PortfolioIndexRoute
-  '/admin/administration/settings': typeof AdminAdministrationSettingsRoute
-  '/admin/administration/team': typeof AdminAdministrationTeamRoute
-  '/admin/content/$kind/$itemId': typeof AdminContentKindItemIdRoute
-  '/admin/content/$kind/': typeof AdminContentKindIndexRoute
+  '/office-dc5zk6/administration/settings': typeof OfficeDc5zk6AdministrationSettingsRoute
+  '/office-dc5zk6/administration/team': typeof OfficeDc5zk6AdministrationTeamRoute
+  '/office-dc5zk6/content/$kind/$itemId': typeof OfficeDc5zk6ContentKindItemIdRoute
+  '/office-dc5zk6/content/$kind/': typeof OfficeDc5zk6ContentKindIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -293,33 +296,33 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/about'
-    | '/admin'
     | '/compliance'
     | '/contact'
     | '/docs'
+    | '/office-dc5zk6'
     | '/portfolio'
     | '/privacy'
     | '/roadmap'
     | '/status'
     | '/terms'
     | '/waitlist'
-    | '/admin/invite'
-    | '/admin/knowledge'
-    | '/admin/waitlist'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
+    | '/office-dc5zk6/invite'
+    | '/office-dc5zk6/knowledge'
+    | '/office-dc5zk6/waitlist'
     | '/portfolio/pride'
     | '/portfolio/pulsepay'
-    | '/admin/'
     | '/announcements/'
     | '/blog/'
     | '/news/'
+    | '/office-dc5zk6/'
     | '/portfolio/'
-    | '/admin/administration/settings'
-    | '/admin/administration/team'
-    | '/admin/content/$kind/$itemId'
-    | '/admin/content/$kind/'
+    | '/office-dc5zk6/administration/settings'
+    | '/office-dc5zk6/administration/team'
+    | '/office-dc5zk6/content/$kind/$itemId'
+    | '/office-dc5zk6/content/$kind/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -333,65 +336,65 @@ export interface FileRouteTypes {
     | '/status'
     | '/terms'
     | '/waitlist'
-    | '/admin/invite'
-    | '/admin/knowledge'
-    | '/admin/waitlist'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
+    | '/office-dc5zk6/invite'
+    | '/office-dc5zk6/knowledge'
+    | '/office-dc5zk6/waitlist'
     | '/portfolio/pride'
     | '/portfolio/pulsepay'
-    | '/admin'
     | '/announcements'
     | '/blog'
     | '/news'
+    | '/office-dc5zk6'
     | '/portfolio'
-    | '/admin/administration/settings'
-    | '/admin/administration/team'
-    | '/admin/content/$kind/$itemId'
-    | '/admin/content/$kind'
+    | '/office-dc5zk6/administration/settings'
+    | '/office-dc5zk6/administration/team'
+    | '/office-dc5zk6/content/$kind/$itemId'
+    | '/office-dc5zk6/content/$kind'
   id:
     | '__root__'
     | '/'
     | '/$'
     | '/about'
-    | '/admin'
     | '/compliance'
     | '/contact'
     | '/docs'
+    | '/office-dc5zk6'
     | '/portfolio'
     | '/privacy'
     | '/roadmap'
     | '/status'
     | '/terms'
     | '/waitlist'
-    | '/admin/invite'
-    | '/admin/knowledge'
-    | '/admin/waitlist'
     | '/announcements/$slug'
     | '/blog/$slug'
     | '/news/$slug'
+    | '/office-dc5zk6/invite'
+    | '/office-dc5zk6/knowledge'
+    | '/office-dc5zk6/waitlist'
     | '/portfolio/pride'
     | '/portfolio/pulsepay'
-    | '/admin/'
     | '/announcements/'
     | '/blog/'
     | '/news/'
+    | '/office-dc5zk6/'
     | '/portfolio/'
-    | '/admin/administration/settings'
-    | '/admin/administration/team'
-    | '/admin/content/$kind/$itemId'
-    | '/admin/content/$kind/'
+    | '/office-dc5zk6/administration/settings'
+    | '/office-dc5zk6/administration/team'
+    | '/office-dc5zk6/content/$kind/$itemId'
+    | '/office-dc5zk6/content/$kind/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   AboutRoute: typeof AboutRoute
-  AdminRoute: typeof AdminRouteWithChildren
   ComplianceRoute: typeof ComplianceRoute
   ContactRoute: typeof ContactRoute
   DocsRoute: typeof DocsRoute
+  OfficeDc5zk6Route: typeof OfficeDc5zk6RouteWithChildren
   PortfolioRoute: typeof PortfolioRouteWithChildren
   PrivacyRoute: typeof PrivacyRoute
   RoadmapRoute: typeof RoadmapRoute
@@ -429,13 +432,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin': {
-      id: '/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/compliance': {
       id: '/compliance'
       path: '/compliance'
@@ -455,6 +451,13 @@ declare module '@tanstack/react-router' {
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/office-dc5zk6': {
+      id: '/office-dc5zk6'
+      path: '/office-dc5zk6'
+      fullPath: '/office-dc5zk6'
+      preLoaderRoute: typeof OfficeDc5zk6RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio': {
@@ -499,34 +502,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WaitlistRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/': {
-      id: '/admin/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/invite': {
-      id: '/admin/invite'
-      path: '/invite'
-      fullPath: '/admin/invite'
-      preLoaderRoute: typeof AdminInviteRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/knowledge': {
-      id: '/admin/knowledge'
-      path: '/knowledge'
-      fullPath: '/admin/knowledge'
-      preLoaderRoute: typeof AdminKnowledgeRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/waitlist': {
-      id: '/admin/waitlist'
-      path: '/waitlist'
-      fullPath: '/admin/waitlist'
-      preLoaderRoute: typeof AdminWaitlistRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/announcements/': {
       id: '/announcements/'
       path: '/announcements'
@@ -569,6 +544,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/office-dc5zk6/': {
+      id: '/office-dc5zk6/'
+      path: '/'
+      fullPath: '/office-dc5zk6/'
+      preLoaderRoute: typeof OfficeDc5zk6IndexRouteImport
+      parentRoute: typeof OfficeDc5zk6Route
+    }
+    '/office-dc5zk6/invite': {
+      id: '/office-dc5zk6/invite'
+      path: '/invite'
+      fullPath: '/office-dc5zk6/invite'
+      preLoaderRoute: typeof OfficeDc5zk6InviteRouteImport
+      parentRoute: typeof OfficeDc5zk6Route
+    }
+    '/office-dc5zk6/knowledge': {
+      id: '/office-dc5zk6/knowledge'
+      path: '/knowledge'
+      fullPath: '/office-dc5zk6/knowledge'
+      preLoaderRoute: typeof OfficeDc5zk6KnowledgeRouteImport
+      parentRoute: typeof OfficeDc5zk6Route
+    }
+    '/office-dc5zk6/waitlist': {
+      id: '/office-dc5zk6/waitlist'
+      path: '/waitlist'
+      fullPath: '/office-dc5zk6/waitlist'
+      preLoaderRoute: typeof OfficeDc5zk6WaitlistRouteImport
+      parentRoute: typeof OfficeDc5zk6Route
+    }
     '/portfolio/': {
       id: '/portfolio/'
       path: '/'
@@ -590,60 +593,63 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioPulsepayRouteImport
       parentRoute: typeof PortfolioRoute
     }
-    '/admin/administration/settings': {
-      id: '/admin/administration/settings'
+    '/office-dc5zk6/administration/settings': {
+      id: '/office-dc5zk6/administration/settings'
       path: '/administration/settings'
-      fullPath: '/admin/administration/settings'
-      preLoaderRoute: typeof AdminAdministrationSettingsRouteImport
-      parentRoute: typeof AdminRoute
+      fullPath: '/office-dc5zk6/administration/settings'
+      preLoaderRoute: typeof OfficeDc5zk6AdministrationSettingsRouteImport
+      parentRoute: typeof OfficeDc5zk6Route
     }
-    '/admin/administration/team': {
-      id: '/admin/administration/team'
+    '/office-dc5zk6/administration/team': {
+      id: '/office-dc5zk6/administration/team'
       path: '/administration/team'
-      fullPath: '/admin/administration/team'
-      preLoaderRoute: typeof AdminAdministrationTeamRouteImport
-      parentRoute: typeof AdminRoute
+      fullPath: '/office-dc5zk6/administration/team'
+      preLoaderRoute: typeof OfficeDc5zk6AdministrationTeamRouteImport
+      parentRoute: typeof OfficeDc5zk6Route
     }
-    '/admin/content/$kind/': {
-      id: '/admin/content/$kind/'
+    '/office-dc5zk6/content/$kind/': {
+      id: '/office-dc5zk6/content/$kind/'
       path: '/content/$kind'
-      fullPath: '/admin/content/$kind/'
-      preLoaderRoute: typeof AdminContentKindIndexRouteImport
-      parentRoute: typeof AdminRoute
+      fullPath: '/office-dc5zk6/content/$kind/'
+      preLoaderRoute: typeof OfficeDc5zk6ContentKindIndexRouteImport
+      parentRoute: typeof OfficeDc5zk6Route
     }
-    '/admin/content/$kind/$itemId': {
-      id: '/admin/content/$kind/$itemId'
+    '/office-dc5zk6/content/$kind/$itemId': {
+      id: '/office-dc5zk6/content/$kind/$itemId'
       path: '/content/$kind/$itemId'
-      fullPath: '/admin/content/$kind/$itemId'
-      preLoaderRoute: typeof AdminContentKindItemIdRouteImport
-      parentRoute: typeof AdminRoute
+      fullPath: '/office-dc5zk6/content/$kind/$itemId'
+      preLoaderRoute: typeof OfficeDc5zk6ContentKindItemIdRouteImport
+      parentRoute: typeof OfficeDc5zk6Route
     }
   }
 }
 
-interface AdminRouteChildren {
-  AdminInviteRoute: typeof AdminInviteRoute
-  AdminKnowledgeRoute: typeof AdminKnowledgeRoute
-  AdminWaitlistRoute: typeof AdminWaitlistRoute
-  AdminIndexRoute: typeof AdminIndexRoute
-  AdminAdministrationSettingsRoute: typeof AdminAdministrationSettingsRoute
-  AdminAdministrationTeamRoute: typeof AdminAdministrationTeamRoute
-  AdminContentKindItemIdRoute: typeof AdminContentKindItemIdRoute
-  AdminContentKindIndexRoute: typeof AdminContentKindIndexRoute
+interface OfficeDc5zk6RouteChildren {
+  OfficeDc5zk6InviteRoute: typeof OfficeDc5zk6InviteRoute
+  OfficeDc5zk6KnowledgeRoute: typeof OfficeDc5zk6KnowledgeRoute
+  OfficeDc5zk6WaitlistRoute: typeof OfficeDc5zk6WaitlistRoute
+  OfficeDc5zk6IndexRoute: typeof OfficeDc5zk6IndexRoute
+  OfficeDc5zk6AdministrationSettingsRoute: typeof OfficeDc5zk6AdministrationSettingsRoute
+  OfficeDc5zk6AdministrationTeamRoute: typeof OfficeDc5zk6AdministrationTeamRoute
+  OfficeDc5zk6ContentKindItemIdRoute: typeof OfficeDc5zk6ContentKindItemIdRoute
+  OfficeDc5zk6ContentKindIndexRoute: typeof OfficeDc5zk6ContentKindIndexRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminInviteRoute: AdminInviteRoute,
-  AdminKnowledgeRoute: AdminKnowledgeRoute,
-  AdminWaitlistRoute: AdminWaitlistRoute,
-  AdminIndexRoute: AdminIndexRoute,
-  AdminAdministrationSettingsRoute: AdminAdministrationSettingsRoute,
-  AdminAdministrationTeamRoute: AdminAdministrationTeamRoute,
-  AdminContentKindItemIdRoute: AdminContentKindItemIdRoute,
-  AdminContentKindIndexRoute: AdminContentKindIndexRoute,
+const OfficeDc5zk6RouteChildren: OfficeDc5zk6RouteChildren = {
+  OfficeDc5zk6InviteRoute: OfficeDc5zk6InviteRoute,
+  OfficeDc5zk6KnowledgeRoute: OfficeDc5zk6KnowledgeRoute,
+  OfficeDc5zk6WaitlistRoute: OfficeDc5zk6WaitlistRoute,
+  OfficeDc5zk6IndexRoute: OfficeDc5zk6IndexRoute,
+  OfficeDc5zk6AdministrationSettingsRoute:
+    OfficeDc5zk6AdministrationSettingsRoute,
+  OfficeDc5zk6AdministrationTeamRoute: OfficeDc5zk6AdministrationTeamRoute,
+  OfficeDc5zk6ContentKindItemIdRoute: OfficeDc5zk6ContentKindItemIdRoute,
+  OfficeDc5zk6ContentKindIndexRoute: OfficeDc5zk6ContentKindIndexRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const OfficeDc5zk6RouteWithChildren = OfficeDc5zk6Route._addFileChildren(
+  OfficeDc5zk6RouteChildren,
+)
 
 interface PortfolioRouteChildren {
   PortfolioPrideRoute: typeof PortfolioPrideRoute
@@ -665,10 +671,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   AboutRoute: AboutRoute,
-  AdminRoute: AdminRouteWithChildren,
   ComplianceRoute: ComplianceRoute,
   ContactRoute: ContactRoute,
   DocsRoute: DocsRoute,
+  OfficeDc5zk6Route: OfficeDc5zk6RouteWithChildren,
   PortfolioRoute: PortfolioRouteWithChildren,
   PrivacyRoute: PrivacyRoute,
   RoadmapRoute: RoadmapRoute,

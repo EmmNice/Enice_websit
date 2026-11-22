@@ -102,7 +102,7 @@ function DashboardPage() {
               <Button
                 variant="primary"
                 icon={Plus}
-                onClick={() => void navigate({ to: "/admin/content/blog/new" })}
+                onClick={() => void navigate({ to: "/office-dc5zk6/content/blog/new" })}
               >
                 New blog post
               </Button>
@@ -330,7 +330,7 @@ function DashboardSkeleton() {
   );
 }
 
-export const Route = createFileRoute("/admin/")({
+export const Route = createFileRoute("/office-dc5zk6/")({
   component: function AdminDashboardRoute() {
     return (
       <AdminShell>

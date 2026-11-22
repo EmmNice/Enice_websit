@@ -71,7 +71,7 @@ function InvitePage() {
             </p>
             <button
               type="button"
-              onClick={() => navigate({ to: "/admin" })}
+              onClick={() => navigate({ to: "/office-dc5zk6" })}
               className="bg-foreground text-background mt-6 w-full rounded-md px-4 py-2.5 text-[14px] font-semibold"
             >
               Go to sign in
@@ -127,7 +127,7 @@ function InvitePage() {
   );
 }
 
-export const Route = createFileRoute("/admin/invite")({
+export const Route = createFileRoute("/office-dc5zk6/invite")({
   head: () => ({
     meta: [{ title: "Set up your account" }, { name: "robots", content: "noindex" }],
   }),

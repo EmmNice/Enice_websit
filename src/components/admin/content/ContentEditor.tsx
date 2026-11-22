@@ -240,7 +240,7 @@ export function ContentEditor({ kind, itemId }: { kind: ContentKind; itemId: str
         setSavedAt(new Date());
         if (!options.silent) toast.success("Draft created");
         // Swap the URL to the edit route without a reload, so subsequent saves are updates.
-        void navigate({ to: `/admin/content/${segment}/${created.id}`, replace: true });
+        void navigate({ to: `/office-dc5zk6/content/${segment}/${created.id}`, replace: true });
         return created;
       } catch (caught) {
         if (caught instanceof CmsError && caught.isConflict) {

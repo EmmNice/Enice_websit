@@ -574,7 +574,7 @@ function shortAgent(userAgent: string | null): string {
   return os ? `${browser} on ${os}` : browser;
 }
 
-export const Route = createFileRoute("/admin/administration/settings")({
+export const Route = createFileRoute("/office-dc5zk6/administration/settings")({
   component: function SettingsRoute() {
     return (
       <AdminShell>

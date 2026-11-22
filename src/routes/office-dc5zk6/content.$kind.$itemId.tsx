@@ -5,7 +5,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { ContentEditor } from "@/components/admin/content/ContentEditor";
 
 /**
- * Content editor route: `/admin/content/:kind/:itemId`.
+ * Content editor route: `/office-dc5zk6/content/:kind/:itemId`.
  *
  * `:itemId` of `new` is the create form; any other value edits that item. Handling both here — one
  * route rather than a separate `/new` route — means the editor swaps from create to edit in place
@@ -17,7 +17,7 @@ function ContentEditorRoute() {
   const kind = kindFromSegment(segment);
 
   useEffect(() => {
-    if (!kind) void navigate({ to: "/admin/content/blog", replace: true });
+    if (!kind) void navigate({ to: "/office-dc5zk6/content/blog", replace: true });
   }, [kind, navigate]);
 
   if (!kind) return null;
@@ -29,6 +29,6 @@ function ContentEditorRoute() {
   );
 }
 
-export const Route = createFileRoute("/admin/content/$kind/$itemId")({
+export const Route = createFileRoute("/office-dc5zk6/content/$kind/$itemId")({
   component: ContentEditorRoute,
 });

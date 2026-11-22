@@ -72,7 +72,7 @@ function TeamScreen() {
       });
       if (result.inviteToken) {
         setLink({
-          url: `${window.location.origin}/admin/invite?token=${encodeURIComponent(result.inviteToken)}`,
+          url: `${window.location.origin}/office-dc5zk6/invite?token=${encodeURIComponent(result.inviteToken)}`,
           emailed: Boolean(result.emailed),
           to: result.admin.email,
         });
@@ -95,7 +95,7 @@ function TeamScreen() {
       const result = await administrators.reissue(admin.id);
       if (result.inviteToken) {
         setLink({
-          url: `${window.location.origin}/admin/invite?token=${encodeURIComponent(result.inviteToken)}`,
+          url: `${window.location.origin}/office-dc5zk6/invite?token=${encodeURIComponent(result.inviteToken)}`,
           emailed: false,
           to: admin.email,
         });
@@ -335,7 +335,7 @@ function TeamScreen() {
   );
 }
 
-export const Route = createFileRoute("/admin/administration/team")({
+export const Route = createFileRoute("/office-dc5zk6/administration/team")({
   component: function TeamRoute() {
     return (
       <AdminShell requiredPermission="team.manage">

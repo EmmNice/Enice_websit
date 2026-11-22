@@ -626,7 +626,7 @@ router.add("POST /administrators", async ({ req, body, identity }) => {
     const { emailProvider } = await import("../src/lib/email/index.server");
     const { groupSender } = await import("../src/lib/email/senders");
     const { AUTO_GENERATED_HEADERS } = await import("../src/lib/email/types");
-    const link = `https://enicehq.com/admin/invite?token=${encodeURIComponent(result.inviteToken)}`;
+    const link = `https://enicehq.com/office-dc5zk6/invite?token=${encodeURIComponent(result.inviteToken)}`;
     await emailProvider().send({
       from: groupSender(),
       to: result.admin.email,

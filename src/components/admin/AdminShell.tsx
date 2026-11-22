@@ -327,7 +327,7 @@ function SidebarNav({ pathname, onNavigate }: { pathname: string; onNavigate?: (
 
 function Brand() {
   return (
-    <Link to="/admin" className="flex items-center gap-2.5 px-4 py-4">
+    <Link to="/office-dc5zk6" className="flex items-center gap-2.5 px-4 py-4">
       <span className="bg-primary text-primary-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[13px] font-bold">
         E
       </span>
@@ -434,7 +434,7 @@ function AccountMenu() {
 
           <div className="p-1">
             <Link
-              to="/admin/administration/settings"
+              to="/office-dc5zk6/administration/settings"
               onClick={() => setOpen(false)}
               className="text-foreground hover:bg-secondary flex items-center gap-2 rounded-md px-3 py-2 text-[12.5px] transition-colors"
               role="menuitem"

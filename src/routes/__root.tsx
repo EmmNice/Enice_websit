@@ -152,7 +152,7 @@ function ErrorComponent({ error, reset }: ErrorComponentProps) {
  */
 function RootComponent() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
-  const isAdmin = pathname.startsWith("/admin");
+  const isAdmin = pathname.startsWith("/office-dc5zk6");
 
   /*
    * `.site` is the public site's dark theme, declared on <html> in index.html so it is active

@@ -96,6 +96,19 @@
           "value": "public, max-age=3600"
         }
       ]
+    },
+    {
+      "source": "/office-dc5zk6(.*)",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow, noarchive, nosnippet"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
     }
   ],
   "redirects": [
@@ -156,6 +169,14 @@
     {
       "source": "/feed.xml",
       "destination": "/api/site?__route=rss"
+    },
+    {
+      "source": "/admin",
+      "destination": "/api/site?__route=__blocked"
+    },
+    {
+      "source": "/admin/:path*",
+      "destination": "/api/site?__route=__blocked"
     },
     {
       "source": "/((?!api/)[^.]*)",

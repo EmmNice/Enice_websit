@@ -401,7 +401,7 @@ function KnowledgeScreen() {
   );
 }
 
-export const Route = createFileRoute("/admin/knowledge")({
+export const Route = createFileRoute("/office-dc5zk6/knowledge")({
   component: function KnowledgeRoute() {
     return (
       <AdminShell requiredPermission="ai.knowledge.read">

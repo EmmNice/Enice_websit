@@ -41,28 +41,28 @@ export const CONTENT_KIND_META: Record<ContentKind, ContentKindMeta> = {
   blog: {
     singular: "Blog post",
     plural: "Blog",
-    route: "/admin/content/blog",
+    route: "/office-dc5zk6/content/blog",
     publicPrefix: "/blog",
     description: "Long-form articles published to the ENICE Group blog.",
   },
   announcement: {
     singular: "Announcement",
     plural: "Announcements",
-    route: "/admin/content/announcements",
+    route: "/office-dc5zk6/content/announcements",
     publicPrefix: "/announcements",
     description: "Company, product and partnership announcements, with an optional call to action.",
   },
   update: {
     singular: "Update",
     plural: "Updates",
-    route: "/admin/content/updates",
+    route: "/office-dc5zk6/content/updates",
     publicPrefix: null,
     description: "Short notices about new services, features and expansions.",
   },
   news: {
     singular: "News entry",
     plural: "News",
-    route: "/admin/content/news",
+    route: "/office-dc5zk6/content/news",
     publicPrefix: "/news",
     description: "The ENICE news feed and changelog of milestones and platform changes.",
   },
@@ -238,7 +238,7 @@ export interface ContentSummary {
 /**
  * URL segment per kind, for the admin panel's routes.
  *
- * Deliberately not the kind name: an editor navigates to `/admin/content/announcements`, which
+ * Deliberately not the kind name: an editor navigates to `/office-dc5zk6/content/announcements`, which
  * reads correctly, while the kind itself is singular (`announcement`) because it describes one
  * item. Keeping the mapping explicit here means the route and the model can differ without either
  * one being guessed at a call site.

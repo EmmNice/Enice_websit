@@ -94,7 +94,7 @@ export function ContentList({ kind }: { kind: ContentKind }) {
     return () => clearTimeout(timer);
   }, [load, search]);
 
-  const editHref = (id: string) => `/admin/content/${segment}/${id}`;
+  const editHref = (id: string) => `/office-dc5zk6/content/${segment}/${id}`;
 
   const runAction = async (
     id: string,
@@ -130,7 +130,7 @@ export function ContentList({ kind }: { kind: ContentKind }) {
             <Button
               variant="primary"
               icon={Plus}
-              onClick={() => void navigate({ to: `/admin/content/${segment}/new` })}
+              onClick={() => void navigate({ to: `/office-dc5zk6/content/${segment}/new` })}
             >
               New {meta.singular.toLowerCase()}
             </Button>
@@ -191,7 +191,7 @@ export function ContentList({ kind }: { kind: ContentKind }) {
               <Button
                 variant="primary"
                 icon={Plus}
-                onClick={() => void navigate({ to: `/admin/content/${segment}/new` })}
+                onClick={() => void navigate({ to: `/office-dc5zk6/content/${segment}/new` })}
               >
                 Create the first one
               </Button>

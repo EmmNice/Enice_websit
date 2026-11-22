@@ -5,7 +5,7 @@ import { AdminShell } from "@/components/admin/AdminShell";
 import { ContentList } from "@/components/admin/content/ContentList";
 
 /**
- * Content list route: `/admin/content/:kind`.
+ * Content list route: `/office-dc5zk6/content/:kind`.
  *
  * `:kind` is the URL segment (`announcements`), which `kindFromSegment` maps to the model kind
  * (`announcement`). An unrecognised segment redirects to the blog list rather than rendering a
@@ -17,7 +17,7 @@ function ContentListRoute() {
   const kind = kindFromSegment(segment);
 
   useEffect(() => {
-    if (!kind) void navigate({ to: "/admin/content/blog", replace: true });
+    if (!kind) void navigate({ to: "/office-dc5zk6/content/blog", replace: true });
   }, [kind, navigate]);
 
   if (!kind) return null;
@@ -29,6 +29,6 @@ function ContentListRoute() {
   );
 }
 
-export const Route = createFileRoute("/admin/content/$kind/")({
+export const Route = createFileRoute("/office-dc5zk6/content/$kind/")({
   component: ContentListRoute,
 });

@@ -699,7 +699,7 @@ function WaitlistScreen() {
   );
 }
 
-export const Route = createFileRoute("/admin/waitlist")({
+export const Route = createFileRoute("/office-dc5zk6/waitlist")({
   component: function WaitlistRoute() {
     return (
       <AdminShell requiredPermission="waitlist.read">

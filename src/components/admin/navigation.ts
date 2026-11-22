@@ -26,7 +26,7 @@ export interface NavEntry {
   description?: string;
   /**
    * Treat a deeper path as this item being active. Needed because an editor screen lives at
-   * `/admin/content/blog/<id>` and the sidebar entry is `/admin/content/blog`.
+   * `/office-dc5zk6/content/blog/<id>` and the sidebar entry is `/office-dc5zk6/content/blog`.
    */
   matchPrefix?: boolean;
 }
@@ -42,7 +42,7 @@ export const NAV_GROUPS: NavGroup[] = [
     entries: [
       {
         label: "Dashboard",
-        to: "/admin",
+        to: "/office-dc5zk6",
         icon: "LayoutDashboard",
         description: "Publishing activity and what is queued to go out",
         keywords: ["home", "overview", "start"],
@@ -54,7 +54,7 @@ export const NAV_GROUPS: NavGroup[] = [
     entries: [
       {
         label: "Blog",
-        to: "/admin/content/blog",
+        to: "/office-dc5zk6/content/blog",
         icon: "FileText",
         permission: "content.read",
         matchPrefix: true,
@@ -63,7 +63,7 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       {
         label: "Announcements",
-        to: "/admin/content/announcements",
+        to: "/office-dc5zk6/content/announcements",
         icon: "Megaphone",
         permission: "content.read",
         matchPrefix: true,
@@ -72,7 +72,7 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       {
         label: "Updates",
-        to: "/admin/content/updates",
+        to: "/office-dc5zk6/content/updates",
         icon: "Zap",
         permission: "content.read",
         matchPrefix: true,
@@ -81,7 +81,7 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       {
         label: "News",
-        to: "/admin/content/news",
+        to: "/office-dc5zk6/content/news",
         icon: "Newspaper",
         permission: "content.read",
         matchPrefix: true,
@@ -95,7 +95,7 @@ export const NAV_GROUPS: NavGroup[] = [
     entries: [
       {
         label: "PulsePay waitlist",
-        to: "/admin/waitlist",
+        to: "/office-dc5zk6/waitlist",
         icon: "Users",
         permission: "waitlist.read",
         matchPrefix: true,
@@ -109,7 +109,7 @@ export const NAV_GROUPS: NavGroup[] = [
     entries: [
       {
         label: "Assistant knowledge",
-        to: "/admin/knowledge",
+        to: "/office-dc5zk6/knowledge",
         icon: "Sparkles",
         permission: "ai.knowledge.read",
         matchPrefix: true,
@@ -123,7 +123,7 @@ export const NAV_GROUPS: NavGroup[] = [
     entries: [
       {
         label: "Team",
-        to: "/admin/administration/team",
+        to: "/office-dc5zk6/administration/team",
         icon: "Users",
         permission: "team.manage",
         description: "Who can sign in, and what they can do",
@@ -131,7 +131,7 @@ export const NAV_GROUPS: NavGroup[] = [
       },
       {
         label: "Settings",
-        to: "/admin/administration/settings",
+        to: "/office-dc5zk6/administration/settings",
         icon: "Settings",
         description: "Your profile, password, two-factor authentication and sessions",
         keywords: ["account", "password", "2fa", "profile", "security", "sign out"],
@@ -146,8 +146,8 @@ export const NAV_ENTRIES: NavEntry[] = NAV_GROUPS.flatMap((group) => group.entri
 /**
  * Finds the navigation entry a pathname belongs to.
  *
- * The longest match wins, so `/admin/content/blog/abc` resolves to Blog rather than to Dashboard —
- * `/admin` is a prefix of everything and would otherwise always win.
+ * The longest match wins, so `/office-dc5zk6/content/blog/abc` resolves to Blog rather than to Dashboard —
+ * `/office-dc5zk6` is a prefix of everything and would otherwise always win.
  */
 export function activeEntry(pathname: string): NavEntry | null {
   let best: NavEntry | null = null;
@@ -159,8 +159,8 @@ export function activeEntry(pathname: string): NavEntry | null {
     if (!best || entry.to.length > best.to.length) best = entry;
   }
 
-  // `/admin` only matches exactly; as a prefix it would shadow every child route.
-  if (!best && pathname === "/admin") return NAV_ENTRIES[0];
+  // `/office-dc5zk6` only matches exactly; as a prefix it would shadow every child route.
+  if (!best && pathname === "/office-dc5zk6") return NAV_ENTRIES[0];
   return best;
 }
 
