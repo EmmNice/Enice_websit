@@ -3,6 +3,7 @@ import { SITE_URL } from "@/lib/site";
 import type { LucideIcon } from "lucide-react";
 import { Bitcoin, Boxes, Lock, Globe, Layers, ShieldCheck, Zap, BarChart3 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
+import { PrideSurface, SurfaceNote } from "@/components/site/ProductSurfaces";
 import { StyledText } from "@/components/site/StyledText";
 import { Reveal } from "@/components/site/Reveal";
 import {
@@ -62,158 +63,6 @@ const WAITLIST_MAILTO = "mailto:corporate@enicehq.com?subject=Join%20the%20PRIDE
 //
 // What remains is the asset pairs the platform intends to list and an abstract shape for each,
 // drawn in the surface ramp. The footer caption still explains what the panel is.
-
-const TICKER_DATA = [
-  {
-    symbol: "BTC/USDT",
-    name: "Bitcoin",
-    up: true,
-    shape: [62, 61, 64, 68, 65, 70, 72, 71, 74, 73, 76, 74],
-  },
-  {
-    symbol: "ETH/USDT",
-    name: "Ethereum",
-    up: true,
-    shape: [38, 36, 37, 40, 39, 42, 41, 43, 44, 43, 45, 44],
-  },
-  {
-    symbol: "SOL/USDT",
-    name: "Solana",
-    up: false,
-    shape: [20, 21, 22, 20, 19, 21, 20, 18, 19, 18, 18, 17],
-  },
-  {
-    symbol: "BNB/USDT",
-    name: "BNB",
-    up: true,
-    shape: [55, 54, 56, 57, 56, 58, 59, 60, 58, 61, 62, 61],
-  },
-];
-
-/**
- * An abstract trend line.
- *
- * Direction is drawn in the site's own palette — the brand accent for rising, bone-faint for falling — rather
- * than the green/red of a trading terminal. Green on this site means one thing, "available", and
- * spending it on a decorative line would make the one honest availability signal meaningless.
- */
-function Sparkline({ data, up }: { data: number[]; up: boolean }) {
-  const min = Math.min(...data);
-  const max = Math.max(...data);
-  const range = max - min || 1;
-  const w = 60;
-  const h = 24;
-  const pts = data
-    .map((v, i) => {
-      const x = (i / (data.length - 1)) * w;
-      const y = h - ((v - min) / range) * h;
-      return `${x},${y}`;
-    })
-    .join(" ");
-
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} aria-hidden className="overflow-visible">
-      <polyline
-        points={pts}
-        fill="none"
-        stroke={up ? "var(--electric)" : "var(--bone-faint)"}
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-/** The candle field behind the panel header. Purely a texture; same two-tone discipline. */
-function CandlestickChart() {
-  const bars = [
-    { h: 48, open: 30, close: 42, up: true },
-    { h: 36, open: 25, close: 18, up: false },
-    { h: 56, open: 20, close: 48, up: true },
-    { h: 40, open: 35, close: 28, up: false },
-    { h: 64, open: 22, close: 58, up: true },
-    { h: 44, open: 38, close: 30, up: false },
-    { h: 72, open: 18, close: 66, up: true },
-    { h: 52, open: 42, close: 34, up: false },
-    { h: 60, open: 26, close: 54, up: true },
-    { h: 48, open: 40, close: 32, up: false },
-    { h: 80, open: 20, close: 74, up: true },
-    { h: 56, open: 48, close: 36, up: false },
-    { h: 88, open: 22, close: 82, up: true },
-  ];
-
-  return (
-    <div className="flex h-20 items-end gap-1.5 px-2" aria-hidden>
-      {bars.map((bar, i) => {
-        const bodyH = Math.abs(bar.close - bar.open);
-        const bodyTop = bar.up ? bar.h - bar.close : bar.h - bar.open;
-        return (
-          <div key={i} className="relative flex flex-1 flex-col items-center">
-            <div
-              className={`w-px ${bar.up ? "bg-electric/35" : "bg-bone-faint/30"}`}
-              style={{ height: bar.h + "px" }}
-            />
-            <div
-              className={`absolute w-full max-w-[8px] rounded-sm ${
-                bar.up ? "bg-electric/70" : "bg-bone-faint/45"
-              }`}
-              style={{ height: Math.max(bodyH, 4) + "px", top: bodyTop + "px" }}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function MarketsPanel() {
-  return (
-    <Panel raised aria-hidden className="overflow-hidden">
-      <div className="flex items-center justify-between border-b border-border px-5 py-3">
-        <span className="flex items-center gap-2">
-          <Bitcoin className="h-4 w-4 text-electric" strokeWidth={1.5} />
-          <span className="text-[12px] font-semibold text-bone-strong">PRIDE Markets</span>
-        </span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-bone-faint">
-          Digital Assets
-        </span>
-      </div>
-
-      <div className="border-b border-border bg-surface-1 px-4 pt-4 pb-2">
-        <div className="px-1 pb-2">
-          <span className="font-mono text-[11px] tracking-[0.14em] text-bone-faint">BTC/USDT</span>
-        </div>
-        <CandlestickChart />
-        {/* No `/60` on the day token: that landed at 1.12:1 against the panel, i.e. invisible.
-            Decorative is not a licence to be illegible — it just means it is not announced. */}
-        <div className="mt-1 flex justify-between px-1 pb-1">
-          {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => (
-            <span key={d} className="text-[10px] font-medium text-bone-faint">
-              {d}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <ul className="divide-y divide-border">
-        {TICKER_DATA.map((t) => (
-          <li key={t.symbol} className="flex items-center gap-3 px-5 py-3">
-            <span className="flex min-w-0 flex-1 items-center gap-2">
-              <span className="text-[12px] font-semibold text-bone-strong">{t.symbol}</span>
-              <span className="text-[10px] text-bone-faint">{t.name}</span>
-            </span>
-            <Sparkline data={t.shape} up={t.up} />
-          </li>
-        ))}
-      </ul>
-
-      <div className="flex items-center justify-center border-t border-border px-5 py-3">
-        <span className="type-meta text-[10px]">Simulated preview · Real-time data at launch</span>
-      </div>
-    </Panel>
-  );
-}
 
 // ─── Fallback content ─────────────────────────────────────────────────────────
 //
@@ -395,8 +244,15 @@ function PridePage() {
             </div>
           </div>
 
-          {/* ── Decorative markets panel ── */}
-          <MarketsPanel />
+          {/* ── Product surface ──
+              The exchange as it actually works: a naira wallet funded by bank transfer, the pairs
+              it quotes, and the two controls that matter (allowlisted withdrawal addresses, a
+              payment PIN kept separate). Replaced a candlestick chart and sparklines drawn from
+              invented data, which is the fastest way to make a real product look fake. */}
+          <div aria-hidden>
+            <PrideSurface />
+            <SurfaceNote />
+          </div>
         </div>
       </Section>
 

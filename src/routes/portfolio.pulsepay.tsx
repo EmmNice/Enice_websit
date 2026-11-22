@@ -14,6 +14,7 @@ import {
   Lock,
 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
+import { PulsePaySurface, SurfaceNote } from "@/components/site/ProductSurfaces";
 import {
   Cta,
   Eyebrow,
@@ -26,7 +27,6 @@ import {
 } from "@/components/site/primitives";
 import { PRODUCTS } from "@/components/site/navigation";
 import { useSectionFields, fieldItems, fieldText } from "@/lib/cms/use-section";
-import { SHADOW_CARD, SHADOW_FLOAT, SURFACE_1, SURFACE_2, SURFACE_3 } from "@/lib/design";
 import { ORGANIZATION_REF, breadcrumbJsonLd, pageHead } from "@/lib/seo";
 
 export const Route = createFileRoute("/portfolio/pulsepay")({
@@ -71,8 +71,6 @@ export const Route = createFileRoute("/portfolio/pulsepay")({
  * brand colour and a light-theme grey. Both are built from the shared surface constants now, so
  * the card reads as the same material as the panels around it and cannot drift from them.
  */
-const CARD_FACE = `linear-gradient(135deg, ${SURFACE_3} 0%, ${SURFACE_2} 55%, ${SURFACE_1} 100%)`;
-const CARD_BEHIND = `linear-gradient(135deg, ${SURFACE_2} 0%, ${SURFACE_1} 100%)`;
 
 // ─── Fallback content ─────────────────────────────────────────────────────────
 //
@@ -240,68 +238,15 @@ function PulsePayPage() {
             </div>
           </div>
 
-          {/* ── Card visual ──
-              Decorative: `aria-hidden`, with nothing focusable inside it. */}
-          <Panel
-            aria-hidden
-            className="relative overflow-hidden"
-            style={{ boxShadow: SHADOW_CARD, minHeight: "300px" }}
-          >
-            <div className="tech-grid tech-grid-flat" />
-
-            {/* Card stack — fixed pixel size so it never grows too large on mobile */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              {/* Card peeking from the upper-right */}
-              <div
-                className="absolute rounded-2xl border border-border"
-                style={{
-                  width: "200px",
-                  aspectRatio: "1.586/1",
-                  background: CARD_BEHIND,
-                  transform: "rotate(7deg) translate(22px, -18px)",
-                  boxShadow: SHADOW_CARD,
-                }}
-              />
-
-              {/* Main card */}
-              <div
-                className="relative flex flex-col justify-between rounded-2xl border border-border p-4"
-                style={{
-                  width: "200px",
-                  aspectRatio: "1.586/1",
-                  background: CARD_FACE,
-                  transform: "rotate(-4deg)",
-                  boxShadow: SHADOW_FLOAT,
-                }}
-              >
-                {/* Top: brand + NFC */}
-                <div className="flex items-start justify-between">
-                  <span className="text-[9px] font-bold uppercase tracking-[0.22em] text-bone-strong">
-                    PulsePay
-                  </span>
-                  <Wifi className="h-3.5 w-3.5 rotate-90 text-bone-faint" />
-                </div>
-                {/* Chip — the one place a small electric fill is right */}
-                <div className="h-6 w-9 rounded-md bg-gradient-to-br from-electric to-electric-deep" />
-                {/* Card number */}
-                <div className="tnum font-mono text-[9px] tracking-[0.2em] text-bone-soft">
-                  •••• •••• •••• ••••
-                </div>
-                {/* Bottom: cardholder + icon */}
-                <div className="flex items-end justify-between">
-                  <div>
-                    <div className="text-[6px] uppercase tracking-[0.2em] text-bone-faint">
-                      Cardholder
-                    </div>
-                    <div className="text-[9px] font-semibold uppercase tracking-[0.16em] text-foreground">
-                      ENICE GROUP
-                    </div>
-                  </div>
-                  <CreditCard className="h-4 w-4 text-bone-faint" strokeWidth={1.5} />
-                </div>
-              </div>
-            </div>
-          </Panel>
+          {/* ── Product surface ──
+              The real app, drawn in HTML: balance, the actions it offers, and the fee on each
+              transaction. It replaced a decorative render of a payment card, which told a reader
+              nothing about whether the product works. `aria-hidden` because the figures are
+              examples, not data. */}
+          <div aria-hidden>
+            <PulsePaySurface />
+            <SurfaceNote />
+          </div>
         </div>
       </Section>
 

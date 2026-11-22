@@ -527,15 +527,17 @@
   }
 
   .type-lead {
-    font-size: clamp(1rem, 1.25vw, 1.1875rem);
-    line-height: 1.65;
+    font-size: clamp(1.0625rem, 1.3vw, 1.25rem);
+    line-height: 1.6;
     color: var(--muted-foreground);
     text-wrap: pretty;
   }
 
   .type-body {
-    font-size: 0.9375rem;
-    line-height: 1.7;
+    /* 16px: the size a reader expects on a corporate site. At 15px the body sat a notch under the
+       browser default, which reads as cramped rather than considered. */
+    font-size: 1rem;
+    line-height: 1.68;
     color: var(--muted-foreground);
     text-wrap: pretty;
   }
