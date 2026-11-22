@@ -1,4 +1,4 @@
-import { db } from "../db";
+import { db, json } from "../db";
 
 /**
  * One-time corrections to copy that shipped before the products were separated.
@@ -119,7 +119,7 @@ export async function applyCopyFixes(): Promise<void> {
   }
 
   await sql`
-    INSERT INTO site_settings (key, value) VALUES (${MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    INSERT INTO site_settings (key, value) VALUES (${MARKER}, ${JSON.stringify({ applied: true })})
     ON CONFLICT (key) DO NOTHING
   `;
 }
@@ -184,12 +184,12 @@ export async function applyPulsePayCopy(): Promise<void> {
 
   await sql`
     UPDATE site_sections
-       SET fields = ${JSON.stringify({
+       SET fields = ${json({
          eyebrow: "Digital Banking & Financial Platform",
          heading: "PulsePay",
          subheading:
            "A complete digital banking platform for everyday money—open instant Naira accounts, send fast transfers, pay bills, spend globally with Naira and USD virtual cards, and manage your money with Fin, your built-in AI financial assistant.",
-       })}::jsonb
+       })}
      WHERE key = 'portfolio.pulsepay'
   `;
 
@@ -201,7 +201,7 @@ export async function applyPulsePayCopy(): Promise<void> {
          subheading:
            "PulsePay covers the whole of everyday money: accounts, transfers, cards, bills, protection and a built-in assistant, in one platform.",
          items: PULSEPAY_FEATURES,
-       })}::jsonb
+       })}
      WHERE key = 'portfolio.pulsepay.features'
   `;
 
@@ -230,7 +230,7 @@ export async function applyPulsePayCopy(): Promise<void> {
   `;
 
   await sql`
-    INSERT INTO site_settings (key, value) VALUES (${PULSEPAY_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    INSERT INTO site_settings (key, value) VALUES (${PULSEPAY_MARKER}, ${JSON.stringify({ applied: true })})
     ON CONFLICT (key) DO NOTHING
   `;
 }
@@ -288,7 +288,7 @@ export async function applyPrideTradeCopy(): Promise<void> {
          heading: "PrideTrade",
          subheading:
            "ENICE Group's global multi-currency and digital asset platform—hold USD, EUR, GBP, and Naira accounts, send cross-border payments, trade cryptocurrencies, buy and sell gift cards, and stay connected worldwide with instant travel eSIMs.",
-       })}::jsonb
+       })}
      WHERE key = 'portfolio.pride'
   `;
 
@@ -301,7 +301,7 @@ export async function applyPrideTradeCopy(): Promise<void> {
            { label: "Digital Assets", value: "Instant crypto & stablecoin trading" },
            { label: "Global Utility", value: "Gift cards & international travel eSIMs" },
          ],
-       })}::jsonb
+       })}
      WHERE key = 'portfolio.pride.facts'
   `;
 
@@ -313,7 +313,7 @@ export async function applyPrideTradeCopy(): Promise<void> {
          subheading:
            "The scope the platform is being built to, not a claim that any of it is live today.",
          items: PRIDE_CAPABILITIES,
-       })}::jsonb
+       })}
      WHERE key = 'portfolio.pride.highlights'
   `;
 
@@ -325,7 +325,26 @@ export async function applyPrideTradeCopy(): Promise<void> {
   `;
 
   await sql`
-    INSERT INTO site_settings (key, value) VALUES (${PRIDE_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    INSERT INTO site_settings (key, value) VALUES (${PRIDE_MARKER}, ${JSON.stringify({ applied: true })})
     ON CONFLICT (key) DO NOTHING
+  `;
+}
+
+/**
+ * Repairs sections whose `fields` column ended up holding a JSON *string* rather than an object.
+ *
+ * The first run of the corrections above passed `JSON.stringify(...)` into a `::jsonb` cast, and the
+ * driver had already encoded the value, so Postgres stored the document as a string scalar. The
+ * content inside is correct; only its shape is wrong, which is enough to make the page fall back to
+ * its built-in copy. `#>> '{}'` pulls the inner text out and parses it back into an object.
+ *
+ * Idempotent: once no row has a string in `fields`, it updates nothing.
+ */
+export async function normalizeSectionFields(): Promise<void> {
+  const sql = db();
+  await sql`
+    UPDATE site_sections
+       SET fields = (fields #>> '{}')::jsonb
+     WHERE jsonb_typeof(fields) = 'string'
   `;
 }

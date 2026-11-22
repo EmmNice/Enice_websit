@@ -95,7 +95,12 @@ import {
   uniqueSlug,
 } from "./lib/repo/content";
 import { seedWebsiteDefaults } from "./lib/repo/website";
-import { applyCopyFixes, applyPrideTradeCopy, applyPulsePayCopy } from "./lib/repo/copy-fixes";
+import {
+  applyCopyFixes,
+  applyPrideTradeCopy,
+  applyPulsePayCopy,
+  normalizeSectionFields,
+} from "./lib/repo/copy-fixes";
 import {
   changeOwnPassword,
   twoFactorStatus,
@@ -440,6 +445,7 @@ router.add("GET /dashboard", async () => {
   await applyCopyFixes();
   await applyPulsePayCopy();
   await applyPrideTradeCopy();
+  await normalizeSectionFields();
   return dashboardSnapshot();
 });
 

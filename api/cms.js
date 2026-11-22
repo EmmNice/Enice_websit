@@ -15907,7 +15907,7 @@ async function applyCopyFixes() {
     `;
   }
   await sql`
-    INSERT INTO site_settings (key, value) VALUES (${MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    INSERT INTO site_settings (key, value) VALUES (${MARKER}, ${JSON.stringify({ applied: true })})
     ON CONFLICT (key) DO NOTHING
   `;
 }
@@ -15952,11 +15952,11 @@ async function applyPulsePayCopy() {
   if (existing.length > 0) return;
   await sql`
     UPDATE site_sections
-       SET fields = ${JSON.stringify({
+       SET fields = ${json({
     eyebrow: "Digital Banking & Financial Platform",
     heading: "PulsePay",
     subheading: "A complete digital banking platform for everyday money\u2014open instant Naira accounts, send fast transfers, pay bills, spend globally with Naira and USD virtual cards, and manage your money with Fin, your built-in AI financial assistant."
-  })}::jsonb
+  })}
      WHERE key = 'portfolio.pulsepay'
   `;
   await sql`
@@ -15966,7 +15966,7 @@ async function applyPulsePayCopy() {
     heading: "Everything a modern payments stack should be.",
     subheading: "PulsePay covers the whole of everyday money: accounts, transfers, cards, bills, protection and a built-in assistant, in one platform.",
     items: PULSEPAY_FEATURES
-  })}::jsonb
+  })}
      WHERE key = 'portfolio.pulsepay.features'
   `;
   await sql`
@@ -15990,7 +15990,7 @@ async function applyPulsePayCopy() {
      WHERE fields::text LIKE '%third-party security certification%'
   `;
   await sql`
-    INSERT INTO site_settings (key, value) VALUES (${PULSEPAY_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    INSERT INTO site_settings (key, value) VALUES (${PULSEPAY_MARKER}, ${JSON.stringify({ applied: true })})
     ON CONFLICT (key) DO NOTHING
   `;
 }
@@ -16029,7 +16029,7 @@ async function applyPrideTradeCopy() {
     eyebrow: "Multi-Currency & Digital Assets",
     heading: "PrideTrade",
     subheading: "ENICE Group's global multi-currency and digital asset platform\u2014hold USD, EUR, GBP, and Naira accounts, send cross-border payments, trade cryptocurrencies, buy and sell gift cards, and stay connected worldwide with instant travel eSIMs."
-  })}::jsonb
+  })}
      WHERE key = 'portfolio.pride'
   `;
   await sql`
@@ -16041,7 +16041,7 @@ async function applyPrideTradeCopy() {
       { label: "Digital Assets", value: "Instant crypto & stablecoin trading" },
       { label: "Global Utility", value: "Gift cards & international travel eSIMs" }
     ]
-  })}::jsonb
+  })}
      WHERE key = 'portfolio.pride.facts'
   `;
   await sql`
@@ -16051,7 +16051,7 @@ async function applyPrideTradeCopy() {
     heading: "A global account, not just a trading desk.",
     subheading: "The scope the platform is being built to, not a claim that any of it is live today.",
     items: PRIDE_CAPABILITIES
-  })}::jsonb
+  })}
      WHERE key = 'portfolio.pride.highlights'
   `;
   await sql`
@@ -16060,8 +16060,16 @@ async function applyPrideTradeCopy() {
      WHERE fields::text LIKE '%Same ledger%'
   `;
   await sql`
-    INSERT INTO site_settings (key, value) VALUES (${PRIDE_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    INSERT INTO site_settings (key, value) VALUES (${PRIDE_MARKER}, ${JSON.stringify({ applied: true })})
     ON CONFLICT (key) DO NOTHING
+  `;
+}
+async function normalizeSectionFields() {
+  const sql = db();
+  await sql`
+    UPDATE site_sections
+       SET fields = (fields #>> '{}')::jsonb
+     WHERE jsonb_typeof(fields) = 'string'
   `;
 }
 
@@ -17077,6 +17085,7 @@ router.add("GET /dashboard", async () => {
   await applyCopyFixes();
   await applyPulsePayCopy();
   await applyPrideTradeCopy();
+  await normalizeSectionFields();
   return dashboardSnapshot();
 });
 router.add("GET /search", async ({ query }) => ({
