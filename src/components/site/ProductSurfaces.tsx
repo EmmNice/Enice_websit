@@ -104,25 +104,48 @@ export function PrideSurface({ className }: { className?: string }) {
   return (
     <Panel raised aria-hidden className={className}>
       <div className="flex items-center justify-between border-b border-border px-5 py-3">
-        <span className="text-[12.5px] font-semibold text-bone-strong">PrideTrade Exchange</span>
-        <span className="font-mono text-[10px] tracking-[0.18em] text-bone-faint">NGN</span>
+        <span className="text-[12.5px] font-semibold text-bone-strong">PrideTrade</span>
+        <span className="font-mono text-[10px] tracking-[0.18em] text-bone-faint">
+          Multi-currency
+        </span>
+      </div>
+
+      {/* Accounts and assets in one switcher: fiat on the left, crypto on the right, so the shape of
+          the product reads before a single number does. */}
+      <div className="flex gap-1.5 overflow-hidden border-b border-border px-4 py-3">
+        {["USD", "EUR", "GBP", "NGN", "USDT", "BTC"].map((code) => {
+          const active = code === "USD";
+          return (
+            <span
+              key={code}
+              className={`flex-1 border py-1.5 text-center font-mono text-[10px] ${
+                active
+                  ? "border-[color:var(--pride-accent)]/60 text-[color:var(--pride-accent)]"
+                  : "border-border text-bone-faint"
+              }`}
+            >
+              {code}
+            </span>
+          );
+        })}
       </div>
 
       <div className="border-b border-border px-5 py-5">
         <p className="text-[10.5px] font-semibold tracking-[0.16em] text-bone-faint uppercase">
-          Naira wallet
+          USD account
         </p>
         <p className="tnum mt-2 font-mono text-[26px] leading-none font-semibold text-bone-strong">
-          {naira(1_240_000)}
+          $12,480.00
         </p>
+        <p className="tnum mt-2 text-[11px] text-bone-faint">≈ {naira(18_720_000)}</p>
         <div className="mt-4 grid grid-cols-2 gap-2">
           <span className="flex items-center justify-center gap-1.5 border border-[color:var(--pride-accent)]/40 py-2 text-[11px] font-semibold text-[color:var(--pride-accent)]">
             <ArrowDownLeft className="h-3.5 w-3.5" strokeWidth={1.5} />
-            Fund
+            Add money
           </span>
           <span className="flex items-center justify-center gap-1.5 border border-border py-2 text-[11px] font-semibold text-bone-strong">
             <ArrowUpRight className="h-3.5 w-3.5" strokeWidth={1.5} />
-            Withdraw
+            Send abroad
           </span>
         </div>
       </div>
@@ -151,14 +174,14 @@ export function PrideSurface({ className }: { className?: string }) {
             className="h-3.5 w-3.5 shrink-0 text-[color:var(--pride-accent)]"
             strokeWidth={1.5}
           />
-          Naira deposits and withdrawals by bank transfer.
+          Gift cards bought and redeemed with instant wallet payout.
         </p>
         <p className="flex items-center gap-2 text-[10.5px] text-bone-faint">
-          <CreditCard
+          <Smartphone
             className="h-3.5 w-3.5 shrink-0 text-[color:var(--pride-accent)]"
             strokeWidth={1.5}
           />
-          Withdrawal addresses allowlisted. Payment PIN kept separate.
+          Travel eSIMs in 150+ countries. Allowlisted withdrawals, separate payment PIN.
         </p>
       </div>
     </Panel>

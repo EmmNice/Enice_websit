@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { SITE_URL } from "@/lib/site";
 import type { LucideIcon } from "lucide-react";
-import { Bitcoin, Boxes, Lock, Globe, Layers, ShieldCheck, Zap, BarChart3 } from "lucide-react";
+import {
+  Bitcoin,
+  Boxes,
+  Lock,
+  Globe,
+  Gift,
+  ShieldCheck,
+  Smartphone,
+  Zap,
+  BarChart3,
+} from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { PrideSurface, SurfaceNote } from "@/components/site/ProductSurfaces";
 import { StyledText } from "@/components/site/StyledText";
@@ -31,7 +41,7 @@ export const Route = createFileRoute("/portfolio/pride")({
         "@type": "SoftwareApplication",
         name: "PrideTrade",
         description:
-          "ENICE Group's digital asset platform for cryptocurrency trading, secure custody and transfers. Launching Q3 2027.",
+          "ENICE Group's global multi-currency and digital asset platform: USD, EUR, GBP and Naira accounts, cross-border payments, crypto and stablecoin trading, gift cards, and travel eSIMs. Launching Q3 2027.",
         url: `${SITE_URL}/portfolio/pride`,
         applicationCategory: "FinanceApplication",
         operatingSystem: "Web, iOS, Android",
@@ -83,10 +93,11 @@ const CARD_ICONS: Record<string, LucideIcon> = {
   BarChart3,
   Bitcoin,
   Boxes,
+  Gift,
   Globe,
-  Layers,
   Lock,
   ShieldCheck,
+  Smartphone,
   Zap,
 };
 
@@ -105,38 +116,33 @@ function cardIcon(name: string): LucideIcon {
  * derived from position at render time.
  */
 const LAUNCH_FACTS = [
-  { label: "Status", value: "Planned Project" },
-  { label: "Launch", value: "Q3 2027" },
-  { label: "Category", value: "Digital Assets" },
+  { label: "Multi-Currency", value: "USD, EUR, GBP & NGN accounts" },
+  { label: "Digital Assets", value: "Instant crypto & stablecoin trading" },
+  { label: "Global Utility", value: "Gift cards & international travel eSIMs" },
 ];
 
 // ─── Feature highlights ───────────────────────────────────────────────────────
 
 const HIGHLIGHTS = [
   {
-    icon: BarChart3,
-    title: "Multi-asset trading",
-    desc: "Trade major digital assets with deep liquidity and institutional-grade execution: Bitcoin, Ethereum, and beyond.",
-  },
-  {
-    icon: Lock,
-    title: "Secure custody",
-    desc: "Cold storage, multi-signature protection, and continuous on-chain monitoring for every asset in your portfolio.",
-  },
-  {
     icon: Globe,
-    title: "Built for scale",
-    desc: "Global access with compliance and reporting designed for regulated markets from day one, in Africa, Europe, and beyond.",
+    title: "Multi-Currency Accounts & Cross-Border Payments",
+    desc: "Hold and convert USD, EUR, GBP, and NGN in dedicated virtual accounts, send international payouts, and receive global payments seamlessly.",
   },
   {
-    icon: Zap,
-    title: "Instant settlement",
-    desc: "Near-instant on-chain and off-chain settlement rails so your capital moves as fast as the market does.",
+    icon: BarChart3,
+    title: "Cryptocurrency & Stablecoin Trading",
+    desc: "Buy, sell, and swap BTC, ETH, USDT, and major digital assets with transparent live rates, instant Naira settlement, and allowlisted withdrawal security.",
   },
   {
-    icon: ShieldCheck,
-    title: "Regulatory-ready",
-    desc: "Compliance built in from the ground up: KYC, AML, and transaction monitoring at the core.",
+    icon: Gift,
+    title: "Gift Card Exchange",
+    desc: "Buy and redeem major international retail, gaming, and lifestyle gift cards at competitive rates with instant wallet payout.",
+  },
+  {
+    icon: Smartphone,
+    title: "Global Travel eSIMs & Compliance",
+    desc: "Activate instant international mobile data plans in 150+ countries with zero roaming fees, backed by built-in KYC, AML, and real-time transaction screening.",
   },
 ];
 
@@ -189,21 +195,21 @@ function PridePage() {
                 text={fieldText(
                   header,
                   "subheading",
-                  "PrideTrade is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance **simple, secure, and accessible**. The platform lets users trade, hold and move digital assets from one account.",
+                  "ENICE Group's global multi-currency and digital asset platform—hold USD, EUR, GBP, and Naira accounts, send cross-border payments, trade cryptocurrencies, buy and sell gift cards, and stay connected worldwide with instant travel eSIMs.",
                 )}
                 accentClassName="text-electric"
                 boldClassName="font-semibold text-foreground"
               />
             </p>
 
-            <dl className="mt-10 grid grid-cols-3 gap-3">
+            <dl className="mt-10 grid gap-3 sm:grid-cols-3">
               {launchFacts.map((m, i) => (
                 <Panel key={`${m.label}-${i}`} tone="quiet" className="p-3">
                   <dt className="text-[9px] font-semibold uppercase tracking-[0.2em] text-bone-faint">
                     {m.label}
                   </dt>
                   <dd
-                    className={`tnum mt-1 text-[12px] font-semibold ${
+                    className={`mt-1 text-[11.5px] leading-snug font-semibold ${
                       i === 0 ? "text-electric" : "text-foreground"
                     }`}
                   >
@@ -245,7 +251,7 @@ function PridePage() {
             heading={fieldText(
               highlightsSection,
               "heading",
-              "Digital assets, without the friction.",
+              "A global account, not just a trading desk.",
             )}
             lead={fieldText(
               highlightsSection,

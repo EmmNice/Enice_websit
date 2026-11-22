@@ -234,3 +234,98 @@ export async function applyPulsePayCopy(): Promise<void> {
     ON CONFLICT (key) DO NOTHING
   `;
 }
+
+/**
+ * PrideTrade repositioned from a crypto desk to a standalone multi-currency platform.
+ *
+ * Same shape as the PulsePay correction above: the hero, the three boxes under it and the four
+ * capability cards are rows, and the cards are an array, so the section fields are set outright.
+ *
+ * It also drops the last trace of the shared-ecosystem claim, which was a fact row reading
+ * "Same ledger / As PulsePay".
+ */
+const PRIDE_MARKER = "copy_fixes_pridetrade_platform_v1";
+
+const PRIDE_CAPABILITIES = [
+  {
+    icon: "Globe",
+    title: "Multi-Currency Accounts & Cross-Border Payments",
+    description:
+      "Hold and convert USD, EUR, GBP, and NGN in dedicated virtual accounts, send international payouts, and receive global payments seamlessly.",
+  },
+  {
+    icon: "BarChart3",
+    title: "Cryptocurrency & Stablecoin Trading",
+    description:
+      "Buy, sell, and swap BTC, ETH, USDT, and major digital assets with transparent live rates, instant Naira settlement, and allowlisted withdrawal security.",
+  },
+  {
+    icon: "Gift",
+    title: "Gift Card Exchange",
+    description:
+      "Buy and redeem major international retail, gaming, and lifestyle gift cards at competitive rates with instant wallet payout.",
+  },
+  {
+    icon: "Smartphone",
+    title: "Global Travel eSIMs & Compliance",
+    description:
+      "Activate instant international mobile data plans in 150+ countries with zero roaming fees, backed by built-in KYC, AML, and real-time transaction screening.",
+  },
+];
+
+export async function applyPrideTradeCopy(): Promise<void> {
+  const sql = db();
+
+  const existing = await sql<{ key: string }[]>`
+    SELECT key FROM site_settings WHERE key = ${PRIDE_MARKER}
+  `;
+  if (existing.length > 0) return;
+
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+         eyebrow: "Multi-Currency & Digital Assets",
+         heading: "PrideTrade",
+         subheading:
+           "ENICE Group's global multi-currency and digital asset platform—hold USD, EUR, GBP, and Naira accounts, send cross-border payments, trade cryptocurrencies, buy and sell gift cards, and stay connected worldwide with instant travel eSIMs.",
+       })}::jsonb
+     WHERE key = 'portfolio.pride'
+  `;
+
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+         heading: "At launch",
+         items: [
+           { label: "Multi-Currency", value: "USD, EUR, GBP & NGN accounts" },
+           { label: "Digital Assets", value: "Instant crypto & stablecoin trading" },
+           { label: "Global Utility", value: "Gift cards & international travel eSIMs" },
+         ],
+       })}::jsonb
+     WHERE key = 'portfolio.pride.facts'
+  `;
+
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+         eyebrow: "Platform Capabilities",
+         heading: "A global account, not just a trading desk.",
+         subheading:
+           "The scope the platform is being built to, not a claim that any of it is live today.",
+         items: PRIDE_CAPABILITIES,
+       })}::jsonb
+     WHERE key = 'portfolio.pride.highlights'
+  `;
+
+  // The last row that still tied the two products together.
+  await sql`
+    UPDATE site_sections
+       SET fields = replace(fields::text, 'Same ledger', 'Own ledger')::jsonb
+     WHERE fields::text LIKE '%Same ledger%'
+  `;
+
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${PRIDE_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    ON CONFLICT (key) DO NOTHING
+  `;
+}

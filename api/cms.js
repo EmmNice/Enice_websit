@@ -10622,9 +10622,9 @@ ON CONFLICT (key) DO NOTHING;
 
 INSERT INTO site_sections (key, label, group_name, type, visible, status, fields, sort_order)
 VALUES ('portfolio.pulsepay', 'PulsePay page', 'Portfolio', 'hero', true, 'published', '{
-  "eyebrow": "Fintech Infrastructure Platform",
+  "eyebrow": "Digital Banking & Financial Platform",
   "heading": "PulsePay",
-  "subheading": "A virtual payment platform that issues Naira and USD cards, handles KYC verification, moves funds between users, and delivers value-added services with speed and reliability."
+  "subheading": "A complete digital banking platform for everyday money\u2014open instant Naira accounts, send fast transfers, pay bills, spend globally with Naira and USD virtual cards, and manage your money with Fin, your built-in AI financial assistant."
 }'::jsonb, 210)
 ON CONFLICT (key) DO NOTHING;
 
@@ -10877,14 +10877,14 @@ INSERT INTO site_sections (key, label, group_name, type, visible, status, fields
 VALUES ('portfolio.pulsepay.features', 'PulsePay capabilities', 'Portfolio', 'featureGrid', true, 'published', '{
   "eyebrow": "Platform Capabilities",
   "heading": "Everything a modern payments stack should be.",
-  "subheading": "PulsePay covers the whole of everyday money: accounts, transfers, cards, bills, protection and a built-in assistant, in one platform.",
+  "subheading": "PulsePay covers the full payments stack: issuance, compliance, transfers, and spending controls, in one integrated platform.",
   "items": [
-    {"icon":"Landmark","title":"Instant Naira Bank Accounts","description":"Get a dedicated Nigerian bank account in minutes to receive salaries, collect payments, and hold funds securely."},
-    {"icon":"Send","title":"Fast Transfers & P2P Payments","description":"Send money instantly to any Nigerian bank account or transfer between PulsePay wallets with zero friction."},
-    {"icon":"CreditCard","title":"Naira & USD Virtual Cards","description":"Issue Naira and USD virtual cards in seconds for seamless local checkouts, international subscriptions, and global online spend."},
-    {"icon":"Receipt","title":"Bills, Airtime & Utilities","description":"Pay electricity, cable TV, internet, airtime, and data bills in seconds with instant receipts and automated recurring schedules."},
-    {"icon":"ShieldCheck","title":"Built-in KYC & Fraud Protection","description":"Tiered identity verification, real-time transaction screening, and dual-control security protecting every account and transfer."},
-    {"icon":"Sparkles","title":"Fin AI Financial Assistant","description":"Track spending, get smart cashflow insights, and execute transfers or bill payments using natural voice and text commands."}
+    {"icon":"CreditCard","title":"Instant virtual card issuance","description":"Issue Naira and USD virtual cards in seconds for individuals and teams."},
+    {"icon":"ShieldCheck","title":"Built-in KYC verification","description":"Identity verification and compliance checks built directly into the onboarding flow."},
+    {"icon":"Users","title":"Peer-to-peer transfers","description":"Move funds between users and fund wallets instantly with no friction."},
+    {"icon":"Lock","title":"Built-in KYC & Fraud Protection","description":"Tiered identity verification, real-time transaction screening, and dual-control security protecting every account and transfer."},
+    {"icon":"Zap","title":"Value-added services","description":"Bill payments, airtime, utilities, and more built directly into the platform."},
+    {"icon":"BarChart3","title":"Fin AI Financial Assistant","description":"Track spending, get smart cashflow insights, and execute transfers or bill payments using natural voice and text commands."}
   ]
 }'::jsonb, 212)
 ON CONFLICT (key) DO NOTHING;
@@ -10893,7 +10893,7 @@ INSERT INTO site_sections (key, label, group_name, type, visible, status, fields
 VALUES ('portfolio.pulsepay.compliance', 'PulsePay compliance', 'Portfolio', 'featureGrid', true, 'published', '{
   "eyebrow": "Compliance & Regulation",
   "heading": "Built for regulated markets from the ground up.",
-  "subheading": "PulsePay operates within Nigeria''s regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions.",
+  "subheading": "PulsePay operates within Nigeria''s regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions. ",
   "items": [
     {"title":"Row-Level Security"},
     {"title":"Tenant Isolation"},
@@ -15562,32 +15562,129 @@ var DEFAULT_SECTIONS = [
     type: "hero",
     order: 230,
     fields: {
-      eyebrow: "Digital Assets",
+      eyebrow: "Multi-Currency & Digital Assets",
       heading: "PrideTrade",
-      subheading: "PrideTrade is ENICE Group's digital asset platform, designed to make cryptocurrency and digital finance simple, secure and accessible, from one account."
+      subheading: "ENICE Group's global multi-currency and digital asset platform\u2014hold USD, EUR, GBP, and Naira accounts, send cross-border payments, trade cryptocurrencies, buy and sell gift cards, and stay connected worldwide with instant travel eSIMs."
     }
   },
   {
     key: "portfolio.pride.facts",
-    label: "PRIDE launch facts",
+    label: "PrideTrade highlights",
     group: "Portfolio",
     type: "statistics",
     order: 231,
     fields: {
       heading: "At launch",
       items: [
-        { value: "2027", label: "Public launch" },
-        { value: "Same ledger", label: "As PulsePay" },
-        { value: "Self-custody option", label: "Keys stay with the holder" }
+        {
+          label: "Multi-Currency",
+          value: "USD, EUR, GBP & NGN accounts"
+        },
+        {
+          label: "Digital Assets",
+          value: "Instant crypto & stablecoin trading"
+        },
+        {
+          label: "Global Utility",
+          value: "Gift cards & international travel eSIMs"
+        }
       ]
     }
   },
   {
     key: "portfolio.pride.highlights",
-    label: "PRIDE highlights",
+    label: "PrideTrade capabilities",
     group: "Portfolio",
     type: "featureGrid",
     order: 232,
+    fields: {
+      eyebrow: "Platform Capabilities",
+      heading: "A global account, not just a trading desk.",
+      subheading: "The scope the platform is being built to, not a claim that any of it is live today.",
+      items: [
+        {
+          icon: "Globe",
+          title: "Multi-Currency Accounts & Cross-Border Payments",
+          description: "Hold and convert USD, EUR, GBP, and NGN in dedicated virtual accounts, send international payouts, and receive global payments seamlessly."
+        },
+        {
+          icon: "BarChart3",
+          title: "Cryptocurrency & Stablecoin Trading",
+          description: "Buy, sell, and swap BTC, ETH, USDT, and major digital assets with transparent live rates, instant Naira settlement, and allowlisted withdrawal security."
+        },
+        {
+          icon: "Gift",
+          title: "Gift Card Exchange",
+          description: "Buy and redeem major international retail, gaming, and lifestyle gift cards at competitive rates with instant wallet payout."
+        },
+        {
+          icon: "Smartphone",
+          title: "Global Travel eSIMs & Compliance",
+          description: "Activate instant international mobile data plans in 150+ countries with zero roaming fees, backed by built-in KYC, AML, and real-time transaction screening."
+        }
+      ]
+    }
+  },
+  {
+    key: "portfolio.index",
+    label: "Products page",
+    group: "Portfolio",
+    type: "hero",
+    order: 200,
+    fields: {
+      eyebrow: "ENICE Products",
+      heading: "Products built by ENICE Group",
+      subheading: "Payments, financial services, business communication, and digital commerce. Each product runs on the same infrastructure and is built to operate at scale."
+    }
+  },
+  {
+    key: "portfolio.pulsepay",
+    label: "PulsePay page",
+    group: "Portfolio",
+    type: "hero",
+    order: 210,
+    fields: {
+      eyebrow: "Digital Banking & Financial Platform",
+      heading: "PulsePay",
+      subheading: "A complete digital banking platform for everyday money\u2014open instant Naira accounts, send fast transfers, pay bills, spend globally with Naira and USD virtual cards, and manage your money with Fin, your built-in AI financial assistant."
+    }
+  },
+  /*
+   * The bands *inside* each product page, previously hardcoded in the route components.
+   *
+   * Migration 11 made each product page's header editable and stopped there, so the capability
+   * grids, the facts strips, the sector tiles and the compliance pills below them still needed a
+   * deploy to change — which is the content that moves most on a product page. Each band is an
+   * existing section type, so the admin form and the sanitiser already understand it, and each
+   * component keeps its built-in copy as the fallback. Migration 13 seeds the same rows into
+   * existing databases.
+   *
+   * `sort_order` follows the order the bands appear on their page, inside the block already
+   * reserved for that page by migration 11 (210 PulsePay, 220 PulseAssist, 230 ePulse, 240 PRIDE and 250 DevaPay — all since removed).
+   */
+  {
+    key: "portfolio.pulsepay.stats",
+    label: "PulsePay facts strip",
+    group: "Portfolio",
+    type: "statistics",
+    order: 211,
+    fields: {
+      heading: "PulsePay at a glance",
+      // Only figures that can be checked: `< 5s — Card issuance time` was removed from this strip
+      // because there is no published benchmark behind it.
+      items: [
+        { value: "Naira & USD", label: "Card currencies" },
+        { value: "2", label: "Currency rails (NGN + USD)" },
+        { value: "Every account", label: "KYC screening" }
+      ]
+    }
+  },
+  {
+    key: "portfolio.pulsepay.features",
+    label: "PulsePay capabilities",
+    group: "Portfolio",
+    type: "featureGrid",
+    order: 212,
     fields: {
       eyebrow: "Platform Capabilities",
       heading: "Everything a modern payments stack should be.",
@@ -15635,7 +15732,7 @@ var DEFAULT_SECTIONS = [
     fields: {
       eyebrow: "Compliance & Regulation",
       heading: "Built for regulated markets from the ground up.",
-      subheading: "PulsePay operates within Nigeria's regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions.",
+      subheading: "PulsePay operates within Nigeria's regulatory framework, with row-level security, KYC screening on every account, and audit logging of privileged actions. ",
       // A plain list of mechanism names rendered as pills, so only each row's title is read.
       items: [
         { title: "Row-Level Security" },
@@ -15894,6 +15991,76 @@ async function applyPulsePayCopy() {
   `;
   await sql`
     INSERT INTO site_settings (key, value) VALUES (${PULSEPAY_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
+    ON CONFLICT (key) DO NOTHING
+  `;
+}
+var PRIDE_MARKER = "copy_fixes_pridetrade_platform_v1";
+var PRIDE_CAPABILITIES = [
+  {
+    icon: "Globe",
+    title: "Multi-Currency Accounts & Cross-Border Payments",
+    description: "Hold and convert USD, EUR, GBP, and NGN in dedicated virtual accounts, send international payouts, and receive global payments seamlessly."
+  },
+  {
+    icon: "BarChart3",
+    title: "Cryptocurrency & Stablecoin Trading",
+    description: "Buy, sell, and swap BTC, ETH, USDT, and major digital assets with transparent live rates, instant Naira settlement, and allowlisted withdrawal security."
+  },
+  {
+    icon: "Gift",
+    title: "Gift Card Exchange",
+    description: "Buy and redeem major international retail, gaming, and lifestyle gift cards at competitive rates with instant wallet payout."
+  },
+  {
+    icon: "Smartphone",
+    title: "Global Travel eSIMs & Compliance",
+    description: "Activate instant international mobile data plans in 150+ countries with zero roaming fees, backed by built-in KYC, AML, and real-time transaction screening."
+  }
+];
+async function applyPrideTradeCopy() {
+  const sql = db();
+  const existing = await sql`
+    SELECT key FROM site_settings WHERE key = ${PRIDE_MARKER}
+  `;
+  if (existing.length > 0) return;
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+    eyebrow: "Multi-Currency & Digital Assets",
+    heading: "PrideTrade",
+    subheading: "ENICE Group's global multi-currency and digital asset platform\u2014hold USD, EUR, GBP, and Naira accounts, send cross-border payments, trade cryptocurrencies, buy and sell gift cards, and stay connected worldwide with instant travel eSIMs."
+  })}::jsonb
+     WHERE key = 'portfolio.pride'
+  `;
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+    heading: "At launch",
+    items: [
+      { label: "Multi-Currency", value: "USD, EUR, GBP & NGN accounts" },
+      { label: "Digital Assets", value: "Instant crypto & stablecoin trading" },
+      { label: "Global Utility", value: "Gift cards & international travel eSIMs" }
+    ]
+  })}::jsonb
+     WHERE key = 'portfolio.pride.facts'
+  `;
+  await sql`
+    UPDATE site_sections
+       SET fields = ${JSON.stringify({
+    eyebrow: "Platform Capabilities",
+    heading: "A global account, not just a trading desk.",
+    subheading: "The scope the platform is being built to, not a claim that any of it is live today.",
+    items: PRIDE_CAPABILITIES
+  })}::jsonb
+     WHERE key = 'portfolio.pride.highlights'
+  `;
+  await sql`
+    UPDATE site_sections
+       SET fields = replace(fields::text, 'Same ledger', 'Own ledger')::jsonb
+     WHERE fields::text LIKE '%Same ledger%'
+  `;
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${PRIDE_MARKER}, ${JSON.stringify({ applied: true })}::jsonb)
     ON CONFLICT (key) DO NOTHING
   `;
 }
@@ -16909,6 +17076,7 @@ router.add("GET /dashboard", async () => {
   await seedWebsiteDefaults();
   await applyCopyFixes();
   await applyPulsePayCopy();
+  await applyPrideTradeCopy();
   return dashboardSnapshot();
 });
 router.add("GET /search", async ({ query }) => ({
