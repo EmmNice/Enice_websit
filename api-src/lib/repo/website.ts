@@ -903,9 +903,9 @@ const DEFAULT_SECTIONS: {
     order: 32,
     fields: {
       eyebrow: "Our products",
-      heading: "Start with the product you need, or run both together",
+      heading: "Start with the product you need",
       subheading:
-        "Both products are built on the same ENICE Engine, so payments and digital assets share one secure foundation.",
+        "PulsePay and PrideTrade today, each standing on its own. More products are in development.",
       // `bullets` carries the product's checkable facts, one `Label: Value` pair per line, and
       // `url` is the product page. See `parseFacts` in src/routes/index.tsx.
       items: [

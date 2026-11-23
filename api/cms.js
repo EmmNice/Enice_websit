@@ -15120,8 +15120,8 @@ var DEFAULT_SECTIONS = [
     order: 32,
     fields: {
       eyebrow: "Our products",
-      heading: "Start with the product you need, or run both together",
-      subheading: "Both products are built on the same ENICE Engine, so payments and digital assets share one secure foundation.",
+      heading: "Start with the product you need",
+      subheading: "PulsePay and PrideTrade today, each standing on its own. More products are in development.",
       // `bullets` carries the product's checkable facts, one `Label: Value` pair per line, and
       // `url` is the product page. See `parseFacts` in src/routes/index.tsx.
       items: [
@@ -16120,6 +16120,42 @@ async function applyPortfolioCopy() {
   }
   await sql`
     INSERT INTO site_settings (key, value) VALUES (${PORTFOLIO_MARKER}, ${json({ applied: true })})
+    ON CONFLICT (key) DO NOTHING
+  `;
+}
+var HOME_MARKER = "copy_fixes_home_products_v1";
+var HOME_PAIRS = [
+  ["Start with the product you need, or run both together", "Start with the product you need"],
+  [
+    "Both products are built on the same ENICE Engine, so payments and digital assets share one secure foundation.",
+    "PulsePay and PrideTrade today, each standing on its own. More products are in development."
+  ],
+  ["Start with the product you need, or run all three together", "Start with the product you need"],
+  [
+    "Every product is built on the same ENICE Engine, so payments, conversations and email share one secure foundation.",
+    "PulsePay and PrideTrade today, each standing on its own. More products are in development."
+  ]
+];
+async function applyHomeCopy() {
+  const sql = db();
+  const existing = await sql`
+    SELECT key FROM site_settings WHERE key = ${HOME_MARKER}
+  `;
+  if (existing.length > 0) return;
+  for (const [from, to] of HOME_PAIRS) {
+    await sql`
+      UPDATE site_sections
+         SET fields = replace(fields::text, ${from}, ${to})::jsonb
+       WHERE fields::text LIKE ${"%" + from + "%"}
+    `;
+  }
+  await sql`
+    UPDATE site_sections
+       SET fields = jsonb_set(fields, '{items}', '[]'::jsonb)
+     WHERE key = 'home.products'
+  `;
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${HOME_MARKER}, ${json({ applied: true })})
     ON CONFLICT (key) DO NOTHING
   `;
 }
@@ -17137,6 +17173,7 @@ router.add("GET /dashboard", async () => {
   await applyPulsePayCopy();
   await applyPrideTradeCopy();
   await applyPortfolioCopy();
+  await applyHomeCopy();
   await normalizeSectionFields();
   return dashboardSnapshot();
 });

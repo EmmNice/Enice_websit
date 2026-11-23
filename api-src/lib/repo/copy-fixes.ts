@@ -412,3 +412,51 @@ export async function applyPortfolioCopy(): Promise<void> {
     ON CONFLICT (key) DO NOTHING
   `;
 }
+
+/**
+ * The homepage bands still carried the three-product story, including the claim that everything
+ * shared one engine. They now name what exists and say plainly that each product stands alone.
+ */
+const HOME_MARKER = "copy_fixes_home_products_v1";
+
+const HOME_PAIRS: [string, string][] = [
+  ["Start with the product you need, or run both together", "Start with the product you need"],
+  [
+    "Both products are built on the same ENICE Engine, so payments and digital assets share one secure foundation.",
+    "PulsePay and PrideTrade today, each standing on its own. More products are in development.",
+  ],
+  ["Start with the product you need, or run all three together", "Start with the product you need"],
+  [
+    "Every product is built on the same ENICE Engine, so payments, conversations and email share one secure foundation.",
+    "PulsePay and PrideTrade today, each standing on its own. More products are in development.",
+  ],
+];
+
+export async function applyHomeCopy(): Promise<void> {
+  const sql = db();
+
+  const existing = await sql<{ key: string }[]>`
+    SELECT key FROM site_settings WHERE key = ${HOME_MARKER}
+  `;
+  if (existing.length > 0) return;
+
+  for (const [from, to] of HOME_PAIRS) {
+    await sql`
+      UPDATE site_sections
+         SET fields = replace(fields::text, ${from}, ${to})::jsonb
+       WHERE fields::text LIKE ${"%" + from + "%"}
+    `;
+  }
+
+  // The unused product grid still listed three offerings, two of them suspended. Real deletion.
+  await sql`
+    UPDATE site_sections
+       SET fields = jsonb_set(fields, '{items}', '[]'::jsonb)
+     WHERE key = 'home.products'
+  `;
+
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${HOME_MARKER}, ${json({ applied: true })})
+    ON CONFLICT (key) DO NOTHING
+  `;
+}
