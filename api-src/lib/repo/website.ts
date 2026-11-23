@@ -852,9 +852,9 @@ const DEFAULT_SECTIONS: {
     order: 30,
     fields: {
       eyebrow: "What we build",
-      heading: "Two platforms, one foundation.",
+      heading: "Built one at a time, to one standard.",
       subheading:
-        "Payments and digital assets, built on the same ledger, compliance and infrastructure.",
+        "Payments and digital assets today, with more in development. Each product stands on its own.",
       // The three cards the homepage product band renders. `index` numbering is derived from
       // position, and bullets are one per line.
       items: [

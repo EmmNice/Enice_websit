@@ -15073,8 +15073,8 @@ var DEFAULT_SECTIONS = [
     order: 30,
     fields: {
       eyebrow: "What we build",
-      heading: "Two platforms, one foundation.",
-      subheading: "Payments and digital assets, built on the same ledger, compliance and infrastructure.",
+      heading: "Built one at a time, to one standard.",
+      subheading: "Payments and digital assets today, with more in development. Each product stands on its own.",
       // The three cards the homepage product band renders. `index` numbering is derived from
       // position, and bullets are one per line.
       items: [
@@ -16070,6 +16070,57 @@ async function normalizeSectionFields() {
     UPDATE site_sections
        SET fields = (fields #>> '{}')::jsonb
      WHERE jsonb_typeof(fields) = 'string'
+  `;
+}
+var PORTFOLIO_MARKER = "copy_fixes_portfolio_growth_v1";
+var PORTFOLIO_PAIRS = [
+  [
+    "Two products, held to the same standard of engineering",
+    "A growing portfolio, held to one standard of engineering"
+  ],
+  [
+    "Two separate products, each designed, built and operated by ENICE on infrastructure we run ourselves.",
+    "PulsePay and PrideTrade are the first. Each is designed, built and operated by ENICE on its own infrastructure, and the portfolio is built to grow."
+  ],
+  ["Two products, one platform", "The products we run today"],
+  [
+    "Payments and digital assets. Two products, each built and run on its own infrastructure, to operate at scale.",
+    "Payments and digital assets today, with more to come. Each product is built and run on its own infrastructure, to operate at scale."
+  ],
+  ["Two platforms, one foundation.", "Built one at a time, to one standard."],
+  [
+    "Payments and digital assets, built on the same ledger, compliance and infrastructure.",
+    "Payments and digital assets today, with more in development. Each product stands on its own."
+  ],
+  [
+    "Shared identity, compliance and settlement run across both products, built to",
+    "Each product runs its own identity, compliance and settlement stack, built to"
+  ],
+  [
+    "PulsePay and PrideTrade, built and operated by ENICE Group. PulsePay is in pilot ahead of general availability; PrideTrade opens its waitlist ahead of launch.",
+    "PulsePay and PrideTrade today, built and operated by ENICE Group. PulsePay is in pilot ahead of general availability; PrideTrade opens its waitlist ahead of launch, with more products in development."
+  ],
+  [
+    "PrideTrade for trading and custody. Two separate products.",
+    "PrideTrade for trading and custody. Each runs on its own infrastructure."
+  ]
+];
+async function applyPortfolioCopy() {
+  const sql = db();
+  const existing = await sql`
+    SELECT key FROM site_settings WHERE key = ${PORTFOLIO_MARKER}
+  `;
+  if (existing.length > 0) return;
+  for (const [from, to] of PORTFOLIO_PAIRS) {
+    await sql`
+      UPDATE site_sections
+         SET fields = replace(fields::text, ${from}, ${to})::jsonb
+       WHERE fields::text LIKE ${"%" + from + "%"}
+    `;
+  }
+  await sql`
+    INSERT INTO site_settings (key, value) VALUES (${PORTFOLIO_MARKER}, ${json({ applied: true })})
+    ON CONFLICT (key) DO NOTHING
   `;
 }
 
@@ -17085,6 +17136,7 @@ router.add("GET /dashboard", async () => {
   await applyCopyFixes();
   await applyPulsePayCopy();
   await applyPrideTradeCopy();
+  await applyPortfolioCopy();
   await normalizeSectionFields();
   return dashboardSnapshot();
 });

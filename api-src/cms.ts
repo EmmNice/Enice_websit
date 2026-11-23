@@ -98,6 +98,7 @@ import { seedWebsiteDefaults } from "./lib/repo/website";
 import {
   applyCopyFixes,
   applyPrideTradeCopy,
+  applyPortfolioCopy,
   applyPulsePayCopy,
   normalizeSectionFields,
 } from "./lib/repo/copy-fixes";
@@ -445,6 +446,7 @@ router.add("GET /dashboard", async () => {
   await applyCopyFixes();
   await applyPulsePayCopy();
   await applyPrideTradeCopy();
+  await applyPortfolioCopy();
   await normalizeSectionFields();
   return dashboardSnapshot();
 });

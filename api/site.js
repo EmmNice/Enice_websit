@@ -65,7 +65,7 @@ var DEFAULT_OG_IMAGE = `${SITE_URL}/og.png`;
 var PAGE_SEO = {
   "/": {
     title: "ENICE Group | Payments and Digital Asset Infrastructure",
-    description: "ENICE Group builds and operates payment and digital asset platforms: PulsePay for cards, wallets and transfers, PrideTrade for trading and custody. Two separate products."
+    description: "ENICE Group builds and operates payment and digital asset platforms: PulsePay for cards, wallets and transfers, PrideTrade for trading and custody. Each runs on its own infrastructure."
   },
   "/about": {
     title: "About ENICE Group | A Technology Company Building African Infrastructure",

@@ -44,7 +44,7 @@ interface Product {
 }
 
 /**
- * The two products ENICE Group runs. This list is the portfolio — the homepage shows nothing
+ * The products ENICE Group runs today. The portfolio is expected to grow, so nothing here assumes
  * else, whatever the CMS holds (see `src/lib/retired-products.ts`).
  */
 const PRODUCTS: Product[] = [
@@ -228,7 +228,7 @@ function Landing() {
                   text={fieldText(
                     portfolio,
                     "heading",
-                    "Two products, held to the same standard of engineering",
+                    "A growing portfolio, held to one standard of engineering",
                   )}
                   accentClassName="text-electric"
                 />
@@ -238,7 +238,7 @@ function Landing() {
                   text={fieldText(
                     portfolio,
                     "subheading",
-                    "Two separate products, each designed, built and operated by ENICE on infrastructure we run ourselves.",
+                    "PulsePay and PrideTrade are the first. Each is designed, built and operated by ENICE on its own infrastructure, and the portfolio is built to grow.",
                   )}
                   accentClassName="text-electric"
                 />
@@ -311,7 +311,7 @@ function Landing() {
           <Reveal delay={120}>
             <div className="mt-10 flex flex-col gap-5 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
               <p className="max-w-2xl text-[14px] leading-relaxed text-bone-soft">
-                Shared identity, compliance and settlement run across both products, built to
+                Each product runs its own identity, compliance and settlement stack, built to
                 applicable standards in the Federal Republic of Nigeria with strict privacy and
                 security controls.
               </p>

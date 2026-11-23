@@ -182,7 +182,7 @@ function PortfolioIndexPage() {
           lead={fieldText(
             header,
             "subheading",
-            "Payments and digital assets. Two products, each built and run on its own infrastructure, to operate at scale.",
+            "Payments and digital assets today, with more to come. Each product is built and run on its own infrastructure, to operate at scale.",
           )}
         />
       </Section>
@@ -195,8 +195,8 @@ function PortfolioIndexPage() {
         <SectionIntro
           id="active-heading"
           eyebrow="Our Products"
-          heading="Two products, one platform"
-          lead="PulsePay and PrideTrade, built and operated by ENICE Group. PulsePay is in pilot ahead of general availability; PrideTrade opens its waitlist ahead of launch."
+          heading="The products we run today"
+          lead="PulsePay and PrideTrade today, built and operated by ENICE Group. PulsePay is in pilot ahead of general availability; PrideTrade opens its waitlist ahead of launch, with more products in development."
         />
 
         <div className="mt-14 grid gap-8 lg:grid-cols-2">

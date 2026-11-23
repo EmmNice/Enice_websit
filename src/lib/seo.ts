@@ -118,7 +118,7 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   "/": {
     title: "ENICE Group | Payments and Digital Asset Infrastructure",
     description:
-      "ENICE Group builds and operates payment and digital asset platforms: PulsePay for cards, wallets and transfers, PrideTrade for trading and custody. Two separate products.",
+      "ENICE Group builds and operates payment and digital asset platforms: PulsePay for cards, wallets and transfers, PrideTrade for trading and custody. Each runs on its own infrastructure.",
   },
   "/about": {
     title: "About ENICE Group | A Technology Company Building African Infrastructure",
