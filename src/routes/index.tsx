@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { LucideIcon } from "lucide-react";
-import { ArrowDown, ArrowRight, Bitcoin, CreditCard } from "lucide-react";
+import { ArrowDown, ArrowRight, Bitcoin, CreditCard, ShieldCheck } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { FAQSection } from "@/components/site/FAQSection";
 import { Reveal } from "@/components/site/Reveal";
@@ -25,6 +25,37 @@ export const Route = createFileRoute("/")({
 //
 // Copy blocks are CMS fallbacks: each band reads its `home.*` section and overlays whatever an
 // administrator has published. See `src/lib/cms/use-section.ts`.
+
+/**
+ * The two plain-English bands under the product grid.
+ *
+ * Written to be read by someone deciding whether to trust the company with money, not by someone
+ * comparing feature tables: no platform language, no "solutions", no counts of capabilities. The
+ * About band states where the company is, what it has live, and what it is for.
+ */
+const FOCUS = [
+  {
+    icon: CreditCard,
+    title: "Payments & Cards",
+    body: "Simple Naira and USD virtual cards and fast transfers through PulsePay.",
+  },
+  {
+    icon: Bitcoin,
+    title: "Digital Assets",
+    body: "Straightforward digital asset trading and account management through PrideTrade.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Security & Compliance",
+    body: "Built to Nigerian regulatory and data protection standards with strict account security.",
+  },
+];
+
+const ABOUT_FACTS = [
+  { title: "Founded in Nigeria", detail: "Abuja & Kaduna" },
+  { title: "2 live platforms", detail: "PulsePay & PrideTrade" },
+  { title: "Built for everyday use", detail: "And business operations" },
+];
 
 interface Product {
   to: string;
@@ -216,7 +247,7 @@ function Landing() {
       {/* ═══ PRODUCTS & TECHNOLOGY ══════════════════════════════════════ */}
       <section
         id="products"
-        className="bg-background py-24 sm:py-32"
+        className="bg-background py-24 sm:py-32 lg:py-36"
         aria-labelledby="products-heading"
       >
         <Container>
@@ -323,11 +354,85 @@ function Landing() {
         </Container>
       </section>
 
+      {/* ═══ WHAT WE FOCUS ON ═══════════════════════════════════════════════ */}
+      <section
+        id="focus"
+        className="border-t border-border bg-background py-24 sm:py-32 lg:py-36"
+        aria-labelledby="focus-heading"
+      >
+        <Container>
+          <Reveal>
+            <div className="max-w-2xl">
+              <Eyebrow>What we focus on</Eyebrow>
+              <h2 id="focus-heading" className="type-h2 mt-5 text-foreground">
+                Built for reliability
+              </h2>
+              <p className="type-lead mt-5">
+                Three things we spend our time on. Everything else follows from them.
+              </p>
+            </div>
+          </Reveal>
+
+          <Reveal delay={80}>
+            <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {FOCUS.map((f) => (
+                <div key={f.title} className="panel flex h-full flex-col p-7 sm:p-8">
+                  <f.icon aria-hidden className="h-5 w-5 text-electric" strokeWidth={1.6} />
+                  <h3 className="mt-6 text-[16px] font-semibold text-foreground">{f.title}</h3>
+                  <p className="type-body mt-2.5 text-[14px]">{f.body}</p>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </Container>
+      </section>
+
+      {/* ═══ ABOUT ══════════════════════════════════════════════════════════ */}
+      <section
+        id="about"
+        className="border-t border-border bg-surface-1 py-24 sm:py-32 lg:py-36"
+        aria-labelledby="about-heading"
+      >
+        <Container>
+          <div className="grid gap-12 lg:grid-cols-[1.1fr_1fr] lg:items-start lg:gap-16">
+            <Reveal>
+              <div>
+                <Eyebrow>About us</Eyebrow>
+                <h2 id="about-heading" className="type-h2 mt-5 text-foreground">
+                  About ENICE Group
+                </h2>
+                <p className="type-lead mt-6 max-w-xl">
+                  ENICE Technology Limited is a Nigerian technology company based in Abuja and
+                  Kaduna. We build practical financial and digital software—including PulsePay and
+                  PrideTrade—designed to make everyday payments, virtual cards, and digital asset
+                  management simple and reliable.
+                </p>
+              </div>
+            </Reveal>
+
+            <Reveal delay={80}>
+              <dl className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+                {ABOUT_FACTS.map((fact) => (
+                  <div key={fact.title} className="panel p-6">
+                    <dt className="text-[11px] font-semibold tracking-[0.16em] text-bone-faint uppercase">
+                      {fact.title}
+                    </dt>
+                    <dd className="mt-2 text-[15px] font-semibold text-foreground">
+                      {fact.detail}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </Reveal>
+          </div>
+        </Container>
+      </section>
+
       <FAQSection />
 
       {/* ═══ CLOSING CTA ════════════════════════════════════════════════════ */}
       <section className="band-cta relative overflow-hidden" aria-labelledby="cta-heading">
-        <Container className="flex flex-col items-start justify-between gap-8 py-16 sm:py-20 lg:flex-row lg:items-center">
+        <Container className="flex flex-col items-start justify-between gap-8 py-20 sm:py-24 lg:flex-row lg:items-center lg:py-28">
           <div className="max-w-2xl">
             <h2 id="cta-heading" className="type-h2 text-white">
               See what ENICE can do for your business
