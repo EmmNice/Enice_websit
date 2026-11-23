@@ -89,7 +89,7 @@ function acknowledgementHtml(name: string): string {
     </td></tr>
     <tr><td style="padding:24px 0 0;border-top:1px solid #e5e7eb;">
       <p style="margin:0;font-size:12px;line-height:1.6;color:#6b7280;">
-        ENICE Group &middot; Abuja &amp; Kaduna, Nigeria
+        ENICE Group &middot; Nigeria
       </p>
     </td></tr>
   </table>

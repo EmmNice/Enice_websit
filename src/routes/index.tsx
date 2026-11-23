@@ -52,7 +52,7 @@ const FOCUS = [
 ];
 
 const ABOUT_FACTS = [
-  { title: "Founded in Nigeria", detail: "Abuja & Kaduna" },
+  { title: "Founded in Nigeria", detail: "Nigerian owned and operated" },
   { title: "2 live platforms", detail: "PulsePay & PrideTrade" },
   { title: "Built for everyday use", detail: "And business operations" },
 ];
@@ -402,10 +402,10 @@ function Landing() {
                   About ENICE Group
                 </h2>
                 <p className="type-lead mt-6 max-w-xl">
-                  ENICE Technology Limited is a Nigerian technology company based in Abuja and
-                  Kaduna. We build practical financial and digital software—including PulsePay and
-                  PrideTrade—designed to make everyday payments, virtual cards, and digital asset
-                  management simple and reliable.
+                  ENICE Technology Limited is a Nigerian technology company. We build practical
+                  financial and digital software—including PulsePay and PrideTrade—designed to make
+                  everyday payments, virtual cards, and digital asset management simple and
+                  reliable.
                 </p>
               </div>
             </Reveal>

@@ -177,7 +177,7 @@ export function SiteFooter() {
                   className="mt-0.5 h-3.5 w-3.5 shrink-0 text-electric"
                   strokeWidth={1.75}
                 />
-                Abuja and Kaduna, Nigeria
+                Nigeria
               </p>
             </div>
           </div>

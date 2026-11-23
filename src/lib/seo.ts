@@ -62,7 +62,6 @@ export function organizationJsonLd() {
     foundingDate: "2026",
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Abuja",
       addressRegion: "FCT",
       addressCountry: "NG",
     },
