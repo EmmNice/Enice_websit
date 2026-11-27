@@ -88,9 +88,7 @@ function FollowPulsePay({
         )}
       </h2>
       <p className="mt-1 text-[13px] text-bone-soft">
-        {optional
-          ? "Not required to join. Follow us for launch news, sneak peeks and early-access updates."
-          : "Launch news, sneak peeks and early-access updates."}
+        Launch news, sneak peeks and early-access updates.
       </p>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {FOLLOW_LINKS.map(({ label, handle, href, Icon }) => (
