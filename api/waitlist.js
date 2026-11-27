@@ -29,6 +29,41 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 
+// node_modules/standardwebhooks/dist/timing_safe_equal.js
+var require_timing_safe_equal = __commonJS({
+  "node_modules/standardwebhooks/dist/timing_safe_equal.js"(exports) {
+    "use strict";
+    Object.defineProperty(exports, "__esModule", { value: true });
+    exports.timingSafeEqual = void 0;
+    function assert(expr, msg = "") {
+      if (!expr) {
+        throw new Error(msg);
+      }
+    }
+    function timingSafeEqual(a, b2) {
+      if (a.byteLength !== b2.byteLength) {
+        return false;
+      }
+      if (!(a instanceof DataView)) {
+        a = new DataView(ArrayBuffer.isView(a) ? a.buffer : a);
+      }
+      if (!(b2 instanceof DataView)) {
+        b2 = new DataView(ArrayBuffer.isView(b2) ? b2.buffer : b2);
+      }
+      assert(a instanceof DataView);
+      assert(b2 instanceof DataView);
+      const length = a.byteLength;
+      let out = 0;
+      let i = -1;
+      while (++i < length) {
+        out |= a.getUint8(i) ^ b2.getUint8(i);
+      }
+      return out === 0;
+    }
+    exports.timingSafeEqual = timingSafeEqual;
+  }
+});
+
 // node_modules/@stablelib/base64/lib/base64.js
 var require_base64 = __commonJS({
   "node_modules/@stablelib/base64/lib/base64.js"(exports) {
@@ -666,49 +701,15 @@ var require_sha256 = __commonJS({
   }
 });
 
-// node_modules/standardwebhooks/dist/timing_safe_equal.js
-var require_timing_safe_equal = __commonJS({
-  "node_modules/standardwebhooks/dist/timing_safe_equal.js"(exports) {
-    "use strict";
-    Object.defineProperty(exports, "__esModule", { value: true });
-    exports.timingSafeEqual = timingSafeEqual;
-    function assert(expr, msg = "") {
-      if (!expr) {
-        throw new Error(msg);
-      }
-    }
-    function timingSafeEqual(a, b2) {
-      if (a.byteLength !== b2.byteLength) {
-        return false;
-      }
-      if (!(a instanceof DataView)) {
-        a = new DataView(ArrayBuffer.isView(a) ? a.buffer : a);
-      }
-      if (!(b2 instanceof DataView)) {
-        b2 = new DataView(ArrayBuffer.isView(b2) ? b2.buffer : b2);
-      }
-      assert(a instanceof DataView);
-      assert(b2 instanceof DataView);
-      const length = a.byteLength;
-      let out = 0;
-      let i = -1;
-      while (++i < length) {
-        out |= a.getUint8(i) ^ b2.getUint8(i);
-      }
-      return out === 0;
-    }
-  }
-});
-
 // node_modules/standardwebhooks/dist/index.js
 var require_dist = __commonJS({
   "node_modules/standardwebhooks/dist/index.js"(exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     exports.Webhook = exports.WebhookVerificationError = void 0;
+    var timing_safe_equal_1 = require_timing_safe_equal();
     var base64 = require_base64();
     var sha2562 = require_sha256();
-    var timing_safe_equal_1 = require_timing_safe_equal();
     var WEBHOOK_TOLERANCE_IN_SECONDS = 5 * 60;
     var ExtendableError = class _ExtendableError extends Error {
       constructor(message) {
@@ -728,6 +729,9 @@ var require_dist = __commonJS({
     exports.WebhookVerificationError = WebhookVerificationError;
     var Webhook2 = class _Webhook {
       constructor(secret, options) {
+        if (!secret) {
+          throw new Error("Secret can't be empty.");
+        }
         if ((options === null || options === void 0 ? void 0 : options.format) === "raw") {
           if (secret instanceof Uint8Array) {
             this.key = secret;
@@ -743,20 +747,15 @@ var require_dist = __commonJS({
           }
           this.key = base64.decode(secret);
         }
-        if (this.key.length === 0) {
-          throw new Error("Secret can't be empty.");
-        }
       }
-      verify(payload, headers, options) {
-        var _a;
-        const jsonParse = (_a = options === null || options === void 0 ? void 0 : options.jsonParse) !== null && _a !== void 0 ? _a : true;
-        const normalizedHeaders = {};
-        for (const key of Object.keys(headers)) {
-          normalizedHeaders[key.toLowerCase()] = headers[key];
+      verify(payload, headers_) {
+        const headers = {};
+        for (const key of Object.keys(headers_)) {
+          headers[key.toLowerCase()] = headers_[key];
         }
-        const msgId = normalizedHeaders["webhook-id"];
-        const msgSignature = normalizedHeaders["webhook-signature"];
-        const msgTimestamp = normalizedHeaders["webhook-timestamp"];
+        const msgId = headers["webhook-id"];
+        const msgSignature = headers["webhook-signature"];
+        const msgTimestamp = headers["webhook-timestamp"];
         if (!msgSignature || !msgId || !msgTimestamp) {
           throw new WebhookVerificationError("Missing required headers");
         }
@@ -771,15 +770,7 @@ var require_dist = __commonJS({
             continue;
           }
           if ((0, timing_safe_equal_1.timingSafeEqual)(encoder.encode(signature), encoder.encode(expectedSignature))) {
-            const payloadString = payload.toString();
-            if (payloadString === "") {
-              return void 0;
-            }
-            if (jsonParse) {
-              return JSON.parse(payloadString);
-            } else {
-              return void 0;
-            }
+            return JSON.parse(payload.toString());
           }
         }
         throw new WebhookVerificationError("No matching signature found");
@@ -800,7 +791,7 @@ var require_dist = __commonJS({
       verifyTimestamp(timestampHeader) {
         const now = Math.floor(Date.now() / 1e3);
         const timestamp = parseInt(timestampHeader, 10);
-        if (Number.isNaN(timestamp)) {
+        if (isNaN(timestamp)) {
           throw new WebhookVerificationError("Invalid Signature Headers");
         }
         if (now - timestamp > WEBHOOK_TOLERANCE_IN_SECONDS) {
@@ -6989,7 +6980,6 @@ var MimeNode = class {
     }
     await this.finalizeChildNodes();
     this.content = this.contentDecoder ? await this.contentDecoder.finalize() : null;
-    this.contentDecoder = false;
     this.state = "finished";
   }
   async finalizeChildNodes() {
@@ -9982,41 +9972,20 @@ function base64ArrayBuffer(arrayBuffer) {
 // node_modules/postal-mime/src/postal-mime.js
 var MAX_NESTING_DEPTH = 256;
 var MAX_HEADERS_SIZE = 2 * 1024 * 1024;
-var MAX_RFC822_NESTING_DEPTH = 10;
 function toCamelCase(key) {
   return key.replace(/-(.)/g, (o, c) => c.toUpperCase());
 }
-function parseLimitOption(value, defaultValue, name) {
-  if (value === void 0 || value === null) {
-    return defaultValue;
-  }
-  if (typeof value !== "number" || !Number.isInteger(value) || value < 0) {
-    throw new TypeError(`${name} must be a non-negative integer`);
-  }
-  return value;
-}
 var PostalMime = class _PostalMime {
-  // async so that an invalid option rejects the returned promise instead of throwing
-  // synchronously, which would escape a `.catch()` chain
-  static async parse(buf, options) {
+  static parse(buf, options) {
     const parser = new _PostalMime(options);
     return parser.parse(buf);
   }
-  // rfc822NestingDepth is internal state that nested parsers receive from their parent.
-  // It is deliberately a separate argument rather than an option, so that forwarding a
-  // caller supplied options object can not seed it and switch the recursion limit off.
-  constructor(options, rfc822NestingDepth = 0) {
+  constructor(options) {
     this.options = options || {};
     this.mimeOptions = {
-      maxNestingDepth: parseLimitOption(this.options.maxNestingDepth, MAX_NESTING_DEPTH, "maxNestingDepth"),
-      maxHeadersSize: parseLimitOption(this.options.maxHeadersSize, MAX_HEADERS_SIZE, "maxHeadersSize")
+      maxNestingDepth: this.options.maxNestingDepth || MAX_NESTING_DEPTH,
+      maxHeadersSize: this.options.maxHeadersSize || MAX_HEADERS_SIZE
     };
-    this.maxRfc822NestingDepth = parseLimitOption(
-      this.options.maxRfc822NestingDepth,
-      MAX_RFC822_NESTING_DEPTH,
-      "maxRfc822NestingDepth"
-    );
-    this.rfc822NestingDepth = rfc822NestingDepth;
     this.root = this.currentNode = new MimeNode({
       postalMime: this,
       ...this.mimeOptions
@@ -10116,20 +10085,8 @@ var PostalMime = class _PostalMime {
       alternative = alternative || false;
       related = related || false;
       if (!node.contentType.multipart) {
-        const inlineRfc822 = this.isInlineMessageRfc822(node) && !forceRfc822Attachments;
-        const rfc822DepthExceeded = inlineRfc822 && this.rfc822NestingDepth >= this.maxRfc822NestingDepth;
-        if (inlineRfc822 && !rfc822DepthExceeded) {
-          const subParser = new _PostalMime(
-            {
-              // Only the limits are inherited. Options that decide how a part
-              // is classified stay with the parser that was configured.
-              ...this.mimeOptions,
-              maxRfc822NestingDepth: this.maxRfc822NestingDepth,
-              // attachments are encoded by the parent parser, keep raw buffers here
-              attachmentEncoding: "arraybuffer"
-            },
-            this.rfc822NestingDepth + 1
-          );
+        if (this.isInlineMessageRfc822(node) && !forceRfc822Attachments) {
+          const subParser = new _PostalMime();
           node.subMessage = await subParser.parse(node.content);
           if (!textMap.has(node)) {
             textMap.set(node, {});
@@ -10170,11 +10127,8 @@ var PostalMime = class _PostalMime {
             mimeType: node.contentType.parsed.value,
             disposition: node.contentDisposition?.parsed?.value || null
           };
-          if (related && node.contentId && !rfc822DepthExceeded) {
+          if (related && node.contentId) {
             attachment.related = true;
-          }
-          if (rfc822DepthExceeded) {
-            attachment.rfc822DepthExceeded = true;
           }
           if (node.contentDescription) {
             attachment.description = node.contentDescription;
@@ -10449,7 +10403,7 @@ var PostalMime = class _PostalMime {
 
 // node_modules/resend/dist/index.mjs
 var import_standardwebhooks = __toESM(require_dist(), 1);
-var version = "6.38.1";
+var version = "6.20.0";
 function buildPaginationUrl(base, options) {
   const queryString = buildPaginationQuery(options);
   return queryString ? `${base}?${queryString}` : base;
@@ -10465,28 +10419,25 @@ var ApiKeys = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async create(payload, requestOptions = {}) {
-    return await this.resend.post("/api-keys", payload, requestOptions);
+  async create(payload, options = {}) {
+    return await this.resend.post("/api-keys", payload, options);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/api-keys", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async update(id, payload, requestOptions = {}) {
-    return await this.resend.patch(`/api-keys/${id}`, payload, requestOptions);
-  }
-  async remove(id, requestOptions = {}) {
-    return await this.resend.delete(`/api-keys/${id}`, void 0, requestOptions);
+  async remove(id) {
+    return await this.resend.delete(`/api-keys/${id}`);
   }
 };
 var AutomationRuns = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async get(options, requestOptions = {}) {
-    return await this.resend.get(`/automations/${options.automationId}/runs/${options.runId}`, requestOptions);
+  async get(options) {
+    return await this.resend.get(`/automations/${options.automationId}/runs/${options.runId}`);
   }
-  async list(options, requestOptions = {}) {
+  async list(options) {
     const queryString = buildPaginationQuery(options);
     const searchParams = new URLSearchParams(queryString);
     if (options.status) {
@@ -10495,41 +10446,16 @@ var AutomationRuns = class {
     }
     const qs = searchParams.toString();
     const url = qs ? `/automations/${options.automationId}/runs?${qs}` : `/automations/${options.automationId}/runs`;
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
 };
-var TRIGGER_FIELDS = { eventName: "event_name" };
-var SEND_EMAIL_FIELDS = {
-  template: "template",
-  subject: "subject",
-  from: "from",
-  replyTo: "reply_to",
-  topicId: "topic_id"
-};
-var WAIT_FOR_EVENT_FIELDS = {
-  eventName: "event_name",
-  timeout: "timeout",
-  filterRule: "filter_rule"
-};
-var CONTACT_UPDATE_FIELDS = {
-  firstName: "first_name",
-  lastName: "last_name",
-  unsubscribed: "unsubscribed",
-  properties: "properties"
-};
-var ADD_TO_SEGMENT_FIELDS = { segmentId: "segment_id" };
-function renameFields(config2, fields) {
-  const result = {};
-  for (const sdkField of Object.keys(fields)) result[fields[sdkField]] = config2[sdkField];
-  return result;
-}
 function parseStepConfig(step) {
   switch (step.type) {
     case "trigger":
       return {
         key: step.key,
         type: step.type,
-        config: renameFields(step.config, TRIGGER_FIELDS)
+        config: { event_name: step.config.eventName }
       };
     case "delay":
       return {
@@ -10541,13 +10467,22 @@ function parseStepConfig(step) {
       return {
         key: step.key,
         type: step.type,
-        config: renameFields(step.config, SEND_EMAIL_FIELDS)
+        config: {
+          template: step.config.template,
+          subject: step.config.subject,
+          from: step.config.from,
+          reply_to: step.config.replyTo
+        }
       };
     case "wait_for_event":
       return {
         key: step.key,
         type: step.type,
-        config: renameFields(step.config, WAIT_FOR_EVENT_FIELDS)
+        config: {
+          event_name: step.config.eventName,
+          timeout: step.config.timeout,
+          filter_rule: step.config.filterRule
+        }
       };
     case "condition":
       return {
@@ -10559,7 +10494,12 @@ function parseStepConfig(step) {
       return {
         key: step.key,
         type: step.type,
-        config: renameFields(step.config, CONTACT_UPDATE_FIELDS)
+        config: {
+          first_name: step.config.firstName,
+          last_name: step.config.lastName,
+          unsubscribed: step.config.unsubscribed,
+          properties: step.config.properties
+        }
       };
     case "contact_delete":
       return {
@@ -10571,7 +10511,7 @@ function parseStepConfig(step) {
       return {
         key: step.key,
         type: step.type,
-        config: renameFields(step.config, ADD_TO_SEGMENT_FIELDS)
+        config: { segment_id: step.config.segmentId }
       };
   }
 }
@@ -10603,51 +10543,40 @@ var Automations = class {
     this.resend = resend;
     this.runs = new AutomationRuns(this.resend);
   }
-  async create(payload, requestOptions = {}) {
-    return await this.resend.post("/automations", parseAutomationToApiOptions(payload), requestOptions);
+  async create(payload) {
+    return await this.resend.post("/automations", parseAutomationToApiOptions(payload));
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const params = [buildPaginationQuery(options)];
     if (options.status) params.push(`status=${encodeURIComponent(options.status)}`);
     const qs = params.filter(Boolean).join("&");
     const url = qs ? `/automations?${qs}` : "/automations";
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async get(id, requestOptions = {}) {
-    return await this.resend.get(`/automations/${id}`, requestOptions);
+  async get(id) {
+    return await this.resend.get(`/automations/${id}`);
   }
-  async remove(id, requestOptions = {}) {
-    return await this.resend.delete(`/automations/${id}`, void 0, requestOptions);
+  async remove(id) {
+    return await this.resend.delete(`/automations/${id}`);
   }
-  async update(id, payload, requestOptions = {}) {
+  async update(id, payload) {
     const apiPayload = {};
     if (payload.name !== void 0) apiPayload.name = payload.name;
     if (payload.status !== void 0) apiPayload.status = payload.status;
     if (payload.steps !== void 0) apiPayload.steps = payload.steps.map(parseStepConfig);
     if (payload.connections !== void 0) apiPayload.connections = payload.connections.map(parseConnection);
-    return await this.resend.patch(`/automations/${id}`, apiPayload, requestOptions);
+    return await this.resend.patch(`/automations/${id}`, apiPayload);
   }
-  async duplicate(id, requestOptions = {}) {
-    return await this.resend.post(`/automations/${id}/duplicate`, void 0, requestOptions);
+  async duplicate(id) {
+    return await this.resend.post(`/automations/${id}/duplicate`);
   }
-  async stop(id, requestOptions = {}) {
-    return await this.resend.post(`/automations/${id}/stop`, void 0, requestOptions);
+  async stop(id) {
+    return await this.resend.post(`/automations/${id}/stop`);
   }
 };
-function encodeBase64(bytes) {
-  if (typeof Buffer !== "undefined") return Buffer.from(bytes.buffer, bytes.byteOffset, bytes.byteLength).toString("base64");
-  let binary = "";
-  for (let i = 0; i < bytes.length; i += 32768) binary += String.fromCharCode(...bytes.subarray(i, i + 32768));
-  return btoa(binary);
-}
-function parseAttachmentContent(content) {
-  if (ArrayBuffer.isView(content)) return encodeBase64(new Uint8Array(content.buffer, content.byteOffset, content.byteLength));
-  if (content instanceof ArrayBuffer) return encodeBase64(new Uint8Array(content));
-  return content;
-}
 function parseAttachments(attachments) {
   return attachments?.map((attachment) => ({
-    content: parseAttachmentContent(attachment.content),
+    content: attachment.content,
     filename: attachment.filename,
     path: attachment.path,
     content_type: attachment.contentType,
@@ -10688,24 +10617,24 @@ var Batch$1 = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async send(payload, requestOptions) {
-    return this.create(payload, requestOptions);
+  async send(payload, options) {
+    return this.create(payload, options);
   }
-  async create(payload, requestOptions) {
+  async create(payload, options) {
     const emails = [];
     for (const email of payload) {
-      const body = { ...email };
-      if (body.react) {
-        body.html = await render(body.react);
-        body.react = void 0;
+      if (email.react) {
+        email.html = await render(email.react);
+        email.react = void 0;
       }
-      emails.push(parseEmailToApiOptions(body));
+      emails.push(parseEmailToApiOptions(email));
     }
-    const headers = new Headers({ "x-batch-validation": requestOptions?.batchValidation ?? "strict" });
-    for (const [key, value] of new Headers(requestOptions?.headers || void 0)) headers.set(key, value);
     return await this.resend.post("/emails/batch", emails, {
-      ...requestOptions,
-      headers
+      ...options,
+      headers: {
+        "x-batch-validation": options?.batchValidation ?? "strict",
+        ...options?.headers
+      }
     });
   }
 };
@@ -10713,7 +10642,7 @@ var Broadcasts = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async create(payload, requestOptions = {}) {
+  async create(payload, options = {}) {
     const html = payload.react ? await render(payload.react) : payload.html;
     return await this.resend.post("/broadcasts", {
       name: payload.name,
@@ -10728,36 +10657,25 @@ var Broadcasts = class {
       topic_id: payload.topicId,
       send: payload.send,
       scheduled_at: payload.scheduledAt
-    }, requestOptions);
+    }, options);
   }
-  async send(id, payload, requestOptions = {}) {
-    return await this.resend.post(`/broadcasts/${id}/send`, { scheduled_at: payload?.scheduledAt }, requestOptions);
+  async send(id, payload) {
+    return await this.resend.post(`/broadcasts/${id}/send`, { scheduled_at: payload?.scheduledAt });
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/broadcasts", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async get(id, requestOptions = {}) {
-    return await this.resend.get(`/broadcasts/${id}`, requestOptions);
+  async get(id) {
+    return await this.resend.get(`/broadcasts/${id}`);
   }
-  async recipients(id, options, requestOptions = {}) {
-    const url = `/broadcasts/${id}/recipients?${buildRecipientsQuery(options)}`;
-    return await this.resend.get(url, requestOptions);
+  async remove(id) {
+    return await this.resend.delete(`/broadcasts/${id}`);
   }
-  async clickedLinks(id, options = {}, requestOptions = {}) {
-    const url = buildPaginationUrl(`/broadcasts/${id}/clicked-links`, options);
-    return await this.resend.get(url, requestOptions);
+  async cancel(id) {
+    return await this.resend.post(`/broadcasts/${id}/cancel`);
   }
-  async remove(id, requestOptions = {}) {
-    return await this.resend.delete(`/broadcasts/${id}`, void 0, requestOptions);
-  }
-  async cancel(id, requestOptions = {}) {
-    return await this.resend.post(`/broadcasts/${id}/cancel`, void 0, requestOptions);
-  }
-  async duplicate(id, requestOptions = {}) {
-    return await this.resend.post(`/broadcasts/${id}/duplicate`, void 0, requestOptions);
-  }
-  async update(id, payload, requestOptions = {}) {
+  async update(id, payload) {
     const html = payload.react ? await render(payload.react) : payload.html;
     return await this.resend.patch(`/broadcasts/${id}`, {
       name: payload.name,
@@ -10770,27 +10688,9 @@ var Broadcasts = class {
       reply_to: payload.replyTo,
       preview_text: payload.previewText,
       topic_id: payload.topicId
-    }, requestOptions);
+    });
   }
 };
-function buildRecipientsQuery(options) {
-  const { type, email, bounceType, ...pagination } = options;
-  const searchParams = new URLSearchParams(buildPaginationQuery(pagination));
-  searchParams.set("type", type);
-  if (email !== void 0) searchParams.set("email", email);
-  if (bounceType !== void 0) searchParams.set("bounce_type", bounceType);
-  return searchParams.toString();
-}
-var DOT_SEGMENT = /^(?:\.|%2e){1,2}$/i;
-function stripIgnoredCharacters(requestPath) {
-  let path = requestPath.replace(/[\t\n\r]/g, "");
-  while (path.length > 0 && path.charCodeAt(path.length - 1) <= 32) path = path.slice(0, -1);
-  return path;
-}
-function hasDotSegment(requestPath) {
-  const [pathname] = stripIgnoredCharacters(requestPath).split(/[?#]/);
-  return pathname.split(/[\\/]/).some((segment) => DOT_SEGMENT.test(segment));
-}
 function parseContactPropertyFromApi(contactProperty) {
   return {
     id: contactProperty.id,
@@ -10812,13 +10712,13 @@ var ContactProperties = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async create(options, requestOptions = {}) {
+  async create(options) {
     const apiOptions = parseContactPropertyToApiOptions(options);
-    return await this.resend.post("/contact-properties", apiOptions, requestOptions);
+    return await this.resend.post("/contact-properties", apiOptions);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/contact-properties", options);
-    const response = await this.resend.get(url, requestOptions);
+    const response = await this.resend.get(url);
     if (response.data) return {
       data: {
         ...response.data,
@@ -10829,7 +10729,7 @@ var ContactProperties = class {
     };
     return response;
   }
-  async get(id, requestOptions = {}) {
+  async get(id) {
     if (!id) return {
       data: null,
       headers: null,
@@ -10839,7 +10739,7 @@ var ContactProperties = class {
         name: "missing_required_field"
       }
     };
-    const response = await this.resend.get(`/contact-properties/${id}`, requestOptions);
+    const response = await this.resend.get(`/contact-properties/${id}`);
     if (response.data) return {
       data: {
         object: "contact_property",
@@ -10850,7 +10750,7 @@ var ContactProperties = class {
     };
     return response;
   }
-  async update(payload, requestOptions = {}) {
+  async update(payload) {
     if (!payload.id) return {
       data: null,
       headers: null,
@@ -10861,9 +10761,9 @@ var ContactProperties = class {
       }
     };
     const apiOptions = parseContactPropertyToApiOptions(payload);
-    return await this.resend.patch(`/contact-properties/${payload.id}`, apiOptions, requestOptions);
+    return await this.resend.patch(`/contact-properties/${payload.id}`, apiOptions);
   }
-  async remove(id, requestOptions = {}) {
+  async remove(id) {
     if (!id) return {
       data: null,
       headers: null,
@@ -10873,26 +10773,26 @@ var ContactProperties = class {
         name: "missing_required_field"
       }
     };
-    return await this.resend.delete(`/contact-properties/${id}`, void 0, requestOptions);
+    return await this.resend.delete(`/contact-properties/${id}`);
   }
 };
 var ContactImports = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async create(payload, requestOptions = {}) {
+  async create(payload, options = {}) {
     const formData = this.buildCreateFormData(payload);
-    return this.resend.post("/contacts/imports", formData, requestOptions);
+    return this.resend.post("/contacts/imports", formData, options);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const searchParams = new URLSearchParams(buildPaginationQuery(options));
     if (options.status !== void 0) searchParams.set("status", options.status);
     const queryString = searchParams.toString();
     const url = queryString ? `/contacts/imports?${queryString}` : "/contacts/imports";
-    return this.resend.get(url, requestOptions);
+    return this.resend.get(url);
   }
-  async get(id, requestOptions = {}) {
-    return this.resend.get(`/contacts/imports/${id}`, requestOptions);
+  async get(id) {
+    return this.resend.get(`/contacts/imports/${id}`);
   }
   buildCreateFormData(payload) {
     const formData = new FormData();
@@ -10922,7 +10822,7 @@ var ContactSegments = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async list(options, requestOptions = {}) {
+  async list(options) {
     if (!options.contactId && !options.email) return {
       data: null,
       headers: null,
@@ -10933,9 +10833,9 @@ var ContactSegments = class {
       }
     };
     const url = buildPaginationUrl(`/contacts/${options.email ? options.email : options.contactId}/segments`, options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async add(options, requestOptions = {}) {
+  async add(options) {
     if (!options.contactId && !options.email) return {
       data: null,
       headers: null,
@@ -10946,9 +10846,9 @@ var ContactSegments = class {
       }
     };
     const identifier = options.email ? options.email : options.contactId;
-    return this.resend.post(`/contacts/${identifier}/segments/${options.segmentId}`, void 0, requestOptions);
+    return this.resend.post(`/contacts/${identifier}/segments/${options.segmentId}`);
   }
-  async remove(options, requestOptions = {}) {
+  async remove(options) {
     if (!options.contactId && !options.email) return {
       data: null,
       headers: null,
@@ -10959,14 +10859,14 @@ var ContactSegments = class {
       }
     };
     const identifier = options.email ? options.email : options.contactId;
-    return this.resend.delete(`/contacts/${identifier}/segments/${options.segmentId}`, void 0, requestOptions);
+    return this.resend.delete(`/contacts/${identifier}/segments/${options.segmentId}`);
   }
 };
 var ContactTopics = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async update(payload, requestOptions = {}) {
+  async update(payload) {
     if (!payload.id && !payload.email) return {
       data: null,
       headers: null,
@@ -10977,9 +10877,9 @@ var ContactTopics = class {
       }
     };
     const identifier = payload.email ? payload.email : payload.id;
-    return this.resend.patch(`/contacts/${identifier}/topics`, payload.topics, requestOptions);
+    return this.resend.patch(`/contacts/${identifier}/topics`, payload.topics);
   }
-  async list(options, requestOptions = {}) {
+  async list(options) {
     if (!options.id && !options.email) return {
       data: null,
       headers: null,
@@ -10990,12 +10890,9 @@ var ContactTopics = class {
       }
     };
     const url = buildPaginationUrl(`/contacts/${options.email ? options.email : options.id}/topics`, options);
-    return this.resend.get(url, requestOptions);
+    return this.resend.get(url);
   }
 };
-function isLegacyCreateContactOptions(payload) {
-  return "audienceId" in payload && Boolean(payload.audienceId);
-}
 var Contacts = class {
   constructor(resend) {
     this.resend = resend;
@@ -11003,8 +10900,8 @@ var Contacts = class {
     this.topics = new ContactTopics(this.resend);
     this.segments = new ContactSegments(this.resend);
   }
-  async create(payload, requestOptions = {}) {
-    if (isLegacyCreateContactOptions(payload)) {
+  async create(payload, options = {}) {
+    if ("audienceId" in payload) {
       if ("segments" in payload || "topics" in payload) return {
         data: null,
         headers: null,
@@ -11020,7 +10917,7 @@ var Contacts = class {
         first_name: payload.firstName,
         last_name: payload.lastName,
         properties: payload.properties
-      }, requestOptions);
+      }, options);
     }
     return await this.resend.post("/contacts", {
       unsubscribed: payload.unsubscribed,
@@ -11030,19 +10927,19 @@ var Contacts = class {
       properties: payload.properties,
       segments: payload.segments,
       topics: payload.topics
-    }, requestOptions);
+    }, options);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const segmentId = options.segmentId ?? options.audienceId;
     if (!segmentId) {
       const url2 = buildPaginationUrl("/contacts", options);
-      return await this.resend.get(url2, requestOptions);
+      return await this.resend.get(url2);
     }
     const url = buildPaginationUrl(`/segments/${segmentId}/contacts`, options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async get(options, requestOptions = {}) {
-    if (typeof options === "string") return this.resend.get(`/contacts/${options}`, requestOptions);
+  async get(options) {
+    if (typeof options === "string") return this.resend.get(`/contacts/${options}`);
     if (!options.id && !options.email) return {
       data: null,
       headers: null,
@@ -11052,10 +10949,10 @@ var Contacts = class {
         name: "missing_required_field"
       }
     };
-    if (!options.audienceId) return this.resend.get(`/contacts/${options?.email ? options?.email : options?.id}`, requestOptions);
-    return this.resend.get(`/audiences/${options.audienceId}/contacts/${options?.email ? options?.email : options?.id}`, requestOptions);
+    if (!options.audienceId) return this.resend.get(`/contacts/${options?.email ? options?.email : options?.id}`);
+    return this.resend.get(`/audiences/${options.audienceId}/contacts/${options?.email ? options?.email : options?.id}`);
   }
-  async update(options, requestOptions = {}) {
+  async update(options) {
     if (!options.id && !options.email) return {
       data: null,
       headers: null,
@@ -11070,16 +10967,16 @@ var Contacts = class {
       first_name: options.firstName,
       last_name: options.lastName,
       properties: options.properties
-    }, requestOptions);
+    });
     return await this.resend.patch(`/audiences/${options.audienceId}/contacts/${options?.email ? options?.email : options?.id}`, {
       unsubscribed: options.unsubscribed,
       first_name: options.firstName,
       last_name: options.lastName,
       properties: options.properties
-    }, requestOptions);
+    });
   }
-  async remove(payload, requestOptions = {}) {
-    if (typeof payload === "string") return this.resend.delete(`/contacts/${payload}`, void 0, requestOptions);
+  async remove(payload) {
+    if (typeof payload === "string") return this.resend.delete(`/contacts/${payload}`);
     if (!payload.id && !payload.email) return {
       data: null,
       headers: null,
@@ -11089,8 +10986,8 @@ var Contacts = class {
         name: "missing_required_field"
       }
     };
-    if (!payload.audienceId) return this.resend.delete(`/contacts/${payload?.email ? payload?.email : payload?.id}`, void 0, requestOptions);
-    return this.resend.delete(`/audiences/${payload.audienceId}/contacts/${payload?.email ? payload?.email : payload?.id}`, void 0, requestOptions);
+    if (!payload.audienceId) return this.resend.delete(`/contacts/${payload?.email ? payload?.email : payload?.id}`);
+    return this.resend.delete(`/audiences/${payload.audienceId}/contacts/${payload?.email ? payload?.email : payload?.id}`);
   }
 };
 function parseDomainToApiOptions(domain) {
@@ -11109,7 +11006,7 @@ var DomainClaims = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async create(payload, requestOptions = {}) {
+  async create(payload, options = {}) {
     return await this.resend.post("/domains/claim", {
       name: payload.name,
       region: payload.region,
@@ -11117,13 +11014,13 @@ var DomainClaims = class {
       open_tracking: payload.openTracking,
       click_tracking: payload.clickTracking,
       tracking_subdomain: payload.trackingSubdomain
-    }, requestOptions);
+    }, options);
   }
-  async get(domainId, requestOptions = {}) {
-    return await this.resend.get(`/domains/${domainId}/claim`, requestOptions);
+  async get(domainId) {
+    return await this.resend.get(`/domains/${domainId}/claim`);
   }
-  async verify(domainId, requestOptions = {}) {
-    return await this.resend.post(`/domains/${domainId}/claim/verify`, void 0, requestOptions);
+  async verify(domainId) {
+    return await this.resend.post(`/domains/${domainId}/claim/verify`);
   }
 };
 var Domains = class {
@@ -11131,58 +11028,58 @@ var Domains = class {
     this.resend = resend;
     this.claims = new DomainClaims(this.resend);
   }
-  async create(payload, requestOptions = {}) {
-    return await this.resend.post("/domains", parseDomainToApiOptions(payload), requestOptions);
+  async create(payload, options = {}) {
+    return await this.resend.post("/domains", parseDomainToApiOptions(payload), options);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/domains", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async get(id, requestOptions = {}) {
-    return await this.resend.get(`/domains/${id}`, requestOptions);
+  async get(id) {
+    return await this.resend.get(`/domains/${id}`);
   }
-  async update(payload, requestOptions = {}) {
+  async update(payload) {
     return await this.resend.patch(`/domains/${payload.id}`, {
       click_tracking: payload.clickTracking,
       open_tracking: payload.openTracking,
       tls: payload.tls,
       capabilities: payload.capabilities,
       tracking_subdomain: payload.trackingSubdomain
-    }, requestOptions);
+    });
   }
-  async remove(id, requestOptions = {}) {
-    return await this.resend.delete(`/domains/${id}`, void 0, requestOptions);
+  async remove(id) {
+    return await this.resend.delete(`/domains/${id}`);
   }
-  async verify(id, requestOptions = {}) {
-    return await this.resend.post(`/domains/${id}/verify`, void 0, requestOptions);
+  async verify(id) {
+    return await this.resend.post(`/domains/${id}/verify`);
   }
 };
 var Attachments$1 = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async get(options, requestOptions = {}) {
+  async get(options) {
     const { emailId, id } = options;
-    return await this.resend.get(`/emails/${emailId}/attachments/${id}`, requestOptions);
+    return await this.resend.get(`/emails/${emailId}/attachments/${id}`);
   }
-  async list(options, requestOptions = {}) {
+  async list(options) {
     const { emailId } = options;
     const url = buildPaginationUrl(`/emails/${emailId}/attachments`, options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
 };
 var Attachments = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async get(options, requestOptions = {}) {
+  async get(options) {
     const { emailId, id } = options;
-    return await this.resend.get(`/emails/receiving/${emailId}/attachments/${id}`, requestOptions);
+    return await this.resend.get(`/emails/receiving/${emailId}/attachments/${id}`);
   }
-  async list(options, requestOptions = {}) {
+  async list(options) {
     const { emailId } = options;
     const url = buildPaginationUrl(`/emails/receiving/${emailId}/attachments`, options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
 };
 var Receiving = class {
@@ -11190,21 +11087,21 @@ var Receiving = class {
     this.resend = resend;
     this.attachments = new Attachments(resend);
   }
-  async get(id, options = {}, requestOptions = {}) {
+  async get(id, options = {}) {
     const searchParams = new URLSearchParams();
     if (options.html_format !== void 0) searchParams.set("html_format", options.html_format);
     const queryString = searchParams.toString();
     const path = queryString ? `/emails/receiving/${id}?${queryString}` : `/emails/receiving/${id}`;
-    return await this.resend.get(path, requestOptions);
+    return await this.resend.get(path);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/emails/receiving", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
   async forward(options, requestOptions = {}) {
     const { emailId, to, from } = options;
     const passthrough = options.passthrough !== false;
-    const emailResponse = await this.get(emailId, {}, { signal: requestOptions.signal });
+    const emailResponse = await this.get(emailId);
     if (emailResponse.error) return {
       data: null,
       error: emailResponse.error,
@@ -11237,13 +11134,18 @@ var Receiving = class {
       },
       headers: null
     };
-    const raw = await this.downloadRaw(email.raw.download_url, requestOptions.signal);
-    if (raw.error) return {
+    const rawResponse = await fetch(email.raw.download_url);
+    if (!rawResponse.ok) return {
       data: null,
-      error: raw.error,
+      error: {
+        name: "application_error",
+        message: "Failed to download raw email content",
+        statusCode: rawResponse.status
+      },
       headers: null
     };
-    const parsed = await PostalMime.parse(raw.content, { attachmentEncoding: "base64" });
+    const rawEmailContent = await rawResponse.text();
+    const parsed = await PostalMime.parse(rawEmailContent, { attachmentEncoding: "base64" });
     const attachments = parsed.attachments.map((attachment) => {
       const contentId = attachment.contentId ? attachment.contentId.replace(/^<|>$/g, "") : void 0;
       return {
@@ -11273,12 +11175,17 @@ var Receiving = class {
       },
       headers: null
     };
-    const raw = await this.downloadRaw(email.raw.download_url, requestOptions.signal);
-    if (raw.error) return {
+    const rawResponse = await fetch(email.raw.download_url);
+    if (!rawResponse.ok) return {
       data: null,
-      error: raw.error,
+      error: {
+        name: "application_error",
+        message: "Failed to download raw email content",
+        statusCode: rawResponse.status
+      },
       headers: null
     };
+    const rawEmailContent = await rawResponse.text();
     return await this.resend.post("/emails", {
       from,
       to,
@@ -11287,36 +11194,10 @@ var Receiving = class {
       html,
       attachments: [{
         filename: "forwarded_message.eml",
-        content: Buffer.from(raw.content).toString("base64"),
+        content: Buffer.from(rawEmailContent).toString("base64"),
         content_type: "message/rfc822"
       }]
     }, requestOptions);
-  }
-  async downloadRaw(url, signal) {
-    try {
-      const response = await fetch(url, { signal });
-      if (!response.ok) return {
-        content: null,
-        error: {
-          name: "application_error",
-          message: "Failed to download raw email content",
-          statusCode: response.status
-        }
-      };
-      return {
-        content: await response.arrayBuffer(),
-        error: null
-      };
-    } catch {
-      return {
-        content: null,
-        error: {
-          name: "application_error",
-          message: "Failed to download raw email content",
-          statusCode: null
-        }
-      };
-    }
   }
 };
 var Emails = class {
@@ -11325,423 +11206,103 @@ var Emails = class {
     this.attachments = new Attachments$1(resend);
     this.receiving = new Receiving(resend);
   }
-  async send(payload, requestOptions = {}) {
-    return this.create(payload, requestOptions);
+  async send(payload, options = {}) {
+    return this.create(payload, options);
   }
-  async create(payload, requestOptions = {}) {
+  async create(payload, options = {}) {
     const body = { ...payload };
     if (payload.react) body.html = await render(payload.react);
-    return await this.resend.post("/emails", parseEmailToApiOptions(body), requestOptions);
+    return await this.resend.post("/emails", parseEmailToApiOptions(body), options);
   }
-  async get(id, requestOptions = {}) {
-    return await this.resend.get(`/emails/${id}`, requestOptions);
+  async get(id) {
+    return await this.resend.get(`/emails/${id}`);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/emails", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async update(payload, requestOptions = {}) {
-    return await this.resend.patch(`/emails/${payload.id}`, { scheduled_at: payload.scheduledAt }, requestOptions);
+  async update(payload) {
+    return await this.resend.patch(`/emails/${payload.id}`, { scheduled_at: payload.scheduledAt });
   }
-  async cancel(id, requestOptions = {}) {
-    return await this.resend.post(`/emails/${id}/cancel`, void 0, requestOptions);
-  }
-  async share(id, payload, requestOptions = {}) {
-    return await this.resend.post(`/emails/${id}/share`, { expires_in: payload?.expiresIn }, requestOptions);
-  }
-  async metrics(options = {}, requestOptions = {}) {
-    const queryString = buildMetricsQuery(options);
-    const url = queryString ? `/emails/metrics?${queryString}` : "/emails/metrics";
-    return await this.resend.get(url, requestOptions);
+  async cancel(id) {
+    return await this.resend.post(`/emails/${id}/cancel`);
   }
 };
-function buildMetricsQuery(options) {
-  const params = {
-    start_date: options.startDate,
-    end_date: options.endDate,
-    timezone: options.timezone,
-    granularity: options.granularity,
-    metrics: options.metrics?.join(","),
-    dimensions: options.dimensions?.join(","),
-    domain_id: options.domainId?.join(","),
-    email_id: options.emailId?.join(","),
-    broadcast_id: options.broadcastId?.join(",")
-  };
-  const searchParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) if (value !== void 0 && value !== "") searchParams.set(key, value);
-  return searchParams.toString();
-}
-var Events$1 = class {
+var Events = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async send(payload, requestOptions = {}) {
-    return await this.resend.post("/events/send", parseEventToApiOptions(payload), requestOptions);
+  async send(payload) {
+    return await this.resend.post("/events/send", parseEventToApiOptions(payload));
   }
-  async create(payload, requestOptions = {}) {
-    return await this.resend.post("/events", payload, requestOptions);
+  async create(payload) {
+    return await this.resend.post("/events", payload);
   }
-  async get(identifier, requestOptions = {}) {
-    return await this.resend.get(`/events/${encodeURIComponent(identifier)}`, requestOptions);
+  async get(identifier) {
+    return await this.resend.get(`/events/${encodeURIComponent(identifier)}`);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/events", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async update(identifier, payload, requestOptions = {}) {
-    return await this.resend.patch(`/events/${encodeURIComponent(identifier)}`, payload, requestOptions);
+  async update(identifier, payload) {
+    return await this.resend.patch(`/events/${encodeURIComponent(identifier)}`, payload);
   }
-  async remove(identifier, requestOptions = {}) {
-    return await this.resend.delete(`/events/${encodeURIComponent(identifier)}`, void 0, requestOptions);
-  }
-};
-function buildInboxPath(selector) {
-  const idOrEmail = selector?.inboxId ?? selector?.emailAddress;
-  return idOrEmail ? `/inboxes/${encodeURIComponent(idOrEmail)}` : void 0;
-}
-var missingInboxError = () => ({
-  data: null,
-  headers: null,
-  error: {
-    message: "Missing `inboxId` or `emailAddress` field.",
-    statusCode: null,
-    name: "missing_required_field"
-  }
-});
-var InboxAgent = class {
-  constructor(resend) {
-    this.resend = resend;
-  }
-  async get(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    return this.resend.get(`${inboxPath}/agent`, requestOptions);
-  }
-  async update(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { instructions, tone, actions } = options;
-    return this.resend.patch(`${inboxPath}/agent`, {
-      instructions,
-      tone,
-      actions
-    }, requestOptions);
-  }
-};
-function buildInboxCursorUrl(base, options = {}) {
-  const searchParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(options)) {
-    if (value === void 0) continue;
-    searchParams.set(key, Array.isArray(value) ? value.join(",") : String(value));
-  }
-  const queryString = searchParams.toString();
-  return queryString ? `${base}?${queryString}` : base;
-}
-var InboxDrafts = class {
-  constructor(resend) {
-    this.resend = resend;
-  }
-  async list(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { limit, after, before } = options;
-    const url = buildInboxCursorUrl(`${inboxPath}/drafts`, {
-      limit,
-      after,
-      before
-    });
-    return this.resend.get(url, requestOptions);
-  }
-  async create(payload, options = {}) {
-    const inboxPath = buildInboxPath(payload);
-    if (!inboxPath) return missingInboxError();
-    const { inboxId, emailAddress, threadId, replyToEmailId, attachments, ...content } = payload;
-    return this.resend.post(`${inboxPath}/drafts`, {
-      ...content,
-      attachments: parseAttachments(attachments),
-      thread_id: threadId,
-      reply_to_email_id: replyToEmailId
-    }, options);
-  }
-  async get(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    return this.resend.get(`${inboxPath}/drafts/${options.draftId}`, requestOptions);
-  }
-  async update(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { inboxId, emailAddress, draftId, attachments, ...content } = options;
-    return this.resend.patch(`${inboxPath}/drafts/${draftId}`, {
-      ...content,
-      attachments: attachments === null ? null : parseAttachments(attachments)
-    }, requestOptions);
-  }
-  async remove(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    return this.resend.delete(`${inboxPath}/drafts/${options.draftId}`, void 0, requestOptions);
-  }
-  async send(payload, options = {}) {
-    const inboxPath = buildInboxPath(payload);
-    if (!inboxPath) return missingInboxError();
-    const { draftId, headers } = payload;
-    return this.resend.post(`${inboxPath}/drafts/${draftId}/send`, headers ? { headers } : void 0, options);
-  }
-};
-var InboxLabels = class {
-  constructor(resend) {
-    this.resend = resend;
-  }
-  async list(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    return this.resend.get(`${inboxPath}/labels`, requestOptions);
-  }
-  async create(payload, options = {}) {
-    const inboxPath = buildInboxPath(payload);
-    if (!inboxPath) return missingInboxError();
-    const { name, color } = payload;
-    return this.resend.post(`${inboxPath}/labels`, {
-      name,
-      color
-    }, options);
-  }
-  async update(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { labelId, name, color } = options;
-    return this.resend.patch(`${inboxPath}/labels/${labelId}`, {
-      name,
-      color
-    }, requestOptions);
-  }
-  async remove(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    return this.resend.delete(`${inboxPath}/labels/${options.labelId}`, void 0, requestOptions);
-  }
-};
-var InboxThreadEmails = class {
-  constructor(resend) {
-    this.resend = resend;
-  }
-  async list(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { inboxId, emailAddress, threadId, ...pagination } = options;
-    const url = buildPaginationUrl(`${inboxPath}/threads/${threadId}/emails`, pagination);
-    return this.resend.get(url, requestOptions);
-  }
-  async get(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { threadId, emailId } = options;
-    return this.resend.get(`${inboxPath}/threads/${threadId}/emails/${emailId}`, requestOptions);
-  }
-  async reply(payload, options = {}) {
-    const inboxPath = buildInboxPath(payload);
-    if (!inboxPath) return missingInboxError();
-    const { threadId, emailId, cc, bcc, html, text, subject, replyAll, attachments, headers } = payload;
-    return this.resend.post(`${inboxPath}/threads/${threadId}/emails/${emailId}/reply`, {
-      cc,
-      bcc,
-      html,
-      text,
-      subject,
-      reply_all: replyAll,
-      attachments: parseAttachments(attachments),
-      headers
-    }, options);
-  }
-  async forward(payload, options = {}) {
-    const inboxPath = buildInboxPath(payload);
-    if (!inboxPath) return missingInboxError();
-    const { threadId, emailId, to, cc, bcc, html, text, subject, attachments, headers } = payload;
-    return this.resend.post(`${inboxPath}/threads/${threadId}/emails/${emailId}/forward`, {
-      to,
-      cc,
-      bcc,
-      html,
-      text,
-      subject,
-      attachments: parseAttachments(attachments),
-      headers
-    }, options);
-  }
-};
-var InboxThreadLabels = class {
-  constructor(resend) {
-    this.resend = resend;
-  }
-  async add(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { threadId, labels } = options;
-    return this.resend.post(`${inboxPath}/threads/${threadId}/labels`, { labels }, requestOptions);
-  }
-  async set(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { threadId, labels } = options;
-    return this.resend.put(`${inboxPath}/threads/${threadId}/labels`, { labels }, requestOptions);
-  }
-  async remove(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { threadId, labelId } = options;
-    return this.resend.delete(`${inboxPath}/threads/${threadId}/labels/${labelId}`, void 0, requestOptions);
-  }
-};
-var InboxThreads = class {
-  constructor(resend) {
-    this.resend = resend;
-    this.emails = new InboxThreadEmails(resend);
-    this.labels = new InboxThreadLabels(resend);
-  }
-  async list(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { folders, labels, read, limit, after, before } = options;
-    const url = buildInboxCursorUrl(`${inboxPath}/threads`, {
-      folders,
-      labels,
-      read,
-      limit,
-      after,
-      before
-    });
-    return this.resend.get(url, requestOptions);
-  }
-  async search(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { folders, labels, read, query, from, to, cc, bcc, hasAttachment, startDate, endDate, limit, after, before } = options;
-    const url = buildInboxCursorUrl(`${inboxPath}/threads/search`, {
-      folders,
-      labels,
-      read,
-      query,
-      from,
-      to,
-      cc,
-      bcc,
-      has_attachment: hasAttachment,
-      start_date: startDate,
-      end_date: endDate,
-      limit,
-      after,
-      before
-    });
-    return this.resend.get(url, requestOptions);
-  }
-  async get(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    return this.resend.get(`${inboxPath}/threads/${options.threadId}`, requestOptions);
-  }
-  async update(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    const { threadId, read, folder } = options;
-    return this.resend.patch(`${inboxPath}/threads/${threadId}`, {
-      read,
-      folder
-    }, requestOptions);
-  }
-  async remove(options, requestOptions = {}) {
-    const inboxPath = buildInboxPath(options);
-    if (!inboxPath) return missingInboxError();
-    return this.resend.delete(`${inboxPath}/threads/${options.threadId}`, void 0, requestOptions);
-  }
-};
-var Inboxes = class {
-  constructor(resend) {
-    this.resend = resend;
-    this.threads = new InboxThreads(resend);
-    this.labels = new InboxLabels(resend);
-    this.drafts = new InboxDrafts(resend);
-    this.agent = new InboxAgent(resend);
-  }
-  async create(payload, options = {}) {
-    return this.resend.post("/inboxes", {
-      email_address: payload.emailAddress,
-      name: payload.name,
-      forwarding: payload.forwarding,
-      from_name: payload.fromName
-    }, options);
-  }
-  async list(options = {}, requestOptions = {}) {
-    const url = buildPaginationUrl("/inboxes", options);
-    return this.resend.get(url, requestOptions);
-  }
-  async get(idOrEmail, requestOptions = {}) {
-    return this.resend.get(`/inboxes/${encodeURIComponent(idOrEmail)}`, requestOptions);
-  }
-  async update(idOrEmail, payload, requestOptions = {}) {
-    return this.resend.patch(`/inboxes/${encodeURIComponent(idOrEmail)}`, {
-      name: payload.name,
-      from_name: payload.fromName
-    }, requestOptions);
-  }
-  async remove(idOrEmail, requestOptions = {}) {
-    return this.resend.delete(`/inboxes/${encodeURIComponent(idOrEmail)}`, void 0, requestOptions);
+  async remove(identifier) {
+    return await this.resend.delete(`/events/${encodeURIComponent(identifier)}`);
   }
 };
 var Logs = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/logs", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async get(id, requestOptions = {}) {
-    return await this.resend.get(`/logs/${id}`, requestOptions);
+  async get(id) {
+    return await this.resend.get(`/logs/${id}`);
   }
 };
 var OAuthGrants = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/oauth/grants", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async revoke(id, requestOptions = {}) {
-    return await this.resend.delete(`/oauth/grants/${id}`, void 0, requestOptions);
+  async revoke(id) {
+    return await this.resend.delete(`/oauth/grants/${id}`);
   }
 };
 var Segments = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async create(payload, requestOptions = {}) {
-    return await this.resend.post("/segments", payload, requestOptions);
+  async create(payload, options = {}) {
+    return await this.resend.post("/segments", payload, options);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/segments", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async get(id, requestOptions = {}) {
-    return await this.resend.get(`/segments/${id}`, requestOptions);
+  async get(id) {
+    return await this.resend.get(`/segments/${id}`);
   }
-  async update(id, payload, requestOptions = {}) {
-    return await this.resend.patch(`/segments/${id}`, payload, requestOptions);
-  }
-  async remove(id, requestOptions = {}) {
-    return await this.resend.delete(`/segments/${id}`, void 0, requestOptions);
+  async remove(id) {
+    return await this.resend.delete(`/segments/${id}`);
   }
 };
 var Batch = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async add(options, requestOptions = {}) {
-    return this.resend.post("/suppressions/batch/add", options, requestOptions);
+  async add(options) {
+    return this.resend.post("/suppressions/batch/add", options);
   }
-  async remove(options, requestOptions = {}) {
-    return this.resend.post("/suppressions/batch/remove", options, requestOptions);
+  async remove(options) {
+    return this.resend.post("/suppressions/batch/remove", options);
   }
 };
 var missingIdentifierError = () => ({
@@ -11758,21 +11319,21 @@ var Suppressions = class {
     this.resend = resend;
     this.batch = new Batch(resend);
   }
-  async add(options, requestOptions = {}) {
-    return this.resend.post("/suppressions", options, requestOptions);
+  async add(options) {
+    return this.resend.post("/suppressions", options);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const queryString = buildSuppressionsQuery(options);
     const url = queryString ? `/suppressions?${queryString}` : "/suppressions";
-    return this.resend.get(url, requestOptions);
+    return this.resend.get(url);
   }
-  async get(idOrEmail, requestOptions = {}) {
+  async get(idOrEmail) {
     if (!idOrEmail) return missingIdentifierError();
-    return this.resend.get(`/suppressions/${encodeURIComponent(idOrEmail)}`, requestOptions);
+    return this.resend.get(`/suppressions/${encodeURIComponent(idOrEmail)}`);
   }
-  async remove(idOrEmail, requestOptions = {}) {
+  async remove(idOrEmail) {
     if (!idOrEmail) return missingIdentifierError();
-    return this.resend.delete(`/suppressions/${encodeURIComponent(idOrEmail)}`, void 0, requestOptions);
+    return this.resend.delete(`/suppressions/${encodeURIComponent(idOrEmail)}`);
   }
 };
 function buildSuppressionsQuery(options) {
@@ -11815,62 +11376,62 @@ var ChainableTemplateResult = class {
   then(onfulfilled, onrejected) {
     return this.promise.then(onfulfilled, onrejected);
   }
-  async publish(requestOptions = {}) {
-    const { data, error, headers } = await this.promise;
+  async publish() {
+    const { data, error } = await this.promise;
     if (error) return {
       data: null,
-      headers,
+      headers: null,
       error
     };
-    return this.publishFn(data.id, requestOptions);
+    return this.publishFn(data.id);
   }
 };
 var Templates = class {
   constructor(resend) {
     this.resend = resend;
   }
-  create(payload, requestOptions = {}) {
-    return new ChainableTemplateResult(this.performCreate(payload, requestOptions), this.publish.bind(this));
+  create(payload) {
+    return new ChainableTemplateResult(this.performCreate(payload), this.publish.bind(this));
   }
-  async performCreate(payload, requestOptions) {
+  async performCreate(payload) {
     const body = { ...payload };
     if (payload.react) body.html = await render(payload.react);
-    return this.resend.post("/templates", parseTemplateToApiOptions(body), requestOptions);
+    return this.resend.post("/templates", parseTemplateToApiOptions(body));
   }
-  async remove(identifier, requestOptions = {}) {
-    return await this.resend.delete(`/templates/${identifier}`, void 0, requestOptions);
+  async remove(identifier) {
+    return await this.resend.delete(`/templates/${identifier}`);
   }
-  async get(identifier, requestOptions = {}) {
-    return await this.resend.get(`/templates/${identifier}`, requestOptions);
+  async get(identifier) {
+    return await this.resend.get(`/templates/${identifier}`);
   }
-  async list(options = {}, requestOptions = {}) {
-    return this.resend.get(`/templates${getPaginationQueryProperties(options)}`, requestOptions);
+  async list(options = {}) {
+    return this.resend.get(`/templates${getPaginationQueryProperties(options)}`);
   }
-  duplicate(identifier, requestOptions = {}) {
-    return new ChainableTemplateResult(this.resend.post(`/templates/${identifier}/duplicate`, void 0, requestOptions), this.publish.bind(this));
+  duplicate(identifier) {
+    return new ChainableTemplateResult(this.resend.post(`/templates/${identifier}/duplicate`), this.publish.bind(this));
   }
-  async publish(identifier, requestOptions = {}) {
-    return await this.resend.post(`/templates/${identifier}/publish`, void 0, requestOptions);
+  async publish(identifier) {
+    return await this.resend.post(`/templates/${identifier}/publish`);
   }
-  async update(identifier, payload, requestOptions = {}) {
-    return await this.resend.patch(`/templates/${identifier}`, parseTemplateToApiOptions(payload), requestOptions);
+  async update(identifier, payload) {
+    return await this.resend.patch(`/templates/${identifier}`, parseTemplateToApiOptions(payload));
   }
 };
 var Topics = class {
   constructor(resend) {
     this.resend = resend;
   }
-  async create(payload, requestOptions = {}) {
+  async create(payload) {
     const { defaultSubscription, ...body } = payload;
     return await this.resend.post("/topics", {
       ...body,
       default_subscription: defaultSubscription
-    }, requestOptions);
+    });
   }
-  async list(requestOptions = {}) {
-    return await this.resend.get("/topics", requestOptions);
+  async list() {
+    return await this.resend.get("/topics");
   }
-  async get(id, requestOptions = {}) {
+  async get(id) {
     if (!id) return {
       data: null,
       headers: null,
@@ -11880,9 +11441,9 @@ var Topics = class {
         name: "missing_required_field"
       }
     };
-    return await this.resend.get(`/topics/${id}`, requestOptions);
+    return await this.resend.get(`/topics/${id}`);
   }
-  async update(payload, requestOptions = {}) {
+  async update(payload) {
     if (!payload.id) return {
       data: null,
       headers: null,
@@ -11892,9 +11453,9 @@ var Topics = class {
         name: "missing_required_field"
       }
     };
-    return await this.resend.patch(`/topics/${payload.id}`, payload, requestOptions);
+    return await this.resend.patch(`/topics/${payload.id}`, payload);
   }
-  async remove(id, requestOptions = {}) {
+  async remove(id) {
     if (!id) return {
       data: null,
       headers: null,
@@ -11904,69 +11465,28 @@ var Topics = class {
         name: "missing_required_field"
       }
     };
-    return await this.resend.delete(`/topics/${id}`, void 0, requestOptions);
-  }
-};
-var Usage = class {
-  constructor(resend) {
-    this.resend = resend;
-  }
-  async get(requestOptions = {}) {
-    return await this.resend.get("/usage", requestOptions);
-  }
-};
-var Attempts = class {
-  constructor(resend) {
-    this.resend = resend;
-  }
-  async list(options, requestOptions = {}) {
-    const { webhookId, eventId } = options;
-    const url = buildPaginationUrl(`/webhooks/${webhookId}/events/${eventId}/attempts`, options);
-    return await this.resend.get(url, requestOptions);
-  }
-};
-var Events = class {
-  constructor(resend) {
-    this.resend = resend;
-    this.attempts = new Attempts(resend);
-  }
-  async list(options, requestOptions = {}) {
-    const { webhookId } = options;
-    const url = buildPaginationUrl(`/webhooks/${webhookId}/events`, options);
-    return await this.resend.get(url, requestOptions);
-  }
-  async get(options, requestOptions = {}) {
-    const { webhookId, eventId } = options;
-    return await this.resend.get(`/webhooks/${webhookId}/events/${eventId}`, requestOptions);
-  }
-  async replay(options, requestOptions = {}) {
-    const { webhookId, eventId } = options;
-    return await this.resend.post(`/webhooks/${webhookId}/events/${eventId}/replay`, void 0, requestOptions);
+    return await this.resend.delete(`/topics/${id}`);
   }
 };
 var Webhooks = class {
   constructor(resend) {
     this.resend = resend;
-    this.events = new Events(resend);
   }
-  async create(payload, requestOptions = {}) {
-    return await this.resend.post("/webhooks", payload, requestOptions);
+  async create(payload, options = {}) {
+    return await this.resend.post("/webhooks", payload, options);
   }
-  async get(id, requestOptions = {}) {
-    return await this.resend.get(`/webhooks/${id}`, requestOptions);
+  async get(id) {
+    return await this.resend.get(`/webhooks/${id}`);
   }
-  async list(options = {}, requestOptions = {}) {
+  async list(options = {}) {
     const url = buildPaginationUrl("/webhooks", options);
-    return await this.resend.get(url, requestOptions);
+    return await this.resend.get(url);
   }
-  async update(id, payload, requestOptions = {}) {
-    return await this.resend.patch(`/webhooks/${id}`, payload, requestOptions);
+  async update(id, payload) {
+    return await this.resend.patch(`/webhooks/${id}`, payload);
   }
-  async remove(id, requestOptions = {}) {
-    return await this.resend.delete(`/webhooks/${id}`, void 0, requestOptions);
-  }
-  async rotateSigningSecret(id, requestOptions = {}) {
-    return await this.resend.post(`/webhooks/${id}/signing-secret/rotate`, void 0, requestOptions);
+  async remove(id) {
+    return await this.resend.delete(`/webhooks/${id}`);
   }
   verify(payload) {
     return new import_standardwebhooks.Webhook(payload.webhookSecret).verify(payload.payload, {
@@ -11984,9 +11504,6 @@ function getDefaultBaseUrl() {
 function getDefaultUserAgent() {
   return typeof process !== "undefined" && process.env ? process.env.RESEND_USER_AGENT || defaultUserAgent : defaultUserAgent;
 }
-function isDebugEnabled() {
-  return typeof process !== "undefined" && process.env ? process.env.RESEND_DEBUG === "true" : false;
-}
 var Resend = class {
   constructor(key, options) {
     this.key = key;
@@ -12000,14 +11517,12 @@ var Resend = class {
     this.contacts = new Contacts(this);
     this.domains = new Domains(this);
     this.emails = new Emails(this);
-    this.events = new Events$1(this);
-    this.inboxes = new Inboxes(this);
+    this.events = new Events(this);
     this.logs = new Logs(this);
     this.oauthGrants = new OAuthGrants(this);
     this.suppressions = new Suppressions(this);
     this.templates = new Templates(this);
     this.topics = new Topics(this);
-    this.usage = new Usage(this);
     this.webhooks = new Webhooks(this);
     if (!key) {
       if (typeof process !== "undefined" && process.env) this.key = process.env.RESEND_API_KEY;
@@ -12015,7 +11530,6 @@ var Resend = class {
     }
     this.baseUrl = options?.baseUrl ?? getDefaultBaseUrl();
     this.userAgent = options?.userAgent ?? getDefaultUserAgent();
-    this.debug = isDebugEnabled();
     this.headers = new Headers({
       Authorization: `Bearer ${this.key}`,
       "User-Agent": this.userAgent,
@@ -12023,24 +11537,13 @@ var Resend = class {
     });
   }
   logError(error, path, status) {
-    if (!this.debug) return;
-    console.error("[Resend API Error]:", {
+    if (typeof process !== "undefined" && process.env && process.env.NODE_ENV !== "production") console.error("[Resend API Error]:", {
       ...status !== void 0 && { status },
       error,
       path
     });
   }
   async fetchRequest(path, options = {}) {
-    if (hasDotSegment(path)) return {
-      data: null,
-      error: {
-        message: "Path parameters cannot be `.` or `..`.",
-        statusCode: null,
-        name: "invalid_parameter"
-      },
-      headers: null
-    };
-    const { signal } = options;
     try {
       const response = await fetch(`${this.baseUrl}${path}`, options);
       if (!response.ok) try {
@@ -12053,7 +11556,6 @@ var Resend = class {
           headers: Object.fromEntries(response.headers.entries())
         };
       } catch (err) {
-        if (signal?.aborted && err === signal.reason) throw err;
         if (err instanceof SyntaxError) {
           const error2 = {
             name: "application_error",
