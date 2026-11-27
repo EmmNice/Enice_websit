@@ -65,15 +65,32 @@ const FOLLOW_LINKS = [
 ];
 
 /**
- * Follow buttons for PulsePay's own TikTok and Instagram accounts. Shown under the sign-up form
- * and again on the confirmation screen, which is when someone is most likely to follow.
+ * Follow buttons for PulsePay's own TikTok and Instagram accounts. Shown inside the sign-up form,
+ * above the consent box and Join button where people will see it, and marked optional: they are
+ * plain links that open in a new tab, so they never block or change the sign-up. Shown again on
+ * the confirmation screen.
  */
-function FollowPulsePay({ heading, className }: { heading: string; className?: string }) {
+function FollowPulsePay({
+  heading,
+  optional = false,
+  className,
+}: {
+  heading: string;
+  optional?: boolean;
+  className?: string;
+}) {
   return (
     <div className={className}>
-      <h2 className="text-lg font-semibold text-white">{heading}</h2>
+      <h2 className="text-lg font-semibold text-white">
+        {heading}
+        {optional && (
+          <span className="ml-2 text-[13px] font-normal text-bone-soft">(optional)</span>
+        )}
+      </h2>
       <p className="mt-1 text-[13px] text-bone-soft">
-        Launch news, sneak peeks and early-access updates.
+        {optional
+          ? "Not required to join. Follow us for launch news, sneak peeks and early-access updates."
+          : "Launch news, sneak peeks and early-access updates."}
       </p>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {FOLLOW_LINKS.map(({ label, handle, href, Icon }) => (
@@ -333,6 +350,8 @@ function WaitlistPage() {
               {errors.interests && <p className={ERROR_CLASS}>{errors.interests}</p>}
             </fieldset>
 
+            <FollowPulsePay heading="Follow us" optional className="mt-8" />
+
             <div className="mt-8">
               <label className="flex cursor-pointer items-start gap-3">
                 <input
@@ -395,11 +414,6 @@ function WaitlistPage() {
               No payment required. We will notify you when access opens.
             </p>
           </form>
-
-          <FollowPulsePay
-            heading="Follow PulsePay"
-            className="mt-8 rounded-xl border border-border bg-surface-1/60 p-5 sm:p-7"
-          />
         </Container>
       </section>
     </SiteShell>
