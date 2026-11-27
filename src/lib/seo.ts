@@ -35,6 +35,16 @@ export const SOCIAL_PROFILES = [
 ] as const;
 
 /**
+ * PulsePay's own social handles, separate from the ENICE Group profiles above.
+ * Shown on the PulsePay waitlist so people can follow the product while they wait.
+ * The Instagram link is the bare profile URL with the share-tracking query removed.
+ */
+export const PULSEPAY_SOCIALS = {
+  tiktok: "https://www.tiktok.com/@pulsepay0",
+  instagram: "https://www.instagram.com/pulsepay.ng",
+} as const;
+
+/**
  * Organization entity for the homepage.
  *
  * Kept deliberately complete — name, logo, contact, location, founding date and `sameAs` — as

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Check, Loader2 } from "lucide-react";
 import { SiteShell } from "@/components/site/SiteShell";
 import { Container } from "@/components/site/primitives";
-import { pageHead } from "@/lib/seo";
+import { PULSEPAY_SOCIALS, pageHead } from "@/lib/seo";
 import {
   EMPTY_WAITLIST,
   submitWaitlist,
@@ -23,6 +23,79 @@ const LABEL_CLASS = "block text-[12px] font-semibold text-bone-strong";
 const INPUT_CLASS =
   "mt-2 block w-full rounded-md border border-border bg-surface-1 px-3.5 py-3 text-[15px] text-foreground transition-colors placeholder:text-bone-faint hover:border-hairline-strong focus:border-[var(--pulsepay-accent)] focus:outline-none disabled:opacity-60 aria-[invalid=true]:border-destructive";
 const ERROR_CLASS = "mt-1.5 text-[12px] text-destructive";
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className={className} fill="currentColor">
+      <path d="M16.6 3c.3 2.4 1.7 3.9 4 4.1v3.1c-1.5.1-2.9-.4-4-1.1v6.3c0 3.3-2.3 5.6-5.4 5.6-3 0-5.4-2.4-5.4-5.4 0-3.3 2.7-5.7 6-5.3v3.2c-1.5-.4-2.9.6-2.9 2.1 0 1.2.9 2.2 2.2 2.2 1.4 0 2.2-1 2.2-2.4V3h3.3Z" />
+    </svg>
+  );
+}
+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden
+      className={className}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+    >
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+const FOLLOW_LINKS = [
+  {
+    label: "Follow on TikTok",
+    handle: "@pulsepay0",
+    href: PULSEPAY_SOCIALS.tiktok,
+    Icon: TikTokIcon,
+  },
+  {
+    label: "Follow on Instagram",
+    handle: "@pulsepay.ng",
+    href: PULSEPAY_SOCIALS.instagram,
+    Icon: InstagramIcon,
+  },
+];
+
+/**
+ * Follow buttons for PulsePay's own TikTok and Instagram accounts. Shown under the sign-up form
+ * and again on the confirmation screen, which is when someone is most likely to follow.
+ */
+function FollowPulsePay({ heading, className }: { heading: string; className?: string }) {
+  return (
+    <div className={className}>
+      <h2 className="text-lg font-semibold text-white">{heading}</h2>
+      <p className="mt-1 text-[13px] text-bone-soft">
+        Launch news, sneak peeks and early-access updates.
+      </p>
+      <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+        {FOLLOW_LINKS.map(({ label, handle, href, Icon }) => (
+          <li key={label}>
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-md border border-border bg-surface-1 px-4 py-3 transition-colors hover:border-[var(--pulsepay-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pulsepay-accent)]"
+            >
+              <Icon className="h-5 w-5 shrink-0 text-[var(--pulsepay-accent)]" />
+              <span className="min-w-0">
+                <span className="block text-[14px] font-semibold text-white">{label}</span>
+                <span className="block truncate text-[12.5px] text-bone-soft">{handle}</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
 
 /**
  * The PulsePay early-access page.
@@ -113,6 +186,10 @@ function WaitlistPage() {
                 ? "We already have these details, so there is nothing more to do. We will be in touch when PulsePay opens."
                 : "Thank you. We will write to you when PulsePay opens, with early access details. There is nothing to pay and nothing more you need to do."}
             </p>
+            <FollowPulsePay
+              heading="Follow PulsePay while you wait"
+              className="mt-10 border-t border-border pt-8 text-left"
+            />
           </Container>
         </section>
       </SiteShell>
@@ -318,6 +395,11 @@ function WaitlistPage() {
               No payment required. We will notify you when access opens.
             </p>
           </form>
+
+          <FollowPulsePay
+            heading="Follow PulsePay"
+            className="mt-8 rounded-xl border border-border bg-surface-1/60 p-5 sm:p-7"
+          />
         </Container>
       </section>
     </SiteShell>
